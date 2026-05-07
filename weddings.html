@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weddings & Corporate Events | Braj Nidhi</title>
-    <meta name="description" content="Host divine weddings and executive corporate offsites at Braj Nidhi. Discover our luxury venues, AV halls, and customizable event packages.">
+    <title>Divine Weddings | Braj Nidhi</title>
+    <meta name="description" content="Host divine weddings at Braj Nidhi in Vrindavan. Discover our luxury venues and customizable wedding packages.">
     <link rel="stylesheet" href="style.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -52,72 +52,42 @@
             border: 2px solid #1a1a1a;
         }
 
-        .events-split-hero {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .hero-single-card {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 4px;
             margin-top: 20px;
         }
 
-        .hero-split-card {
-            position: relative;
-            height: 450px;
-            overflow: hidden;
-            border-radius: 4px;
-        }
-
-        .hero-split-card img {
+        .hero-single-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s ease;
         }
 
-        .hero-split-card:hover img {
-            transform: scale(1.05);
-        }
-
-        .hero-split-content {
+        .hero-single-content {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 40px 30px;
+            padding: 60px 40px;
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
             color: #fff;
         }
 
-        .hero-split-content h3 {
+        .hero-single-content h3 {
             font-family: 'Arial Black', sans-serif;
-            font-size: 2rem;
+            font-size: 3rem;
             text-transform: uppercase;
             margin-bottom: 10px;
             line-height: 1.1;
         }
 
-        .hero-split-content p {
-            font-size: 1rem;
+        .hero-single-content p {
+            font-size: 1.2rem;
             opacity: 0.9;
-            margin-bottom: 20px;
-        }
-
-        .hero-split-content .btn-white {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 25px;
-            background: #fff;
-            color: #1a1a1a;
-            text-decoration: none;
-            font-weight: 800;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            border-radius: 30px;
-            transition: all 0.3s;
-        }
-
-        .hero-split-content .btn-white:hover {
-            background: #fbc434;
+            max-width: 600px;
         }
 
         /* Module Sections */
@@ -338,7 +308,6 @@
         }
 
         @media (max-width: 900px) {
-            .events-split-hero,
             .events-bento,
             .packages-grid,
             .inquiry-form {
@@ -354,7 +323,7 @@
     </style>
 </head>
 <body>
-    <!-- SVG Definitions (Copied from index.html) -->
+    <!-- SVG Definitions -->
     <svg style="display: none;">
         <defs>
             <g id="peacock-feather">
@@ -385,8 +354,8 @@
         <nav>
             <ul>
                 <li><a href="guesthouse.html">Guesthouse</a></li>
-                <li><a href="events.html#weddings">Weddings</a></li>
-                <li><a href="events.html#corporate">Corporate</a></li>
+                <li><a href="weddings.html">Weddings</a></li>
+                <li><a href="corporate.html">Corporate</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
             </ul>
         </nav>
@@ -399,25 +368,13 @@
         <!-- Hero Section -->
         <section class="events-hero">
             <div class="hero-bento-container">
-                <div class="hero-title-large">CELEBRATE & CONVENE</div>
+                <div class="hero-title-large">DIVINE CELEBRATIONS</div>
                 
-                <div class="events-split-hero">
-                    <div class="hero-split-card">
-                        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop" alt="Divine Weddings">
-                        <div class="hero-split-content">
-                            <h3>Divine Weddings</h3>
-                            <p>Begin your sacred journey in the spiritual heart of Vrindavan with our bespoke wedding venues and services.</p>
-                            <a href="#weddings" class="btn-white">Explore Weddings <i class="fas fa-arrow-down"></i></a>
-                        </div>
-                    </div>
-                    
-                    <div class="hero-split-card">
-                        <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1000&auto=format&fit=crop" alt="Corporate Offsites">
-                        <div class="hero-split-content">
-                            <h3>Executive Offsites</h3>
-                            <p>Inspire your team with state-of-the-art AV halls and serene surroundings designed for focused retreats.</p>
-                            <a href="#corporate" class="btn-white">Explore Corporate <i class="fas fa-arrow-down"></i></a>
-                        </div>
+                <div class="hero-single-card">
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1200&auto=format&fit=crop" alt="Divine Weddings">
+                    <div class="hero-single-content">
+                        <h3>Your Sacred Journey Begins</h3>
+                        <p>Experience the spiritual heart of Vrindavan with our bespoke wedding venues and personalized services designed for your special day.</p>
                     </div>
                 </div>
             </div>
@@ -426,7 +383,7 @@
         <!-- Weddings & Events Module -->
         <section id="weddings" class="module-section">
             <div class="module-header">
-                <h2>Weddings & Events</h2>
+                <h2>Wedding Venues</h2>
                 <p>From intimate spiritual ceremonies to grand celebrations, our venues offer the perfect blend of heritage charm and modern luxury.</p>
             </div>
 
@@ -476,64 +433,11 @@
             </div>
         </section>
 
-        <!-- Corporate Offsite Module -->
-        <section id="corporate" class="module-section" style="background: #fff;">
-            <div class="module-header">
-                <h2>Corporate Offsites</h2>
-                <p>Elevate your corporate gatherings with our premium infrastructure, high-speed connectivity, and dedicated AV support.</p>
-            </div>
-
-            <div class="events-bento">
-                <div class="bento-item">
-                    <i class="fas fa-project-diagram"></i>
-                    <h4>Executive AV Hall</h4>
-                    <p>Theater-style seating for up to 150 pax. Equipped with 4K projectors, surround sound, and high-speed enterprise Wi-Fi.</p>
-                </div>
-                <div class="bento-item">
-                    <i class="fas fa-users"></i>
-                    <h4>Boardrooms</h4>
-                    <p>Intimate meeting spaces for up to 20 pax with interactive smart boards and video conferencing facilities.</p>
-                </div>
-                <div class="bento-item">
-                    <i class="fas fa-mug-hot"></i>
-                    <h4>Networking Lounges</h4>
-                    <p>Breakout areas with premium coffee stations and serene garden views to foster organic networking and brainstorming.</p>
-                </div>
-            </div>
-
-            <div class="packages-grid">
-                <div class="package-card">
-                    <h3>Day Conference Package</h3>
-                    <ul class="package-features">
-                        <li><i class="fas fa-check"></i> Executive AV Hall Access (8 Hours)</li>
-                        <li><i class="fas fa-check"></i> 4K Projector & PA System</li>
-                        <li><i class="fas fa-check"></i> 2 Tea/Coffee Breaks with Snacks</li>
-                        <li><i class="fas fa-check"></i> Executive Buffet Lunch</li>
-                        <li><i class="fas fa-check"></i> Dedicated IT Support Staff</li>
-                    </ul>
-                    <a href="#inquiry" class="btn-outline" style="border: 2px solid #1a1a1a; padding: 15px 30px; text-decoration: none; color: #1a1a1a; font-weight: 800; text-transform: uppercase; display: inline-block;">Request Quote</a>
-                </div>
-                
-                <div class="package-card">
-                    <div class="package-badge">Premium</div>
-                    <h3>Leadership Retreat</h3>
-                    <ul class="package-features">
-                        <li><i class="fas fa-check"></i> 2 Days Boardroom & AV Hall Access</li>
-                        <li><i class="fas fa-check"></i> 10 Executive Suites Included</li>
-                        <li><i class="fas fa-check"></i> All Meals + Gala Dinner Setup</li>
-                        <li><i class="fas fa-check"></i> Guided Temple Tour Experience</li>
-                        <li><i class="fas fa-check"></i> Team Building Activities Space</li>
-                    </ul>
-                    <a href="#inquiry" class="btn-outline" style="border: 2px solid #1a1a1a; padding: 15px 30px; text-decoration: none; color: #1a1a1a; font-weight: 800; text-transform: uppercase; display: inline-block;">Request Quote</a>
-                </div>
-            </div>
-        </section>
-
         <!-- Lead Capture Form -->
         <section id="inquiry" class="inquiry-form-section">
             <div class="form-container">
-                <h2>Plan Your Event</h2>
-                <p>Fill out the form below or <a href="#" style="color: #fbc434; text-decoration: underline;">Download our Event Brochure</a> for detailed floor plans and menus.</p>
+                <h2>Plan Your Wedding</h2>
+                <p>Fill out the form below or <a href="#" style="color: #fbc434; text-decoration: underline;">Download our Wedding Brochure</a> for detailed floor plans and menus.</p>
                 
                 <form class="inquiry-form">
                     <div class="form-group">
@@ -555,11 +459,9 @@
                     <div class="form-group full-width">
                         <label>Event Type</label>
                         <select required>
-                            <option value="">Select Event Type</option>
-                            <option value="wedding">Wedding / Pre-Wedding</option>
-                            <option value="corporate">Corporate Offsite / Conference</option>
-                            <option value="social">Social Gathering / Party</option>
-                            <option value="other">Other</option>
+                            <option value="wedding" selected>Wedding</option>
+                            <option value="pre-wedding">Pre-Wedding / Engagement</option>
+                            <option value="anniversary">Anniversary</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -572,7 +474,7 @@
                     </div>
                     <div class="form-group full-width">
                         <label>Additional Requirements</label>
-                        <textarea rows="4" placeholder="Tell us more about your event needs (e.g. AV setup, specific catering needs)"></textarea>
+                        <textarea rows="4" placeholder="Tell us more about your wedding needs (e.g. decor, specific catering needs)"></textarea>
                     </div>
                     <button type="submit">Submit Inquiry <i class="fas fa-paper-plane" style="margin-left: 10px;"></i></button>
                 </form>
@@ -608,8 +510,8 @@
             <div class="footer-col">
                 <h3>Stay & Book</h3>
                 <a href="booking.html">Book Your Stay</a>
-                <a href="events.html#weddings">Wedding Packages</a>
-                <a href="events.html#corporate">Corporate Stays</a>
+                <a href="weddings.html">Wedding Packages</a>
+                <a href="corporate.html">Corporate Stays</a>
                 <a href="#">Refund Policy</a>
             </div>
             <div class="footer-col">
