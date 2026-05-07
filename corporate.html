@@ -220,6 +220,102 @@
             color: #e95d35;
         }
 
+        /* Split Section */
+        .split-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin: 80px auto;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+
+        .split-content h3 {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .split-content p {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .split-image {
+            height: 500px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .split-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reverse {
+            direction: rtl;
+        }
+        
+        .reverse .split-content {
+            direction: ltr;
+        }
+
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .testimonial-card {
+            background: #fff;
+            padding: 40px;
+            border: 1px solid #eee;
+            position: relative;
+        }
+
+        .testimonial-card i.fa-quote-left {
+            font-size: 2rem;
+            color: #fbc434;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .author-info h5 {
+            font-family: 'Arial Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .author-info span {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
         /* Forms */
         .inquiry-form-section {
             background: #1a1a1a;
@@ -310,7 +406,9 @@
         @media (max-width: 900px) {
             .events-bento,
             .packages-grid,
-            .inquiry-form {
+            .inquiry-form,
+            .split-section,
+            .testimonials-grid {
                 grid-template-columns: 1fr;
             }
             .form-group.full-width {
@@ -429,6 +527,99 @@
                         <li><i class="fas fa-check"></i> Team Building Activities Space</li>
                     </ul>
                     <a href="#inquiry" class="btn-outline" style="border: 2px solid #1a1a1a; padding: 15px 30px; text-decoration: none; color: #1a1a1a; font-weight: 800; text-transform: uppercase; display: inline-block;">Request Quote</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Vrindavan Split Section -->
+        <section class="split-section">
+            <div class="split-content">
+                <h3>The Power of Spiritual Clarity</h3>
+                <p>Escape the noise of the city and bring your leadership team to the serene, spiritual atmosphere of Vrindavan. The calm surroundings foster deep focus, innovative thinking, and stress-free strategic planning.</p>
+                <p>Our dedicated corporate spaces are designed to blend state-of-the-art technology with a peaceful environment, ensuring your offsite is both highly productive and deeply rejuvenating.</p>
+                <ul class="package-features" style="margin-top: 20px;">
+                    <li><i class="fas fa-check"></i> Zero Distractions & Noise-Free Environment</li>
+                    <li><i class="fas fa-check"></i> Inspiring Heritage Architecture</li>
+                    <li><i class="fas fa-check"></i> Focus-Enhancing Atmosphere</li>
+                </ul>
+            </div>
+            <div class="split-image">
+                <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop" alt="Corporate Strategy Meeting">
+            </div>
+        </section>
+
+        <!-- Executive Dining Split Section (Reverse) -->
+        <section class="split-section reverse">
+            <div class="split-content">
+                <h3>Executive Dining Experiences</h3>
+                <p>Nourish your team with premium Sattvic cuisine. Our culinary experts design customized menus that maintain high energy levels throughout your intense strategy sessions.</p>
+                <p>From working lunches in the boardroom to elaborate gala dinners in the courtyard, we ensure a seamless dining experience.</p>
+                <ul class="package-features" style="margin-top: 20px;">
+                    <li><i class="fas fa-check"></i> Energizing Coffee & Tea Breaks</li>
+                    <li><i class="fas fa-check"></i> Premium Buffet Setups</li>
+                    <li><i class="fas fa-check"></i> Custom Gala Dinner Themes</li>
+                </ul>
+            </div>
+            <div class="split-image">
+                <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1000&auto=format&fit=crop" alt="Executive Dining">
+            </div>
+        </section>
+
+        <!-- Team Building & Activities -->
+        <section class="module-section" style="padding-top: 20px;">
+            <div class="module-header">
+                <h2>Beyond the Boardroom</h2>
+                <p>Enhance team cohesion with our curated spiritual and wellness activities.</p>
+            </div>
+            <div class="events-bento">
+                <div class="bento-item">
+                    <i class="fas fa-walking"></i>
+                    <h4>Heritage Walks</h4>
+                    <p>Guided morning tours to the most historic and spiritually significant temples in Vrindavan.</p>
+                </div>
+                <div class="bento-item">
+                    <i class="fas fa-spa"></i>
+                    <h4>Yoga & Meditation</h4>
+                    <p>Start your day with guided yoga sessions in our tranquil gardens to improve focus and reduce stress.</p>
+                </div>
+                <div class="bento-item">
+                    <i class="fas fa-hands-helping"></i>
+                    <h4>Seva Activities</h4>
+                    <p>Organize corporate social responsibility (CSR) activities like food distribution (Anna Daan) for team bonding.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="module-section" style="background: #f5f5f5; max-width: 100%; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+                <div class="module-header">
+                    <h2>Trusted by Leaders</h2>
+                    <p>See what companies are saying about their offsite experiences at Braj Nidhi.</p>
+                </div>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"Hosting our annual leadership retreat at Braj Nidhi was the best decision. The AV hall was perfectly equipped, and the serene environment led to our most productive strategy session yet."</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=150&auto=format&fit=crop" class="author-img" alt="CEO">
+                            <div class="author-info">
+                                <h5>Rajesh K.</h5>
+                                <span>CEO, TechVision India</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"The hospitality team went above and beyond for our offsite. The working lunches were fantastic, and the morning meditation sessions completely recharged the team. Highly recommended!"</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" class="author-img" alt="HR Director">
+                            <div class="author-info">
+                                <h5>Sneha Sharma</h5>
+                                <span>HR Director, GlobalCorp</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

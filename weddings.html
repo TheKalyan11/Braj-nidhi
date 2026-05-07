@@ -220,6 +220,142 @@
             color: #e95d35;
         }
 
+        /* Split Section */
+        .split-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin: 80px auto;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+
+        .split-content h3 {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .split-content p {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .split-image {
+            height: 500px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .split-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reverse {
+            direction: rtl;
+        }
+        
+        .reverse .split-content {
+            direction: ltr;
+        }
+
+        /* Gallery Masonry */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-auto-rows: 250px;
+            grid-auto-flow: dense;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .gallery-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .gallery-item.tall {
+            grid-row: span 2;
+        }
+
+        .gallery-item.wide {
+            grid-column: span 2;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .testimonial-card {
+            background: #fff;
+            padding: 40px;
+            border: 1px solid #eee;
+            position: relative;
+        }
+
+        .testimonial-card i.fa-quote-left {
+            font-size: 2rem;
+            color: #fbc434;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .author-info h5 {
+            font-family: 'Arial Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .author-info span {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
         /* Forms */
         .inquiry-form-section {
             background: #1a1a1a;
@@ -310,8 +446,13 @@
         @media (max-width: 900px) {
             .events-bento,
             .packages-grid,
-            .inquiry-form {
+            .inquiry-form,
+            .split-section,
+            .testimonials-grid {
                 grid-template-columns: 1fr;
+            }
+            .gallery-item.large, .gallery-item.wide {
+                grid-column: span 1;
             }
             .form-group.full-width {
                 grid-column: span 1;
@@ -429,6 +570,95 @@
                         <li><i class="fas fa-check"></i> Dedicated Event Manager</li>
                     </ul>
                     <a href="#inquiry" class="btn-outline" style="border: 2px solid #1a1a1a; padding: 15px 30px; text-decoration: none; color: #1a1a1a; font-weight: 800; text-transform: uppercase; display: inline-block;">Request Quote</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Culinary Excellence Split Section -->
+        <section class="split-section">
+            <div class="split-content">
+                <h3>Sattvic Culinary Excellence</h3>
+                <p>Delight your guests with our exquisite, pure vegetarian catering. From traditional regional delicacies to global cuisines, our master chefs craft menus that are both divinely delicious and culturally respectful.</p>
+                <p>Experience interactive live counters, artisanal sweets, and customized wedding cakes, all prepared in our state-of-the-art hygienic kitchens without onion or garlic.</p>
+                <ul class="package-features" style="margin-top: 20px;">
+                    <li><i class="fas fa-check"></i> 100% Pure Vegetarian (No Onion/Garlic option)</li>
+                    <li><i class="fas fa-check"></i> Customized Menus & Live Counters</li>
+                    <li><i class="fas fa-check"></i> Specialized Artisanal Sweets</li>
+                </ul>
+            </div>
+            <div class="split-image">
+                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000&auto=format&fit=crop" alt="Premium Catering">
+            </div>
+        </section>
+
+        <!-- Guest Accommodation Split Section (Reverse) -->
+        <section class="split-section reverse">
+            <div class="split-content">
+                <h3>Luxury Guest Accommodation</h3>
+                <p>Ensure your family and friends experience the utmost comfort during your multi-day celebrations. Braj Nidhi offers premium rooms and expansive suites designed with spiritual luxury in mind.</p>
+                <p>Our dedicated hospitality team ensures seamless check-ins, personalized welcome hampers, and 24/7 room service for your esteemed guests.</p>
+                <a href="guesthouse.html" class="btn-outline" style="border: 2px solid #1a1a1a; padding: 12px 25px; text-decoration: none; color: #1a1a1a; font-weight: 800; text-transform: uppercase; display: inline-block; margin-top: 15px;">View Rooms & Suites</a>
+            </div>
+            <div class="split-image">
+                <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1000&auto=format&fit=crop" alt="Luxury Suites">
+            </div>
+        </section>
+
+        <!-- Wedding Gallery -->
+        <section class="module-section" style="padding-top: 20px;">
+            <div class="module-header">
+                <h2>Moments of Magic</h2>
+                <p>A glimpse into the beautiful memories crafted at Braj Nidhi.</p>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item large">
+                    <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000&auto=format&fit=crop" alt="Wedding Couple">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1000&auto=format&fit=crop" alt="Wedding Decor">
+                </div>
+                <div class="gallery-item tall">
+                    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop" alt="Wedding Ceremony">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop" alt="Wedding Mandap">
+                </div>
+                <div class="gallery-item wide">
+                    <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1000&auto=format&fit=crop" alt="Wedding Reception">
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="module-section" style="background: #f5f5f5; max-width: 100%; padding: 80px 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+                <div class="module-header">
+                    <h2>Happy Couples</h2>
+                    <p>Hear from those who began their forever journey with us.</p>
+                </div>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"Our wedding at Braj Nidhi was nothing short of a fairytale. The spiritual aura of Vrindavan combined with the impeccable luxury and service made our special day truly divine. The catering was absolutely phenomenal!"</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" class="author-img" alt="Rahul">
+                            <div class="author-info">
+                                <h5>Rahul & Anjali</h5>
+                                <span>Married Dec 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"We wanted a destination wedding that respected our traditions while offering premium comfort to our guests. Braj Nidhi delivered exactly that. The Grand Courtyard mandap setup under the stars was breathtaking."</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" class="author-img" alt="Priya">
+                            <div class="author-info">
+                                <h5>Vikram & Priya</h5>
+                                <span>Married Oct 2025</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
