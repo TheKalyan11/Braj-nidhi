@@ -73,10 +73,11 @@ header.scrolled .btn-book:hover {
     font-weight: 700;
     letter-spacing: 1px;
     cursor: pointer;
+    color: #000000;
 }
 
 .logo span {
-    color: var(--accent);
+    color: #000000;
 }
 
 nav ul {
