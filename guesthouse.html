@@ -12,30 +12,199 @@
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
     <style>
         .guesthouse-hero {
-            height: 70vh;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('guestroom-1.jpg');
-            background-size: cover;
-            background-position: center;
+            background-color: #231f1c;
+            padding: 120px 0 60px 0;
             display: flex;
-            align-items: center;
             justify-content: center;
-            text-align: center;
-            color: #fff;
-            padding-top: 80px;
-            position: relative;
         }
 
-        .guesthouse-hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            font-weight: 300;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        .hero-bento-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-title-large {
+            font-size: 6.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1;
+            margin-bottom: -45px;
+            position: relative;
+            z-index: 2;
+            font-family: 'Arial Black', Impact, sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .hero-main-img-wrap {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            z-index: 1;
+        }
+
+        .hero-main-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-orange-banner {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background: #e95d35;
+            color: #fff;
+            padding: 15px 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .hero-bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .bento-box {
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .bento-green {
+            background: #9fe173;
+            color: #1a1a1a;
+            position: relative;
+            overflow: hidden;
         }
         
-        .guesthouse-hero p {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto;
+        .bento-green h3 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            line-height: 1.2;
+            text-transform: uppercase;
+            margin: 0;
+            font-family: 'Arial Black', sans-serif;
+        }
+        
+        .bento-green svg {
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            opacity: 0.5;
+        }
+
+        .bento-pink {
+            background: #edd2cc;
+            color: #1a1a1a;
+        }
+
+        .bento-beige {
+            background: #e8dac4;
+            color: #1a1a1a;
+        }
+
+        .bento-icon {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .bento-box h4 {
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .bento-box p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .bento-yellow {
+            background: #fbc434;
+            color: #1a1a1a;
+            position: relative;
+            z-index: 3;
+            margin-top: -120px;
+            padding-top: 80px;
+        }
+
+        .bento-yellow h3 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-family: 'Arial Black', sans-serif;
+            line-height: 1.1;
+        }
+
+        .bento-yellow p {
+            margin-bottom: 30px;
+        }
+
+        .bento-btn {
+            display: inline-block;
+            border: 2px solid #1a1a1a;
+            color: #1a1a1a;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 12px 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+            width: fit-content;
+        }
+        
+        .bento-btn:hover {
+            background: #1a1a1a;
+            color: #fbc434;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .bento-yellow {
+                margin-top: 0;
+                grid-column: span 2;
+            }
+            .hero-title-large {
+                font-size: 8vw;
+                margin-bottom: -4vw;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero-bento-grid {
+                grid-template-columns: 1fr;
+            }
+            .bento-yellow {
+                grid-column: span 1;
+            }
+            .hero-title-large {
+                font-size: 12vw;
+                margin-bottom: -6vw;
+            }
+            .hero-main-img-wrap {
+                min-height: 300px;
+            }
         }
 
         .amenities-grid {
@@ -253,12 +422,42 @@
 
     <main>
         <section class="guesthouse-hero">
-            <div class="hero-content">
-                <svg class="animated-flute" style="width: 80px; height: 80px; margin-bottom: 20px;">
-                    <use href="#krishna-flute-feather"></use>
-                </svg>
-                <h1>Luxury Suites & Accommodations</h1>
-                <p>A divine sanctuary blending heritage architecture with uncompromising modern comfort in the heart of Vrindavan.</p>
+            <div class="hero-bento-container">
+                <div class="hero-title-large">STAY WITH COMFORT</div>
+                
+                <div class="hero-main-img-wrap">
+                    <img src="guestroom-1.jpg" alt="Resort View">
+                    <div class="hero-orange-banner">
+                        FIND ROOMS FOR A STAY <i class="fas fa-binoculars"></i>
+                    </div>
+                </div>
+
+                <div class="hero-bento-grid">
+                    <div class="bento-box bento-green">
+                        <h3>DESTINATION.<br>LUXURY.<br>RESPITE.</h3>
+                        <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+                            <path d="M0,15 Q20,0 50,15 T100,15 M0,20 Q20,5 50,20 T100,20 M0,25 Q20,10 50,25 T100,25" fill="none" stroke="#6aa147" stroke-width="2"/>
+                        </svg>
+                    </div>
+
+                    <div class="bento-box bento-pink">
+                        <i class="far fa-heart bento-icon"></i>
+                        <h4>IT'S YOUR OWN, PLAN BIG SHOW</h4>
+                        <p>We love orchestrating your wedding events</p>
+                    </div>
+
+                    <div class="bento-box bento-beige">
+                        <i class="fas fa-spa bento-icon"></i>
+                        <h4>TRY OUR EXHILARATING SPA & GYM</h4>
+                        <p>Experience the world's greatest relaxation on earth!</p>
+                    </div>
+
+                    <div class="bento-box bento-yellow">
+                        <h3>2K26 FALL TRAVEL GUIDE</h3>
+                        <p>The autumn foliage in full display, it's the perfect time to hit the road.</p>
+                        <a href="#" class="bento-btn">VIEW ONLINE GUIDE <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
             </div>
         </section>
 
