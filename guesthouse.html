@@ -212,45 +212,64 @@
             }
         }
 
+        .amenities-section {
+            padding: 100px 5%;
+            background: #fafafa;
+        }
+
         .amenities-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: #e5e5e5;
+            margin-top: 60px;
+            border: 1px solid #e5e5e5;
         }
 
         .amenity-item {
-            text-align: center;
-            padding: 40px 30px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            transition: 0.3s;
-            border: 1px solid rgba(218, 165, 32, 0.1);
+            text-align: left;
+            padding: 50px 40px;
+            background: #ffffff;
+            transition: all 0.4s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .amenity-item:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-gold);
-            box-shadow: 0 15px 40px rgba(218, 165, 32, 0.15);
+            background: #000000;
         }
 
         .amenity-icon {
-            font-size: 45px;
-            color: var(--accent-gold);
-            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #000000;
+            margin-bottom: 25px;
+            transition: 0.4s ease;
         }
 
         .amenity-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--primary-blue);
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #000000;
             margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Arial Black', sans-serif;
+            transition: 0.4s ease;
         }
-        
+
         .amenity-item p {
-            color: #666;
+            color: #666666;
+            font-size: 0.95rem;
             line-height: 1.6;
+            transition: 0.4s ease;
+            margin: 0;
+        }
+
+        .amenity-item:hover .amenity-icon,
+        .amenity-item:hover .amenity-title,
+        .amenity-item:hover p {
+            color: #ffffff;
         }
 
         /* New Listing Layout Styles */
@@ -401,7 +420,7 @@
         <a href="index.html" class="logo" style="text-decoration: none;">BRAJ<span>NIDHI</span></a>
         <nav>
             <ul>
-                <li><a href="guesthouse.html" style="color: var(--accent-gold);">Guesthouse</a></li>
+                <li><a href="guesthouse.html">Guesthouse</a></li>
                 <li><a href="index.html#weddings">Weddings</a></li>
                 <li><a href="index.html#corporate">Corporate</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
@@ -545,14 +564,10 @@
         </section>
 
         <!-- Amenities Section -->
-        <section class="amenities-section" style="padding: 80px 5%; background: #ffffff;">
+        <section class="amenities-section">
             <div class="section-header">
-                <h2 class="divine-header">
-                    <span class="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"></use></svg></span>
-                    <span class="divine-text">Premium Amenities</span>
-                    <span class="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"></use></svg></span>
-                </h2>
-                <p>Everything you need for a comfortable and spiritually uplifting stay.</p>
+                <div class="hero-title-large" style="margin-bottom: 25px; box-shadow: none; border: 2px solid #000;">PREMIUM AMENITIES</div>
+                <p style="color: #666; max-width: 600px; margin: 0 auto; font-size: 1.1rem;">Everything you need for a comfortable and spiritually uplifting stay.</p>
             </div>
             <div class="amenities-grid">
                 <div class="amenity-item">
