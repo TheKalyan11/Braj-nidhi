@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weddings & Corporate Events | Braj Nidhi</title>
+    <meta name="description" content="Host divine weddings and executive corporate offsites at Braj Nidhi. Discover our luxury venues, AV halls, and customizable event packages.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+    <style>
+        /* Events specific styles */
+        body {
+            background-color: #fafafa;
+            color: #1a1a1a;
+        }
+
+        .events-hero {
+            background-color: #ffffff;
+            padding: 120px 0 60px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-bento-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-title-large {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            display: inline-block;
+            align-self: center;
+            padding: 12px 30px;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1;
+            margin-bottom: -25px;
+            position: relative;
+            z-index: 2;
+            font-family: 'Arial Black', Impact, sans-serif;
+            letter-spacing: 2px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border: 2px solid #1a1a1a;
+        }
+
+        .events-split-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .hero-split-card {
+            position: relative;
+            height: 450px;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .hero-split-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .hero-split-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .hero-split-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 40px 30px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            color: #fff;
+        }
+
+        .hero-split-content h3 {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 2rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+
+        .hero-split-content p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .hero-split-content .btn-white {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: #fff;
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .hero-split-content .btn-white:hover {
+            background: #fbc434;
+        }
+
+        /* Module Sections */
+        .module-section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .module-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .module-header h2 {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 3rem;
+            color: #1a1a1a;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .module-header p {
+            font-size: 1.1rem;
+            color: #555;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Bento Grids */
+        .events-bento {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: #e5e5e5;
+            border: 1px solid #e5e5e5;
+        }
+
+        .bento-item {
+            background: #fff;
+            padding: 40px;
+            transition: all 0.4s ease;
+        }
+
+        .bento-item:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .bento-item i {
+            font-size: 2rem;
+            color: #e95d35;
+            margin-bottom: 20px;
+            transition: color 0.4s ease;
+        }
+
+        .bento-item:hover i {
+            color: #fbc434;
+        }
+
+        .bento-item h4 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .bento-item p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            transition: color 0.4s ease;
+        }
+
+        .bento-item:hover p {
+            color: #ccc;
+        }
+
+        /* Package Cards */
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .package-card {
+            border: 2px solid #1a1a1a;
+            padding: 40px;
+            background: #fff;
+            position: relative;
+        }
+
+        .package-badge {
+            position: absolute;
+            top: -15px;
+            right: 30px;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 8px 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .package-card h3 {
+            font-size: 2rem;
+            font-family: 'Arial Black', sans-serif;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .package-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .package-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            color: #444;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .package-features li i {
+            color: #e95d35;
+        }
+
+        /* Forms */
+        .inquiry-form-section {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 80px 20px;
+            margin-top: 80px;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-container h2 {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .form-container p {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 40px;
+        }
+
+        .inquiry-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .inquiry-form label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ccc;
+        }
+
+        .inquiry-form input, 
+        .inquiry-form select, 
+        .inquiry-form textarea {
+            padding: 15px;
+            background: transparent;
+            border: 1px solid #444;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .inquiry-form input:focus, 
+        .inquiry-form select:focus, 
+        .inquiry-form textarea:focus {
+            border-color: #fbc434;
+        }
+
+        .inquiry-form button {
+            grid-column: span 2;
+            padding: 20px;
+            background: #fff;
+            color: #1a1a1a;
+            border: none;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .inquiry-form button:hover {
+            background: #fbc434;
+        }
+
+        @media (max-width: 900px) {
+            .events-split-hero,
+            .events-bento,
+            .packages-grid,
+            .inquiry-form {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .inquiry-form button {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG Definitions (Copied from index.html) -->
+    <svg style="display: none;">
+        <defs>
+            <g id="peacock-feather">
+                <path d="M50,80 C10,80 0,20 50,0 C100,20 90,80 50,80 Z" fill="#008000" opacity="0.9"/>
+                <path d="M50,70 C20,70 15,25 50,10 C85,25 80,70 50,70 Z" fill="#32CD32"/>
+                <ellipse cx="50" cy="30" rx="14" ry="20" fill="#00CED1"/>
+                <ellipse cx="50" cy="30" rx="8" ry="12" fill="#000080"/>
+                <path d="M50,0 L50,95" stroke="#006400" stroke-width="2"/>
+            </g>
+            <g id="krishna-flute-feather">
+                <path d="M10,75 L90,45" stroke="#DAA520" stroke-width="12" stroke-linecap="round"/>
+                <path d="M12,73 L88,44" stroke="#F0E68C" stroke-width="6" stroke-linecap="round"/>
+                <line x1="20" y1="76" x2="25" y2="63" stroke="#DC143C" stroke-width="3"/>
+                <line x1="23" y1="75" x2="28" y2="62" stroke="#DC143C" stroke-width="3"/>
+                <circle cx="40" cy="62" r="2.5" fill="#3e2723"/>
+                <circle cx="50" cy="59" r="2.5" fill="#3e2723"/>
+                <circle cx="60" cy="56" r="2.5" fill="#3e2723"/>
+                <circle cx="70" cy="53" r="2.5" fill="#3e2723"/>
+                <g transform="translate(55, 10) rotate(15) scale(0.4)">
+                    <use href="#peacock-feather"/>
+                </g>
+            </g>
+        </defs>
+    </svg>
+
+    <header id="main-header" class="scrolled">
+        <a href="index.html" class="logo" style="text-decoration: none;">BRAJ<span>NIDHI</span></a>
+        <nav>
+            <ul>
+                <li><a href="guesthouse.html">Guesthouse</a></li>
+                <li><a href="events.html#weddings">Weddings</a></li>
+                <li><a href="events.html#corporate">Corporate</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="nav-btns">
+            <a href="booking.html" class="btn-book">Book Now</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="events-hero">
+            <div class="hero-bento-container">
+                <div class="hero-title-large">CELEBRATE & CONVENE</div>
+                
+                <div class="events-split-hero">
+                    <div class="hero-split-card">
+                        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop" alt="Divine Weddings">
+                        <div class="hero-split-content">
+                            <h3>Divine Weddings</h3>
+                            <p>Begin your sacred journey in the spiritual heart of Vrindavan with our bespoke wedding venues and services.</p>
+                            <a href="#weddings" class="btn-white">Explore Weddings <i class="fas fa-arrow-down"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-split-card">
+                        <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1000&auto=format&fit=crop" alt="Corporate Offsites">
+                        <div class="hero-split-content">
+                            <h3>Executive Offsites</h3>
+                            <p>Inspire your team with state-of-the-art AV halls and serene surroundings designed for focused retreats.</p>
+                            <a href="#corporate" class="btn-white">Explore Corporate <i class="fas fa-arrow-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Weddings & Events Module -->
+        <section id="weddings" class="module-section">
+            <div class="module-header">
+                <h2>Weddings & Events</h2>
+                <p>From intimate spiritual ceremonies to grand celebrations, our venues offer the perfect blend of heritage charm and modern luxury.</p>
+            </div>
+
+            <div class="events-bento">
+                <div class="bento-item">
+                    <i class="fas fa-om"></i>
+                    <h4>The Grand Courtyard</h4>
+                    <p>An open-air venue perfect for traditional ceremonies under the stars. Accommodates up to 500 guests with customized mandap setups.</p>
+                </div>
+                <div class="bento-item">
+                    <i class="fas fa-glass-cheers"></i>
+                    <h4>Royal Banquet</h4>
+                    <p>A fully air-conditioned, pillar-less hall designed for grand receptions and sangeet nights. Premium acoustics and lighting included.</p>
+                </div>
+                <div class="bento-item">
+                    <i class="fas fa-camera"></i>
+                    <h4>Pre-Wedding Spaces</h4>
+                    <p>Beautifully landscaped gardens and heritage architecture providing stunning backdrops for your pre-wedding photography.</p>
+                </div>
+            </div>
+
+            <div class="packages-grid">
+                <div class="package-card">
+                    <div class="package-badge">Popular</div>
+                    <h3>The Sacred Vows</h3>
+                    <ul class="package-features">
+                        <li><i class="fas fa-check"></i> Grand Courtyard Venue Access (12 Hours)</li>
+                        <li><i class="fas fa-check"></i> Traditional Floral Mandap Setup</li>
+                        <li><i class="fas fa-check"></i> Pure Vegetarian Catering for 200 Guests</li>
+                        <li><i class="fas fa-check"></i> 2 Bridal Dressing Rooms</li>
+                        <li><i class="fas fa-check"></i> Basic Sound & Lighting System</li>
+                    </ul>
+                    <a href="#inquiry" class="btn-outline" style="border: 2px solid #1a1a1a; padding: 15px 30px; text-decoration: none; color: #1a1a1a; font-weight: 800; text-transform: uppercase; display: inline-block;">Request Quote</a>
+                </div>
+                
+                <div class="package-card">
+                    <h3>The Heritage Royale</h3>
+                    <ul class="package-features">
+                        <li><i class="fas fa-check"></i> Full Property Exclusive Access (2 Days)</li>
+                        <li><i class="fas fa-check"></i> Custom Theme Decor & floral arrangements</li>
+                        <li><i class="fas fa-check"></i> Multi-cuisine Live Counters for 500 Guests</li>
+                        <li><i class="fas fa-check"></i> 20 Guest Suites Included</li>
+                        <li><i class="fas fa-check"></i> Dedicated Event Manager</li>
+                    </ul>
+                    <a href="#inquiry" class="btn-outline" style="border: 2px solid #1a1a1a; padding: 15px 30px; text-decoration: none; color: #1a1a1a; font-weight: 800; text-transform: uppercase; display: inline-block;">Request Quote</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Corporate Offsite Module -->
+        <section id="corporate" class="module-section" style="background: #fff;">
+            <div class="module-header">
+                <h2>Corporate Offsites</h2>
+                <p>Elevate your corporate gatherings with our premium infrastructure, high-speed connectivity, and dedicated AV support.</p>
+            </div>
+
+            <div class="events-bento">
+                <div class="bento-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <h4>Executive AV Hall</h4>
+                    <p>Theater-style seating for up to 150 pax. Equipped with 4K projectors, surround sound, and high-speed enterprise Wi-Fi.</p>
+                </div>
+                <div class="bento-item">
+                    <i class="fas fa-users"></i>
+                    <h4>Boardrooms</h4>
+                    <p>Intimate meeting spaces for up to 20 pax with interactive smart boards and video conferencing facilities.</p>
+                </div>
+                <div class="bento-item">
+                    <i class="fas fa-mug-hot"></i>
+                    <h4>Networking Lounges</h4>
+                    <p>Breakout areas with premium coffee stations and serene garden views to foster organic networking and brainstorming.</p>
+                </div>
+            </div>
+
+            <div class="packages-grid">
+                <div class="package-card">
+                    <h3>Day Conference Package</h3>
+                    <ul class="package-features">
+                        <li><i class="fas fa-check"></i> Executive AV Hall Access (8 Hours)</li>
+                        <li><i class="fas fa-check"></i> 4K Projector & PA System</li>
+                        <li><i class="fas fa-check"></i> 2 Tea/Coffee Breaks with Snacks</li>
+                        <li><i class="fas fa-check"></i> Executive Buffet Lunch</li>
+                        <li><i class="fas fa-check"></i> Dedicated IT Support Staff</li>
+                    </ul>
+                    <a href="#inquiry" class="btn-outline" style="border: 2px solid #1a1a1a; padding: 15px 30px; text-decoration: none; color: #1a1a1a; font-weight: 800; text-transform: uppercase; display: inline-block;">Request Quote</a>
+                </div>
+                
+                <div class="package-card">
+                    <div class="package-badge">Premium</div>
+                    <h3>Leadership Retreat</h3>
+                    <ul class="package-features">
+                        <li><i class="fas fa-check"></i> 2 Days Boardroom & AV Hall Access</li>
+                        <li><i class="fas fa-check"></i> 10 Executive Suites Included</li>
+                        <li><i class="fas fa-check"></i> All Meals + Gala Dinner Setup</li>
+                        <li><i class="fas fa-check"></i> Guided Temple Tour Experience</li>
+                        <li><i class="fas fa-check"></i> Team Building Activities Space</li>
+                    </ul>
+                    <a href="#inquiry" class="btn-outline" style="border: 2px solid #1a1a1a; padding: 15px 30px; text-decoration: none; color: #1a1a1a; font-weight: 800; text-transform: uppercase; display: inline-block;">Request Quote</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lead Capture Form -->
+        <section id="inquiry" class="inquiry-form-section">
+            <div class="form-container">
+                <h2>Plan Your Event</h2>
+                <p>Fill out the form below or <a href="#" style="color: #fbc434; text-decoration: underline;">Download our Event Brochure</a> for detailed floor plans and menus.</p>
+                
+                <form class="inquiry-form">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" placeholder="John" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" placeholder="Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" placeholder="+91 90000 00000" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Event Type</label>
+                        <select required>
+                            <option value="">Select Event Type</option>
+                            <option value="wedding">Wedding / Pre-Wedding</option>
+                            <option value="corporate">Corporate Offsite / Conference</option>
+                            <option value="social">Social Gathering / Party</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estimated Guest Count</label>
+                        <input type="number" placeholder="E.g. 150">
+                    </div>
+                    <div class="form-group">
+                        <label>Expected Date</label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Additional Requirements</label>
+                        <textarea rows="4" placeholder="Tell us more about your event needs (e.g. AV setup, specific catering needs)"></textarea>
+                    </div>
+                    <button type="submit">Submit Inquiry <i class="fas fa-paper-plane" style="margin-left: 10px;"></i></button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer" style="margin-top: 0; background: #fff; padding-top: 80px;">
+        <div class="footer-top-links">
+            <div class="footer-col">
+                <div class="logo">BRAJ<span>NIDHI</span></div>
+                <p style="margin-top: 20px; color: #666; font-size: 0.9rem;">Experiencing divine luxury and comfort in the sacred city of Vrindavan.</p>
+                <div class="social-links" style="margin-top: 20px;">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Our Spaces</h3>
+                <a href="guesthouse.html">Rooms & Suites</a>
+                <a href="index.html#testimonials">Guest Reviews</a>
+            </div>
+            <div class="footer-col">
+                <h3>Explore Vrindavan</h3>
+                <a href="#">Bankey Bihari Mandir</a>
+                <a href="#">Prem Mandir</a>
+                <a href="#">ISKCON Temple</a>
+                <a href="#">Local Attractions</a>
+            </div>
+            <div class="footer-col">
+                <h3>Stay & Book</h3>
+                <a href="booking.html">Book Your Stay</a>
+                <a href="events.html#weddings">Wedding Packages</a>
+                <a href="events.html#corporate">Corporate Stays</a>
+                <a href="#">Refund Policy</a>
+            </div>
+            <div class="footer-col">
+                <h3>Information</h3>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Guest Policy</a>
+                <a href="#">Cancellation Policy</a>
+            </div>
+        </div>
+        
+        <div class="footer-middle-bar">
+            <span>Privacy Policy</span>
+            <span>Copyright &copy; BRAJNIDHI 2026</span>
+            <span>Terms Of Use</span>
+        </div>
+
+        <div class="footer-massive-text">
+            BRAJNIDHI
+        </div>
+    </footer>
+
+    <!-- Floating UI -->
+    <div class="floating-controls">
+        <a href="https://wa.me/910000000000" class="floating-btn wa-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
