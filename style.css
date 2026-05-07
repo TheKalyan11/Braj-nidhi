@@ -88,7 +88,7 @@ nav ul {
 
 nav ul li a {
     text-decoration: none;
-    color: var(--text-main);
+    color: #000000;
     font-weight: 500;
     font-size: 0.95rem;
     transition: var(--transition);
@@ -131,8 +131,8 @@ header.scrolled nav ul li a:hover {
 }
 
 .btn-book {
-    background: var(--primary);
-    color: #000;
+    background: #000000;
+    color: #ffffff;
     padding: 12px 28px;
     border-radius: 50px;
     text-decoration: none;
