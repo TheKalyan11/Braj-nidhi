@@ -6,6 +6,8 @@
     <title>Guesthouse & Suites | Braj Nidhi</title>
     <meta name="description" content="Discover our luxury guesthouse suites in Vrindavan. Heritage architecture meets modern comfort.">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="banner.css">
+    <link rel="stylesheet" href="features.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Font -->
@@ -336,12 +338,13 @@
         }
         .promo-col-center img {
             width: 100%;
-            max-width: 400px;
-            height: 550px;
+            height: auto;
+            max-height: 600px;
             object-fit: cover;
             display: block;
             margin: 0 auto;
-            border-radius: 4px;
+            border-radius: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
         .promo-col-right {
             flex: 1;
@@ -496,6 +499,9 @@
             }
         }
 
+        /* Amenities Banner moved to banner.css */
+
+
         /* New Listing Layout Styles */
         .listing-container {
             max-width: 1200px;
@@ -611,6 +617,12 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        @media (max-width: 900px) {
+            .listing-container {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -651,7 +663,7 @@
             </ul>
         </nav>
         <div class="nav-btns">
-            <a href="booking.html" class="btn-book">Book Now</a>
+            <a href="index.html#contact" class="btn-book">Book Now</a>
         </div>
     </header>
 
@@ -747,7 +759,7 @@
                                     <span><i class="fas fa-wifi"></i> Free WiFi</span>
                                     <span><i class="fas fa-coffee"></i> Tea/Coffee</span>
                                 </div>
-                                <a href="booking.html" class="btn-availability" style="display: block; text-align: center; text-decoration: none; color: #000;">Book for ₹8,500 <i class="fas fa-chevron-right"></i></a>
+                                <a href="index.html#contact" class="btn-availability" style="display: block; text-align: center; text-decoration: none; color: #000;">Book for ₹8,500 <i class="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
 
@@ -764,7 +776,7 @@
                                     <span><i class="fas fa-bath"></i> Deep Tub</span>
                                     <span><i class="fas fa-concierge-bell"></i> 24/7 Service</span>
                                 </div>
-                                <a href="booking.html" class="btn-availability" style="display: block; text-align: center; text-decoration: none; color: #000;">Book for ₹12,500 <i class="fas fa-chevron-right"></i></a>
+                                <a href="index.html#contact" class="btn-availability" style="display: block; text-align: center; text-decoration: none; color: #000;">Book for ₹12,500 <i class="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
 
@@ -781,7 +793,7 @@
                                     <span><i class="fas fa-user-tie"></i> Personal Attendant</span>
                                     <span><i class="fas fa-hot-tub"></i> Jacuzzi</span>
                                 </div>
-                                <a href="booking.html" class="btn-availability" style="display: block; text-align: center; text-decoration: none; color: #000;">Book for ₹25,000 <i class="fas fa-chevron-right"></i></a>
+                                <a href="index.html#contact" class="btn-availability" style="display: block; text-align: center; text-decoration: none; color: #000;">Book for ₹25,000 <i class="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -829,6 +841,57 @@
             </div>
         </section>
 
+        <!-- Amenities Auto-Scrolling Marquee -->
+        <div class="amenities-banner">
+            <div class="scroller-container">
+                <div class="scroller-content">
+                    <div class="scroller-item"><i class="fas fa-parking"></i> Parking Space</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-tv"></i> HD Television</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-concierge-bell"></i> 24-hour Room Service</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-tshirt"></i> Laundry Service</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-mug-hot"></i> Tea/Coffee Maker</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-leaf"></i> Pure Vegetarian Restaurant</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-place-of-worship"></i> 3 km from ISKCON Temple</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-om"></i> 3 km from Prem Mandir</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-bath"></i> Bathtub in Suite Category</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-wifi"></i> Free High-Speed Wi-Fi</div>
+                    <div class="scroller-dot">✦</div>
+                </div>
+                <!-- Duplicate for seamless loop -->
+                <div class="scroller-content" aria-hidden="true">
+                    <div class="scroller-item"><i class="fas fa-parking"></i> Parking Space</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-tv"></i> HD Television</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-concierge-bell"></i> 24-hour Room Service</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-tshirt"></i> Laundry Service</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-mug-hot"></i> Tea/Coffee Maker</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-leaf"></i> Pure Vegetarian Restaurant</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-place-of-worship"></i> 3 km from ISKCON Temple</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-om"></i> 3 km from Prem Mandir</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-bath"></i> Bathtub in Suite Category</div>
+                    <div class="scroller-dot">✦</div>
+                    <div class="scroller-item"><i class="fas fa-wifi"></i> Free High-Speed Wi-Fi</div>
+                    <div class="scroller-dot">✦</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Promo Section 1 -->
         <section class="promo-section-1">
             <div class="promo-col-left">
@@ -838,14 +901,14 @@
                     <a href="#" class="promo-link">BREAKFAST <i class="fas fa-chevron-right"></i></a>
                 </div>
                 <div class="promo-tour-card">
-                    <img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=200&h=300&fit=crop" alt="Vrindavan Tour" class="promo-tour-img">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Vrindavan_Chandrodaya_Mandir.jpg/400px-Vrindavan_Chandrodaya_Mandir.jpg" alt="Vrindavan Tour" class="promo-tour-img">
                     <div class="promo-tour-text">TEMPLE TOUR GUIDE</div>
                     <i class="fas fa-cube" style="font-size: 1.5rem; margin-left: auto; color: #1a1a1a;"></i>
                 </div>
             </div>
             
             <div class="promo-col-center">
-                <img src="https://images.unsplash.com/photo-1590050752117-23a9d7f66c41?q=80&w=800&auto=format&fit=crop" alt="Spiritual Architecture">
+                <img src="spiritual_wide.png" alt="Spiritual Architecture">
             </div>
 
             <div class="promo-col-right">
@@ -881,7 +944,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer" id="contact">
         <div class="footer-top-links">
             <div class="footer-col">
                 <h3>Company</h3>
@@ -899,7 +962,7 @@
             </div>
             <div class="footer-col">
                 <h3>Stay & Book</h3>
-                <a href="booking.html">Book Your Stay</a>
+                <a href="index.html#contact">Book Your Stay</a>
                 <a href="weddings.html">Wedding Packages</a>
                 <a href="corporate.html">Corporate Stays</a>
                 <a href="#">Refund Policy</a>
@@ -931,12 +994,6 @@
         </div>
     </footer>
 
-    <!-- Floating UI -->
-    <div class="floating-controls">
-        <a href="https://wa.me/910000000000" class="floating-btn wa-btn" target="_blank">
-            <i class="fab fa-whatsapp"></i>
-        </a>
-    </div>
 
     <script>
         // Header scroll effect
@@ -949,5 +1006,51 @@
             }
         });
     </script>
+        <!-- Global Floating Features -->
+    <div class="whatsapp-container">
+        <a href="https://wa.me/910000000000" class="whatsapp-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+
+    <div class="premium-music-player" id="musicPlayer">
+        <div class="player-glass">
+            <button class="play-btn" id="musicToggle">
+                <i class="fas fa-play"></i>
+            </button>
+            <div class="liquid-shine"></div>
+        </div>
+        <audio id="bgMusic" loop preload="auto" crossorigin="anonymous" src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3">
+            <source src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3" type="audio/mpeg">
+            <source src="https://cdn.pixabay.com/audio/2022/02/22/audio_d0a13e6912.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <div class="chatbot-container">
+        <div class="chatbot-btn" id="chatbotBtn">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <div class="bot-img"><i class="fas fa-om"></i></div>
+                <div>
+                    <h4>Braj Nidhi Guide</h4>
+                    <span>Online | AI Assistant</span>
+                </div>
+                <i class="fas fa-times" id="closeChat" style="margin-left: auto; cursor: pointer;"></i>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="msg bot">Radhe Radhe! Welcome to Braj Nidhi. I am your AI guide for Vrindavan. How may I help you today?</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Ask me anything...">
+                <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="features.js"></script>
 </body>
 </html>

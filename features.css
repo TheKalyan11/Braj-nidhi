@@ -1,0 +1,274 @@
+/* ===== Global Floating Features (Music & AI Chatbot) ===== */
+
+/* Music Player Controls */
+.music-player-container {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.music-btn {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.music-btn:hover {
+    transform: scale(1.1);
+    background: rgba(233, 93, 53, 0.8);
+    border-color: #e95d35;
+}
+
+.music-btn.playing {
+    background: #e95d35;
+    animation: music-pulse 2s infinite;
+}
+
+/* WhatsApp Button Styles */
+.whatsapp-container {
+    position: fixed;
+    bottom: 95px;
+    left: 30px;
+    z-index: 9999;
+}
+
+.whatsapp-btn {
+    width: 50px;
+    height: 50px;
+    background: #25d366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(37, 211, 102, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+}
+
+.whatsapp-btn:hover {
+    transform: scale(1.1) translateY(-5px);
+    background: #20b858;
+}
+
+.whatsapp-btn i {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+@keyframes music-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(233, 93, 53, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(233, 93, 53, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(233, 93, 53, 0); }
+}
+
+.music-label {
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    backdrop-filter: blur(5px);
+}
+
+.music-player-container:hover .music-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* AI Chatbot Controls */
+.chatbot-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+}
+
+.chatbot-btn {
+    width: 60px;
+    height: 60px;
+    background: #e95d35;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(233, 93, 53, 0.4);
+    position: relative;
+}
+
+.chatbot-btn::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: inherit;
+    z-index: -1;
+    animation: chatbot-ping 1.5s ease-out infinite;
+}
+
+@keyframes chatbot-ping {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+.chatbot-btn:hover {
+    transform: scale(1.05) translateY(-5px);
+    background: #d14d2a;
+}
+
+/* Chat Window */
+.chat-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 500px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-window.active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.chat-header {
+    background: #1a1a1a;
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-header .bot-img {
+    width: 40px;
+    height: 40px;
+    background: #e95d35;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.chat-header h4 {
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.chat-header span {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: #fdfbf7;
+}
+
+.msg {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.msg.bot {
+    align-self: flex-start;
+    background: #fff;
+    border: 1px solid #eee;
+    color: #333;
+    border-bottom-left-radius: 2px;
+}
+
+.msg.user {
+    align-self: flex-end;
+    background: #e95d35;
+    color: #fff;
+    border-bottom-right-radius: 2px;
+}
+
+.chat-input {
+    padding: 15px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.chat-input button {
+    background: #e95d35;
+    color: #fff;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.chat-input button:hover {
+    background: #d14d2a;
+}
+
+/* Dark page adjustments */
+.index-page .music-btn {
+    background: rgba(255, 255, 255, 0.1);
+}

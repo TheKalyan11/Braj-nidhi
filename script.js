@@ -7,18 +7,9 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Simple animation for the reserve button
-const reserveBtn = document.querySelector('.btn-reserve');
-if (reserveBtn) {
-    reserveBtn.addEventListener('click', () => {
-        reserveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        setTimeout(() => {
-            reserveBtn.innerHTML = 'Reservation Sent!';
-            reserveBtn.style.background = '#2ecc71';
-            reserveBtn.style.color = '#fff';
-        }, 1500);
-    });
-}
+// Simple animation for the reserve button - REMOVED to allow direct navigation
+// The user reported 'Book Now' not opening anything. 
+// Standard anchor tags will now handle navigation directly.
 
 // Intersection Observer for Stats Section
 const statsContainer = document.querySelector('.stats-container');
@@ -69,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         slidesPerView: 'auto',
         loop: true,
         autoplay: {
-            delay: 3000,
+            delay: 2000,
             disableOnInteraction: false,
         },
         coverflowEffect: {
@@ -85,16 +76,18 @@ document.addEventListener('DOMContentLoaded', () => {
         },
     });
 
-    // Initialize Swiper for Testimonials
+    // Initialize Swiper for Testimonials with Smooth Linear Scroll
     const testimonialSwiper = new Swiper('.testimonials-slider', {
         slidesPerView: 'auto',
         spaceBetween: 24,
         loop: true,
+        speed: 5000,
         autoplay: {
-            delay: 1000,
+            delay: 0,
             disableOnInteraction: false,
         },
         grabCursor: true,
+        freeMode: true,
     });
 
     // FAQ Toggle Logic

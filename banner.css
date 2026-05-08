@@ -1,0 +1,66 @@
+/* ===== Amenities Scrolling Marquee Banner ===== */
+.amenities-banner {
+    background: #1a1a1a;
+    overflow: hidden;
+    padding: 0;
+    border-top: 3px solid #e95d35;
+    border-bottom: 3px solid #e95d35;
+    width: 100%;
+    position: relative;
+    z-index: 10;
+}
+
+.scroller-container {
+    display: flex;
+    width: max-content; /* Ensures container is wide enough for all items */
+    animation: marquee-scroll 40s linear infinite;
+}
+
+.amenities-banner:hover .scroller-container {
+    animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.scroller-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.scroller-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 22px 35px;
+    white-space: nowrap;
+    font-family: 'Outfit', sans-serif;
+}
+
+.scroller-item i {
+    color: #e95d35;
+    font-size: 1.1rem;
+}
+
+.scroller-dot {
+    color: #e95d35;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+}
