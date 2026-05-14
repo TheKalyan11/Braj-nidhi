@@ -78,6 +78,7 @@ content = content.replace(/<div className=\"chatbot-container\">[\s\S]*?<\/div>\
 content = content.replace(/<div className=\"faq-question\">/g, '<div className=\"faq-question\" onClick={toggleFAQ}>');
 
 // Link replacements
+content = content.replace(/<h1>Timeless Luxury, Urban Elegance<\/h1>/gi, '<h1>Timeless Luxury. Divine Serenity.</h1>');
 content = content.replace(/href=\"index\.html/g, 'href="/');
 content = content.replace(/href=\"guesthouse\.html/g, 'href="/guesthouse');
 content = content.replace(/href=\"weddings\.html/g, 'href="/weddings');

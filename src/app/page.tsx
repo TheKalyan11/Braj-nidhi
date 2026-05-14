@@ -216,7 +216,7 @@ export default function Home() {
     <main>
         <section className="hero">
             <div className="hero-content">
-                <h1>Timeless Luxury, Urban Elegance</h1>
+                <h1>Timeless Luxury. Divine Serenity.</h1>
                 <p>Experience the finest hospitality in the heart of the city. Our heritage suites offer an oasis of calm amidst the vibrant urban landscape.</p>
                 
                 <div className="rating-info">

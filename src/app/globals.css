@@ -169,7 +169,7 @@ header.scrolled nav ul li a:hover {
     align-items: center;
     padding: 0 8%;
     background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
-                url("/city-hero-bg.jpg") no-repeat center center/cover;
+                url("/hero.png") no-repeat center center/cover;
 }
 
 .hero-content {
@@ -194,6 +194,34 @@ header.scrolled nav ul li a:hover {
 }
 
 /* --- Booking Widget --- */
+.rating-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 20px;
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.stars {
+    color: var(--gold);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.reviews {
+    color: var(--white);
+    font-size: 0.85rem;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+}
+
 .booking-widget {
     position: absolute;
     bottom: 80px;
