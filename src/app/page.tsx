@@ -1047,44 +1047,53 @@ export default function Home() {
     </footer>
 
 
-    {/*  Swiper JS  */}
-    
-      
-      {/* Audio Element */}
-      <div className="premium-music-player" id="musicPlayer">
-          <div className="player-glass">
-              <button className={"play-btn " + (isPlaying ? "playing" : "")} onClick={toggleMusic}>
-                  <i className={"fas " + (isPlaying ? "fa-pause" : "fa-play")}></i>
-              </button>
-              <div className="liquid-shine"></div>
-          </div>
-          <audio ref={audioRef} id="bgMusic" loop preload="auto" crossOrigin="anonymous">
-            <source src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3" type="audio/mpeg" />
-          </audio>
-      </div>
+    {/* Left Floating Social Stack: Instagram (top) → WhatsApp (middle) → Music (bottom) */}
+    <div className="float-social-stack">
+        <a href="https://www.instagram.com/brajnidhi/" target="_blank" rel="noopener noreferrer" className="float-btn float-instagram" title="Follow us on Instagram">
+            <i className="fab fa-instagram"></i>
+        </a>
+        <a href="https://wa.me/910000000000" target="_blank" rel="noopener noreferrer" className="float-btn float-whatsapp" title="Chat on WhatsApp">
+            <i className="fab fa-whatsapp"></i>
+        </a>
+    </div>
 
-      <div className={"chatbot-container " + (isChatOpen ? "active" : "")}>
-          <div className="chatbot-btn" onClick={() => setIsChatOpen(!isChatOpen)}>
-              <i className="fas fa-robot"></i>
-          </div>
-          <div className={"chat-window " + (isChatOpen ? "active" : "")}>
-              <div className="chat-header">
-                  <div className="bot-img"><i className="fas fa-om"></i></div>
-                  <div>
-                      <h4>Braj Nidhi Guide</h4>
-                      <span>Online | AI Assistant</span>
-                  </div>
-                  <i className="fas fa-times" onClick={() => setIsChatOpen(false)} style={{marginLeft: "auto", cursor: "pointer"}}></i>
-              </div>
-              <div className="chat-messages">
-                  <div className="msg bot">Radhe Radhe! Welcome to Braj Nidhi. I am your AI guide for Vrindavan. How may I help you today?</div>
-              </div>
-              <div className="chat-input">
-                  <input type="text" placeholder="Ask me anything..." />
-                  <button><i className="fas fa-paper-plane"></i></button>
-              </div>
-          </div>
-      </div>
+    {/* Music Player — Hare Krishna Mahamantra */}
+    <div className="premium-music-player" id="musicPlayer">
+        <div className="player-glass" title="Hare Krishna Mahamantra">
+            <button className={"play-btn " + (isPlaying ? "playing" : "")} onClick={toggleMusic}>
+                <i className={"fas " + (isPlaying ? "fa-pause" : "fa-play")}></i>
+            </button>
+            <div className="liquid-shine"></div>
+        </div>
+        <audio ref={audioRef} id="bgMusic" loop preload="auto" crossOrigin="anonymous">
+            <source src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3" type="audio/mpeg" />
+            <source src="https://cdn.pixabay.com/audio/2022/02/22/audio_d0a13e6912.mp3" type="audio/mpeg" />
+        </audio>
+    </div>
+
+    {/* Chatbot */}
+    <div className={"chatbot-container " + (isChatOpen ? "active" : "")}>
+        <div className="chatbot-btn" onClick={() => setIsChatOpen(!isChatOpen)}>
+            <i className="fas fa-robot"></i>
+        </div>
+        <div className={"chat-window " + (isChatOpen ? "active" : "")}>
+            <div className="chat-header">
+                <div className="bot-img"><i className="fas fa-om"></i></div>
+                <div>
+                    <h4>Braj Nidhi Guide</h4>
+                    <span>Online | AI Assistant</span>
+                </div>
+                <i className="fas fa-times" onClick={() => setIsChatOpen(false)} style={{marginLeft: "auto", cursor: "pointer"}}></i>
+            </div>
+            <div className="chat-messages">
+                <div className="msg bot">Radhe Radhe! Welcome to Braj Nidhi. I am your AI guide for Vrindavan. How may I help you today?</div>
+            </div>
+            <div className="chat-input">
+                <input type="text" placeholder="Ask me anything..." />
+                <button><i className="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
     </div>
   );
 }
