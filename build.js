@@ -59,7 +59,7 @@ content = content.replace(/<div className=\"form-group full-width\">\s*<label>Ev
 content = content.replace(/<div className=\"price\">₹12,500<span>\/night<\/span><\/div>/gi, 
     '<div className="price">₹{roomPrices[bookingData.roomType].toLocaleString()}<span>/night</span></div>');
 content = content.replace(/<div className=\"occupancy\">2-4 guests<\/div>/gi, 
-    '<div className="occupancy">{roomOccupancy[bookingData.roomType]}</div>');
+    '<div className="occupancy">{getGuestCount(bookingData.guests)}</div>');
 
 // Replace Reservation Button
 content = content.replace(/<button className=\"btn-reserve\">Request Reservation<\/button>/gi, 
@@ -111,6 +111,13 @@ export default function Home() {
     'Luxury Suite': '2-3 guests',
     'Executive Room': '1-2 guests',
     'Royal Heritage Suite': '2-4 guests'
+  };
+
+  const getGuestCount = (guestsStr: string) => {
+    const adults = parseInt(guestsStr.match(/(\\d+)\\s*Adult/)?.[1] || '0');
+    const children = parseInt(guestsStr.match(/(\\d+)\\s*Child/)?.[1] || '0');
+    const total = adults + children;
+    return \`\${total} guest\${total > 1 ? 's' : ''}\`;
   };
 
   const [bookingData, setBookingData] = useState({

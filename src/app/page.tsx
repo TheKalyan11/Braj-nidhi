@@ -24,6 +24,13 @@ export default function Home() {
     'Royal Heritage Suite': '2-4 guests'
   };
 
+  const getGuestCount = (guestsStr: string) => {
+    const adults = parseInt(guestsStr.match(/(\d+)\s*Adult/)?.[1] || '0');
+    const children = parseInt(guestsStr.match(/(\d+)\s*Child/)?.[1] || '0');
+    const total = adults + children;
+    return `${total} guest${total > 1 ? 's' : ''}`;
+  };
+
   const [bookingData, setBookingData] = useState({
     checkIn: '2026-05-12',
     checkOut: '2026-05-18',
@@ -247,7 +254,7 @@ export default function Home() {
 
                 <div className="price-row">
                     <div className="price">₹{roomPrices[bookingData.roomType].toLocaleString()}<span>/night</span></div>
-                    <div className="occupancy">{roomOccupancy[bookingData.roomType]}</div>
+                    <div className="occupancy">{getGuestCount(bookingData.guests)}</div>
                 </div>
 
                 <a href="#contact" className="btn-reserve" style={{"display":"block","textAlign":"center","textDecoration":"none","position":"relative","zIndex":"5"}}>Request Reservation</a>
