@@ -1,0 +1,203 @@
+const fs = require('fs');
+
+let html = fs.readFileSync('design-repo/index.html', 'utf8');
+
+// Extract body content
+let bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<script src=\"https:\/\/cdn/i);
+if (!bodyMatch) {
+  bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+}
+let content = bodyMatch[1];
+
+// Convert to JSX
+content = content.replace(/class=/g, 'className=');
+content = content.replace(/stroke-width=/g, 'strokeWidth=');
+content = content.replace(/fill-opacity=/g, 'fillOpacity=');
+content = content.replace(/onclick=\"this.classList.toggle\('flipped'\)\"/g, "onClick={(e) => e.currentTarget.classList.toggle('flipped')}");
+content = content.replace(/onclick=\"[^\"]*\"/g, "onClick={() => {}}");
+content = content.replace(/allowfullscreen=\"\"/g, 'allowFullScreen={true}');
+content = content.replace(/allowfullscreen/g, 'allowFullScreen={true}');
+content = content.replace(/referrerpolicy/g, 'referrerPolicy');
+content = content.replace(/style=\"([^\"]*)\"/g, (match, p1) => {
+    let styleObj = {};
+    p1.split(';').forEach(s => {
+        if (!s.trim()) return;
+        let [k, v] = s.split(':');
+        k = k.trim().replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+        styleObj[k] = v.trim();
+    });
+    return 'style={' + JSON.stringify(styleObj) + '}';
+});
+
+// Self-closing tags
+content = content.replace(/<img([^>]*(?!\/))>/g, '<img$1 />');
+content = content.replace(/<br>/g, '<br />');
+content = content.replace(/<input([^>]*(?!\/))>/g, '<input$1 />');
+content = content.replace(/<source([^>]*(?!\/))>/g, '<source$1 />');
+content = content.replace(/<use([^>]*(?!\/))><\/use>/g, '<use$1 />');
+content = content.replace(/<use([^>]*(?!\/))>/g, '<use$1 />');
+content = content.replace(/\/\s\/>/g, ' />'); // Fix double slashes
+
+// HTML comments to JSX
+content = content.replace(/<!--([\s\S]*?)-->/g, '{/* $1 */}');
+
+
+// Clean up chat and music logic inside the extracted HTML
+content = content.replace(/<div className=\"premium-music-player\"[^>]*>[\s\S]*?<\/audio>\n    <\/div>/i, '');
+content = content.replace(/<div className=\"chatbot-container\">[\s\S]*?<\/div>\n    <\/div>/i, '');
+
+// Fix FAQ onclick
+content = content.replace(/<div className=\"faq-question\">/g, '<div className=\"faq-question\" onClick={toggleFAQ}>');
+
+// Link replacements
+content = content.replace(/href=\"index\.html/g, 'href="/');
+content = content.replace(/href=\"guesthouse\.html/g, 'href="/guesthouse');
+content = content.replace(/href=\"weddings\.html/g, 'href="/weddings');
+content = content.replace(/href=\"corporate\.html/g, 'href="/corporate');
+content = content.replace(/href=\"booking\.html/g, 'href="/booking');
+
+// Convert remaining tags to Link components where possible, but href fix is enough for now.
+
+
+const component = `
+"use client";
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+
+export default function Home() {
+  const [scrolled, setScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).Swiper) {
+      new (window as any).Swiper('.gallery-slider', {
+        effect: 'coverflow',
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: 'auto',
+        loop: true,
+        autoplay: { delay: 2000, disableOnInteraction: false },
+        coverflowEffect: { rotate: 0, stretch: 0, depth: 100, modifier: 2, slideShadows: true },
+        navigation: { nextEl: '.swiper-button-next-custom', prevEl: '.swiper-button-prev-custom' },
+      });
+      new (window as any).Swiper('.testimonials-slider', {
+        slidesPerView: 'auto',
+        spaceBetween: 24,
+        loop: true,
+        speed: 5000,
+        autoplay: { delay: 0, disableOnInteraction: false },
+        grabCursor: true,
+        freeMode: true,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    // Stats observer
+    const statsContainer = document.querySelector('.stats-container');
+    const counters = document.querySelectorAll('.counter');
+    let animated = false;
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !animated && statsContainer) {
+                statsContainer.classList.add('animate-up');
+                counters.forEach(counter => {
+                    const targetAttr = counter.getAttribute('data-target');
+                    if (!targetAttr) return;
+                    const target = +targetAttr;
+                    const isDecimal = counter.getAttribute('data-decimal') === 'true';
+                    const updateCount = () => {
+                        const count = +((counter as HTMLElement).innerText);
+                        const inc = target / 50; 
+                        if(count < target) {
+                            if (isDecimal) (counter as HTMLElement).innerText = (count + inc).toFixed(1);
+                            else (counter as HTMLElement).innerText = Math.ceil(count + inc).toString();
+                            setTimeout(updateCount, 30);
+                        } else {
+                            (counter as HTMLElement).innerText = target.toString();
+                        }
+                    };
+                    updateCount();
+                });
+                animated = true;
+            }
+        });
+    }, { threshold: 0.3 });
+    if (statsContainer) observer.observe(statsContainer);
+  }, []);
+
+  const toggleFAQ = (e: any) => {
+    const currentItem = e.currentTarget.parentElement;
+    document.querySelectorAll('.faq-item').forEach(item => {
+        if (item !== currentItem) item.classList.remove('active');
+    });
+    currentItem.classList.toggle('active');
+  };
+
+  const toggleMusic = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  return (
+    <div className="index-page">
+      ${content}
+      
+      {/* Audio Element */}
+      <div className="premium-music-player" id="musicPlayer">
+          <div className="player-glass">
+              <button className={"play-btn " + (isPlaying ? "playing" : "")} onClick={toggleMusic}>
+                  <i className={"fas " + (isPlaying ? "fa-pause" : "fa-play")}></i>
+              </button>
+              <div className="liquid-shine"></div>
+          </div>
+          <audio ref={audioRef} id="bgMusic" loop preload="auto" crossOrigin="anonymous">
+            <source src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3" type="audio/mpeg" />
+          </audio>
+      </div>
+
+      <div className={"chatbot-container " + (isChatOpen ? "active" : "")}>
+          <div className="chatbot-btn" onClick={() => setIsChatOpen(!isChatOpen)}>
+              <i className="fas fa-robot"></i>
+          </div>
+          <div className={"chat-window " + (isChatOpen ? "active" : "")}>
+              <div className="chat-header">
+                  <div className="bot-img"><i className="fas fa-om"></i></div>
+                  <div>
+                      <h4>Braj Nidhi Guide</h4>
+                      <span>Online | AI Assistant</span>
+                  </div>
+                  <i className="fas fa-times" onClick={() => setIsChatOpen(false)} style={{marginLeft: "auto", cursor: "pointer"}}></i>
+              </div>
+              <div className="chat-messages">
+                  <div className="msg bot">Radhe Radhe! Welcome to Braj Nidhi. I am your AI guide for Vrindavan. How may I help you today?</div>
+              </div>
+              <div className="chat-input">
+                  <input type="text" placeholder="Ask me anything..." />
+                  <button><i className="fas fa-paper-plane"></i></button>
+              </div>
+          </div>
+      </div>
+    </div>
+  );
+}
+`;
+
+fs.writeFileSync('src/app/page.tsx', component);
