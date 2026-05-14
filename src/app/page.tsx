@@ -10,17 +10,51 @@ export default function Home() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  const roomPrices: Record<string, number> = {
+    'Luxury Suite': 8500,
+    'Executive Room': 6000,
+    'Royal Heritage Suite': 12500
+  };
+
+  const roomOccupancy: Record<string, string> = {
+    'Luxury Suite': '2-3 guests',
+    'Executive Room': '1-2 guests',
+    'Royal Heritage Suite': '2-4 guests'
+  };
+
   const [bookingData, setBookingData] = useState({
     checkIn: '2026-05-12',
     checkOut: '2026-05-18',
     guests: '2 Adults, 1 Child',
-    roomType: 'Luxury Suite',
+    roomType: 'Royal Heritage Suite',
     eventType: 'Corporate Offsite'
   });
 
   const handleBookingChange = (field: string, value: string) => {
     setBookingData(prev => ({ ...prev, [field]: value }));
+    setOpenDropdown(null);
   };
+
+  const CustomSelect = ({ label, value, options, field }: { label: string, value: string, options: string[], field: string }) => (
+    <div className="custom-select-container">
+      <label>{label}</label>
+      <div className={"custom-select-trigger " + (openDropdown === field ? "active" : "")} onClick={() => setOpenDropdown(openDropdown === field ? null : field)}>
+        <span>{value}</span>
+        <i className="fas fa-chevron-down"></i>
+      </div>
+      {openDropdown === field && (
+        <div className="custom-options">
+          {options.map(opt => (
+            <div key={opt} className={"custom-option " + (value === opt ? "selected" : "")} onClick={() => handleBookingChange(field, opt)}>
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,7 +123,7 @@ export default function Home() {
   }, []);
 
   const requestReservation = () => {
-    alert(`Reservation Requested!\n\nRoom: ${bookingData.roomType}\nCheck-in: ${bookingData.checkIn}\nCheck-out: ${bookingData.checkOut}\nGuests: ${bookingData.guests}\nEvent: ${bookingData.eventType}`);
+    alert(`Reservation Requested!\n\nRoom: ${bookingData.roomType}\nPrice: ₹${roomPrices[bookingData.roomType].toLocaleString()}/night\nCheck-in: ${bookingData.checkIn}\nCheck-out: ${bookingData.checkOut}\nGuests: ${bookingData.guests}\nEvent: ${bookingData.eventType}`);
   };
 
   const toggleFAQ = (e: any) => {
@@ -202,26 +236,18 @@ export default function Home() {
                 </div>
 
                 <div className="booking-form">
-                    <div className="form-group">
-                        <label>Check-in</label><input type="date" value={bookingData.checkIn} onChange={(e) => handleBookingChange('checkIn', e.target.value)} />
+                    <div className="form-group"><label>Check-in</label><input type="date" value={bookingData.checkIn} onChange={(e) => handleBookingChange('checkIn', e.target.value)} />
                     </div>
-                    <div className="form-group">
-                        <label>Check-out</label><input type="date" value={bookingData.checkOut} onChange={(e) => handleBookingChange('checkOut', e.target.value)} />
+                    <div className="form-group"><label>Check-out</label><input type="date" value={bookingData.checkOut} onChange={(e) => handleBookingChange('checkOut', e.target.value)} />
                     </div>
-                    <div className="form-group">
-                        <label>Guests</label><select value={bookingData.guests} onChange={(e) => handleBookingChange('guests', e.target.value)}><option>1 Adult</option><option>2 Adults</option><option>2 Adults, 1 Child</option><option>2 Adults, 2 Children</option></select>
-                    </div>
-                    <div className="form-group">
-                        <label>Room Type</label><select value={bookingData.roomType} onChange={(e) => handleBookingChange('roomType', e.target.value)}><option>Luxury Suite</option><option>Executive Room</option><option>Royal Heritage Suite</option></select>
-                    </div>
-                    <div className="form-group full-width">
-                        <label>Event Type (Optional)</label><select value={bookingData.eventType} onChange={(e) => handleBookingChange('eventType', e.target.value)}><option>None</option><option>Corporate Offsite</option><option>Wedding</option><option>Spiritual Retreat</option></select>
-                    </div>
+                    <CustomSelect label="Guests" value={bookingData.guests} options={["1 Adult", "2 Adults", "2 Adults, 1 Child", "2 Adults, 2 Children"]} field="guests" />
+                    <CustomSelect label="Room Type" value={bookingData.roomType} options={["Luxury Suite", "Executive Room", "Royal Heritage Suite"]} field="roomType" />
+                    <div className="full-width"><CustomSelect label="Event Type (Optional)" value={bookingData.eventType} options={["None", "Corporate Offsite", "Wedding", "Spiritual Retreat"]} field="eventType" /></div>
                 </div>
 
                 <div className="price-row">
-                    <div className="price">₹12,500<span>/night</span></div>
-                    <div className="occupancy">2-4 guests</div>
+                    <div className="price">₹{roomPrices[bookingData.roomType].toLocaleString()}<span>/night</span></div>
+                    <div className="occupancy">{roomOccupancy[bookingData.roomType]}</div>
                 </div>
 
                 <a href="#contact" className="btn-reserve" style={{"display":"block","textAlign":"center","textDecoration":"none","position":"relative","zIndex":"5"}}>Request Reservation</a>

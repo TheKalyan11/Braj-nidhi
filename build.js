@@ -40,17 +40,26 @@ content = content.replace(/<use([^>]*(?!\/))><\/use>/g, '<use$1 />');
 content = content.replace(/<use([^>]*(?!\/))>/g, '<use$1 />');
 content = content.replace(/\/\s\/>/g, ' />'); // Fix double slashes
 
-// Replace Booking Spans with Inputs
-content = content.replace(/<label>Check-in<\/label>\s*<span>[^<]*<\/span>/gi, 
-    '<label>Check-in</label><input type="date" value={bookingData.checkIn} onChange={(e) => handleBookingChange(\'checkIn\', e.target.value)} />');
-content = content.replace(/<label>Check-out<\/label>\s*<span>[^<]*<\/span>/gi, 
-    '<label>Check-out</label><input type="date" value={bookingData.checkOut} onChange={(e) => handleBookingChange(\'checkOut\', e.target.value)} />');
-content = content.replace(/<label>Guests<\/label>\s*<span>[^<]*<\/span>/gi, 
-    '<label>Guests</label><select value={bookingData.guests} onChange={(e) => handleBookingChange(\'guests\', e.target.value)}><option>1 Adult</option><option>2 Adults</option><option>2 Adults, 1 Child</option><option>2 Adults, 2 Children</option></select>');
-content = content.replace(/<label>Room Type<\/label>\s*<span>[^<]*<\/span>/gi, 
-    '<label>Room Type</label><select value={bookingData.roomType} onChange={(e) => handleBookingChange(\'roomType\', e.target.value)}><option>Luxury Suite</option><option>Executive Room</option><option>Royal Heritage Suite</option></select>');
-content = content.replace(/<label>Event Type \(Optional\)<\/label>\s*<span>[^<]*<\/span>/gi, 
-    '<label>Event Type (Optional)</label><select value={bookingData.eventType} onChange={(e) => handleBookingChange(\'eventType\', e.target.value)}><option>None</option><option>Corporate Offsite</option><option>Wedding</option><option>Spiritual Retreat</option></select>');
+// Replace Booking Spans with CustomSelect
+content = content.replace(/<div className=\"form-group\">\s*<label>Check-in<\/label>\s*<span>[^<]*<\/span>/gi, 
+    '<div className="form-group"><label>Check-in</label><input type="date" value={bookingData.checkIn} onChange={(e) => handleBookingChange(\'checkIn\', e.target.value)} />');
+content = content.replace(/<div className=\"form-group\">\s*<label>Check-out<\/label>\s*<span>[^<]*<\/span>/gi, 
+    '<div className="form-group"><label>Check-out</label><input type="date" value={bookingData.checkOut} onChange={(e) => handleBookingChange(\'checkOut\', e.target.value)} />');
+
+content = content.replace(/<div className=\"form-group\">\s*<label>Guests<\/label>\s*<span>[^<]*<\/span>\s*<\/div>/gi, 
+    '<CustomSelect label="Guests" value={bookingData.guests} options={["1 Adult", "2 Adults", "2 Adults, 1 Child", "2 Adults, 2 Children"]} field="guests" />');
+
+content = content.replace(/<div className=\"form-group\">\s*<label>Room Type<\/label>\s*<span>[^<]*<\/span>\s*<\/div>/gi, 
+    '<CustomSelect label="Room Type" value={bookingData.roomType} options={["Luxury Suite", "Executive Room", "Royal Heritage Suite"]} field="roomType" />');
+
+content = content.replace(/<div className=\"form-group full-width\">\s*<label>Event Type \(Optional\)<\/label>\s*<span>[^<]*<\/span>\s*<\/div>/gi, 
+    '<div className="full-width"><CustomSelect label="Event Type (Optional)" value={bookingData.eventType} options={["None", "Corporate Offsite", "Wedding", "Spiritual Retreat"]} field="eventType" /></div>');
+
+// Dynamic Price and Occupancy
+content = content.replace(/<div className=\"price\">₹12,500<span>\/night<\/span><\/div>/gi, 
+    '<div className="price">₹{roomPrices[bookingData.roomType].toLocaleString()}<span>/night</span></div>');
+content = content.replace(/<div className=\"occupancy\">2-4 guests<\/div>/gi, 
+    '<div className="occupancy">{roomOccupancy[bookingData.roomType]}</div>');
 
 // Replace Reservation Button
 content = content.replace(/<button className=\"btn-reserve\">Request Reservation<\/button>/gi, 
@@ -90,17 +99,51 @@ export default function Home() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  const roomPrices: Record<string, number> = {
+    'Luxury Suite': 8500,
+    'Executive Room': 6000,
+    'Royal Heritage Suite': 12500
+  };
+
+  const roomOccupancy: Record<string, string> = {
+    'Luxury Suite': '2-3 guests',
+    'Executive Room': '1-2 guests',
+    'Royal Heritage Suite': '2-4 guests'
+  };
+
   const [bookingData, setBookingData] = useState({
     checkIn: '2026-05-12',
     checkOut: '2026-05-18',
     guests: '2 Adults, 1 Child',
-    roomType: 'Luxury Suite',
+    roomType: 'Royal Heritage Suite',
     eventType: 'Corporate Offsite'
   });
 
   const handleBookingChange = (field: string, value: string) => {
     setBookingData(prev => ({ ...prev, [field]: value }));
+    setOpenDropdown(null);
   };
+
+  const CustomSelect = ({ label, value, options, field }: { label: string, value: string, options: string[], field: string }) => (
+    <div className="custom-select-container">
+      <label>{label}</label>
+      <div className={"custom-select-trigger " + (openDropdown === field ? "active" : "")} onClick={() => setOpenDropdown(openDropdown === field ? null : field)}>
+        <span>{value}</span>
+        <i className="fas fa-chevron-down"></i>
+      </div>
+      {openDropdown === field && (
+        <div className="custom-options">
+          {options.map(opt => (
+            <div key={opt} className={"custom-option " + (value === opt ? "selected" : "")} onClick={() => handleBookingChange(field, opt)}>
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -169,7 +212,7 @@ export default function Home() {
   }, []);
 
   const requestReservation = () => {
-    alert(\`Reservation Requested!\\n\\nRoom: \${bookingData.roomType}\\nCheck-in: \${bookingData.checkIn}\\nCheck-out: \${bookingData.checkOut}\\nGuests: \${bookingData.guests}\\nEvent: \${bookingData.eventType}\`);
+    alert(\`Reservation Requested!\\n\\nRoom: \${bookingData.roomType}\\nPrice: ₹\${roomPrices[bookingData.roomType].toLocaleString()}/night\\nCheck-in: \${bookingData.checkIn}\\nCheck-out: \${bookingData.checkOut}\\nGuests: \${bookingData.guests}\\nEvent: \${bookingData.eventType}\`);
   };
 
   const toggleFAQ = (e: any) => {
