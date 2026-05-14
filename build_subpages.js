@@ -68,6 +68,14 @@ pages.forEach(page => {
     content = content.replace(/<script[\s\S]*?<\/script>/gi, '');
     content = content.replace(/\scrossorigin=/gi, ' crossOrigin=');
 
+    // Specific content updates for Guesthouse
+    if (page.name === 'Guesthouse') {
+        content = content.replace(/<div className=\"hero-title-large\">DIVINE LUXURY IN VRINDAVAN<\/div>/gi, 
+            '<div className="hero-title-large">Luxury Guestrooms & Divine Suites</div>');
+        content = content.replace(/<h2>STAY LONG, SAVE MORE ON SUITES OR ROOMS<\/h2>\s*<p>[\s\S]*?<\/p>/gi, 
+            `<h2>Experience a refined stay within the sacred atmosphere of Braj Nidhi.</h2><p>Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan.<br /><br />Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>`);
+    }
+
     // Extract styles from head to inject into global CSS if necessary, but actually we will just inline it in the component or keep it in the global css. The user has banner.css, features.css, etc. 
     // Let's add them via import in the layout or page.
     // I'll extract inline <style> and add it as a styled-jsx or simply add to style.css.

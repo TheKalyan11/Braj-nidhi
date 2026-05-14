@@ -680,7 +680,7 @@ export default function Guesthouse() {
     <main>
         <section className="guesthouse-hero">
             <div className="hero-bento-container">
-                <div className="hero-title-large">DIVINE LUXURY IN VRINDAVAN</div>
+                <div className="hero-title-large">Luxury Guestrooms & Divine Suites</div>
                 
                 <div className="hero-main-img-wrap">
                     <img src="guestroom-1.jpg" alt="Resort View" />
@@ -932,8 +932,7 @@ export default function Guesthouse() {
         <section className="promo-section-2">
             <div className="promo2-col-left">
                 <div className="sub-title">ROOMS</div>
-                <h2>STAY LONG, SAVE MORE ON SUITES OR ROOMS</h2>
-                <p>The guesthouse is derived from the traditional ashram, which referred to a spiritual retreat seeing frequent visitors, now blended with modern luxury.</p>
+                <h2>Experience a refined stay within the sacred atmosphere of Braj Nidhi.</h2><p>Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan.<br /><br />Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>
                 <a href="#" className="btn-outline">SEE ALL ROOMS <i className="fas fa-arrow-right"></i></a>
             </div>
             
