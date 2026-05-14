@@ -158,7 +158,7 @@ export default function Home() {
       } catch (err) {
         console.warn('Primary audio source failed, trying fallback:', err);
         // Try local file as fallback
-        audio.src = '/hare-krishna.mp3';
+        audio.src = '/hare-krishna-original.mp3';
         audio.load();
         try {
           await audio.play();
@@ -1099,7 +1099,7 @@ export default function Home() {
             onPlay={handleAudioPlay}
         >
             {/* Local file — always works, no CORS/network issues */}
-            <source src="/hare-krishna.mp3" type="audio/mpeg" />
+            <source src="/hare-krishna-original.mp3" type="audio/mpeg" />
             {/* External fallbacks */}
             <source src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3" type="audio/mpeg" />
             <source src="https://cdn.pixabay.com/audio/2022/02/22/audio_d0a13e6912.mp3" type="audio/mpeg" />
