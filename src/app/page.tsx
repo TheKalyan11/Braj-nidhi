@@ -325,8 +325,8 @@ export default function Home() {
                     <a href="#" className="btn-outline">Plan Your Wedding <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
-                    <img src="wedding-1.jpg" alt="Wedding Hall" className="main-img" />
-                    <img src="wedding-2.jpg" alt="Wedding Decor" className="secondary-img" />
+                    <img src="DSC02591.JPG" alt="Wedding Hall" className="main-img" />
+                    <img src="DSC06003-HDR.png" alt="Wedding Decor" className="secondary-img" />
                 </div>
             </div>
         </section>
