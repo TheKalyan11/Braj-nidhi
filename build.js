@@ -30,8 +30,11 @@ content = content.replace(/style=\"([^\"]*)\"/g, (match, p1) => {
     return 'style={' + JSON.stringify(styleObj) + '}';
 });
 
-// Self-closing tags - DO THIS BEFORE adding any React {} logic
-content = content.replace(/<img([^>]*(?!\/))>/g, '<img$1 />');
+// Self-closing tags and optimization attributes
+content = content.replace(/<img([^>]*?)\/?>/g, (match, p1) => {
+    if (p1.includes('loading=')) return `<img${p1} />`;
+    return `<img${p1} loading="lazy" decoding="async" />`;
+});
 content = content.replace(/<br>/g, '<br />');
 content = content.replace(/<hr>/g, '<hr />');
 content = content.replace(/<input([^>]*(?!\/))>/g, '<input$1 />');
@@ -88,6 +91,71 @@ content = content.replace(/guestroom-1\.jpg/gi, 'DSC05818-HDR.png');
 content = content.replace(/guestroom-2\.jpg/gi, 'DSC05963-HDR.png');
 content = content.replace(/<h2>Luxury Guestrooms & Suites<\/h2>\s*<p>Experience tranquility in our boutique rooms with world-class amenities and personalized service\. Each suite is designed to provide a perfect blend of modern comfort and traditional elegance, ensuring a restful stay in the heart of the city\.<\/p>/gi, 
     `<h2>Luxury Guestrooms & Divine Suites</h2><p>Experience a refined stay within the sacred atmosphere of Braj Nidhi. Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan.<br /><br />Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>`);
+content = content.replace(/<section className=\"faq-section\">[\s\S]*?<\/section>/i, 
+    `<section className="faq-section">
+            <div className="faq-container">
+                <div className="faq-left">
+                    <h2>Frequently Asked<br />Questions</h2>
+                    <p>We're here to help you plan your perfect stay in the heart of Vrindavan.</p>
+                </div>
+                <div className="faq-right">
+                    <div className="faq-item">
+                        <div className="faq-question" onClick={toggleFAQ}>
+                            <span>What are the check-in and check-out timings?</span>
+                            <i className="fas fa-chevron-down"></i>
+                        </div>
+                        <div className="faq-answer">
+                            <p>Check-in starts from 12:00 PM and check-out is until 10:00 AM. Early check-in and late check-out may be available upon request.</p>
+                        </div>
+                    </div>
+                    <div className="faq-item">
+                        <div className="faq-question" onClick={toggleFAQ}>
+                            <span>Is Braj Nidhi suitable for weddings and celebrations?</span>
+                            <i className="fas fa-chevron-down"></i>
+                        </div>
+                        <div className="faq-answer">
+                            <p>Yes, Braj Nidhi is an ideal destination for weddings, family functions, spiritual gatherings, and grand celebrations with premium hospitality and elegant event spaces.</p>
+                        </div>
+                    </div>
+                    <div className="faq-item">
+                        <div className="faq-question" onClick={toggleFAQ}>
+                            <span>Do you provide pure sattvic vegetarian food?</span>
+                            <i className="fas fa-chevron-down"></i>
+                        </div>
+                        <div className="faq-answer">
+                            <p>Yes, we serve freshly prepared pure vegetarian sattvic meals crafted with authenticity, devotion, and quality ingredients.</p>
+                        </div>
+                    </div>
+                    <div className="faq-item">
+                        <div className="faq-question" onClick={toggleFAQ}>
+                            <span>Is parking available within the premises?</span>
+                            <i className="fas fa-chevron-down"></i>
+                        </div>
+                        <div className="faq-answer">
+                            <p>Yes, ample parking space is available for both staying guests and event visitors.</p>
+                        </div>
+                    </div>
+                    <div className="faq-item">
+                        <div className="faq-question" onClick={toggleFAQ}>
+                            <span>Do you offer corporate meeting and AV hall facilities?</span>
+                            <i className="fas fa-chevron-down"></i>
+                        </div>
+                        <div className="faq-answer">
+                            <p>Yes, Braj Nidhi features a premium AV hall equipped with professional sound systems, presentation setup, and modern facilities for conferences, meetings, seminars, and retreats.</p>
+                        </div>
+                    </div>
+                    <div className="faq-item">
+                        <div className="faq-question" onClick={toggleFAQ}>
+                            <span>Is Braj Nidhi suitable for spiritual and wellness retreats?</span>
+                            <i className="fas fa-chevron-down"></i>
+                        </div>
+                        <div className="faq-answer">
+                            <p>Absolutely. The peaceful atmosphere of Braj combined with premium accommodations makes it perfect for spiritual retreats, wellness programs, and group stays.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>`);
 content = content.replace(/<header id=\"main-header\">/gi, '<header id="main-header" className={scrolled ? "scrolled" : ""}>');
 content = content.replace(/<h1>Timeless Luxury, Urban Elegance<\/h1>/gi, '<h1>Timeless Luxury. Divine Serenity.</h1>');
 content = content.replace(/href=\"index\.html/g, 'href="/');
