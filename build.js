@@ -78,6 +78,8 @@ content = content.replace(/<div className=\"chatbot-container\">[\s\S]*?<\/div>\
 content = content.replace(/<div className=\"faq-question\">/g, '<div className=\"faq-question\" onClick={toggleFAQ}>');
 
 // Content replacements
+content = content.replace(/<h2>Corporate Offsite & AV Hall<\/h2>\s*<p>Elevate your team's productivity in our high-tech AV halls and collaborative breakout spaces\. Our modern facilities are designed for high-impact conferences, seminars, and corporate retreats with full technical support\.<\/p>/gi,
+    `<h2>Corporate Retreats & Premium AV Hall</h2><p>Host conferences, meetings, leadership retreats, and corporate gatherings in one of Vrindavan’s finest AV venues. Equipped with advanced sound systems, professional setup, elegant interiors, and seamless event support, Braj Nidhi offers a premium experience designed for impactful events.<br /><br />Blending modern facilities with the peaceful atmosphere of Braj, it’s the perfect destination for productive meetings, meaningful retreats, and elevated corporate experiences.</p>`);
 content = content.replace(/wedding-1\.jpg/gi, 'DSC02591.JPG');
 content = content.replace(/wedding-2\.jpg/gi, 'DSC06003-HDR.png');
 content = content.replace(/<h2>Weddings & Grand Celebrations<\/h2>\s*<p>Plan your dream wedding in our scenic gardens and opulent banquet halls\. From intimate ceremonies to grand receptions, we provide comprehensive planning and bespoke catering to make your special day truly unforgettable\.<\/p>/gi,

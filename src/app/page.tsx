@@ -335,8 +335,7 @@ export default function Home() {
             <div className="split-container reverse">
                 <div className="content-box">
                     <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"  /></svg>
-                    <h2>Corporate Offsite & AV Hall</h2>
-                    <p>Elevate your team's productivity in our high-tech AV halls and collaborative breakout spaces. Our modern facilities are designed for high-impact conferences, seminars, and corporate retreats with full technical support.</p>
+                    <h2>Corporate Retreats & Premium AV Hall</h2><p>Host conferences, meetings, leadership retreats, and corporate gatherings in one of Vrindavan’s finest AV venues. Equipped with advanced sound systems, professional setup, elegant interiors, and seamless event support, Braj Nidhi offers a premium experience designed for impactful events.<br /><br />Blending modern facilities with the peaceful atmosphere of Braj, it’s the perfect destination for productive meetings, meaningful retreats, and elevated corporate experiences.</p>
                     <a href="/booking" className="btn-outline">Book Corporate Hall <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
