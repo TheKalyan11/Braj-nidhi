@@ -196,7 +196,7 @@ export default function Home() {
         </defs>
     </svg>
 
-    <header id="main-header">
+    <header id="main-header" className={scrolled ? "scrolled" : ""}>
         <div className="logo"><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  /></div>
         
         <nav>
