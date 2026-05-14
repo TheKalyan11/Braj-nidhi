@@ -77,7 +77,9 @@ content = content.replace(/<div className=\"chatbot-container\">[\s\S]*?<\/div>\
 // Fix FAQ onclick
 content = content.replace(/<div className=\"faq-question\">/g, '<div className=\"faq-question\" onClick={toggleFAQ}>');
 
-// Link replacements
+// Content replacements
+content = content.replace(/<h2>Luxury Guestrooms & Suites<\/h2>\s*<p>Experience tranquility in our boutique rooms with world-class amenities and personalized service\. Each suite is designed to provide a perfect blend of modern comfort and traditional elegance, ensuring a restful stay in the heart of the city\.<\/p>/gi, 
+    `<h2>Luxury Guestrooms & Divine Suites</h2><p>Experience a refined stay within the sacred atmosphere of Braj Nidhi. Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan.<br /><br />Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>`);
 content = content.replace(/<header id=\"main-header\">/gi, '<header id="main-header" className={scrolled ? "scrolled" : ""}>');
 content = content.replace(/<h1>Timeless Luxury, Urban Elegance<\/h1>/gi, '<h1>Timeless Luxury. Divine Serenity.</h1>');
 content = content.replace(/href=\"index\.html/g, 'href="/');

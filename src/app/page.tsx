@@ -307,8 +307,7 @@ export default function Home() {
             <div className="split-container reverse">
                 <div className="content-box">
                     <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"  /></svg>
-                    <h2>Luxury Guestrooms & Suites</h2>
-                    <p>Experience tranquility in our boutique rooms with world-class amenities and personalized service. Each suite is designed to provide a perfect blend of modern comfort and traditional elegance, ensuring a restful stay in the heart of the city.</p>
+                    <h2>Luxury Guestrooms & Divine Suites</h2><p>Experience a refined stay within the sacred atmosphere of Braj Nidhi. Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan.<br /><br />Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>
                     <a href="/guesthouse" className="btn-outline">Explore Rooms <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
