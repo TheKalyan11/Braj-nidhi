@@ -67,6 +67,8 @@ pages.forEach(page => {
     content = content.replace(/<div className=\"chatbot-container\"[^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/i, '');
     content = content.replace(/<script[\s\S]*?<\/script>/gi, '');
     content = content.replace(/\scrossorigin=/gi, ' crossOrigin=');
+    content = content.replace(/guestroom-1\.jpg/gi, 'DSC05963-HDR.png');
+    content = content.replace(/guestroom-2\.jpg/gi, 'DSC05818-HDR.png');
 
     // Specific content updates for Guesthouse
     if (page.name === 'Guesthouse') {

@@ -683,7 +683,7 @@ export default function Guesthouse() {
                 <div className="hero-title-large">Luxury Guestrooms & Divine Suites</div>
                 
                 <div className="hero-main-img-wrap">
-                    <img src="guestroom-1.jpg" alt="Resort View" />
+                    <img src="DSC05963-HDR.png" alt="Resort View" />
                     <div className="hero-orange-banner">
                         FIND ROOMS FOR A STAY <i className="fas fa-binoculars"></i>
                     </div>

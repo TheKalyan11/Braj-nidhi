@@ -311,8 +311,8 @@ export default function Home() {
                     <a href="/guesthouse" className="btn-outline">Explore Rooms <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
-                    <img src="guestroom-1.jpg" alt="Luxury Suite" className="main-img" />
-                    <img src="guestroom-2.jpg" alt="Modern Bathroom" className="secondary-img" />
+                    <img src="DSC05963-HDR.png" alt="Luxury Suite" className="main-img" />
+                    <img src="DSC05818-HDR.png" alt="Modern Bathroom" className="secondary-img" />
                 </div>
             </div>
         </section>
