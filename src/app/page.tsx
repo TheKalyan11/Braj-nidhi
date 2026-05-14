@@ -5,88 +5,63 @@ import Link from 'next/link';
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const [flippedCards, setFlippedCards] = useState<boolean[]>(new Array(8).fill(false));
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const attractions = [
-    {
-      title: "Banke Bihari Temple",
-      dist: "3.69 km",
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Banke_Bihari_Vrindavan.jpg/960px-Banke_Bihari_Vrindavan.jpg",
-      rating: "4.9",
-      loc: "Bihari Pura, Vrindavan",
-      map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6974793!3d27.5815647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736fc201c10711%3A0xbcc1c54b2ce8f41e!2sShri%20Bankey%20Bihari%20Ji%20Temple%2C%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin"
-    },
-    {
-      title: "Prem Mandir",
-      dist: "0.69 km",
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/PremMandirSideViewFromCanteen.jpg/960px-PremMandirSideViewFromCanteen.jpg",
-      rating: "5.0",
-      loc: "Chattikara Road, Vrindavan",
-      map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6774793!3d27.5615647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPrem%20Mandir!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin"
-    },
-    {
-      title: "ISKCON Vrindavan",
-      dist: "1.20 km",
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Iskon_Temple%2C_Vrindawan.jpg/960px-Iskon_Temple%2C_Vrindawan.jpg",
-      rating: "4.8",
-      loc: "Raman Reti, Vrindavan",
-      map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6874793!3d27.5715647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sISKCON%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin"
-    },
-    {
-      title: "Nidhivan",
-      dist: "3.55 km",
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Nidhivan.jpg/960px-Nidhivan.jpg",
-      rating: "4.7",
-      loc: "Goshala Nagar, Vrindavan",
-      map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6984793!3d27.5825647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNidhivan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin"
-    },
-    {
-      title: "Radha Raman Temple",
-      dist: "3.45 km",
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Radha_Raman_Temple_2.jpg/960px-Radha_Raman_Temple_2.jpg",
-      rating: "4.9",
-      loc: "Pancayatana, Vrindavan",
-      map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6994793!3d27.5835647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRadha%20Raman%20Temple!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin"
-    },
-    {
-      title: "Neem Karoli Ashram",
-      dist: "2.72 km",
-      img: "https://brajnidhi.com/neem_karoli.png",
-      rating: "4.9",
-      loc: "Mathura Road, Vrindavan",
-      map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6914793!3d27.5845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNeem%20Karoli%20Baba%20Ashram!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin"
-    },
-    {
-      title: "Raman Reti",
-      dist: "15.39 km",
-      img: "https://brajnidhi.com/raman_reti.png",
-      rating: "4.8",
-      loc: "Gokul, Uttar Pradesh",
-      map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.7214793!3d27.4845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRaman%20Reti!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin"
-    },
-    {
-      title: "Shri Nand Baba Temple",
-      dist: "31.64 km",
-      img: "https://brajnidhi.com/nand_baba.png",
-      rating: "4.9",
-      loc: "Nandgaon, Mathura",
-      map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.4214793!3d27.7845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sShri%20Nand%20Baba%20Temple!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin"
-    }
-  ];
-
-  const toggleCard = (index: number) => {
-    setFlippedCards(prev => {
-      const newState = [...prev];
-      newState[index] = !newState[index];
-      return newState;
-    });
+  const roomPrices: Record<string, number> = {
+    'Luxury Suite': 8500,
+    'Executive Room': 6000,
+    'Royal Heritage Suite': 12500
   };
 
+  const roomOccupancy: Record<string, string> = {
+    'Luxury Suite': '2-3 guests',
+    'Executive Room': '1-2 guests',
+    'Royal Heritage Suite': '2-4 guests'
+  };
 
+  const getGuestCount = (guestsStr: string) => {
+    const adults = parseInt(guestsStr.match(/(\d+)\s*Adult/)?.[1] || '0');
+    const children = parseInt(guestsStr.match(/(\d+)\s*Child/)?.[1] || '0');
+    const total = adults + children;
+    return `${total} guest${total > 1 ? 's' : ''}`;
+  };
+
+  const [bookingData, setBookingData] = useState({
+    checkIn: '2026-05-12',
+    checkOut: '2026-05-18',
+    guests: '2 Adults, 1 Child',
+    roomType: 'Royal Heritage Suite',
+    eventType: 'Corporate Offsite'
+  });
+
+  const handleBookingChange = (field: string, value: string) => {
+    setBookingData(prev => ({ ...prev, [field]: value }));
+    setOpenDropdown(null);
+  };
+
+  const CustomSelect = ({ label, value, options, field }: { label: string, value: string, options: string[], field: string }) => (
+    <div className="custom-select-container">
+      <label>{label}</label>
+      <div className={"custom-select-trigger " + (openDropdown === field ? "active" : "")} onClick={() => setOpenDropdown(openDropdown === field ? null : field)}>
+        <span>{value}</span>
+        <i className="fas fa-chevron-down"></i>
+      </div>
+      {openDropdown === field && (
+        <div className="custom-options">
+          {options.map(opt => (
+            <div key={opt} className={"custom-option " + (value === opt ? "selected" : "")} onClick={() => handleBookingChange(field, opt)}>
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -121,6 +96,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    // Stats observer
     const statsContainer = document.querySelector('.stats-container');
     const counters = document.querySelectorAll('.counter');
     let animated = false;
@@ -153,6 +129,10 @@ export default function Home() {
     if (statsContainer) observer.observe(statsContainer);
   }, []);
 
+  const requestReservation = () => {
+    alert(`Reservation Requested!\n\nRoom: ${bookingData.roomType}\nPrice: ₹${roomPrices[bookingData.roomType].toLocaleString()}/night\nCheck-in: ${bookingData.checkIn}\nCheck-out: ${bookingData.checkOut}\nGuests: ${bookingData.guests}\nEvent: ${bookingData.eventType}`);
+  };
+
   const toggleFAQ = (e: any) => {
     const currentItem = e.currentTarget.parentElement;
     document.querySelectorAll('.faq-item').forEach(item => {
@@ -175,6 +155,7 @@ export default function Home() {
   return (
     <div className="index-page">
       
+    {/*  Krishna Feather & Flute SVG Definitions  */}
     <svg style={{"display":"none"}}>
         <defs>
             <g id="peacock-feather">
@@ -186,18 +167,28 @@ export default function Home() {
             </g>
 
             <g id="krishna-flute-feather">
+                {/*  Flute Body  */}
                 <path d="M10,75 L90,45" stroke="#DAA520" strokeWidth="12" stroke-linecap="round"/>
                 <path d="M12,73 L88,44" stroke="#F0E68C" strokeWidth="6" stroke-linecap="round"/>
+                
+                {/*  Red Details / Bindings  */}
                 <line x1="20" y1="76" x2="25" y2="63" stroke="#DC143C" strokeWidth="3"/>
                 <line x1="23" y1="75" x2="28" y2="62" stroke="#DC143C" strokeWidth="3"/>
+                
                 <line x1="75" y1="56" x2="80" y2="43" stroke="#DC143C" strokeWidth="3"/>
                 <line x1="78" y1="55" x2="83" y2="42" stroke="#DC143C" strokeWidth="3"/>
+
+                {/*  Flute Holes  */}
                 <circle cx="40" cy="62" r="2.5" fill="#3e2723"/>
                 <circle cx="50" cy="59" r="2.5" fill="#3e2723"/>
                 <circle cx="60" cy="56" r="2.5" fill="#3e2723"/>
                 <circle cx="70" cy="53" r="2.5" fill="#3e2723"/>
+                
+                {/*  Tassel Strings  */}
                 <path d="M23,75 Q15,90 30,95" fill="none" stroke="#FFD700" strokeWidth="2"/>
                 <path d="M27,74 Q35,90 30,95" fill="none" stroke="#FFD700" strokeWidth="2"/>
+                
+                {/*  Use Feather  */}
                 <g transform="translate(55, 10) rotate(15) scale(0.4)">
                     <use href="#peacock-feather" />
                 </g>
@@ -206,7 +197,7 @@ export default function Home() {
     </svg>
 
     <header id="main-header" className={scrolled ? "scrolled" : ""}>
-        <div className="logo"><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  loading="lazy" decoding="async" /></div>
+        <div className="logo"><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  /></div>
         
         <nav>
             <ul>
@@ -226,9 +217,9 @@ export default function Home() {
         <section className="hero">
             <div className="hero-content">
                 <h1>Timeless Luxury. Divine Serenity.</h1>
-                <p>Experience a refined stay within the sacred atmosphere of Braj Nidhi. Our divine suites offer an oasis of calm amidst the spiritual heart of Vrindavan.</p>
+                <p>Experience the finest hospitality in the heart of the city. Our heritage suites offer an oasis of calm amidst the vibrant urban landscape.</p>
                 
-                <div className="rating-info liquid-glass">
+                <div className="rating-info">
                     <span className="stars"><i className="fas fa-star"></i> 4.9</span>
                     <span className="reviews">from 2,400+ stays</span>
                 </div>
@@ -252,34 +243,21 @@ export default function Home() {
                 </div>
 
                 <div className="booking-form">
-                    <div className="form-group">
-                        <label>Check-in</label>
-                        <span>May 12, 2026</span>
+                    <div className="form-group"><label>Check-in</label><input type="date" value={bookingData.checkIn} onChange={(e) => handleBookingChange('checkIn', e.target.value)} />
                     </div>
-                    <div className="form-group">
-                        <label>Check-out</label>
-                        <span>May 18, 2026</span>
+                    <div className="form-group"><label>Check-out</label><input type="date" value={bookingData.checkOut} onChange={(e) => handleBookingChange('checkOut', e.target.value)} />
                     </div>
-                    <div className="form-group">
-                        <label>Guests</label>
-                        <span>2 Adults, 1 Child</span>
-                    </div>
-                    <div className="form-group">
-                        <label>Room Type</label>
-                        <span>Luxury Suite</span>
-                    </div>
-                    <div className="form-group full-width">
-                        <label>Event Type (Optional)</label>
-                        <span>Corporate Offsite</span>
-                    </div>
+                    <CustomSelect label="Guests" value={bookingData.guests} options={["1 Adult", "2 Adults", "2 Adults, 1 Child", "2 Adults, 2 Children"]} field="guests" />
+                    <CustomSelect label="Room Type" value={bookingData.roomType} options={["Luxury Suite", "Executive Room", "Royal Heritage Suite"]} field="roomType" />
+                    <div className="full-width"><CustomSelect label="Event Type (Optional)" value={bookingData.eventType} options={["None", "Corporate Offsite", "Wedding", "Spiritual Retreat"]} field="eventType" /></div>
                 </div>
 
                 <div className="price-row">
-                    <div className="price">₹12,500<span>/night</span></div>
-                    <div className="occupancy">2-4 guests</div>
+                    <div className="price">₹{roomPrices[bookingData.roomType].toLocaleString()}<span>/night</span></div>
+                    <div className="occupancy">{getGuestCount(bookingData.guests)}</div>
                 </div>
 
-                <a href="#contact" className="btn-reserve" style={{ display: "block", textAlign: "center", textDecoration: "none", position: "relative", zIndex: 5 }}>Request Reservation</a>
+                <a href="#contact" className="btn-reserve" style={{"display":"block","textAlign":"center","textDecoration":"none","position":"relative","zIndex":"5"}}>Request Reservation</a>
             </div>
         </section>
 
@@ -287,78 +265,78 @@ export default function Home() {
             <div className="scrolling-banner">
                 <div className="banner-track">
                     <div className="logo-item"><i className="fas fa-bed"></i> Luxury Suites</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-ring"></i> Scenic Weddings</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-laptop-house"></i> Corporate Offsites</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-landmark"></i> Heritage Living</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-glass-cheers"></i> Grand Banquets</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-video"></i> Modern AV Halls</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-star"></i> Boutique Stays</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-spa"></i> Wellness Retreats</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
+                    
+                    {/*  Duplicate for infinite effect  */}
                     <div className="logo-item"><i className="fas fa-bed"></i> Luxury Suites</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-ring"></i> Scenic Weddings</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-laptop-house"></i> Corporate Offsites</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-landmark"></i> Heritage Living</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-glass-cheers"></i> Grand Banquets</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-video"></i> Modern AV Halls</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-star"></i> Boutique Stays</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                     <div className="logo-item"><i className="fas fa-spa"></i> Wellness Retreats</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather" /></svg></div>
+                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
                 </div>
             </div>
         </section>
+
 
         <section className="split-section" id="rooms">
             <div className="split-container reverse">
                 <div className="content-box">
-                    <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"></use></svg>
-                    <h2>Luxury Guestrooms & Divine Suites</h2>
-                    <p>Experience a refined stay within the sacred atmosphere of Braj Nidhi. Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan. Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>
-                    <Link href="/guesthouse" className="liquid-glass-button">Explore Rooms <i className="fas fa-arrow-right"></i></Link>
+                    <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"  /></svg>
+                    <h2>Luxury Guestrooms & Divine Suites</h2><p>Experience a refined stay within the sacred atmosphere of Braj Nidhi. Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan.<br /><br />Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>
+                    <a href="/guesthouse" className="btn-outline">Explore Rooms <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
-                    <img src="guestroom-1.jpg" alt="Luxury Suite" className="main-img" />
-                    <img src="guestroom-2.jpg" alt="Modern Bathroom" className="secondary-img" />
+                    <img src="DSC05818-HDR.png" alt="Luxury Suite" className="main-img" />
+                    <img src="DSC05963-HDR.png" alt="Modern Bathroom" className="secondary-img" />
                 </div>
             </div>
         </section>
 
-        <section className="split-section" id="weddings" style={{background: "#ffffff"}}>
+        <section className="split-section" id="weddings" style={{"background":"#ffffff"}}>
             <div className="split-container">
                 <div className="content-box">
-                    <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"></use></svg>
-                    <h2>Weddings & Grand Celebrations</h2>
-                    <p>Celebrate your most special moments amidst the divine elegance of Braj Nidhi. From intimate wedding ceremonies to luxurious grand celebrations, our majestic venues, premium hospitality, and serene spiritual atmosphere create experiences that feel truly timeless. With beautifully designed spaces, exceptional accommodations, curated sattvic dining, and personalized event planning, every celebration at Braj Nidhi becomes a cherished memory for generations.</p>
-                    <Link href="/weddings" className="liquid-glass-button">Plan Your Wedding <i className="fas fa-arrow-right"></i></Link>
+                    <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"  /></svg>
+                    <h2>Weddings & Grand Celebrations</h2><p>Celebrate your most special moments amidst the divine elegance of Braj Nidhi. From intimate wedding ceremonies to luxurious grand celebrations, our majestic venues, premium hospitality, and serene spiritual atmosphere create experiences that feel truly timeless.<br /><br />With beautifully designed spaces, exceptional accommodations, curated sattvic dining, and personalized event planning, every celebration at Braj Nidhi becomes a cherished memory for generations.</p>
+                    <a href="#" className="btn-outline">Plan Your Wedding <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
-                    <img src="wedding-1.jpg" alt="Wedding Hall" className="main-img" />
-                    <img src="wedding-2.jpg" alt="Wedding Decor" className="secondary-img" />
+                    <img src="DSC02591.JPG" alt="Wedding Hall" className="main-img" />
+                    <img src="DSC06003-HDR.png" alt="Wedding Decor" className="secondary-img" />
                 </div>
             </div>
         </section>
 
-        <section className="split-section" id="corporate" style={{background: "#f4f6f8"}}>
+        <section className="split-section" id="corporate" style={{"background":"#f4f6f8"}}>
             <div className="split-container reverse">
                 <div className="content-box">
-                    <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"></use></svg>
-                    <h2>Corporate Retreats & Professional Excellence</h2>
-                    <p>Host conferences, meetings, leadership retreats, and corporate gatherings in one of Vrindavan’s finest AV venues. Equipped with advanced sound systems, professional setup, elegant interiors, and seamless event support, Braj Nidhi offers a premium experience designed for impactful events. Blending modern facilities with the peaceful atmosphere of Braj, it’s the perfect destination for productive meetings, meaningful retreats, and elevated corporate experiences.</p>
-                    <Link href="/corporate" className="liquid-glass-button">Book Corporate Hall <i className="fas fa-arrow-right"></i></Link>
+                    <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"  /></svg>
+                    <h2>Corporate Retreats & Premium AV Hall</h2><p>Host conferences, meetings, leadership retreats, and corporate gatherings in one of Vrindavan’s finest AV venues. Equipped with advanced sound systems, professional setup, elegant interiors, and seamless event support, Braj Nidhi offers a premium experience designed for impactful events.<br /><br />Blending modern facilities with the peaceful atmosphere of Braj, it’s the perfect destination for productive meetings, meaningful retreats, and elevated corporate experiences.</p>
+                    <a href="/booking" className="btn-outline">Book Corporate Hall <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
                     <img src="corporate-1.jpg" alt="AV Hall" className="main-img" />
@@ -369,6 +347,7 @@ export default function Home() {
 
         <section className="stats-section">
             <div className="stats-container">
+                {/*  God Krishna Ornament with Music Animation  */}
                 <div className="krishna-ornament-wrapper">
                     <img src="kk.png" alt="God Krishna Playing Flute" className="krishna-image" />
                     <div className="music-notes">
@@ -377,6 +356,7 @@ export default function Home() {
                         <i className="fas fa-music note-3"></i>
                     </div>
                 </div>
+                
                 <div className="stat-item">
                     <h2 className="counter" data-target="10">0</h2><span>K+</span>
                     <p>Happy Guests</p>
@@ -399,64 +379,79 @@ export default function Home() {
         <section className="room-types-section">
             <div className="section-header">
                 <h2 className="divine-header">
-                    <span className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"></use></svg></span>
+                    <span className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
                     <span className="divine-text">Exquisite Accommodations</span>
-                    <span className="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"></use></svg></span>
+                    <span className="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
                 </h2>
                 <p>Choose the perfect sanctuary for your stay.</p>
             </div>
             <div className="room-grid">
+                {/*  Room Card 1  */}
                 <div className="room-card new-style">
                     <img src="room_deluxe.png" alt="Deluxe Room" className="room-bg-img" />
                     <div className="card-gradient"></div>
+                    
                     <div className="room-content">
                         <h3>Deluxe Temple View</h3>
                         <p className="room-location"><i className="fas fa-map-marker-alt"></i> Braj Nidhi Guest House, Vrindavan</p>
+                        
                         <div className="room-amenities">
                             <span><i className="fas fa-bed"></i> King Bed</span>
                             <span><i className="fas fa-wifi"></i> Free WiFi</span>
                             <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                         </div>
+                        
                         <button className="btn-availability">Book for ₹8,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
+
+                {/*  Room Card 2  */}
                 <div className="room-card new-style">
                     <img src="room_executive.png" alt="Executive Suite" className="room-bg-img" />
                     <div className="card-gradient"></div>
+                    
                     <div className="room-content">
                         <h3>Executive Suite</h3>
                         <p className="room-location"><i className="fas fa-map-marker-alt"></i> Braj Nidhi Guest House, Vrindavan</p>
+                        
                         <div className="room-amenities">
                             <span><i className="fas fa-couch"></i> Living Area</span>
                             <span><i className="fas fa-bath"></i> Deep Tub</span>
                             <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                         </div>
+                        
                         <button className="btn-availability">Book for ₹12,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
+
+                {/*  Room Card 3  */}
                 <div className="room-card new-style">
                     <img src="room_royal.png" alt="Royal Heritage Suite" className="room-bg-img" />
                     <div className="card-gradient"></div>
+                    
                     <div className="room-content">
                         <h3>Royal Heritage Suite</h3>
                         <p className="room-location"><i className="fas fa-map-marker-alt"></i> Braj Nidhi Guest House, Vrindavan</p>
+                        
                         <div className="room-amenities">
                             <span><i className="fas fa-crown"></i> Four-Poster Bed</span>
                             <span><i className="fas fa-bell"></i> Personal Attendant</span>
                             <span><i className="fas fa-hot-tub"></i> Jacuzzi</span>
                         </div>
-                        <a href="booking.html" className="btn-availability" style={{display: "block", textAlign: "center", textDecoration: "none"}}>Book for ₹25,000 <i className="fas fa-chevron-right"></i></a>
+                        
+                        <a href="/booking" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Book for ₹25,000 <i className="fas fa-chevron-right"></i></a>
                     </div>
                 </div>
             </div>
         </section>
 
+        {/*  Offers and Packages Section  */}
         <section className="offers-section">
             <div className="section-header">
                 <h2 className="divine-header">
-                    <span className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"></use></svg></span>
+                    <span className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
                     <span className="divine-text">Special Offers & Packages</span>
-                    <span className="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"></use></svg></span>
+                    <span className="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
                 </h2>
                 <p>Unlock exclusive experiences and divine memories with our curated stays.</p>
             </div>
@@ -464,99 +459,293 @@ export default function Home() {
                 <div className="offer-card immersive">
                     <img src="spiritual_retreat.png" alt="Spiritual Retreat" className="offer-bg-img" />
                     <div className="offer-gradient-blur"></div>
+                    
                     <div className="offer-content">
                         <h3>Spiritual Retreat</h3>
                         <p className="offer-subtitle">3-Day Experience</p>
+                        
                         <div className="offer-inline-tags">
                             <span><i className="fas fa-tag"></i> from <strong>₹14,999</strong></span>
                             <span><i className="fas fa-om"></i> VIP Darshan</span>
                         </div>
-                        <a href="booking.html" className="btn-offer-full" style={{display: "block", textAlign: "center", textDecoration: "none"}}>Claim Offer</a>
+                        
+                        <a href="/booking" className="btn-offer-full" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Claim Offer</a>
                     </div>
                 </div>
+
+                {/*  Offer Card 2  */}
                 <div className="offer-card immersive">
                     <img src="wedding_package.png" alt="Royal Wedding" className="offer-bg-img" />
                     <div className="offer-gradient-blur"></div>
+                    
                     <div className="offer-content">
                         <h3>Royal Wedding</h3>
                         <p className="offer-subtitle">Heritage Venue</p>
+                        
                         <div className="offer-inline-tags">
                             <span><i className="fas fa-tag"></i> <strong>Custom Pricing</strong></span>
                             <span><i className="fas fa-users"></i> 50 Guests</span>
                         </div>
-                        <a href="#contact" className="btn-offer-full" style={{display: "block", textAlign: "center", textDecoration: "none"}}>Enquire Now</a>
+                        
+                        <a href="#contact" className="btn-offer-full" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Enquire Now</a>
                     </div>
                 </div>
+
+                {/*  Offer Card 3  */}
                 <div className="offer-card immersive">
                     <img src="corporate_package.png" alt="Weekend Serenity" className="offer-bg-img" />
                     <div className="offer-gradient-blur"></div>
+                    
                     <div className="offer-content">
                         <h3>Weekend Serenity</h3>
                         <p className="offer-subtitle">2-Day Getaway</p>
+                        
                         <div className="offer-inline-tags">
                             <span><i className="fas fa-tag"></i> from <strong>₹9,500</strong></span>
                             <span><i className="fas fa-bed"></i> Luxury Room</span>
                         </div>
-                        <a href="#contact" className="btn-offer-full" style={{display: "block", textAlign: "center", textDecoration: "none", marginTop: "15px"}}>Book This Package</a>
+                        
+                        <a href="#contact" className="btn-offer-full" style={{"display":"block","textAlign":"center","textDecoration":"none","marginTop":"15px"}}>Book This Package</a>
                     </div>
                 </div>
             </div>
         </section>
         
+        {/*  Nearby Attractions Section  */}
         <section className="attractions-section">
             <div className="section-header">
                 <h2 className="divine-header">
-                    <span className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"></use></svg></span>
+                    <span className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
                     <span className="divine-text">Nearby Attractions</span>
-                    <span className="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"></use></svg></span>
+                    <span className="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
                 </h2>
                 <p>Discover the divine landmarks and heritage sites around Braj Nidhi. <span className="click-hint">(Click any card to flip for location)</span></p>
             </div>
-          <div className="attractions-grid">
-            {attractions.map((attraction, index) => (
-              <div 
-                key={index} 
-                className={`attraction-card ${flippedCards[index] ? 'flipped' : ''}`}
-                onClick={() => toggleCard(index)}
-              >
-                <div className="flip-card-inner">
-                  <div className="flip-card-front">
-                    <img src={attraction.img} alt={attraction.title} className="attraction-bg" />
-                    <div className="card-overlay-gradient"></div>
-                    <div className="distance-pill">{attraction.dist}</div>
-                    <div className="attraction-content">
-                      <div className="title-row">
-                        <h3>{attraction.title}</h3>
-                        <span className="rating-pill"><i className="fas fa-star" style={{ color: '#ffd700' }}></i> {attraction.rating}</span>
-                      </div>
-                      <div className="location-line">
-                        <i className="fas fa-map-marker-alt"></i>
-                        <span>{attraction.loc}</span>
-                      </div>
-                      <div className="flip-hint-text">
-                        <i className="fas fa-sync-alt"></i> Click for Map
-                      </div>
+            <div className="attractions-grid">
+                {/*  Attraction 1  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Banke_Bihari_Vrindavan.jpg/960px-Banke_Bihari_Vrindavan.jpg" alt="Banke Bihari Temple" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">3.69 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Banke Bihari Temple</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Bihari Pura, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6974793!3d27.5815647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736fc201c10711%3A0xbcc1c54b2ce8f41e!2sShri%20Bankey%20Bihari%20Ji%20Temple%2C%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
                     </div>
-                  </div>
-                  <div className="flip-card-back">
-                    <iframe 
-                      src={attraction.map} 
-                      width="100%" 
-                      height="100%" 
-                      style={{ border: 0 }} 
-                      allowFullScreen 
-                      loading="lazy" 
-                      referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
-                    <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
-                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+
+                {/*  Attraction 2  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/PremMandirSideViewFromCanteen.jpg/960px-PremMandirSideViewFromCanteen.jpg" alt="Prem Mandir" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">0.69 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Prem Mandir</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 5.0</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Chattikara Road, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6774793!3d27.5615647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPrem%20Mandir!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 3  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Iskon_Temple%2C_Vrindawan.jpg/960px-Iskon_Temple%2C_Vrindawan.jpg" alt="ISKCON Temple" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">1.20 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>ISKCON Vrindavan</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.8</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Raman Reti, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6874793!3d27.5715647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sISKCON%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 4  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Nidhivan.jpg/960px-Nidhivan.jpg" alt="Nidhivan" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">3.55 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Nidhivan</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.7</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Goshala Nagar, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6984793!3d27.5825647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNidhivan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 5  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Radha_Raman_Temple_2.jpg/960px-Radha_Raman_Temple_2.jpg" alt="Radha Raman Temple" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">3.45 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Radha Raman Temple</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Pancayatana, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6994793!3d27.5835647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRadha%20Raman%20Temple!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 6  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="neem_karoli.png" alt="Neem Karoli Ashram" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">2.72 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Neem Karoli Ashram</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Mathura Road, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6914793!3d27.5845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNeem%20Karoli%20Baba%20Ashram!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 7  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="raman_reti.png" alt="Raman Reti" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">15.39 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Raman Reti</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.8</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Gokul, Uttar Pradesh</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.7214793!3d27.4845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRaman%20Reti!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 8  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="nand_baba.png" alt="Shri Nand Baba Temple" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">31.64 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Shri Nand Baba Temple</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Nandgaon, Mathura</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.4214793!3d27.7845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sShri%20Nand%20Baba%20Temple!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        
+        {/*  Gallery Section  */}
         <section className="gallery-section">
             <div className="gallery-header">
                 <h2>&mdash; GALLERY</h2>
@@ -582,7 +771,7 @@ export default function Home() {
                         <img src="images/heritage_architecture.png" alt="Heritage Architecture" />
                     </div>
                 </div>
-                
+                {/*  Navigation Buttons  */}
                 <div className="gallery-nav">
                     <div className="swiper-button-prev-custom"><i className="fas fa-arrow-left"></i></div>
                     <div className="swiper-button-next-custom"><i className="fas fa-arrow-right"></i></div>
@@ -590,7 +779,7 @@ export default function Home() {
             </div>
         </section>
 
-        
+        {/*  Amenities Auto-Scrolling Marquee  */}
         <div className="amenities-banner">
             <div className="scroller-container">
                 <div className="scroller-content">
@@ -615,7 +804,7 @@ export default function Home() {
                     <div className="scroller-item"><i className="fas fa-wifi"></i> Free High-Speed Wi-Fi</div>
                     <div className="scroller-dot">✦</div>
                 </div>
-                
+                {/*  Duplicate for seamless loop  */}
                 <div className="scroller-content" aria-hidden="true">
                     <div className="scroller-item"><i className="fas fa-parking"></i> Parking Space</div>
                     <div className="scroller-dot">✦</div>
@@ -641,7 +830,7 @@ export default function Home() {
             </div>
         </div>
 
-        
+        {/*  Testimonials Section  */}
         <section className="testimonials-section">
             <div className="section-header center-header">
                 <div className="rating-badge">
@@ -652,7 +841,7 @@ export default function Home() {
             
             <div className="testimonials-slider swiper">
                 <div className="swiper-wrapper">
-                
+                {/*  Card 1  */}
                 <div className="swiper-slide testimonial-card">
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"Exceeded our expectations with impeccable service that brought our spiritual journey to life - a truly remarkable stay."</p>
@@ -665,7 +854,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                
+                {/*  Card 2  */}
                 <div className="swiper-slide testimonial-card">
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"Their ability to capture the spiritual essence in every detail is unparalleled - an invaluable cultural experience."</p>
@@ -678,7 +867,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                
+                {/*  Card 3  */}
                 <div className="swiper-slide testimonial-card">
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"Gracious hosts who listen, understand, and craft captivating experiences - a team that truly understands our needs."</p>
@@ -691,7 +880,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                
+                {/*  Card 4  */}
                 <div className="swiper-slide testimonial-card">
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"A refreshing and peaceful environment that consistently delivers exceptional comfort - highly recommended for any visit."</p>
@@ -704,7 +893,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                
+                {/*  Card 5  */}
                 <div className="swiper-slide testimonial-card">
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"From concept to execution, their hospitality knows no bounds - a game-changer for our family vacation."</p>
@@ -717,7 +906,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                
+                {/*  Card 6  */}
                 <div className="swiper-slide testimonial-card">
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"A truly spiritual experience. The view of the temple from my room was breathtaking, and the hospitality was exceptional."</p>
@@ -734,13 +923,12 @@ export default function Home() {
         </section>
 
 
-        
+        {/*  FAQ Section  */}
         <section className="faq-section">
             <div className="faq-container">
                 <div className="faq-left">
                     <h2>Frequently Asked<br />Questions</h2>
                     <p>We're here to help you plan your perfect stay in the heart of Vrindavan.</p>
-                    <div className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"></use></svg></div>
                 </div>
                 <div className="faq-right">
                     <div className="faq-item">
@@ -749,52 +937,43 @@ export default function Home() {
                             <i className="fas fa-chevron-down"></i>
                         </div>
                         <div className="faq-answer">
-                            <p>Check-in starts from 12:00 PM and check-out is until 10:00 AM. Early check-in and late check-out may be available upon request.</p>
+                            <p>Standard Check-in is at 2:00 PM and Check-out is at 11:00 AM. Early check-in or late check-out is subject to availability.</p>
                         </div>
                     </div>
                     <div className="faq-item">
                         <div className="faq-question" onClick={toggleFAQ}>
-                            <span>Is Braj Nidhi suitable for weddings and celebrations?</span>
+                            <span>Is the guesthouse near the Bankey Bihari Temple?</span>
                             <i className="fas fa-chevron-down"></i>
                         </div>
                         <div className="faq-answer">
-                            <p>Yes, Braj Nidhi is an ideal destination for weddings, family functions, spiritual gatherings, and grand celebrations with premium hospitality and elegant event spaces.</p>
+                            <p>Yes, we are located within 1.5 km of the Bankey Bihari Temple, making it a quick 5-minute e-rickshaw ride or a pleasant walk.</p>
                         </div>
                     </div>
                     <div className="faq-item">
                         <div className="faq-question" onClick={toggleFAQ}>
-                            <span>Do you provide pure sattvic vegetarian food?</span>
+                            <span>Do you provide pure vegetarian food?</span>
                             <i className="fas fa-chevron-down"></i>
                         </div>
                         <div className="faq-answer">
-                            <p>Yes, we serve freshly prepared pure vegetarian sattvic meals crafted with authenticity, devotion, and quality ingredients.</p>
+                            <p>Absolutely. Braj Nidhi is a pure Satvik vegetarian establishment. We serve traditional Braj cuisine prepared with the highest standards of hygiene.</p>
                         </div>
                     </div>
                     <div className="faq-item">
                         <div className="faq-question" onClick={toggleFAQ}>
-                            <span>Is parking available within the premises?</span>
+                            <span>Is parking available at the guesthouse?</span>
                             <i className="fas fa-chevron-down"></i>
                         </div>
                         <div className="faq-answer">
-                            <p>Yes, ample parking space is available for both staying guests and event visitors.</p>
+                            <p>Yes, we have a dedicated, secure parking area for guests traveling with their own vehicles at no additional cost.</p>
                         </div>
                     </div>
                     <div className="faq-item">
                         <div className="faq-question" onClick={toggleFAQ}>
-                            <span>Do you offer corporate meeting and AV hall facilities?</span>
+                            <span>How can I book a room?</span>
                             <i className="fas fa-chevron-down"></i>
                         </div>
                         <div className="faq-answer">
-                            <p>Yes, Braj Nidhi features a premium AV hall equipped with professional sound systems, presentation setup, and modern facilities for conferences, meetings, seminars, and retreats.</p>
-                        </div>
-                    </div>
-                    <div className="faq-item">
-                        <div className="faq-question" onClick={toggleFAQ}>
-                            <span>Is Braj Nidhi suitable for spiritual and wellness retreats?</span>
-                            <i className="fas fa-chevron-down"></i>
-                        </div>
-                        <div className="faq-answer">
-                            <p>Absolutely. The peaceful atmosphere of Braj combined with premium accommodations makes it perfect for spiritual retreats, wellness programs, and group stays.</p>
+                            <p>You can book directly through our 'Reserve Now' buttons on this website or reach out to us at +91 98765 43210 for group bookings and weddings.</p>
                         </div>
                     </div>
                 </div>
@@ -803,7 +982,7 @@ export default function Home() {
 
 
 
-        
+        {/*  CTA Section  */}
         <section className="cta-section" id="contact">
             <div className="cta-card">
                 <div className="cta-content">
@@ -816,42 +995,43 @@ export default function Home() {
         </section>
     </main>
 
+    {/*  Footer  */}
     <footer className="site-footer">
         <div className="footer-top-links">
             <div className="footer-col">
                 <h3>Company</h3>
-                <Link href="/">Home</Link>
-                <Link href="/#about">Our Story</Link>
-                <Link href="/guesthouse">Rooms & Suites</Link>
-                <Link href="/#testimonials">Guest Reviews</Link>
+                <a href="/#home">Home</a>
+                <a href="/#about">Our Story</a>
+                <a href="/guesthouse">Rooms & Suites</a>
+                <a href="/#testimonials">Guest Reviews</a>
             </div>
             <div className="footer-col">
                 <h3>Explore Vrindavan</h3>
-                <Link href="#">Bankey Bihari Mandir</Link>
-                <Link href="#">Prem Mandir</Link>
-                <Link href="#">ISKCON Temple</Link>
-                <Link href="#">Local Attractions</Link>
+                <a href="#">Bankey Bihari Mandir</a>
+                <a href="#">Prem Mandir</a>
+                <a href="#">ISKCON Temple</a>
+                <a href="#">Local Attractions</a>
             </div>
             <div className="footer-col">
                 <h3>Stay & Book</h3>
-                <Link href="/booking">Book Your Stay</Link>
-                <Link href="/weddings">Wedding Packages</Link>
-                <Link href="/corporate">Corporate Stays</Link>
-                <Link href="#">Refund Policy</Link>
+                <a href="/booking">Book Your Stay</a>
+                <a href="/weddings">Wedding Packages</a>
+                <a href="/corporate">Corporate Stays</a>
+                <a href="#">Refund Policy</a>
             </div>
             <div className="footer-col">
                 <h3>Help & Support</h3>
-                <Link href="#">FAQ</Link>
-                <Link href="/#contact">Contact Us</Link>
-                <Link href="#">Direction Map</Link>
-                <Link href="#">Group Inquiries</Link>
+                <a href="#">FAQ</a>
+                <a href="/#contact">Contact Us</a>
+                <a href="#">Direction Map</a>
+                <a href="#">Group Inquiries</a>
             </div>
             <div className="footer-col">
                 <h3>Information</h3>
-                <Link href="#">Privacy Policy</Link>
-                <Link href="#">Terms of Service</Link>
-                <Link href="#">Guest Policy</Link>
-                <Link href="#">Cancellation Policy</Link>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Guest Policy</a>
+                <a href="#">Cancellation Policy</a>
             </div>
         </div>
         
@@ -866,49 +1046,45 @@ export default function Home() {
         </div>
     </footer>
 
-    {/* Global Floating Features */}
-    <div className="whatsapp-container">
-        <a href="https://wa.me/910000000000" className="whatsapp-btn" target="_blank" rel="noopener noreferrer">
-            <i className="fab fa-whatsapp"></i>
-        </a>
-    </div>
 
-    <div className="premium-music-player">
-        <div className="player-glass">
-            <button className="play-btn" onClick={toggleMusic}>
-                <i className={isPlaying ? "fas fa-pause" : "fas fa-play"}></i>
-            </button>
-            <div className="liquid-shine"></div>
-        </div>
-        <audio ref={audioRef} loop preload="auto" crossOrigin="anonymous" src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3">
+    {/*  Swiper JS  */}
+    
+      
+      {/* Audio Element */}
+      <div className="premium-music-player" id="musicPlayer">
+          <div className="player-glass">
+              <button className={"play-btn " + (isPlaying ? "playing" : "")} onClick={toggleMusic}>
+                  <i className={"fas " + (isPlaying ? "fa-pause" : "fa-play")}></i>
+              </button>
+              <div className="liquid-shine"></div>
+          </div>
+          <audio ref={audioRef} id="bgMusic" loop preload="auto" crossOrigin="anonymous">
             <source src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3" type="audio/mpeg" />
-            <source src="https://cdn.pixabay.com/audio/2022/02/22/audio_d0a13e6912.mp3" type="audio/mpeg" />
-            Your browser does not support the audio element.
-        </audio>
-    </div>
+          </audio>
+      </div>
 
-    <div className={`chatbot-container ${isChatOpen ? 'open' : ''}`}>
-        <div className="chatbot-btn" onClick={() => setIsChatOpen(!isChatOpen)}>
-            <i className="fas fa-robot"></i>
-        </div>
-        <div className="chat-window" style={{ display: isChatOpen ? 'flex' : 'none' }}>
-            <div className="chat-header">
-                <div className="bot-img"><i className="fas fa-om"></i></div>
-                <div>
-                    <h4>Braj Nidhi Guide</h4>
-                    <span>Online | AI Assistant</span>
-                </div>
-                <i className="fas fa-times" onClick={() => setIsChatOpen(false)} style={{ marginLeft: "auto", cursor: "pointer" }}></i>
-            </div>
-            <div className="chat-messages">
-                <div className="msg bot">Radhe Radhe! Welcome to Braj Nidhi. I am your AI guide for Vrindavan. How may I help you today?</div>
-            </div>
-            <div className="chat-input">
-                <input type="text" placeholder="Ask me anything..." />
-                <button><i className="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </div>
+      <div className={"chatbot-container " + (isChatOpen ? "active" : "")}>
+          <div className="chatbot-btn" onClick={() => setIsChatOpen(!isChatOpen)}>
+              <i className="fas fa-robot"></i>
+          </div>
+          <div className={"chat-window " + (isChatOpen ? "active" : "")}>
+              <div className="chat-header">
+                  <div className="bot-img"><i className="fas fa-om"></i></div>
+                  <div>
+                      <h4>Braj Nidhi Guide</h4>
+                      <span>Online | AI Assistant</span>
+                  </div>
+                  <i className="fas fa-times" onClick={() => setIsChatOpen(false)} style={{marginLeft: "auto", cursor: "pointer"}}></i>
+              </div>
+              <div className="chat-messages">
+                  <div className="msg bot">Radhe Radhe! Welcome to Braj Nidhi. I am your AI guide for Vrindavan. How may I help you today?</div>
+              </div>
+              <div className="chat-input">
+                  <input type="text" placeholder="Ask me anything..." />
+                  <button><i className="fas fa-paper-plane"></i></button>
+              </div>
+          </div>
+      </div>
     </div>
   );
 }

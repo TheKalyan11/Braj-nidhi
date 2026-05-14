@@ -46,11 +46,8 @@ pages.forEach(page => {
         return 'style={' + JSON.stringify(styleObj) + '}';
     });
 
-    // Self-closing tags and optimization attributes
-    content = content.replace(/<img([^>]*?)\/?>/g, (match, p1) => {
-        if (p1.includes('loading=')) return `<img${p1} />`;
-        return `<img${p1} loading="lazy" decoding="async" />`;
-    });
+    // Self-closing tags
+    content = content.replace(/<img([^>]*?)\/?>/g, '<img$1 />');
     content = content.replace(/<br\s*\/?>/g, '<br />');
     content = content.replace(/<input([^>]*?)\/?>/g, '<input$1 />');
     content = content.replace(/<source([^>]*?)\/?>/g, '<source$1 />');
@@ -72,34 +69,11 @@ pages.forEach(page => {
     content = content.replace(/\scrossorigin=/gi, ' crossOrigin=');
     content = content.replace(/guestroom-1\.jpg/gi, 'DSC05818-HDR.png');
     content = content.replace(/guestroom-2\.jpg/gi, 'DSC05963-HDR.png');
-    content = content.replace(/wedding-1\.jpg/gi, 'DSC02591.JPG');
-    content = content.replace(/wedding-2\.jpg/gi, 'DSC06003-HDR.png');
-    
-    // Replace Unsplash placeholders in subpages with real assets if applicable
-    content = content.replace(/https:\/\/images\.unsplash\.com\/photo-1511795409834-ef04bbd61622[^"]+/gi, '/DSC02591.JPG');
-    content = content.replace(/https:\/\/images\.unsplash\.com\/photo-1519225421980-715cb0215aed[^"]+/gi, '/DSC06003-HDR.png');
 
     // Specific content updates for Guesthouse
     if (page.name === 'Guesthouse') {
         content = content.replace(/<div className=\"hero-title-large\">DIVINE LUXURY IN VRINDAVAN<\/div>/gi, 
-            '<div className="hero-title-large">Experience Divine Luxury in the Heart of Vrindavan</div>');
-        
-        // Left Green Card
-        content = content.replace(/<h3>VRINDAVAN\.<br\s*\/?>SPIRITUAL\.<br\s*\/?>LUXURY\.<\/h3>/gi, 
-            '<h3>Stay Close<br />to the<br />Divine</h3><p style={{marginTop: "15px", fontSize: "0.95rem", lineHeight: "1.4", opacity: "0.9"}}>Wake up to the peaceful energy of Braj with soulful surroundings, premium comfort, and a truly spiritual atmosphere.</p>');
-
-        // Celebration Card
-        content = content.replace(/<h4>YOUR DIVINE CELEBRATION<\/h4>\s*<p>We love orchestrating your spiritual and wedding events<\/p>/gi, 
-            '<h4>Weddings & Grand Celebrations</h4><p>Host unforgettable weddings, family celebrations, and sacred ceremonies with majestic venues, premium hospitality, and timeless elegance.</p>');
-
-        // Wellness Card
-        content = content.replace(/<h4>AYURVEDIC SPA & WELLNESS<\/h4>\s*<p>Rejuvenate your senses with traditional holistic therapies<\/p>/gi, 
-            '<h4>Retreats, Wellness & Spiritual Experiences</h4><p>Reconnect through peaceful retreats, soulful experiences, sattvic hospitality, and the calming energy of Vrindavan.</p>');
-
-        // Temple Guide Card
-        content = content.replace(/<h3>VRINDAVAN TEMPLE GUIDE<\/h3>\s*<p>Plan your Darshan with our exclusive guide to Vrindavan\'s divine sites\.<\/p>/gi, 
-            '<h3>Discover Sacred Vrindavan</h3><p>Explore the divine temples, spiritual landmarks, and timeless beauty of Braj while staying at Braj Nidhi.</p>');
-
+            '<div className="hero-title-large">Luxury Guestrooms & Divine Suites</div>');
         content = content.replace(/<h2>STAY LONG, SAVE MORE ON SUITES OR ROOMS<\/h2>\s*<p>[\s\S]*?<\/p>/gi, 
             `<h2>Experience a refined stay within the sacred atmosphere of Braj Nidhi.</h2><p>Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan.<br /><br />Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>`);
     }

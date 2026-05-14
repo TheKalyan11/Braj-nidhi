@@ -655,7 +655,7 @@ export default function Corporate() {
     </svg>
 
     <header id="main-header" className="scrolled">
-        <a href="/" className="logo" style={{textDecoration: "none"}}><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  loading="lazy" decoding="async" /></a>
+        <a href="/" className="logo" style={{textDecoration: "none"}}><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  /></a>
         <nav>
             <ul>
                 <li><a href="/guesthouse">Guesthouse</a></li>
@@ -676,7 +676,7 @@ export default function Corporate() {
                 <div className="hero-title-large">EXECUTIVE OFFSITES</div>
                 
                 <div className="hero-single-card">
-                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1200&auto=format&fit=crop" alt="Corporate Offsites" loading="lazy" decoding="async" />
+                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1200&auto=format&fit=crop" alt="Corporate Offsites" />
                     <div className="hero-single-content">
                         <h3>Inspire Your Team</h3>
                         <p>State-of-the-art AV halls and serene surroundings designed for focused retreats, strategic planning, and corporate gatherings.</p>
@@ -751,7 +751,7 @@ export default function Corporate() {
                 </ul>
             </div>
             <div className="split-image">
-                <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop" alt="Corporate Strategy Meeting" loading="lazy" decoding="async" />
+                <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop" alt="Corporate Strategy Meeting" />
             </div>
         </section>
 
@@ -768,7 +768,7 @@ export default function Corporate() {
                 </ul>
             </div>
             <div className="split-image">
-                <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=1200&auto=format&fit=crop" alt="Executive Dining" loading="lazy" decoding="async" />
+                <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=1200&auto=format&fit=crop" alt="Executive Dining" />
             </div>
         </section>
 
@@ -867,7 +867,7 @@ export default function Corporate() {
                         <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                         <p className="testimonial-text">"Hosting our annual leadership retreat at Braj Nidhi was the best decision. The AV hall was perfectly equipped, and the serene environment led to our most productive strategy session yet."</p>
                         <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=150&auto=format&fit=crop" alt="CEO" loading="lazy" decoding="async" />
+                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=150&auto=format&fit=crop" alt="CEO" />
                             <div>
                                 <h4>Rajesh K.</h4>
                                 <span>CEO, TechVision India</span>
@@ -879,7 +879,7 @@ export default function Corporate() {
                         <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                         <p className="testimonial-text">"The hospitality team went above and beyond for our offsite. The working lunches were fantastic, and the morning meditation sessions completely recharged the team."</p>
                         <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="HR Director" loading="lazy" decoding="async" />
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="HR Director" />
                             <div>
                                 <h4>Sneha Sharma</h4>
                                 <span>HR Director, GlobalCorp</span>
@@ -891,7 +891,7 @@ export default function Corporate() {
                         <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                         <p className="testimonial-text">"Braj Nidhi offers a unique blend of modern facilities and spiritual peace. It's the perfect place for team building and deep focus away from the city noise."</p>
                         <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="Manager" loading="lazy" decoding="async" />
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="Manager" />
                             <div>
                                 <h4>Arjun V.</h4>
                                 <span>Operations Manager</span>
@@ -903,7 +903,7 @@ export default function Corporate() {
                         <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                         <p className="testimonial-text">"The pure vegetarian catering was a huge hit with our international clients. The attention to detail in the AV setup made our conference seamless."</p>
                         <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=150&auto=format&fit=crop" alt="Executive" loading="lazy" decoding="async" />
+                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=150&auto=format&fit=crop" alt="Executive" />
                             <div>
                                 <h4>Meera Nair</h4>
                                 <span>Executive Director</span>

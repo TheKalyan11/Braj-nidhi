@@ -698,7 +698,7 @@ export default function Weddings() {
     </svg>
 
     <header id="main-header" className="scrolled">
-        <a href="/" className="logo" style={{textDecoration: "none"}}><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  loading="lazy" decoding="async" /></a>
+        <a href="/" className="logo" style={{textDecoration: "none"}}><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  /></a>
         <nav>
             <ul>
                 <li><a href="/guesthouse">Guesthouse</a></li>
@@ -719,7 +719,7 @@ export default function Weddings() {
                 <div className="hero-title-large">DIVINE CELEBRATIONS</div>
                 
                 <div className="hero-single-card">
-                    <img src="/DSC02591.JPG" alt="Divine Weddings" loading="lazy" decoding="async" />
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1200&auto=format&fit=crop" alt="Divine Weddings" />
                     <div className="hero-single-content">
                         <h3>Your Divine Journey Begins</h3>
                         <p>Experience the spiritual heart of Vrindavan with our bespoke wedding venues and personalized services designed for your special day.</p>
@@ -794,7 +794,7 @@ export default function Weddings() {
                 </ul>
             </div>
             <div className="split-image">
-                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop" alt="Fine Dining" loading="lazy" decoding="async" />
+                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop" alt="Fine Dining" />
             </div>
         </section>
 
@@ -807,7 +807,7 @@ export default function Weddings() {
                 <a href="/guesthouse" className="btn-outline" style={{"border":"2px solid #1a1a1a","padding":"12px 25px","textDecoration":"none","color":"#1a1a1a","fontWeight":"800","textTransform":"uppercase","display":"inline-block","marginTop":"15px"}}>View Rooms & Suites</a>
             </div>
             <div className="split-image">
-                <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1000&auto=format&fit=crop" alt="Luxury Suites" loading="lazy" decoding="async" />
+                <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1000&auto=format&fit=crop" alt="Luxury Suites" />
             </div>
         </section>
 
@@ -819,19 +819,19 @@ export default function Weddings() {
             </div>
             <div className="gallery-grid">
                 <div className="gallery-item large">
-                    <img src="/DSC06003-HDR.png" alt="Wedding Couple" loading="lazy" decoding="async" />
+                    <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000&auto=format&fit=crop" alt="Wedding Couple" />
                 </div>
                 <div className="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1000&auto=format&fit=crop" alt="Wedding Decor" loading="lazy" decoding="async" />
+                    <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1000&auto=format&fit=crop" alt="Wedding Decor" />
                 </div>
                 <div className="gallery-item tall">
-                    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop" alt="Wedding Ceremony" loading="lazy" decoding="async" />
+                    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop" alt="Wedding Ceremony" />
                 </div>
                 <div className="gallery-item">
-                    <img src="/DSC02591.JPG" alt="Wedding Mandap" loading="lazy" decoding="async" />
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop" alt="Wedding Mandap" />
                 </div>
                 <div className="gallery-item wide">
-                    <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1000&auto=format&fit=crop" alt="Wedding Reception" loading="lazy" decoding="async" />
+                    <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1000&auto=format&fit=crop" alt="Wedding Reception" />
                 </div>
             </div>
         </section>
@@ -906,7 +906,7 @@ export default function Weddings() {
                         <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                         <p className="testimonial-text">"Our wedding at Braj Nidhi was like a dream. The spiritual atmosphere combined with luxury service made our special day truly divine."</p>
                         <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=150&auto=format&fit=crop" alt="Priya & Rahul" loading="lazy" decoding="async" />
+                            <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=150&auto=format&fit=crop" alt="Priya & Rahul" />
                             <div>
                                 <h4>Priya & Rahul</h4>
                                 <span>Wedding Couple</span>
@@ -918,7 +918,7 @@ export default function Weddings() {
                         <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                         <p className="testimonial-text">"The courtyard setup was breathtaking. Every detail, from the decor to the Sattvic catering, was handled with so much care and grace."</p>
                         <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=150&auto=format&fit=crop" alt="Sanjana M." loading="lazy" decoding="async" />
+                            <img src="https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=150&auto=format&fit=crop" alt="Sanjana M." />
                             <div>
                                 <h4>Sanjana M.</h4>
                                 <span>Bride</span>
@@ -930,7 +930,7 @@ export default function Weddings() {
                         <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                         <p className="testimonial-text">"We couldn't have asked for a better venue. The team at Braj Nidhi made sure everything was perfect for our traditional Vedic ceremony."</p>
                         <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1623091423323-53736861bc14?q=80&w=150&auto=format&fit=crop" alt="Amit & Deepa" loading="lazy" decoding="async" />
+                            <img src="https://images.unsplash.com/photo-1623091423323-53736861bc14?q=80&w=150&auto=format&fit=crop" alt="Amit & Deepa" />
                             <div>
                                 <h4>Amit & Deepa</h4>
                                 <span>Anniversary Celebration</span>
@@ -942,7 +942,7 @@ export default function Weddings() {
                         <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                         <p className="testimonial-text">"Exceptional hospitality. Our guests are still talking about the beautiful surroundings and the peace they felt during the entire event."</p>
                         <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?q=80&w=150&auto=format&fit=crop" alt="Vikram Singh" loading="lazy" decoding="async" />
+                            <img src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?q=80&w=150&auto=format&fit=crop" alt="Vikram Singh" />
                             <div>
                                 <h4>Vikram Singh</h4>
                                 <span>Father of the Bride</span>
