@@ -78,6 +78,8 @@ content = content.replace(/<div className=\"chatbot-container\">[\s\S]*?<\/div>\
 content = content.replace(/<div className=\"faq-question\">/g, '<div className=\"faq-question\" onClick={toggleFAQ}>');
 
 // Content replacements
+content = content.replace(/<h2>Weddings & Grand Celebrations<\/h2>\s*<p>Plan your dream wedding in our scenic gardens and opulent banquet halls\. From intimate ceremonies to grand receptions, we provide comprehensive planning and bespoke catering to make your special day truly unforgettable\.<\/p>/gi,
+    `<h2>Weddings & Grand Celebrations</h2><p>Celebrate your most special moments amidst the divine elegance of Braj Nidhi. From intimate wedding ceremonies to luxurious grand celebrations, our majestic venues, premium hospitality, and serene spiritual atmosphere create experiences that feel truly timeless.<br /><br />With beautifully designed spaces, exceptional accommodations, curated sattvic dining, and personalized event planning, every celebration at Braj Nidhi becomes a cherished memory for generations.</p>`);
 content = content.replace(/guestroom-1\.jpg/gi, 'DSC05818-HDR.png');
 content = content.replace(/guestroom-2\.jpg/gi, 'DSC05963-HDR.png');
 content = content.replace(/<h2>Luxury Guestrooms & Suites<\/h2>\s*<p>Experience tranquility in our boutique rooms with world-class amenities and personalized service\. Each suite is designed to provide a perfect blend of modern comfort and traditional elegance, ensuring a restful stay in the heart of the city\.<\/p>/gi, 

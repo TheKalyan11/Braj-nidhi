@@ -321,8 +321,7 @@ export default function Home() {
             <div className="split-container">
                 <div className="content-box">
                     <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"  /></svg>
-                    <h2>Weddings & Grand Celebrations</h2>
-                    <p>Plan your dream wedding in our scenic gardens and opulent banquet halls. From intimate ceremonies to grand receptions, we provide comprehensive planning and bespoke catering to make your special day truly unforgettable.</p>
+                    <h2>Weddings & Grand Celebrations</h2><p>Celebrate your most special moments amidst the divine elegance of Braj Nidhi. From intimate wedding ceremonies to luxurious grand celebrations, our majestic venues, premium hospitality, and serene spiritual atmosphere create experiences that feel truly timeless.<br /><br />With beautifully designed spaces, exceptional accommodations, curated sattvic dining, and personalized event planning, every celebration at Braj Nidhi becomes a cherished memory for generations.</p>
                     <a href="#" className="btn-outline">Plan Your Wedding <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
