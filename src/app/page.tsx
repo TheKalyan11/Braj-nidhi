@@ -141,16 +141,40 @@ export default function Home() {
     currentItem.classList.toggle('active');
   };
 
-  const toggleMusic = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
+  const toggleMusic = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    } else {
+      try {
+        // Load audio if it hasn't started yet
+        if (audio.readyState < 2) {
+          audio.load();
+        }
+        await audio.play();
+        setIsPlaying(true);
+      } catch (err) {
+        console.warn('Primary audio source failed, trying fallback:', err);
+        // Try fallback source
+        audio.src = 'https://cdn.pixabay.com/audio/2022/02/22/audio_d0a13e6912.mp3';
+        audio.load();
+        try {
+          await audio.play();
+          setIsPlaying(true);
+        } catch (fallbackErr) {
+          console.error('Fallback audio also failed:', fallbackErr);
+          setIsPlaying(false);
+        }
       }
-      setIsPlaying(!isPlaying);
     }
   };
+
+  // Keep isPlaying in sync when audio ends or is paused externally
+  const handleAudioEnd = () => setIsPlaying(false);
+  const handleAudioPause = () => setIsPlaying(false);
+  const handleAudioPlay = () => setIsPlaying(true);
 
   return (
     <div className="index-page">
@@ -1065,7 +1089,15 @@ export default function Home() {
             </button>
             <div className="liquid-shine"></div>
         </div>
-        <audio ref={audioRef} id="bgMusic" loop preload="auto" crossOrigin="anonymous">
+        <audio
+            ref={audioRef}
+            id="bgMusic"
+            loop
+            preload="auto"
+            onEnded={handleAudioEnd}
+            onPause={handleAudioPause}
+            onPlay={handleAudioPlay}
+        >
             <source src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3" type="audio/mpeg" />
             <source src="https://cdn.pixabay.com/audio/2022/02/22/audio_d0a13e6912.mp3" type="audio/mpeg" />
         </audio>
