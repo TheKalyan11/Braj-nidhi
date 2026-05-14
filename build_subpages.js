@@ -28,6 +28,7 @@ pages.forEach(page => {
     content = content.replace(/href=\"booking\.html/g, 'href="/booking');
     content = content.replace(/onclick=\"this.classList.toggle\('flipped'\)\"/g, "onClick={(e) => e.currentTarget.classList.toggle('flipped')}");
     content = content.replace(/onclick=\"[^\"]*\"/g, "onClick={() => {}}"); // Stub out other onclicks
+    content = content.replace(/<a href=\"\/\" className=\"logo\"[^>]*>BRAJ<span>NIDHI<\/span><\/a>/g, '<a href="/" className="logo" style={{textDecoration: "none"}}><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}} /></a>');
     content = content.replace(/allowfullscreen=\"\"/g, 'allowFullScreen={true}');
     content = content.replace(/allowfullscreen/g, 'allowFullScreen={true}');
     content = content.replace(/referrerpolicy/g, 'referrerPolicy');

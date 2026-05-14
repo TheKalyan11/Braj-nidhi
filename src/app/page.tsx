@@ -140,7 +140,7 @@ export default function Home() {
     </svg>
 
     <header id="main-header">
-        <div className="logo">BRAJ<span>NIDHI</span></div>
+        <div className="logo"><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  /></div>
         
         <nav>
             <ul>

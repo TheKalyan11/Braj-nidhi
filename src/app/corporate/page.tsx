@@ -655,7 +655,7 @@ export default function Corporate() {
     </svg>
 
     <header id="main-header" className="scrolled">
-        <a href="/" className="logo" style={{"textDecoration":"none"}}>BRAJ<span>NIDHI</span></a>
+        <a href="/" className="logo" style={{textDecoration: "none"}}><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  /></a>
         <nav>
             <ul>
                 <li><a href="/guesthouse">Guesthouse</a></li>

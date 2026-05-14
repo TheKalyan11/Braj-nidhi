@@ -15,6 +15,7 @@ content = content.replace(/stroke-width=/g, 'strokeWidth=');
 content = content.replace(/fill-opacity=/g, 'fillOpacity=');
 content = content.replace(/onclick=\"this.classList.toggle\('flipped'\)\"/g, "onClick={(e) => e.currentTarget.classList.toggle('flipped')}");
 content = content.replace(/onclick=\"[^\"]*\"/g, "onClick={() => {}}");
+content = content.replace(/<div className=\"logo\">BRAJ<span>NIDHI<\/span><\/div>/g, '<div className="logo"><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}} /></div>');
 content = content.replace(/allowfullscreen=\"\"/g, 'allowFullScreen={true}');
 content = content.replace(/allowfullscreen/g, 'allowFullScreen={true}');
 content = content.replace(/referrerpolicy/g, 'referrerPolicy');
