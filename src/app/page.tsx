@@ -10,6 +10,18 @@ export default function Home() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const [bookingData, setBookingData] = useState({
+    checkIn: '2026-05-12',
+    checkOut: '2026-05-18',
+    guests: '2 Adults, 1 Child',
+    roomType: 'Luxury Suite',
+    eventType: 'Corporate Offsite'
+  });
+
+  const handleBookingChange = (field: string, value: string) => {
+    setBookingData(prev => ({ ...prev, [field]: value }));
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -75,6 +87,10 @@ export default function Home() {
     }, { threshold: 0.3 });
     if (statsContainer) observer.observe(statsContainer);
   }, []);
+
+  const requestReservation = () => {
+    alert(`Reservation Requested!\n\nRoom: ${bookingData.roomType}\nCheck-in: ${bookingData.checkIn}\nCheck-out: ${bookingData.checkOut}\nGuests: ${bookingData.guests}\nEvent: ${bookingData.eventType}`);
+  };
 
   const toggleFAQ = (e: any) => {
     const currentItem = e.currentTarget.parentElement;
@@ -187,24 +203,19 @@ export default function Home() {
 
                 <div className="booking-form">
                     <div className="form-group">
-                        <label>Check-in</label>
-                        <span>May 12, 2026</span>
+                        <label>Check-in</label><input type="date" value={bookingData.checkIn} onChange={(e) => handleBookingChange('checkIn', e.target.value)} />
                     </div>
                     <div className="form-group">
-                        <label>Check-out</label>
-                        <span>May 18, 2026</span>
+                        <label>Check-out</label><input type="date" value={bookingData.checkOut} onChange={(e) => handleBookingChange('checkOut', e.target.value)} />
                     </div>
                     <div className="form-group">
-                        <label>Guests</label>
-                        <span>2 Adults, 1 Child</span>
+                        <label>Guests</label><select value={bookingData.guests} onChange={(e) => handleBookingChange('guests', e.target.value)}><option>1 Adult</option><option>2 Adults</option><option>2 Adults, 1 Child</option><option>2 Adults, 2 Children</option></select>
                     </div>
                     <div className="form-group">
-                        <label>Room Type</label>
-                        <span>Luxury Suite</span>
+                        <label>Room Type</label><select value={bookingData.roomType} onChange={(e) => handleBookingChange('roomType', e.target.value)}><option>Luxury Suite</option><option>Executive Room</option><option>Royal Heritage Suite</option></select>
                     </div>
                     <div className="form-group full-width">
-                        <label>Event Type (Optional)</label>
-                        <span>Corporate Offsite</span>
+                        <label>Event Type (Optional)</label><select value={bookingData.eventType} onChange={(e) => handleBookingChange('eventType', e.target.value)}><option>None</option><option>Corporate Offsite</option><option>Wedding</option><option>Spiritual Retreat</option></select>
                     </div>
                 </div>
 

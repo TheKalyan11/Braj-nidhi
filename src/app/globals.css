@@ -252,9 +252,32 @@ header.scrolled nav ul li a:hover {
     margin-bottom: 5px;
 }
 
-.form-group span {
+.form-group span, .form-group input, .form-group select {
     font-weight: 500;
     font-size: 1rem;
+    background: transparent;
+    border: none;
+    color: var(--white);
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+    display: block;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.form-group select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.form-group select option {
+    background: #1a1a1a;
+    color: white;
 }
 
 .full-width {

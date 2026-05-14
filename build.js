@@ -30,14 +30,32 @@ content = content.replace(/style=\"([^\"]*)\"/g, (match, p1) => {
     return 'style={' + JSON.stringify(styleObj) + '}';
 });
 
-// Self-closing tags
+// Self-closing tags - DO THIS BEFORE adding any React {} logic
 content = content.replace(/<img([^>]*(?!\/))>/g, '<img$1 />');
 content = content.replace(/<br>/g, '<br />');
+content = content.replace(/<hr>/g, '<hr />');
 content = content.replace(/<input([^>]*(?!\/))>/g, '<input$1 />');
 content = content.replace(/<source([^>]*(?!\/))>/g, '<source$1 />');
 content = content.replace(/<use([^>]*(?!\/))><\/use>/g, '<use$1 />');
 content = content.replace(/<use([^>]*(?!\/))>/g, '<use$1 />');
 content = content.replace(/\/\s\/>/g, ' />'); // Fix double slashes
+
+// Replace Booking Spans with Inputs
+content = content.replace(/<label>Check-in<\/label>\s*<span>[^<]*<\/span>/gi, 
+    '<label>Check-in</label><input type="date" value={bookingData.checkIn} onChange={(e) => handleBookingChange(\'checkIn\', e.target.value)} />');
+content = content.replace(/<label>Check-out<\/label>\s*<span>[^<]*<\/span>/gi, 
+    '<label>Check-out</label><input type="date" value={bookingData.checkOut} onChange={(e) => handleBookingChange(\'checkOut\', e.target.value)} />');
+content = content.replace(/<label>Guests<\/label>\s*<span>[^<]*<\/span>/gi, 
+    '<label>Guests</label><select value={bookingData.guests} onChange={(e) => handleBookingChange(\'guests\', e.target.value)}><option>1 Adult</option><option>2 Adults</option><option>2 Adults, 1 Child</option><option>2 Adults, 2 Children</option></select>');
+content = content.replace(/<label>Room Type<\/label>\s*<span>[^<]*<\/span>/gi, 
+    '<label>Room Type</label><select value={bookingData.roomType} onChange={(e) => handleBookingChange(\'roomType\', e.target.value)}><option>Luxury Suite</option><option>Executive Room</option><option>Royal Heritage Suite</option></select>');
+content = content.replace(/<label>Event Type \(Optional\)<\/label>\s*<span>[^<]*<\/span>/gi, 
+    '<label>Event Type (Optional)</label><select value={bookingData.eventType} onChange={(e) => handleBookingChange(\'eventType\', e.target.value)}><option>None</option><option>Corporate Offsite</option><option>Wedding</option><option>Spiritual Retreat</option></select>');
+
+// Replace Reservation Button
+content = content.replace(/<button className=\"btn-reserve\">Request Reservation<\/button>/gi, 
+    '<button className="btn-reserve" onClick={requestReservation}>Request Reservation</button>');
+
 
 // HTML comments to JSX
 content = content.replace(/<!--([\s\S]*?)-->/g, '{/* $1 */}');
@@ -71,6 +89,18 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  const [bookingData, setBookingData] = useState({
+    checkIn: '2026-05-12',
+    checkOut: '2026-05-18',
+    guests: '2 Adults, 1 Child',
+    roomType: 'Luxury Suite',
+    eventType: 'Corporate Offsite'
+  });
+
+  const handleBookingChange = (field: string, value: string) => {
+    setBookingData(prev => ({ ...prev, [field]: value }));
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -137,6 +167,10 @@ export default function Home() {
     }, { threshold: 0.3 });
     if (statsContainer) observer.observe(statsContainer);
   }, []);
+
+  const requestReservation = () => {
+    alert(\`Reservation Requested!\\n\\nRoom: \${bookingData.roomType}\\nCheck-in: \${bookingData.checkIn}\\nCheck-out: \${bookingData.checkOut}\\nGuests: \${bookingData.guests}\\nEvent: \${bookingData.eventType}\`);
+  };
 
   const toggleFAQ = (e: any) => {
     const currentItem = e.currentTarget.parentElement;
