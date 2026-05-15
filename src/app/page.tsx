@@ -425,7 +425,7 @@ export default function Home() {
                             <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                         </div>
                         
-                        <button className="btn-availability">Book for ₹8,500 <i className="fas fa-chevron-right"></i></button>
+                        <button className="btn-availability">Book for ₹3,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
 
@@ -444,7 +444,7 @@ export default function Home() {
                             <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                         </div>
                         
-                        <button className="btn-availability">Book for ₹12,500 <i className="fas fa-chevron-right"></i></button>
+                        <button className="btn-availability">Book for ₹4,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
 
@@ -463,7 +463,7 @@ export default function Home() {
                             <span><i className="fas fa-hot-tub"></i> Jacuzzi</span>
                         </div>
                         
-                        <a href="/booking" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Book for ₹25,000 <i className="fas fa-chevron-right"></i></a>
+                        <a href="/booking" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></a>
                     </div>
                 </div>
             </div>

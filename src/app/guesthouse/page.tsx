@@ -1,8 +1,13 @@
 
 "use client";
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Guesthouse() {
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState("2");
+
   useEffect(() => {
     // Swiper initialization for subpages
     if (typeof window !== 'undefined' && (window as any).Swiper) {
@@ -233,16 +238,18 @@ export default function Guesthouse() {
         .amenities-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            background: #e5e5e5;
-            margin-top: 60px;
-            border: 1px solid #e5e5e5;
+            gap: 15px;
+            background: transparent;
+            margin-top: 10px;
+            border: none;
         }
 
         .amenity-item {
             text-align: left;
-            padding: 50px 40px;
-            background: #ffffff;
+            padding: 30px 25px;
+            background: #fdfaf7;
+            border: 1px solid rgba(59, 18, 18, 0.08);
+            border-radius: 16px;
             transition: all 0.4s ease;
             position: relative;
             display: flex;
@@ -250,20 +257,22 @@ export default function Guesthouse() {
         }
 
         .amenity-item:hover {
-            background: #000000;
+            background: #3b1212;
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(59, 18, 18, 0.2);
         }
 
         .amenity-icon {
             font-size: 2rem;
-            color: #000000;
-            margin-bottom: 25px;
+            color: #3b1212;
+            margin-bottom: 15px;
             transition: 0.4s ease;
         }
 
         .amenity-title {
             font-size: 1.1rem;
             font-weight: 800;
-            color: #000000;
+            color: #3b1212;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -280,10 +289,12 @@ export default function Guesthouse() {
         }
 
         .amenity-item:hover .amenity-icon,
-        .amenity-item:hover .amenity-title,
+        .amenity-item:hover .amenity-title { color: #d4af37; }
         .amenity-item:hover p {
             color: #ffffff;
         }
+
+
 
         /* --- New Promotional Sections --- */
         .promo-section-1 {
@@ -523,21 +534,26 @@ export default function Guesthouse() {
             gap: 50px;
         }
 
-        /* Sidebar Filters */
+        /* Sidebar Filters — Premium Maroon Design */
         .filter-sidebar {
-            background: #fff;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            background: #3b1212;
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
             height: fit-content;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: sticky;
+            top: 90px;
+            color: #ffffff;
         }
 
         .filter-sidebar h3 {
-            font-size: 1.5rem;
-            color: #777;
-            margin-bottom: 30px;
+            font-size: 1.6rem;
+            color: #d4af37;
+            margin: 0 0 30px 0;
             font-weight: 500;
             font-family: serif;
+            letter-spacing: 0.5px;
         }
 
         .filter-group {
@@ -546,72 +562,663 @@ export default function Guesthouse() {
 
         .filter-group label {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #888;
-            margin-bottom: 10px;
-            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: #d4af37;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-family: sans-serif;
         }
 
         .filter-input-wrap {
             position: relative;
-            background: #fdfbf7;
-            border-radius: 10px;
-            padding: 12px 15px;
+            background: #4a1818;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .filter-input-wrap:focus-within {
+            border-color: #d4af37;
+            background: #521e1e;
         }
 
-        .filter-input-wrap input {
+        .filter-input-wrap input,
+        .filter-input-wrap select {
             border: none;
             background: transparent;
-            font-size: 0.9rem;
-            color: #555;
+            font-size: 0.95rem;
+            color: #ffffff;
             width: 100%;
             outline: none;
+            font-family: sans-serif;
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 40px; /* Space for icon */
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
         }
         
         .filter-input-wrap i {
-            color: #888;
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
         }
 
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-input-wrap input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .filter-input-wrap i {
+            color: #d4af37;
+            font-size: 1.1rem;
+            pointer-events: none;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0; /* Hide native icon, use custom one */
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Custom Checkbox Styling */
+        .checkbox-group {
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+        
         .checkbox-group label {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            color: #ffffff;
             font-size: 0.9rem;
-            color: #555;
-            margin-bottom: 12px;
-            cursor: pointer;
             text-transform: none;
-            font-weight: normal;
+            letter-spacing: 0;
+            font-weight: 500;
         }
-        
+
         .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #555;
-            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4a1818;
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked {
+            background: #d4af37;
+            border-color: #d4af37;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked::after {
+            content: '✔';
+            position: absolute;
+            color: #3b1212;
+            font-size: 12px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .btn-apply {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             border: none;
-            border-radius: 30px;
-            background: #f4efea;
-            color: #555;
-            font-weight: 600;
+            border-radius: 50px;
+            background: #d4af37;
+            color: #3b1212;
+            font-weight: 700;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s;
             margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
         }
 
         .btn-apply:hover {
-            background: #e9e2db;
+            background: #e5c158;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
         }
 
         /* Main Content area */
@@ -619,7 +1226,7 @@ export default function Guesthouse() {
 
         .property-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 30px;
         }
 
@@ -629,10 +1236,109 @@ export default function Guesthouse() {
             }
         }
 
-        @media (max-width: 900px) {
-            .listing-container {
-                grid-template-columns: 1fr;
-            }
+        .room-card {
+            position: relative;
+            height: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transition: all 0.5s ease;
+        }
+
+        .room-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.3);
+        }
+
+        .room-bg-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            transition: transform 0.8s ease;
+        }
+
+        .room-card:hover .room-bg-img {
+            transform: scale(1.1);
+        }
+
+        .card-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
+            z-index: 1;
+        }
+
+        .room-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 40px;
+            z-index: 2;
+            color: #fff;
+        }
+
+        .room-content h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+            color: #c5a059;
+        }
+
+        .room-location {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .room-amenities {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .room-amenities span {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #eee;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .favorite-btn:hover {
+            background: #fff;
+            color: #2d0a0a;
         }
     ` }} />
       
@@ -728,9 +1434,17 @@ export default function Guesthouse() {
                     <h3>Filter Stay</h3>
                     
                     <div className="filter-group">
-                        <label>CHECK-IN - CHECK-OUT</label>
+                        <label>CHECK-IN DATE</label>
                         <div className="filter-input-wrap">
-                            <input type="text" placeholder="Select Dates" readOnly />
+                            <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} placeholder="dd-mm-yyyy" />
+                            <i className="far fa-calendar-alt"></i>
+                        </div>
+                    </div>
+
+                    <div className="filter-group">
+                        <label>CHECK-OUT DATE</label>
+                        <div className="filter-input-wrap">
+                            <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} placeholder="dd-mm-yyyy" />
                             <i className="far fa-calendar-alt"></i>
                         </div>
                     </div>
@@ -738,16 +1452,21 @@ export default function Guesthouse() {
                     <div className="filter-group">
                         <label>GUESTS</label>
                         <div className="filter-input-wrap">
-                            <input type="text" value="2 Adults, 0 Children" readOnly />
+                            <select value={guests} onChange={(e) => setGuests(e.target.value)}>
+                                <option value="1">1 Adult</option>
+                                <option value="2">2 Adults</option>
+                                <option value="3">3 Adults</option>
+                                <option value="4">4 Adults</option>
+                            </select>
                             <i className="far fa-user"></i>
                         </div>
                     </div>
 
                     <div className="filter-group checkbox-group">
-                        <label style={{"color":"#888","textTransform":"uppercase","fontSize":"0.75rem","fontWeight":"600","marginBottom":"10px"}}>ROOM TYPE</label>
-                        <label><input type="checkbox" checked /> Royal Heritage Suite</label>
-                        <label><input type="checkbox" checked /> Executive Suite</label>
-                        <label><input type="checkbox" checked /> Deluxe Temple View</label>
+                        <label style={{color: "#d4af37", textTransform: "uppercase", fontSize: "0.7rem", fontWeight: "700", marginBottom: "10px"}}>ROOM TYPE</label>
+                        <label><input type="checkbox" defaultChecked /> Royal Heritage Suite</label>
+                        <label><input type="checkbox" defaultChecked /> Executive Suite</label>
+                        <label><input type="checkbox" defaultChecked /> Deluxe Temple View</label>
                     </div>
 
                     <button className="btn-apply">Apply Filters</button>
@@ -758,52 +1477,49 @@ export default function Guesthouse() {
                     <div className="property-list">
                         {/* Card 1 */}
                         <div className="room-card new-style">
-                            <img src="room_deluxe.png" alt="Deluxe Room" className="room-bg-img" />
+                            <img src="room_deluxe.png" alt="Deluxe 2" className="room-bg-img" />
                             <div className="card-gradient"></div>
-                            <button className="favorite-btn"><i className="far fa-heart"></i></button>
                             <div className="room-content">
-                                <h3>Deluxe Temple View</h3>
-                                <p className="room-location"><i className="fas fa-map-marker-alt"></i> Braj Nidhi Guest House, Vrindavan</p>
+                                <h3>Deluxe 2 – Twin Bedded Room</h3>
+                                <p className="room-location" style={{color: "rgba(255,255,255,0.8)", fontSize: "0.9rem", marginBottom: "15px"}}>Ideal for 2 Adults</p>
                                 <div className="room-amenities">
-                                    <span><i className="fas fa-bed"></i> King Bed</span>
+                                    <span><i className="fas fa-bed"></i> Twin Beds</span>
                                     <span><i className="fas fa-wifi"></i> Free WiFi</span>
                                     <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                                 </div>
-                                <a href="/#contact" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none","color":"#000"}}>Book for ₹8,500 <i className="fas fa-chevron-right"></i></a>
+                                <a href="/#contact" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none","color":"#fff", "background": "rgba(255, 255, 255, 0.15)", "backdropFilter": "blur(12px)", "border": "1px solid rgba(255, 255, 255, 0.3)", "borderRadius": "30px", "boxShadow": "0 4px 15px rgba(0,0,0,0.2)"}}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
 
                         {/* Card 2 */}
                         <div className="room-card new-style">
-                            <img src="room_executive.png" alt="Executive Suite" className="room-bg-img" />
+                            <img src="room_executive.png" alt="Deluxe 3" className="room-bg-img" />
                             <div className="card-gradient"></div>
-                            <button className="favorite-btn"><i className="far fa-heart"></i></button>
                             <div className="room-content">
-                                <h3>Executive Suite</h3>
-                                <p className="room-location"><i className="fas fa-map-marker-alt"></i> Braj Nidhi Guest House, Vrindavan</p>
+                                <h3>Deluxe 3 – 3 Bedded Room</h3>
+                                <p className="room-location" style={{color: "rgba(255,255,255,0.8)", fontSize: "0.9rem", marginBottom: "15px"}}>Ideal for 2 Adults + 1 Child OR 3 Adults</p>
                                 <div className="room-amenities">
                                     <span><i className="fas fa-couch"></i> Living Area</span>
                                     <span><i className="fas fa-bath"></i> Deep Tub</span>
                                     <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                                 </div>
-                                <a href="/#contact" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none","color":"#000"}}>Book for ₹12,500 <i className="fas fa-chevron-right"></i></a>
+                                <a href="/#contact" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none","color":"#fff", "background": "rgba(255, 255, 255, 0.15)", "backdropFilter": "blur(12px)", "border": "1px solid rgba(255, 255, 255, 0.3)", "borderRadius": "30px", "boxShadow": "0 4px 15px rgba(0,0,0,0.2)"}}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
 
                         {/* Card 3 */}
                         <div className="room-card new-style">
-                            <img src="room_royal.png" alt="Royal Heritage Suite" className="room-bg-img" />
+                            <img src="room_royal.png" alt="Deluxe 4" className="room-bg-img" />
                             <div className="card-gradient"></div>
-                            <button className="favorite-btn"><i className="far fa-heart"></i></button>
                             <div className="room-content">
-                                <h3>Royal Heritage Suite</h3>
-                                <p className="room-location"><i className="fas fa-map-marker-alt"></i> Braj Nidhi Guest House, Vrindavan</p>
+                                <h3>Deluxe 4 – 4 Bedded Room</h3>
+                                <p className="room-location" style={{color: "rgba(255,255,255,0.8)", fontSize: "0.9rem", marginBottom: "15px"}}>Ideal for 3 Adults + 1 Child OR 4 Adults</p>
                                 <div className="room-amenities">
                                     <span><i className="fas fa-crown"></i> Four-Poster Bed</span>
                                     <span><i className="fas fa-user-tie"></i> Personal Attendant</span>
                                     <span><i className="fas fa-hot-tub"></i> Jacuzzi</span>
                                 </div>
-                                <a href="/#contact" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none","color":"#000"}}>Book for ₹25,000 <i className="fas fa-chevron-right"></i></a>
+                                <a href="/#contact" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none","color":"#fff", "background": "rgba(255, 255, 255, 0.15)", "backdropFilter": "blur(12px)", "border": "1px solid rgba(255, 255, 255, 0.3)", "borderRadius": "30px", "boxShadow": "0 4px 15px rgba(0,0,0,0.2)"}}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -814,39 +1530,39 @@ export default function Guesthouse() {
         {/* Amenities Section */}
         <section className="amenities-section">
             <div className="section-header">
-                <div className="hero-title-large" style={{"marginBottom":"15px","boxShadow":"none","border":"1.5px solid #000","fontSize":"1.6rem","padding":"10px 25px"}}>PREMIUM AMENITIES</div>
-                <p style={{"color":"#666","maxWidth":"600px","margin":"0 auto","fontSize":"1rem"}}>Everything you need for a comfortable and spiritually uplifting stay.</p>
+                <div className="hero-title-large" style={{"marginBottom":"15px","boxShadow":"none","border":"2px solid #3b1212","color":"#3b1212","fontSize":"1.8rem","padding":"12px 35px"}}>PREMIUM AMENITIES</div>
+                <p style={{"color":"#3b1212","maxWidth":"600px","margin":"0 auto","fontSize":"1rem","fontWeight":"600","opacity":"0.8"}}>Everything you need for a comfortable and spiritually uplifting stay.</p>
             </div>
             <div className="amenities-grid">
                 <div className="amenity-item">
                     <div className="amenity-icon"><i className="fas fa-wifi"></i></div>
-                    <div className="amenity-title">High-Speed Wi-Fi</div>
-                    <p>Stay connected with complimentary high-speed internet throughout the property.</p>
+                    <div className="amenity-title">HIGH-SPEED WI-FI</div>
+                    <p>Stay connected with seamless high-speed internet access across the entire Braj Nidhi premises.</p>
                 </div>
                 <div className="amenity-item">
-                    <div className="amenity-icon"><i className="fas fa-utensils"></i></div>
-                    <div className="amenity-title">In-Room Dining</div>
-                    <p>Enjoy our curated menu of pure vegetarian delicacies in the comfort of your room.</p>
+                    <div className="amenity-icon"><i className="fas fa-leaf"></i></div>
+                    <div className="amenity-title">PURE SATTVIC DINING</div>
+                    <p>Experience freshly prepared sattvic meals crafted with devotion, purity, and authentic flavors of Braj.</p>
                 </div>
                 <div className="amenity-item">
-                    <div className="amenity-icon"><i className="fas fa-spa"></i></div>
-                    <div className="amenity-title">Spa & Wellness</div>
-                    <p>Rejuvenate your senses with traditional Ayurvedic therapies and massages.</p>
+                    <div className="amenity-icon"><i className="fas fa-om"></i></div>
+                    <div className="amenity-title">RECREATION & SPIRITUAL EXPERIENCES</div>
+                    <p>Experience the essence of Braj with soulful kirtans, a peaceful visit to the gaushala, and a guided visit to Akshaya Patra — the world’s largest kitchen.</p>
                 </div>
                 <div className="amenity-item">
-                    <div className="amenity-icon"><i className="fas fa-car"></i></div>
-                    <div className="amenity-title">Valet Parking</div>
-                    <p>Secure and convenient parking assistance available 24/7 for all our guests.</p>
+                    <div className="amenity-icon"><i className="fas fa-parking"></i></div>
+                    <div className="amenity-title">SPACIOUS PARKING FACILITY</div>
+                    <p>Convenient and secure parking available for guests, weddings, retreats, and corporate events.</p>
                 </div>
                 <div className="amenity-item">
-                    <div className="amenity-icon"><i className="fas fa-praying-hands"></i></div>
-                    <div className="amenity-title">Temple Assistance</div>
-                    <p>Guided tours and priority darshan arrangements at major Vrindavan temples.</p>
+                    <div className="amenity-icon"><i className="fas fa-place-of-worship"></i></div>
+                    <div className="amenity-title">DIVINE TEMPLE EXPERIENCE</div>
+                    <p>Enjoy easy access to Vrindavan’s sacred temples and immerse yourself in the timeless spiritual energy of Braj.</p>
                 </div>
                 <div className="amenity-item">
                     <div className="amenity-icon"><i className="fas fa-concierge-bell"></i></div>
-                    <div className="amenity-title">24/7 Concierge</div>
-                    <p>Dedicated staff ready to assist you with travel plans and special requests anytime.</p>
+                    <div className="amenity-title">PREMIUM HOSPITALITY</div>
+                    <p>From comfortable stays to personalized assistance, every experience at Braj Nidhi is designed with warmth and care.</p>
                 </div>
             </div>
         </section>
@@ -910,11 +1626,10 @@ export default function Guesthouse() {
                     <a href="#" className="promo-link">FREE WIFI <i className="fas fa-chevron-right"></i></a>
                     <a href="#" className="promo-link">BREAKFAST <i className="fas fa-chevron-right"></i></a>
                 </div>
-                <div className="promo-tour-card">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Vrindavan_Chandrodaya_Mandir.jpg/400px-Vrindavan_Chandrodaya_Mandir.jpg" alt="Vrindavan Tour" className="promo-tour-img" />
+                <motion.div className="promo-tour-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(0,0,0,0.15)" }} transition={{ type: "spring", stiffness: 300 }}>
                     <div className="promo-tour-text">TEMPLE TOUR GUIDE</div>
-                    <i className="fas fa-cube" style={{"fontSize":"1.5rem","marginLeft":"auto","color":"#1a1a1a"}}></i>
-                </div>
+                    <motion.i className="fas fa-cube" style={{"fontSize":"1.5rem","marginLeft":"auto","color":"#1a1a1a"}} animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} />
+                </motion.div>
             </div>
             
             <div className="promo-col-center">
@@ -922,17 +1637,17 @@ export default function Guesthouse() {
             </div>
 
             <div className="promo-col-right">
-                <h2>SERVICE <span className="sub-title">OFFERS</span><br />WE PROVIDE</h2>
-                <p>Braj Nidhi provides aesthetic spiritual guest houses for our International Tourists, Pilgrims, and Event organizers.</p>
-                <a href="#" className="btn-text-arrow">SEE ALL SERVICES <i className="fas fa-arrow-right"></i></a>
+                <h2>SERVICES WE PROVIDE</h2>
+                <p>Braj Nidhi offers premium spiritual stays, elegant event spaces, corporate retreat facilities, sattvic dining experiences, and soulful hospitality — thoughtfully curated for pilgrims, families, international travelers, and event guests seeking the true essence of Braj.</p>
+                <motion.a href="#" className="btn-text-arrow" whileHover={{ scale: 1.05, x: 5 }} whileTap={{ scale: 0.95 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>EXPLORE SERVICES <i className="fas fa-arrow-right"></i></motion.a>
             </div>
         </section>
 
         {/* Promo Section 2 */}
         <section className="promo-section-2">
             <div className="promo2-col-left">
-                <div className="sub-title">ROOMS</div>
-                <h2>Experience a refined stay within the sacred atmosphere of Braj Nidhi.</h2><p>Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan.<br /><br />Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>
+                <div className="sub-title">Wake Up to the Peace of Braj</div>
+                <h2>Experience soulful stays surrounded by the divine atmosphere of Vrindavan.</h2><p>From elegant rooms to premium heritage suites, every space at Braj Nidhi is designed to offer comfort, tranquility, and timeless hospitality.</p>
                 <a href="#" className="btn-outline">SEE ALL ROOMS <i className="fas fa-arrow-right"></i></a>
             </div>
             
@@ -940,12 +1655,12 @@ export default function Guesthouse() {
                 <img src="room_deluxe.png" alt="Deluxe Room" />
                 <div className="promo2-price-badge">
                     <div className="price-top">
-                        <span className="price-num">8.5</span>
+                        <span className="price-num">3.5</span>
                         <span className="price-text">K ₹<br />PER ROOM</span>
-                        <i className="fas fa-cube" style={{"fontSize":"1.5rem","marginLeft":"auto","color":"#1a1a1a"}}></i>
+                        <motion.i className="fas fa-cube" style={{"fontSize":"1.5rem","marginLeft":"auto","color":"#1a1a1a"}} animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} />
                     </div>
                     <div className="price-bottom">
-                        START FROM 8,500 ₹ PER NIGHT.
+                        START FROM 3,500 ₹ PER NIGHT.
                     </div>
                 </div>
             </div>

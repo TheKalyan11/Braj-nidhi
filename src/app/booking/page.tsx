@@ -305,11 +305,11 @@ export default function BookingPage() {
                         <div className="room-selection">
                             <div className="room-card-mini selected">
                                 <h4>Royal Heritage Suite</h4>
-                                <p className="price">₹12,500 / night</p>
+                                <p className="price">₹4,999 / night</p>
                             </div>
                             <div className="room-card-mini">
                                 <h4>Executive Suite</h4>
-                                <p className="price">₹8,500 / night</p>
+                                <p className="price">₹3,500 / night</p>
                             </div>
                         </div>
 
@@ -363,20 +363,20 @@ export default function BookingPage() {
                         <h3>Stay Summary</h3>
                         <div style={{"marginTop":"20px"}}>
                             <div className="summary-row">
-                                <span>6 Nights x ₹12,500</span>
-                                <span>₹75,000</span>
+                                <span>6 Nights x ₹4,999</span>
+                                <span>₹29,994</span>
                             </div>
                             <div className="summary-row">
                                 <span>Service Charge (5%)</span>
-                                <span>₹3,750</span>
+                                <span>₹1,500</span>
                             </div>
                             <div className="summary-row">
                                 <span>Taxes (GST 12%)</span>
-                                <span>₹9,000</span>
+                                <span>₹3,600</span>
                             </div>
                             <div className="summary-total">
                                 <span>Total Amount</span>
-                                <span>₹87,750</span>
+                                <span>₹35,094</span>
                             </div>
                         </div>
                         <button className="btn-confirm">Proceed to Payment</button>
