@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Guesthouse() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState("2");
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
 
   useEffect(() => {
     // Swiper initialization for subpages
@@ -662,6 +663,100 @@ export default function Guesthouse() {
             margin: 16px 0;
         }
 
+        /* Date input — show native picker */
+        .filter-input-wrap input[type="date"] {
+            color-scheme: light;
+            cursor: pointer;
+        }
+
+        /* Guest counter stepper */
+        .guest-counter-wrap {
+            background: transparent;
+            padding: 4px 0;
+        }
+
+        .guest-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: #ffffff;
+            border: 1.5px solid rgba(59, 18, 18, 0.12);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .guest-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .guest-row:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .guest-row-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3b1212;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .guest-row-label small {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: rgba(59,18,18,0.5);
+        }
+
+        .guest-stepper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guest-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1.5px solid #3b1212;
+            background: transparent;
+            color: #3b1212;
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-weight: 700;
+            padding: 0;
+        }
+
+        .guest-btn:hover {
+            background: #3b1212;
+            color: #d4af37;
+        }
+
+        .guest-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .guest-btn:disabled:hover {
+            background: transparent;
+            color: #3b1212;
+        }
+
+        .guest-count {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #3b1212;
+            min-width: 18px;
+            text-align: center;
+        }
+
         /* Custom Checkbox Styling */
         .checkbox-group {
             margin-top: 4px;
@@ -976,34 +1071,51 @@ export default function Guesthouse() {
                     <div className="filter-group">
                         <label>CHECK-IN DATE</label>
                         <div className="filter-input-wrap">
-                            <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} placeholder="dd-mm-yyyy" />
-                            <i className="far fa-calendar-alt"></i>
+                            <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
                         </div>
                     </div>
 
                     <div className="filter-group">
                         <label>CHECK-OUT DATE</label>
                         <div className="filter-input-wrap">
-                            <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} placeholder="dd-mm-yyyy" />
-                            <i className="far fa-calendar-alt"></i>
+                            <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
                         </div>
                     </div>
+
+                    <div className="filter-divider"></div>
 
                     <div className="filter-group">
                         <label>GUESTS</label>
-                        <div className="filter-input-wrap">
-                            <select value={guests} onChange={(e) => setGuests(e.target.value)}>
-                                <option value="1">1 Adult</option>
-                                <option value="2">2 Adults</option>
-                                <option value="3">3 Adults</option>
-                                <option value="4">4 Adults</option>
-                            </select>
-                            <i className="far fa-user"></i>
+                        <div className="guest-counter-wrap">
+                            <div className="guest-row">
+                                <div className="guest-row-label">
+                                    Adults
+                                    <small>Age 13+</small>
+                                </div>
+                                <div className="guest-stepper">
+                                    <button className="guest-btn" onClick={() => setAdults(a => Math.max(1, a - 1))} disabled={adults <= 1}>−</button>
+                                    <span className="guest-count">{adults}</span>
+                                    <button className="guest-btn" onClick={() => setAdults(a => Math.min(10, a + 1))} disabled={adults >= 10}>+</button>
+                                </div>
+                            </div>
+                            <div className="guest-row">
+                                <div className="guest-row-label">
+                                    Children
+                                    <small>Age 0–12</small>
+                                </div>
+                                <div className="guest-stepper">
+                                    <button className="guest-btn" onClick={() => setChildren(c => Math.max(0, c - 1))} disabled={children <= 0}>−</button>
+                                    <span className="guest-count">{children}</span>
+                                    <button className="guest-btn" onClick={() => setChildren(c => Math.min(6, c + 1))} disabled={children >= 6}>+</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
+                    <div className="filter-divider"></div>
+
                     <div className="filter-group checkbox-group">
-                        <label style={{color: "#d4af37", textTransform: "uppercase", fontSize: "0.7rem", fontWeight: "700", marginBottom: "10px"}}>ROOM TYPE</label>
+                        <label style={{color: "#8b6914", textTransform: "uppercase", fontSize: "0.65rem", fontWeight: "700", marginBottom: "10px"}}>ROOM TYPE</label>
                         <label><input type="checkbox" defaultChecked /> Royal Heritage Suite</label>
                         <label><input type="checkbox" defaultChecked /> Executive Suite</label>
                         <label><input type="checkbox" defaultChecked /> Deluxe Temple View</label>
