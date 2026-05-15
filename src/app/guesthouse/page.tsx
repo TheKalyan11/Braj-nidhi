@@ -530,98 +530,124 @@ export default function Guesthouse() {
             margin: 0 auto;
             padding: 20px 20px;
             display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 50px;
+            grid-template-columns: 290px 1fr;
+            gap: 40px;
         }
 
-        /* Sidebar Filters — Premium Maroon Design */
+        /* Sidebar Filters — Refined Luxury Design */
         .filter-sidebar {
-            background: #3b1212;
-            padding: 32px;
-            border-radius: 24px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            background: linear-gradient(160deg, #fdf8f0 0%, #faf3e8 100%);
+            padding: 28px 24px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(59, 18, 18, 0.1), 0 2px 8px rgba(59, 18, 18, 0.06);
             height: fit-content;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(212, 175, 55, 0.25);
             position: sticky;
             top: 90px;
-            color: #ffffff;
+            color: #3b1212;
+        }
+
+        .filter-sidebar::before {
+            content: '';
+            display: block;
+            height: 3px;
+            background: linear-gradient(90deg, #3b1212, #d4af37, #3b1212);
+            border-radius: 3px 3px 0 0;
+            margin: -28px -24px 24px -24px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
 
         .filter-sidebar h3 {
-            font-size: 1.6rem;
-            color: #d4af37;
-            margin: 0 0 30px 0;
-            font-weight: 500;
-            font-family: serif;
-            letter-spacing: 0.5px;
+            font-size: 1.45rem;
+            color: #3b1212;
+            margin: 0 0 22px 0;
+            font-weight: 700;
+            font-family: Georgia, serif;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-sidebar h3::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(212,175,55,0.5), transparent);
         }
 
         .filter-group {
-            margin-bottom: 25px;
+            margin-bottom: 18px;
         }
 
         .filter-group label {
             display: block;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #d4af37;
-            margin-bottom: 8px;
+            letter-spacing: 2px;
+            color: #8b6914;
+            margin-bottom: 7px;
             font-weight: 700;
             font-family: sans-serif;
         }
 
         .filter-input-wrap {
             position: relative;
-            background: #4a1818;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 14px 16px;
+            background: #ffffff;
+            border: 1.5px solid rgba(59, 18, 18, 0.12);
+            border-radius: 10px;
+            padding: 11px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.3s;
-            margin-bottom: 20px;
+            transition: all 0.25s ease;
         }
         
+        .filter-input-wrap:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            box-shadow: 0 2px 8px rgba(59, 18, 18, 0.06);
+        }
+
         .filter-input-wrap:focus-within {
             border-color: #d4af37;
-            background: #521e1e;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
         }
 
         .filter-input-wrap input,
         .filter-input-wrap select {
             border: none;
             background: transparent;
-            font-size: 0.95rem;
-            color: #ffffff;
+            font-size: 0.9rem;
+            color: #3b1212;
             width: 100%;
             outline: none;
             font-family: sans-serif;
             appearance: none;
             -webkit-appearance: none;
-            padding-right: 40px; /* Space for icon */
+            padding-right: 30px;
+            font-weight: 500;
         }
 
         .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
+            color: rgba(59, 18, 18, 0.35);
+            font-weight: 400;
         }
         
         .filter-input-wrap i {
             color: #d4af37;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             pointer-events: none;
             position: absolute;
-            right: 16px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             z-index: 2;
         }
 
         .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
             cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
+            opacity: 0;
             position: absolute;
             right: 0;
             top: 0;
@@ -629,552 +655,44 @@ export default function Guesthouse() {
             height: 100%;
         }
 
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .filter-input-wrap input::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-        
-        .filter-input-wrap i {
-            color: #d4af37;
-            font-size: 1.1rem;
-            pointer-events: none;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-        }
-
-        .filter-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-            opacity: 0; /* Hide native icon, use custom one */
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
+        /* Divider between sections */
+        .filter-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
+            margin: 16px 0;
         }
 
         /* Custom Checkbox Styling */
         .checkbox-group {
-            margin-top: 25px;
-            margin-bottom: 25px;
+            margin-top: 4px;
+            margin-bottom: 16px;
         }
         
         .checkbox-group label {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 10px;
+            margin-bottom: 10px;
             cursor: pointer;
-            color: #ffffff;
-            font-size: 0.9rem;
+            color: #4a1a1a;
+            font-size: 0.85rem;
             text-transform: none;
             letter-spacing: 0;
-            font-weight: 500;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+
+        .checkbox-group label:hover {
+            color: #3b1212;
         }
 
         .checkbox-group input[type="checkbox"] {
             appearance: none;
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #4a1818;
-            border: 1px solid rgba(255,255,255,0.2);
+            width: 17px;
+            height: 17px;
+            background: #ffffff;
+            border: 1.5px solid rgba(59, 18, 18, 0.2);
             border-radius: 4px;
             cursor: pointer;
             position: relative;
@@ -1183,15 +701,15 @@ export default function Guesthouse() {
         }
 
         .checkbox-group input[type="checkbox"]:checked {
-            background: #d4af37;
-            border-color: #d4af37;
+            background: #3b1212;
+            border-color: #3b1212;
         }
 
         .checkbox-group input[type="checkbox"]:checked::after {
             content: '✔';
             position: absolute;
-            color: #3b1212;
-            font-size: 12px;
+            color: #d4af37;
+            font-size: 10px;
             font-weight: bold;
             top: 50%;
             left: 50%;
@@ -1200,26 +718,48 @@ export default function Guesthouse() {
 
         .btn-apply {
             width: 100%;
-            padding: 16px;
+            padding: 13px;
             border: none;
             border-radius: 50px;
-            background: #d4af37;
-            color: #3b1212;
+            background: linear-gradient(135deg, #3b1212 0%, #5a1a1a 100%);
+            color: #d4af37;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
+            transition: all 0.3s ease;
+            margin-top: 8px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+            letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(59, 18, 18, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-apply::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #5a1a1a, #8b2a2a);
+            transition: left 0.3s ease;
+            z-index: 0;
+        }
+
+        .btn-apply:hover::before {
+            left: 0;
         }
 
         .btn-apply:hover {
-            background: #e5c158;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 8px 22px rgba(59, 18, 18, 0.35);
+            color: #f0cc5a;
         }
+
+        .btn-apply span {
+            position: relative;
+            z-index: 1;
+        }
+
 
         /* Main Content area */
 
@@ -1469,7 +1009,7 @@ export default function Guesthouse() {
                         <label><input type="checkbox" defaultChecked /> Deluxe Temple View</label>
                     </div>
 
-                    <button className="btn-apply">Apply Filters</button>
+                    <button className="btn-apply"><span>Apply Filters</span></button>
                 </aside>
 
                 {/* Main Listing */}
