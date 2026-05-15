@@ -861,8 +861,8 @@ export default function Guesthouse() {
 
         .property-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
+            grid-template-columns: 1fr;
+            gap: 28px;
         }
 
         @media (max-width: 900px) {
@@ -873,7 +873,7 @@ export default function Guesthouse() {
 
         .room-card {
             position: relative;
-            height: 500px;
+            height: 400px;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
