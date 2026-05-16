@@ -1129,7 +1129,7 @@ export default function Guesthouse() {
                     <div className="property-list">
                         {/* Card 1 */}
                         <div className="room-card new-style">
-                            <img src="room_deluxe.png" alt="Deluxe 2" className="room-bg-img" />
+                            <img src="DSC05818-HDR.png" alt="Deluxe 2" className="room-bg-img" />
                             <div className="card-gradient"></div>
                             <div className="room-content">
                                 <h3>Deluxe 2 – Twin Bedded Room</h3>
@@ -1145,7 +1145,7 @@ export default function Guesthouse() {
 
                         {/* Card 2 */}
                         <div className="room-card new-style">
-                            <img src="room_executive.png" alt="Deluxe 3" className="room-bg-img" />
+                            <img src="DSC05963-HDR.png" alt="Deluxe 3" className="room-bg-img" />
                             <div className="card-gradient"></div>
                             <div className="room-content">
                                 <h3>Deluxe 3 – 3 Bedded Room</h3>
