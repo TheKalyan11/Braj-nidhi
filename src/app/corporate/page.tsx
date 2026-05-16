@@ -626,6 +626,44 @@ export default function Corporate() {
                 grid-column: span 1;
             }
         }
+
+        .conf-section { padding: 80px 20px; background: #fafaf8; border-top: 1px solid #ececec; }
+        .conf-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 300px 1fr; gap: 60px; align-items: center; }
+        .conf-badge { width: 260px; height: 260px; border-radius: 50%; background: linear-gradient(135deg,#6b4f2a,#9e7f52,#6b4f2a); display: flex; align-items: center; justify-content: center; text-align: center; padding: 36px; box-shadow: 0 16px 50px rgba(107,79,42,.35), 0 0 0 10px rgba(158,127,82,.12); margin: 0 auto; position: relative; }
+        .conf-badge::before { content: ''; position: absolute; inset: 10px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.3); }
+        .conf-badge h3 { font-family: Georgia,serif; font-size: 1.4rem; font-weight: 700; color: #fff; line-height: 1.35; position: relative; z-index: 1; }
+        .conf-list { display: flex; flex-direction: column; position: relative; }
+        .conf-list::before { content: ''; position: absolute; left: 27px; top: 36px; bottom: 36px; width: 2px; background: linear-gradient(to bottom,#c8a96e,#9e7f52,#c8a96e); }
+        .conf-item { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: center; padding: 16px 0; }
+        .conf-num-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; z-index: 1; }
+        .conf-circle { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff; transition: transform .3s; }
+        .conf-item:hover .conf-circle { transform: scale(1.1); }
+        .conf-circle.navy  { background:#1a2f5e; box-shadow:0 6px 20px rgba(26,47,94,.4); }
+        .conf-circle.slate { background:#4a5e7a; box-shadow:0 6px 20px rgba(74,94,122,.4); }
+        .conf-circle.steel { background:#6b7a8d; box-shadow:0 6px 20px rgba(107,122,141,.4); }
+        .conf-circle.warm  { background:#c47a3a; box-shadow:0 6px 20px rgba(196,122,58,.4); }
+        .conf-circle.stone { background:#8c8272; box-shadow:0 6px 20px rgba(140,130,114,.4); }
+        .conf-num { font-size:.65rem; font-weight:800; color:#9e7f52; letter-spacing:1px; }
+        .conf-text h4 { font-family:'Arial Black',sans-serif; font-size:.88rem; text-transform:uppercase; letter-spacing:1.5px; color:#1a1a1a; margin-bottom:4px; }
+        .conf-text p { font-size:.875rem; color:#666; line-height:1.55; margin:0; }
+        @media(max-width:900px){ .conf-inner { grid-template-columns:1fr; } .conf-badge { width:200px; height:200px; } }
+
+        /* Testimonial Auto-Scroll */
+        .testi-track-wrap { overflow: hidden; position: relative; padding: 20px 0; }
+        .testi-track { display: flex; gap: 24px; animation: scrollTestimonials 30s linear infinite; width: max-content; }
+        .testi-track:hover { animation-play-state: paused; }
+        @keyframes scrollTestimonials {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .testi-card { flex-shrink: 0; width: 380px; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 32px; position: relative; }
+        .testi-quote { font-size: 1.5rem; color: #fbc434; margin-bottom: 16px; }
+        .testi-stars { color: #fbc434; font-size: 0.9rem; margin-bottom: 12px; letter-spacing: 2px; }
+        .testi-text { font-size: 0.95rem; color: #555; line-height: 1.6; font-style: italic; margin-bottom: 20px; }
+        .testi-user { display: flex; align-items: center; gap: 12px; }
+        .testi-user img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+        .testi-user h4 { font-family: 'Arial Black', sans-serif; font-size: 0.9rem; text-transform: uppercase; margin: 0; color: #1a1a1a; }
+        .testi-user span { font-size: 0.8rem; color: #888; }
     ` }} />
       
     {/* SVG Definitions */}
@@ -673,13 +711,13 @@ export default function Corporate() {
         {/* Hero Section */}
         <section className="events-hero">
             <div className="hero-bento-container">
-                <div className="hero-title-large">EXECUTIVE OFFSITES</div>
+                <div className="hero-title-large">CORPORATE RETREATS & CONFERENCES</div>
                 
                 <div className="hero-single-card">
                     <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1200&auto=format&fit=crop" alt="Corporate Offsites" />
                     <div className="hero-single-content">
-                        <h3>Inspire Your Team</h3>
-                        <p>State-of-the-art AV halls and serene surroundings designed for focused retreats, strategic planning, and corporate gatherings.</p>
+                        <h3>Elevate Your Corporate Experience</h3>
+                        <p>Premium AV halls, Bose professional sound systems, acoustic interiors, luxury stays, and soulful Braj experiences all designed for impactful meetings, retreats, and executive events in Vrindavan.</p>
                     </div>
                 </div>
             </div>
@@ -688,25 +726,25 @@ export default function Corporate() {
         {/* Corporate Offsite Module */}
         <section id="corporate" className="module-section">
             <div className="module-header">
-                <h2>Infrastructure & Capabilities</h2>
-                <p>Elevate your corporate gatherings with our premium infrastructure, high-speed connectivity, and dedicated AV support.</p>
+                <h2>INFRASTRUCTURE & CAPABILITIES</h2>
+                <p>Experience world-class conference infrastructure designed for impactful corporate events, executive meetings, seminars, and premium retreats in Vrindavan.</p>
             </div>
 
             <div className="events-bento">
                 <div className="bento-item">
                     <i className="fas fa-project-diagram"></i>
-                    <h4>Executive AV Hall</h4>
-                    <p>Theater-style seating for up to 150 pax. Equipped with 4K projectors, surround sound, and high-speed enterprise Wi-Fi.</p>
+                    <h4>PREMIUM AV HALL</h4>
+                    <p>State-of-the-art conference hall equipped with Bose professional sound systems, advanced AV setup, presentation facilities, and acoustic soundproof interiors.</p>
                 </div>
                 <div className="bento-item">
                     <i className="fas fa-users"></i>
-                    <h4>Boardrooms</h4>
-                    <p>Intimate meeting spaces for up to 20 pax with interactive smart boards and video conferencing facilities.</p>
+                    <h4>EXECUTIVE MEETING SPACES</h4>
+                    <p>Elegant spaces designed for leadership meetings, private discussions, workshops, and collaborative corporate sessions.</p>
                 </div>
                 <div className="bento-item">
                     <i className="fas fa-mug-hot"></i>
-                    <h4>Networking Lounges</h4>
-                    <p>Breakout areas with premium coffee stations and serene garden views to foster organic networking and brainstorming.</p>
+                    <h4>NETWORKING & RETREAT LOUNGES</h4>
+                    <p>Premium breakout areas with peaceful surroundings, ideal for networking, brainstorming, and meaningful corporate interactions.</p>
                 </div>
             </div>
 
@@ -738,16 +776,50 @@ export default function Corporate() {
             </div>
         </section>
 
+        {/* Conference Hall Features */}
+        <section className="conf-section">
+            <div style={{textAlign:'center',marginBottom:'50px'}}>
+                <div style={{display:'inline-block',background:'#f0e8d8',color:'#7c5a2a',fontSize:'0.75rem',fontWeight:800,textTransform:'uppercase',letterSpacing:'2px',padding:'7px 18px',borderRadius:'50px',marginBottom:'14px'}}>AV &amp; Tech Infrastructure</div>
+                <h2 style={{fontFamily:'Arial Black,sans-serif',fontSize:'2rem',textTransform:'uppercase',color:'#1a1a1a',margin:'0 auto',lineHeight:1.2}}>Conference Hall Features</h2>
+            </div>
+            <div className="conf-inner">
+                <div className="conf-badge"><h3>Braj Nidhi Conference Hall Features</h3></div>
+                <div className="conf-list">
+                    <div className="conf-item">
+                        <div className="conf-num-wrap"><div className="conf-circle navy"><i className="fas fa-tv"></i></div><span className="conf-num">01</span></div>
+                        <div className="conf-text"><h4>4K Resolution LED Wall</h4><p>16 ft × 9 ft — Brand Delta Pitch 1.5P COB technology along with 2 Samsung TVs (98 inches)</p></div>
+                    </div>
+                    <div className="conf-item">
+                        <div className="conf-num-wrap"><div className="conf-circle slate"><i className="fas fa-volume-up"></i></div><span className="conf-num">02</span></div>
+                        <div className="conf-text"><h4>High End BOSE Speakers</h4><p>Bose MA12 EX column array for crystal clear sound experience</p></div>
+                    </div>
+                    <div className="conf-item">
+                        <div className="conf-num-wrap"><div className="conf-circle steel"><i className="fas fa-microphone"></i></div><span className="conf-num">03</span></div>
+                        <div className="conf-text"><h4>Microphones</h4><p>Sennheiser wireless super cardioid microphone — 16 gooseneck and 4 handheld</p></div>
+                    </div>
+                    <div className="conf-item">
+                        <div className="conf-num-wrap"><div className="conf-circle warm"><i className="fas fa-video"></i></div><span className="conf-num">04</span></div>
+                        <div className="conf-text"><h4>Video Conferencing</h4><p>Kramer technologies with Sony SRG 40 cameras with AI auto focus</p></div>
+                    </div>
+                    <div className="conf-item">
+                        <div className="conf-num-wrap"><div className="conf-circle stone"><i className="fas fa-wifi"></i></div><span className="conf-num">05</span></div>
+                        <div className="conf-text"><h4>Wireless Presentation</h4><p>Kramer — all participants can present wirelessly without any external device on all three displays</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         {/* Why Choose Vrindavan Split Section */}
         <section className="split-section">
             <div className="split-content">
-                <h3>The Power of Spiritual Clarity</h3>
-                <p>Escape the noise of the city and bring your leadership team to the serene, spiritual atmosphere of Vrindavan. The calm surroundings foster deep focus, innovative thinking, and stress-free strategic planning.</p>
-                <p>Our dedicated corporate spaces are designed to blend state-of-the-art technology with a peaceful environment, ensuring your offsite is both highly productive and deeply rejuvenating.</p>
+                <h3>THE POWER OF PEACEFUL LEADERSHIP</h3>
+                <p>Step away from the noise of the city and experience corporate gatherings in the serene atmosphere of Vrindavan. Braj Nidhi blends premium conference infrastructure with the calm spiritual energy of Braj — creating an environment designed for clarity, creativity, and meaningful conversations.</p>
+                <p>From executive retreats and leadership meets to focused business discussions, every experience is crafted to feel productive, elevated, and refreshing.</p>
                 <ul className="package-features" style={{"marginTop":"20px"}}>
-                    <li><i className="fas fa-check"></i> Zero Distractions & Noise-Free Environment</li>
-                    <li><i className="fas fa-check"></i> Inspiring Heritage Architecture</li>
-                    <li><i className="fas fa-check"></i> Focus-Enhancing Atmosphere</li>
+                    <li><i className="fas fa-check"></i> Peaceful & Distraction-Free Environment</li>
+                    <li><i className="fas fa-check"></i> Premium AV & Bose Sound Setup</li>
+                    <li><i className="fas fa-check"></i> Inspiring Spiritual Atmosphere</li>
+                    <li><i className="fas fa-check"></i> Ideal for Leadership Retreats & Conferences</li>
                 </ul>
             </div>
             <div className="split-image">
@@ -755,44 +827,45 @@ export default function Corporate() {
             </div>
         </section>
 
-        {/* Executive Dining Split Section (Reverse) */}
+        {/* Sattvic Dining Split Section (Reverse) */}
         <section className="split-section reverse">
             <div className="split-content">
-                <h3>Executive Dining Experiences</h3>
-                <p>Nourish your team with premium Sattvic cuisine. Our culinary experts design customized menus that maintain high energy levels throughout your intense strategy sessions.</p>
-                <p>From working lunches in the boardroom to elaborate gala dinners in the courtyard, we ensure a seamless dining experience.</p>
+                <h3>SATTVIC DINING EXPERIENCES</h3>
+                <p>Elevate your corporate gatherings with thoughtfully curated sattvic dining experiences designed to energize, refresh, and inspire. From executive lunches and high-tea sessions to premium dinner setups, every meal at Braj Nidhi is prepared with purity, authenticity, and hospitality.</p>
+                <p>Blending soulful flavors with elegant presentation, we create dining experiences that perfectly complement conferences, retreats, and leadership gatherings.</p>
                 <ul className="package-features" style={{"marginTop":"20px"}}>
-                    <li><i className="fas fa-check"></i> Energizing Coffee & Tea Breaks</li>
-                    <li><i className="fas fa-check"></i> Premium Buffet Setups</li>
-                    <li><i className="fas fa-check"></i> Custom Gala Dinner Themes</li>
+                    <li><i className="fas fa-check"></i> Premium Tea & Coffee Experiences</li>
+                    <li><i className="fas fa-check"></i> Curated Sattvic Buffet Setups</li>
+                    <li><i className="fas fa-check"></i> Executive Dining & Retreat Catering</li>
+                    <li><i className="fas fa-check"></i> Elegant Dinner & Gathering Experiences</li>
                 </ul>
             </div>
             <div className="split-image">
-                <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=1200&auto=format&fit=crop" alt="Executive Dining" />
+                <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=1200&auto=format&fit=crop" alt="Sattvic Dining" />
             </div>
         </section>
 
-        {/* Team Building & Activities */}
+        {/* Experience the Essence of Braj */}
         <section className="module-section" style={{"paddingTop":"20px"}}>
             <div className="module-header">
-                <h2>Beyond the Boardroom</h2>
-                <p>Enhance team cohesion with our curated spiritual and wellness activities.</p>
+                <h2>EXPERIENCE THE ESSENCE OF BRAJ</h2>
+                <p>At Braj Nidhi, corporate gatherings go beyond meetings and presentations. We create meaningful experiences through the spiritual energy, culture, and timeless heritage of Vrindavan.</p>
             </div>
             <div className="events-bento">
                 <div className="bento-item">
                     <i className="fas fa-walking"></i>
-                    <h4>Heritage Walks</h4>
-                    <p>Guided morning tours to the most historic and spiritually significant temples in Vrindavan.</p>
+                    <h4>CURATED BRAJ YATRA EXPERIENCES</h4>
+                    <p>Explore sacred temples, spiritual landmarks, and the divine heritage of Braj through thoughtfully guided experiences.</p>
                 </div>
                 <div className="bento-item">
                     <i className="fas fa-spa"></i>
-                    <h4>Yoga & Meditation</h4>
-                    <p>Start your day with guided yoga sessions in our tranquil gardens to improve focus and reduce stress.</p>
+                    <h4>SOULFUL KIRTANS & WELLNESS</h4>
+                    <p>Reconnect through peaceful kirtans, meditation sessions, and calming wellness experiences designed to refresh the mind and spirit.</p>
                 </div>
                 <div className="bento-item">
                     <i className="fas fa-hands-helping"></i>
-                    <h4>Seva Activities</h4>
-                    <p>Organize corporate social responsibility (CSR) activities like food distribution (Anna Daan) for team bonding.</p>
+                    <h4>GAUSHALA & SEVA EXPERIENCES</h4>
+                    <p>Experience the simplicity and warmth of Braj through peaceful gaushala visits, seva activities, and meaningful cultural interactions unique to Braj Nidhi.</p>
                 </div>
             </div>
         </section>
@@ -848,68 +921,99 @@ export default function Corporate() {
             </div>
         </div>
 
-        {/* Testimonials */}
-        <section className="testimonials-section" style={{"background":"#fdfcf8","padding":"100px 0"}}>
-            <div style={{"maxWidth":"1200px","margin":"0 auto","padding":"0 20px"}}>
-                <div className="section-header center-header">
-                    <div className="rating-badge">
-                        <i className="fas fa-star"></i> Rated 4.8/5 by industry leaders
-                    </div>
-                    <h2>Trusted by Leaders</h2>
-                    <p>See what companies are saying about their offsite experiences at Braj Nidhi.</p>
-                </div>
+        {/* Testimonials — auto-scroll marquee */}
+        <section style={{background:'#fdfcf8', padding:'100px 0', overflow:'hidden', position:'relative'}}>
+            <div style={{maxWidth:'1200px', margin:'0 auto', padding:'0 20px', textAlign:'center', marginBottom:'50px'}}>
+                <div className="rating-badge"><i className="fas fa-star"></i> Rated 4.8/5 by corporate clients</div>
+                <h2 style={{fontFamily:'Arial Black,sans-serif', fontSize:'2.5rem', textTransform:'uppercase', color:'#1a1a1a', margin:'16px 0 12px'}}>Trusted by Leaders</h2>
+                <p style={{color:'#666', fontSize:'1.05rem'}}>See what companies are saying about their offsite experiences at Braj Nidhi.</p>
             </div>
 
-            <div className="testimonials-slider swiper">
-                <div className="swiper-wrapper">
-                    {/* Card 1 */}
-                    <div className="swiper-slide testimonial-card">
-                        <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
-                        <p className="testimonial-text">"Hosting our annual leadership retreat at Braj Nidhi was the best decision. The AV hall was perfectly equipped, and the serene environment led to our most productive strategy session yet."</p>
-                        <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=150&auto=format&fit=crop" alt="CEO" />
-                            <div>
-                                <h4>Rajesh K.</h4>
-                                <span>CEO, TechVision India</span>
-                            </div>
+<div style={{position:'relative', padding:'0 40px'}}>
+                <div style={{position:'absolute', top:0, bottom:0, left:0, width:'100px', background:'linear-gradient(to right, #fdfcf8 0%, transparent 100%)', zIndex:2, pointerEvents:'none', filter:'blur(3px)'}}></div>
+                <div style={{position:'absolute', top:0, bottom:0, right:0, width:'100px', background:'linear-gradient(to left, #fdfcf8 0%, transparent 100%)', zIndex:2, pointerEvents:'none', filter:'blur(3px)'}}></div>
+<div className="testi-track-wrap" style={{overflow:'hidden'}}>
+                    <div className="testi-track">
+                        {/* Card 1 - Raj Malhotra */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Hosting our annual leadership retreat at Braj Nidhi was the best decision. The state-of-the-art AV hall was perfectly equipped, and the serene environment led to our most productive strategy session yet."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Raj Malhotra" /><div><h4>Raj Malhotra</h4><span>CEO, TechVision India</span></div></div>
                         </div>
-                    </div>
-                    {/* Card 2 */}
-                    <div className="swiper-slide testimonial-card">
-                        <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
-                        <p className="testimonial-text">"The hospitality team went above and beyond for our offsite. The working lunches were fantastic, and the morning meditation sessions completely recharged the team."</p>
-                        <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="HR Director" />
-                            <div>
-                                <h4>Sneha Sharma</h4>
-                                <span>HR Director, GlobalCorp</span>
-                            </div>
+                        {/* Card 2 - Priya Iyer */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"The hospitality team went above and beyond for our offsite. The working lunches were fantastic, and the morning meditation sessions completely recharged the entire team."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="Priya Iyer" /><div><h4>Priya Iyer</h4><span>HR Director, GlobalCorp</span></div></div>
                         </div>
-                    </div>
-                    {/* Card 3 */}
-                    <div className="swiper-slide testimonial-card">
-                        <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
-                        <p className="testimonial-text">"Braj Nidhi offers a unique blend of modern facilities and spiritual peace. It's the perfect place for team building and deep focus away from the city noise."</p>
-                        <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="Manager" />
-                            <div>
-                                <h4>Arjun V.</h4>
-                                <span>Operations Manager</span>
-                            </div>
+                        {/* Card 3 - Vikram Sethi */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Braj Nidhi offers a unique blend of modern facilities and spiritual peace. It's the perfect place for team building and deep focus away from the city noise."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" alt="Vikram Sethi" /><div><h4>Vikram Sethi</h4><span>Operations Manager</span></div></div>
                         </div>
-                    </div>
-                    {/* Card 4 */}
-                    <div className="swiper-slide testimonial-card">
-                        <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
-                        <p className="testimonial-text">"The pure vegetarian catering was a huge hit with our international clients. The attention to detail in the AV setup made our conference seamless."</p>
-                        <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=150&auto=format&fit=crop" alt="Executive" />
-                            <div>
-                                <h4>Meera Nair</h4>
-                                <span>Executive Director</span>
-                            </div>
+                        {/* Card 4 - Anjali Patel */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"The pure vegetarian catering was a huge hit with our international clients. The attention to detail in the Bose sound system and AV setup made our conference absolutely seamless."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Anjali Patel" /><div><h4>Anjali Patel</h4><span>Executive Director</span></div></div>
                         </div>
-                    </div>
+                        {/* Card 5 - Sanjay Kumar */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"We've hosted multiple offsites at Braj Nidhi. The combination of luxury rooms, professional AV facilities, and the peaceful Braj atmosphere makes it our go-to choice."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="Sanjay Kumar" /><div><h4>Sanjay Kumar</h4><span>VP Operations, Indigo Tech</span></div></div>
+                        </div>
+                        {/* Card 6 - Sunita Reddy */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Our leadership team returned refreshed and recharged after the Braj Yatra experience. The perfect blend of business infrastructure and spiritual wellness. Highly recommended!"</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Reddy" /><div><h4>Sunita Reddy</h4><span>CHRO, Reliance infra</span></div></div>
+                        </div>
+                        {/* Duplicated for loop */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Hosting our annual leadership retreat at Braj Nidhi was the best decision. The state-of-the-art AV hall was perfectly equipped, and the serene environment led to our most productive strategy session yet."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Raj Malhotra" /><div><h4>Raj Malhotra</h4><span>CEO, TechVision India</span></div></div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"The hospitality team went above and beyond for our offsite. The working lunches were fantastic, and the morning meditation sessions completely recharged the entire team."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="Priya Iyer" /><div><h4>Priya Iyer</h4><span>HR Director, GlobalCorp</span></div></div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Braj Nidhi offers a unique blend of modern facilities and spiritual peace. It's the perfect place for team building and deep focus away from the city noise."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" alt="Vikram Sethi" /><div><h4>Vikram Sethi</h4><span>Operations Manager</span></div></div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"The pure vegetarian catering was a huge hit with our international clients. The attention to detail in the Bose sound system and AV setup made our conference absolutely seamless."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Anjali Patel" /><div><h4>Anjali Patel</h4><span>Executive Director</span></div></div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"We've hosted multiple offsites at Braj Nidhi. The combination of luxury rooms, professional AV facilities, and the peaceful Braj atmosphere makes it our go-to choice."</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="Sanjay Kumar" /><div><h4>Sanjay Kumar</h4><span>VP Operations, Indigo Tech</span></div></div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Our leadership team returned refreshed and recharged after the Braj Yatra experience. The perfect blend of business infrastructure and spiritual wellness. Highly recommended!"</p>
+                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Reddy" /><div><h4>Sunita Reddy</h4><span>CHRO, Reliance infra</span></div></div>
+                        </div>
+</div>
                 </div>
             </div>
         </section>
@@ -996,9 +1100,8 @@ export default function Corporate() {
                         </div>
                         <button type="submit">Send Inquiry <i className="fas fa-paper-plane"></i></button>
                     </form>
-                    <p className="form-footer-note"><i className="fas fa-lock"></i> Your information is secure and confidential</p>
+<p className="form-footer-note"><i className="fas fa-lock"></i> Your information is secure and confidential</p>
                 </div>
-
             </div>
         </section>
 

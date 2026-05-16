@@ -669,6 +669,23 @@ export default function Weddings() {
                 grid-column: span 1;
             }
         }
+
+        /* Testimonial Auto-Scroll */
+        .testi-track-wrap { overflow: hidden; position: relative; padding: 20px 0; }
+        .testi-track { display: flex; gap: 24px; animation: scrollTestimonials 30s linear infinite; width: max-content; }
+        .testi-track:hover { animation-play-state: paused; }
+        @keyframes scrollTestimonials {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .testi-card { flex-shrink: 0; width: 380px; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 32px; position: relative; }
+        .testi-quote { font-size: 1.5rem; color: #fbc434; margin-bottom: 16px; }
+        .testi-stars { color: #fbc434; font-size: 0.9rem; margin-bottom: 12px; letter-spacing: 2px; }
+        .testi-text { font-size: 0.95rem; color: #555; line-height: 1.6; font-style: italic; margin-bottom: 20px; }
+        .testi-user { display: flex; align-items: center; gap: 12px; }
+        .testi-user img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+        .testi-user h4 { font-family: 'Arial Black', sans-serif; font-size: 0.9rem; text-transform: uppercase; margin: 0; color: #1a1a1a; }
+        .testi-user span { font-size: 0.8rem; color: #888; }
     ` }} />
       
     {/* SVG Definitions */}
@@ -887,65 +904,170 @@ export default function Weddings() {
             </div>
         </div>
 
-        {/* Testimonials */}
-        <section className="testimonials-section" style={{"background":"#fdfcf8","padding":"100px 0"}}>
-            <div style={{"maxWidth":"1200px","margin":"0 auto","padding":"0 20px"}}>
-                <div className="section-header center-header">
-                    <div className="rating-badge">
-                        <i className="fas fa-star"></i> Rated 4.9/5 by our happy couples
-                    </div>
-                    <h2>Happy Couples</h2>
-                    <p>Hear from those who began their forever journey with us.</p>
+        {/* Happy Couples - Auto-scroll */}
+        <section style={{background:'#fdfcf8', padding:'100px 0', overflow:'hidden', position:'relative'}}>
+            <div style={{maxWidth:'1200px', margin:'0 auto', padding:'0 20px', textAlign:'center', marginBottom:'50px'}}>
+                <div className="rating-badge">
+                    <i className="fas fa-star"></i> Rated 4.9/5 by our happy couples
                 </div>
+                <h2 style={{fontFamily:'Arial Black,sans-serif', fontSize:'2.5rem', textTransform:'uppercase', color:'#1a1a1a', margin:'16px 0 12px'}}>Happy Couples</h2>
+                <p style={{color:'#666', fontSize:'1.05rem'}}>Hear from those who began their forever journey with us.</p>
             </div>
 
-            <div className="testimonials-slider swiper">
-                <div className="swiper-wrapper">
-                    {/* Card 1 */}
-                    <div className="swiper-slide testimonial-card">
-                        <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
-                        <p className="testimonial-text">"Our wedding at Braj Nidhi was like a dream. The spiritual atmosphere combined with luxury service made our special day truly divine."</p>
-                        <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=150&auto=format&fit=crop" alt="Priya & Rahul" />
-                            <div>
-                                <h4>Priya & Rahul</h4>
-                                <span>Wedding Couple</span>
+            <div style={{position:'relative', padding:'0 40px'}}>
+                <div style={{position:'absolute', top:0, bottom:0, left:0, width:'100px', background:'linear-gradient(to right, #fdfcf8 0%, transparent 100%)', zIndex:2, pointerEvents:'none', filter:'blur(3px)'}}></div>
+                <div style={{position:'absolute', top:0, bottom:0, right:0, width:'100px', background:'linear-gradient(to left, #fdfcf8 0%, transparent 100%)', zIndex:2, pointerEvents:'none', filter:'blur(3px)'}}></div>
+                <div className="testi-track-wrap" style={{overflow:'hidden'}}>
+                    <div className="testi-track">
+                        {/* Card 1 - Priya & Aarav */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Our wedding at Braj Nidhi was like a dream come true. The spiritual atmosphere combined with royal service made our special day truly divine. The team went above and beyond!"</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1615114814213-a2450f03ebe1?q=80&w=150&auto=format&fit=crop" alt="Priya & Aarav" />
+                                <div>
+                                    <h4>Priya & Aarav</h4>
+                                    <span>Wedding Couple</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    {/* Card 2 */}
-                    <div className="swiper-slide testimonial-card">
-                        <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
-                        <p className="testimonial-text">"The courtyard setup was breathtaking. Every detail, from the decor to the Sattvic catering, was handled with so much care and grace."</p>
-                        <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=150&auto=format&fit=crop" alt="Sanjana M." />
-                            <div>
-                                <h4>Sanjana M.</h4>
-                                <span>Bride</span>
+                        {/* Card 2 - Kavita Sharma */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"The mandap setup was absolutely breathtaking. Every detail, from the floral decorations to the authentic Sattvic catering, was handled with so much care and grace."</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Kavita Sharma" />
+                                <div>
+                                    <h4>Kavita Sharma</h4>
+                                    <span>Bride</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    {/* Card 3 */}
-                    <div className="swiper-slide testimonial-card">
-                        <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
-                        <p className="testimonial-text">"We couldn't have asked for a better venue. The team at Braj Nidhi made sure everything was perfect for our traditional Vedic ceremony."</p>
-                        <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1623091423323-53736861bc14?q=80&w=150&auto=format&fit=crop" alt="Amit & Deepa" />
-                            <div>
-                                <h4>Amit & Deepa</h4>
-                                <span>Anniversary Celebration</span>
+                        {/* Card 3 - Vikram & Anjali */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"We couldn't have asked for a better venue. The team at Braj Nidhi made sure everything was perfect for our traditional Vedic ceremony. Truly unforgettable experience!"</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&auto=format&fit=crop" alt="Vikram & Anjali" />
+                                <div>
+                                    <h4>Vikram & Anjali</h4>
+                                    <span>Anniversary Celebration</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    {/* Card 4 */}
-                    <div className="swiper-slide testimonial-card">
-                        <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
-                        <p className="testimonial-text">"Exceptional hospitality. Our guests are still talking about the beautiful surroundings and the peace they felt during the entire event."</p>
-                        <div className="testimonial-user">
-                            <img src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?q=80&w=150&auto=format&fit=crop" alt="Vikram Singh" />
-                            <div>
-                                <h4>Vikram Singh</h4>
-                                <span>Father of the Bride</span>
+                        {/* Card 4 - Rajesh Khanna */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Exceptional hospitality! Our guests are still talking about the beautiful surroundings and the peace they felt during the entire event. Highly recommended for destination weddings."</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Rajesh Khanna" />
+                                <div>
+                                    <h4>Rajesh Khanna</h4>
+                                    <span>Father of the Bride</span>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Card 5 - Meera & Arjun */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"The Ganga Aarti theme was perfect for our reception. Braj Nidhi understood our vision and delivered beyond expectations. Our families are forever grateful!"</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=150&auto=format&fit=crop" alt="Meera & Arjun" />
+                                <div>
+                                    <h4>Meera & Arjun</h4>
+                                    <span>Wedding Couple</span>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Card 6 - Sunita Devi */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"From the moment we arrived, we felt like royalty. The warm hospitality, pristine grounds, and spiritual ambiance made our daughter's wedding magical. Thank you Braj Nidhi!"</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Devi" />
+                                <div>
+                                    <h4>Sunita Devi</h4>
+                                    <span>Mother of the Bride</span>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Duplicated for loop */}
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Our wedding at Braj Nidhi was like a dream come true. The spiritual atmosphere combined with royal service made our special day truly divine. The team went above and beyond!"</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1615114814213-a2450f03ebe1?q=80&w=150&auto=format&fit=crop" alt="Priya & Aarav" />
+                                <div>
+                                    <h4>Priya & Aarav</h4>
+                                    <span>Wedding Couple</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"The mandap setup was absolutely breathtaking. Every detail, from the floral decorations to the authentic Sattvic catering, was handled with so much care and grace."</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Kavita Sharma" />
+                                <div>
+                                    <h4>Kavita Sharma</h4>
+                                    <span>Bride</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"We couldn't have asked for a better venue. The team at Braj Nidhi made sure everything was perfect for our traditional Vedic ceremony. Truly unforgettable experience!"</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&auto=format&fit=crop" alt="Vikram & Anjali" />
+                                <div>
+                                    <h4>Vikram & Anjali</h4>
+                                    <span>Anniversary Celebration</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"Exceptional hospitality! Our guests are still talking about the beautiful surroundings and the peace they felt during the entire event. Highly recommended for destination weddings."</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Rajesh Khanna" />
+                                <div>
+                                    <h4>Rajesh Khanna</h4>
+                                    <span>Father of the Bride</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"The Ganga Aarti theme was perfect for our reception. Braj Nidhi understood our vision and delivered beyond expectations. Our families are forever grateful!"</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=150&auto=format&fit=crop" alt="Meera & Arjun" />
+                                <div>
+                                    <h4>Meera & Arjun</h4>
+                                    <span>Wedding Couple</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="testi-card">
+                            <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
+                            <div className="testi-stars">★★★★★</div>
+                            <p className="testi-text">"From the moment we arrived, we felt like royalty. The warm hospitality, pristine grounds, and spiritual ambiance made our daughter's wedding magical. Thank you Braj Nidhi!"</p>
+                            <div className="testi-user">
+                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Devi" />
+                                <div>
+                                    <h4>Sunita Devi</h4>
+                                    <span>Mother of the Bride</span>
+                                </div>
                             </div>
                         </div>
                     </div>

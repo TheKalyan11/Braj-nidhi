@@ -273,7 +273,6 @@ export default function Home() {
                     </div>
                     <CustomSelect label="Guests" value={bookingData.guests} options={["1 Adult", "2 Adults", "2 Adults, 1 Child", "2 Adults, 2 Children"]} field="guests" />
                     <CustomSelect label="Room Type" value={bookingData.roomType} options={["Luxury Suite", "Executive Room", "Royal Heritage Suite"]} field="roomType" />
-                    <div className="full-width"><CustomSelect label="Event Type (Optional)" value={bookingData.eventType} options={["None", "Corporate Offsite", "Wedding", "Spiritual Retreat"]} field="eventType" /></div>
                 </div>
 
                 <div className="price-row">
@@ -417,7 +416,6 @@ export default function Home() {
                     
                     <div className="room-content">
                         <h3>Deluxe Temple View</h3>
-                        <p className="room-location"><i className="fas fa-map-marker-alt"></i> Braj Nidhi Guest House, Vrindavan</p>
                         
                         <div className="room-amenities">
                             <span><i className="fas fa-bed"></i> King Bed</span>
@@ -436,7 +434,6 @@ export default function Home() {
                     
                     <div className="room-content">
                         <h3>Executive Suite</h3>
-                        <p className="room-location"><i className="fas fa-map-marker-alt"></i> Braj Nidhi Guest House, Vrindavan</p>
                         
                         <div className="room-amenities">
                             <span><i className="fas fa-couch"></i> Living Area</span>
@@ -455,7 +452,6 @@ export default function Home() {
                     
                     <div className="room-content">
                         <h3>Royal Heritage Suite</h3>
-                        <p className="room-location"><i className="fas fa-map-marker-alt"></i> Braj Nidhi Guest House, Vrindavan</p>
                         
                         <div className="room-amenities">
                             <span><i className="fas fa-crown"></i> Four-Poster Bed</span>
