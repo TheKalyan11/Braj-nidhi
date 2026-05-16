@@ -11,13 +11,13 @@ export default function Guesthouse() {
   
   // Slideshow state for Rooms
   const [deluxe2ImgIndex, setDeluxe2ImgIndex] = useState(0);
-  const deluxe2Images = ["DSC05818-HDR.png", "DSC05963-HDR.png"];
+  const deluxe2Images = ["DSC05818-HDR.webp", "DSC05963-HDR.webp"];
   
   const [deluxe3ImgIndex, setDeluxe3ImgIndex] = useState(0);
-  const deluxe3Images = ["d3.png", "d31.png"];
+  const deluxe3Images = ["d3.webp", "d31.webp"];
   
   const [deluxe4ImgIndex, setDeluxe4ImgIndex] = useState(0);
-  const deluxe4Images = ["DSC05963-HDR.png", "d31.png"];
+  const deluxe4Images = ["DSC05963-HDR.webp", "d31.webp"];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -1043,7 +1043,7 @@ export default function Guesthouse() {
                 <div className="hero-title-large">Luxury Guestrooms & Divine Suites</div>
                 
                 <div className="hero-main-img-wrap">
-                    <img src="DSC05818-HDR.png" alt="Resort View" />
+                    <img src="DSC05818-HDR.webp" alt="Resort View" />
                     <div className="hero-orange-banner">
                         FIND ROOMS FOR A STAY <i className="fas fa-binoculars"></i>
                     </div>

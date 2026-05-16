@@ -1,8 +1,19 @@
 
 "use client";
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Corporate() {
+  const [heroImgIndex, setHeroImgIndex] = useState(0);
+  const heroImages = ["/DSC09652.webp", "/DSC09672.webp"];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroImgIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     // Swiper initialization for subpages
     if (typeof window !== 'undefined' && (window as any).Swiper) {
@@ -714,7 +725,18 @@ export default function Corporate() {
                 <div className="hero-title-large">CORPORATE RETREATS & CONFERENCES</div>
                 
                 <div className="hero-single-card">
-                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1200&auto=format&fit=crop" alt="Corporate Offsites" />
+                    <AnimatePresence mode="wait">
+                        <motion.img 
+                            key={heroImgIndex}
+                            src={heroImages[heroImgIndex]}
+                            alt="Corporate Retreats"
+                            initial={{ opacity: 0, scale: 1.1 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 1.5, ease: "easeInOut" }}
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                    </AnimatePresence>
                     <div className="hero-single-content">
                         <h3>Elevate Your Corporate Experience</h3>
                         <p>Premium AV halls, Bose professional sound systems, acoustic interiors, luxury stays, and soulful Braj experiences all designed for impactful meetings, retreats, and executive events in Vrindavan.</p>
@@ -1164,3 +1186,6 @@ export default function Corporate() {
     </div>
   );
 }
+
+
+

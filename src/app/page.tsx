@@ -15,13 +15,13 @@ export default function Home() {
 
   // Slideshow state for Deluxe Rooms
   const [deluxe2ImgIndex, setDeluxe2ImgIndex] = useState(0);
-  const deluxe2Images = ["DSC05818-HDR.png", "DSC05963-HDR.png"];
+  const deluxe2Images = ["DSC05818-HDR.webp", "DSC05963-HDR.webp"];
   
   const [deluxe3ImgIndex, setDeluxe3ImgIndex] = useState(0);
-  const deluxe3Images = ["d3.png", "d31.png"];
+  const deluxe3Images = ["d3.webp", "d31.webp"];
   
   const [deluxe4ImgIndex, setDeluxe4ImgIndex] = useState(0);
-  const deluxe4Images = ["DSC05963-HDR.png", "d31.png"];
+  const deluxe4Images = ["DSC05963-HDR.webp", "d31.webp"];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -354,8 +354,8 @@ export default function Home() {
                     <a href="/guesthouse" className="btn-outline">Explore Rooms <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
-                    <img src="DSC05818-HDR.png" alt="Luxury Suite" className="main-img" />
-                    <img src="DSC05963-HDR.png" alt="Modern Bathroom" className="secondary-img" />
+                    <img src="DSC05818-HDR.webp" alt="Luxury Suite" className="main-img" />
+                    <img src="DSC05963-HDR.webp" alt="Modern Bathroom" className="secondary-img" />
                 </div>
             </div>
         </section>
@@ -368,8 +368,8 @@ export default function Home() {
                     <a href="#" className="btn-outline">Plan Your Wedding <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
-                    <img src="DSC02591.JPG" alt="Wedding Hall" className="main-img" />
-                    <img src="DSC06003-HDR.png" alt="Wedding Decor" className="secondary-img" />
+                    <img src="DSC02591.webp" alt="Wedding Hall" className="main-img" />
+                    <img src="DSC06003-HDR.webp" alt="Wedding Decor" className="secondary-img" />
                 </div>
             </div>
         </section>
@@ -551,7 +551,7 @@ export default function Home() {
 
                 {/*  Offer Card 2  */}
                 <div className="offer-card immersive">
-                    <img src="wedding_package.png" alt="Royal Wedding" className="offer-bg-img" />
+                    <img src="wedding_package.webp" alt="Royal Wedding" className="offer-bg-img" />
                     <div className="offer-gradient-blur"></div>
                     
                     <div className="offer-content">
@@ -798,7 +798,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img src="nand_baba.png" alt="Shri Nand Baba Temple" className="attraction-bg" />
+                            <img src="nand_baba.webp" alt="Shri Nand Baba Temple" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">31.64 km</div>
                             <div className="attraction-content">
