@@ -39,6 +39,20 @@ export default function Corporate() {
     transition: { duration: 0.8, ease: "easeOut" }
   };
 
+  const slideInLeft = {
+    initial: { opacity: 0, x: -70 },
+    whileInView: { opacity: 1, x: 0 },
+    viewport: { once: true },
+    transition: { duration: 1, ease: "easeOut" }
+  };
+
+  const slideInRight = {
+    initial: { opacity: 0, x: 70 },
+    whileInView: { opacity: 1, x: 0 },
+    viewport: { once: true },
+    transition: { duration: 1, ease: "easeOut" }
+  };
+
   const staggerContainer = {
     initial: { opacity: 0 },
     whileInView: { 
@@ -775,7 +789,7 @@ export default function Corporate() {
             </motion.div>
 
             <motion.div className="events-bento" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
-                <motion.div className="bento-item" variants={fadeInUp}>
+                <motion.div className="bento-item" variants={slideInLeft}>
                     <i className="fas fa-project-diagram"></i>
                     <h4>PREMIUM AV HALL</h4>
                     <p>State-of-the-art conference hall equipped with Bose professional sound systems, advanced AV setup, presentation facilities, and acoustic soundproof interiors.</p>
@@ -785,7 +799,7 @@ export default function Corporate() {
                     <h4>EXECUTIVE MEETING SPACES</h4>
                     <p>Elegant spaces designed for leadership meetings, private discussions, workshops, and collaborative corporate sessions.</p>
                 </motion.div>
-                <motion.div className="bento-item" variants={fadeInUp}>
+                <motion.div className="bento-item" variants={slideInRight}>
                     <i className="fas fa-mug-hot"></i>
                     <h4>NETWORKING & RETREAT LOUNGES</h4>
                     <p>Premium breakout areas with peaceful surroundings, ideal for networking, brainstorming, and meaningful corporate interactions.</p>
@@ -793,7 +807,7 @@ export default function Corporate() {
             </motion.div>
 
             <motion.div className="packages-grid" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
-                <motion.div className="package-card" variants={fadeInUp}>
+                <motion.div className="package-card" variants={slideInLeft}>
                     <h3>Day Conference Package</h3>
                     <ul className="package-features">
                         <li><i className="fas fa-check"></i> Executive AV Hall Access (8 Hours)</li>
@@ -805,7 +819,7 @@ export default function Corporate() {
                     <a href="#inquiry" className="btn-outline" style={{"border":"2px solid #1a1a1a","padding":"15px 30px","textDecoration":"none","color":"#1a1a1a","fontWeight":"800","textTransform":"uppercase","display":"inline-block"}}>Request Quote</a>
                 </motion.div>
                 
-                <motion.div className="package-card" variants={fadeInUp}>
+                <motion.div className="package-card" variants={slideInRight}>
                     <div className="package-badge">Premium</div>
                     <h3>Leadership Retreat</h3>
                     <ul className="package-features">
@@ -837,23 +851,23 @@ export default function Corporate() {
                     <h3>Braj Nidhi Conference Hall Features</h3>
                 </motion.div>
                 <motion.div className="conf-list" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
-                    <motion.div className="conf-item" variants={fadeInUp}>
+                    <motion.div className="conf-item" variants={slideInRight}>
                         <div className="conf-num-wrap"><div className="conf-circle navy"><i className="fas fa-tv"></i></div><span className="conf-num">01</span></div>
                         <div className="conf-text"><h4>4K Resolution LED Wall</h4><p>16 ft × 9 ft — Brand Delta Pitch 1.5P COB technology along with 2 Samsung TVs (98 inches)</p></div>
                     </motion.div>
-                    <motion.div className="conf-item" variants={fadeInUp}>
+                    <motion.div className="conf-item" variants={slideInRight}>
                         <div className="conf-num-wrap"><div className="conf-circle slate"><i className="fas fa-volume-up"></i></div><span className="conf-num">02</span></div>
                         <div className="conf-text"><h4>High End BOSE Speakers</h4><p>Bose MA12 EX column array for crystal clear sound experience</p></div>
                     </motion.div>
-                    <motion.div className="conf-item" variants={fadeInUp}>
+                    <motion.div className="conf-item" variants={slideInRight}>
                         <div className="conf-num-wrap"><div className="conf-circle steel"><i className="fas fa-microphone"></i></div><span className="conf-num">03</span></div>
                         <div className="conf-text"><h4>Microphones</h4><p>Sennheiser wireless super cardioid microphone — 16 gooseneck and 4 handheld</p></div>
                     </motion.div>
-                    <motion.div className="conf-item" variants={fadeInUp}>
+                    <motion.div className="conf-item" variants={slideInRight}>
                         <div className="conf-num-wrap"><div className="conf-circle warm"><i className="fas fa-video"></i></div><span className="conf-num">04</span></div>
                         <div className="conf-text"><h4>Video Conferencing</h4><p>Kramer technologies with Sony SRG 40 cameras with AI auto focus</p></div>
                     </motion.div>
-                    <motion.div className="conf-item" variants={fadeInUp}>
+                    <motion.div className="conf-item" variants={slideInRight}>
                         <div className="conf-num-wrap"><div className="conf-circle stone"><i className="fas fa-wifi"></i></div><span className="conf-num">05</span></div>
                         <div className="conf-text"><h4>Wireless Presentation</h4><p>Kramer — all participants can present wirelessly without any external device on all three displays</p></div>
                     </motion.div>
@@ -862,8 +876,8 @@ export default function Corporate() {
         </section>
 
         {/* Why Choose Vrindavan Split Section */}
-        <motion.section className="split-section" {...fadeInUp}>
-            <div className="split-content">
+        <motion.section className="split-section" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+            <motion.div className="split-content" variants={slideInLeft}>
                 <h3>THE POWER OF PEACEFUL LEADERSHIP</h3>
                 <p>Step away from the noise of the city and experience corporate gatherings in the serene atmosphere of Vrindavan. Braj Nidhi blends premium conference infrastructure with the calm spiritual energy of Braj — creating an environment designed for clarity, creativity, and meaningful conversations.</p>
                 <p>From executive retreats and leadership meets to focused business discussions, every experience is crafted to feel productive, elevated, and refreshing.</p>
@@ -873,21 +887,18 @@ export default function Corporate() {
                     <li><i className="fas fa-check"></i> Inspiring Spiritual Atmosphere</li>
                     <li><i className="fas fa-check"></i> Ideal for Leadership Retreats & Conferences</li>
                 </ul>
-            </div>
+            </motion.div>
             <motion.div 
                 className="split-image"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1 }}
+                variants={slideInRight}
             >
                 <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop" alt="Corporate Strategy Meeting" />
             </motion.div>
         </motion.section>
 
         {/* Sattvic Dining Split Section (Reverse) */}
-        <section className="split-section reverse">
-            <div className="split-content">
+        <motion.section className="split-section reverse" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+            <motion.div className="split-content" variants={slideInRight}>
                 <h3>SATTVIC DINING EXPERIENCES</h3>
                 <p>Elevate your corporate gatherings with thoughtfully curated sattvic dining experiences designed to energize, refresh, and inspire. From executive lunches and high-tea sessions to premium dinner setups, every meal at Braj Nidhi is prepared with purity, authenticity, and hospitality.</p>
                 <p>Blending soulful flavors with elegant presentation, we create dining experiences that perfectly complement conferences, retreats, and leadership gatherings.</p>
@@ -897,11 +908,11 @@ export default function Corporate() {
                     <li><i className="fas fa-check"></i> Executive Dining & Retreat Catering</li>
                     <li><i className="fas fa-check"></i> Elegant Dinner & Gathering Experiences</li>
                 </ul>
-            </div>
-            <div className="split-image">
+            </motion.div>
+            <motion.div className="split-image" variants={slideInLeft}>
                 <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=1200&auto=format&fit=crop" alt="Sattvic Dining" />
-            </div>
-        </section>
+            </motion.div>
+        </motion.section>
 
         {/* Experience the Essence of Braj */}
         <section className="module-section" style={{"paddingTop":"20px"}}>
@@ -910,7 +921,7 @@ export default function Corporate() {
                 <p>At Braj Nidhi, corporate gatherings go beyond meetings and presentations. We create meaningful experiences through the spiritual energy, culture, and timeless heritage of Vrindavan.</p>
             </motion.div>
             <motion.div className="events-bento" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
-                <motion.div className="bento-item" variants={fadeInUp}>
+                <motion.div className="bento-item" variants={slideInLeft}>
                     <i className="fas fa-walking"></i>
                     <h4>CURATED BRAJ YATRA EXPERIENCES</h4>
                     <p>Explore sacred temples, spiritual landmarks, and the divine heritage of Braj through thoughtfully guided experiences.</p>
@@ -920,7 +931,7 @@ export default function Corporate() {
                     <h4>SOULFUL KIRTANS & WELLNESS</h4>
                     <p>Reconnect through peaceful kirtans, meditation sessions, and calming wellness experiences designed to refresh the mind and spirit.</p>
                 </motion.div>
-                <motion.div className="bento-item" variants={fadeInUp}>
+                <motion.div className="bento-item" variants={slideInRight}>
                     <i className="fas fa-hands-helping"></i>
                     <h4>GAUSHALA & SEVA EXPERIENCES</h4>
                     <p>Experience the simplicity and warmth of Braj through peaceful gaushala visits, seva activities, and meaningful cultural interactions unique to Braj Nidhi.</p>
