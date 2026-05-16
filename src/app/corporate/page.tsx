@@ -32,6 +32,22 @@ export default function Corporate() {
     }
   }, []);
 
+  const fadeInUp = {
+    initial: { opacity: 0, y: 30 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true },
+    transition: { duration: 0.8, ease: "easeOut" }
+  };
+
+  const staggerContainer = {
+    initial: { opacity: 0 },
+    whileInView: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.2 }
+    },
+    viewport: { once: true }
+  };
+
   return (
     <div className="corporate-page">
       <style dangerouslySetInnerHTML={{ __html: `
@@ -737,41 +753,47 @@ export default function Corporate() {
                             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                         />
                     </AnimatePresence>
-                    <div className="hero-single-content">
+                    <motion.div 
+                        className="hero-single-content"
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, delay: 0.5 }}
+                    >
                         <h3>Elevate Your Corporate Experience</h3>
                         <p>Premium AV halls, Bose professional sound systems, acoustic interiors, luxury stays, and soulful Braj experiences all designed for impactful meetings, retreats, and executive events in Vrindavan.</p>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         </section>
 
         {/* Corporate Offsite Module */}
         <section id="corporate" className="module-section">
-            <div className="module-header">
+            <motion.div className="module-header" {...fadeInUp}>
                 <h2>INFRASTRUCTURE & CAPABILITIES</h2>
                 <p>Experience world-class conference infrastructure designed for impactful corporate events, executive meetings, seminars, and premium retreats in Vrindavan.</p>
-            </div>
+            </motion.div>
 
-            <div className="events-bento">
-                <div className="bento-item">
+            <motion.div className="events-bento" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+                <motion.div className="bento-item" variants={fadeInUp}>
                     <i className="fas fa-project-diagram"></i>
                     <h4>PREMIUM AV HALL</h4>
                     <p>State-of-the-art conference hall equipped with Bose professional sound systems, advanced AV setup, presentation facilities, and acoustic soundproof interiors.</p>
-                </div>
-                <div className="bento-item">
+                </motion.div>
+                <motion.div className="bento-item" variants={fadeInUp}>
                     <i className="fas fa-users"></i>
                     <h4>EXECUTIVE MEETING SPACES</h4>
                     <p>Elegant spaces designed for leadership meetings, private discussions, workshops, and collaborative corporate sessions.</p>
-                </div>
-                <div className="bento-item">
+                </motion.div>
+                <motion.div className="bento-item" variants={fadeInUp}>
                     <i className="fas fa-mug-hot"></i>
                     <h4>NETWORKING & RETREAT LOUNGES</h4>
                     <p>Premium breakout areas with peaceful surroundings, ideal for networking, brainstorming, and meaningful corporate interactions.</p>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
-            <div className="packages-grid">
-                <div className="package-card">
+            <motion.div className="packages-grid" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+                <motion.div className="package-card" variants={fadeInUp}>
                     <h3>Day Conference Package</h3>
                     <ul className="package-features">
                         <li><i className="fas fa-check"></i> Executive AV Hall Access (8 Hours)</li>
@@ -781,9 +803,9 @@ export default function Corporate() {
                         <li><i className="fas fa-check"></i> Dedicated IT Support Staff</li>
                     </ul>
                     <a href="#inquiry" className="btn-outline" style={{"border":"2px solid #1a1a1a","padding":"15px 30px","textDecoration":"none","color":"#1a1a1a","fontWeight":"800","textTransform":"uppercase","display":"inline-block"}}>Request Quote</a>
-                </div>
+                </motion.div>
                 
-                <div className="package-card">
+                <motion.div className="package-card" variants={fadeInUp}>
                     <div className="package-badge">Premium</div>
                     <h3>Leadership Retreat</h3>
                     <ul className="package-features">
@@ -794,45 +816,53 @@ export default function Corporate() {
                         <li><i className="fas fa-check"></i> Team Building Activities Space</li>
                     </ul>
                     <a href="#inquiry" className="btn-outline" style={{"border":"2px solid #1a1a1a","padding":"15px 30px","textDecoration":"none","color":"#1a1a1a","fontWeight":"800","textTransform":"uppercase","display":"inline-block"}}>Request Quote</a>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </section>
 
         {/* Conference Hall Features */}
         <section className="conf-section">
-            <div style={{textAlign:'center',marginBottom:'50px'}}>
+            <motion.div style={{textAlign:'center',marginBottom:'50px'}} {...fadeInUp}>
                 <div style={{display:'inline-block',background:'#f0e8d8',color:'#7c5a2a',fontSize:'0.75rem',fontWeight:800,textTransform:'uppercase',letterSpacing:'2px',padding:'7px 18px',borderRadius:'50px',marginBottom:'14px'}}>AV &amp; Tech Infrastructure</div>
                 <h2 style={{fontFamily:'Arial Black,sans-serif',fontSize:'2rem',textTransform:'uppercase',color:'#1a1a1a',margin:'0 auto',lineHeight:1.2}}>Conference Hall Features</h2>
-            </div>
+            </motion.div>
             <div className="conf-inner">
-                <div className="conf-badge"><h3>Braj Nidhi Conference Hall Features</h3></div>
-                <div className="conf-list">
-                    <div className="conf-item">
+                <motion.div 
+                    className="conf-badge"
+                    initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+                    whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, type: "spring" }}
+                >
+                    <h3>Braj Nidhi Conference Hall Features</h3>
+                </motion.div>
+                <motion.div className="conf-list" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+                    <motion.div className="conf-item" variants={fadeInUp}>
                         <div className="conf-num-wrap"><div className="conf-circle navy"><i className="fas fa-tv"></i></div><span className="conf-num">01</span></div>
                         <div className="conf-text"><h4>4K Resolution LED Wall</h4><p>16 ft × 9 ft — Brand Delta Pitch 1.5P COB technology along with 2 Samsung TVs (98 inches)</p></div>
-                    </div>
-                    <div className="conf-item">
+                    </motion.div>
+                    <motion.div className="conf-item" variants={fadeInUp}>
                         <div className="conf-num-wrap"><div className="conf-circle slate"><i className="fas fa-volume-up"></i></div><span className="conf-num">02</span></div>
                         <div className="conf-text"><h4>High End BOSE Speakers</h4><p>Bose MA12 EX column array for crystal clear sound experience</p></div>
-                    </div>
-                    <div className="conf-item">
+                    </motion.div>
+                    <motion.div className="conf-item" variants={fadeInUp}>
                         <div className="conf-num-wrap"><div className="conf-circle steel"><i className="fas fa-microphone"></i></div><span className="conf-num">03</span></div>
                         <div className="conf-text"><h4>Microphones</h4><p>Sennheiser wireless super cardioid microphone — 16 gooseneck and 4 handheld</p></div>
-                    </div>
-                    <div className="conf-item">
+                    </motion.div>
+                    <motion.div className="conf-item" variants={fadeInUp}>
                         <div className="conf-num-wrap"><div className="conf-circle warm"><i className="fas fa-video"></i></div><span className="conf-num">04</span></div>
                         <div className="conf-text"><h4>Video Conferencing</h4><p>Kramer technologies with Sony SRG 40 cameras with AI auto focus</p></div>
-                    </div>
-                    <div className="conf-item">
+                    </motion.div>
+                    <motion.div className="conf-item" variants={fadeInUp}>
                         <div className="conf-num-wrap"><div className="conf-circle stone"><i className="fas fa-wifi"></i></div><span className="conf-num">05</span></div>
                         <div className="conf-text"><h4>Wireless Presentation</h4><p>Kramer — all participants can present wirelessly without any external device on all three displays</p></div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </div>
         </section>
 
         {/* Why Choose Vrindavan Split Section */}
-        <section className="split-section">
+        <motion.section className="split-section" {...fadeInUp}>
             <div className="split-content">
                 <h3>THE POWER OF PEACEFUL LEADERSHIP</h3>
                 <p>Step away from the noise of the city and experience corporate gatherings in the serene atmosphere of Vrindavan. Braj Nidhi blends premium conference infrastructure with the calm spiritual energy of Braj — creating an environment designed for clarity, creativity, and meaningful conversations.</p>
@@ -844,10 +874,16 @@ export default function Corporate() {
                     <li><i className="fas fa-check"></i> Ideal for Leadership Retreats & Conferences</li>
                 </ul>
             </div>
-            <div className="split-image">
+            <motion.div 
+                className="split-image"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1 }}
+            >
                 <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop" alt="Corporate Strategy Meeting" />
-            </div>
-        </section>
+            </motion.div>
+        </motion.section>
 
         {/* Sattvic Dining Split Section (Reverse) */}
         <section className="split-section reverse">
@@ -869,27 +905,27 @@ export default function Corporate() {
 
         {/* Experience the Essence of Braj */}
         <section className="module-section" style={{"paddingTop":"20px"}}>
-            <div className="module-header">
+            <motion.div className="module-header" {...fadeInUp}>
                 <h2>EXPERIENCE THE ESSENCE OF BRAJ</h2>
                 <p>At Braj Nidhi, corporate gatherings go beyond meetings and presentations. We create meaningful experiences through the spiritual energy, culture, and timeless heritage of Vrindavan.</p>
-            </div>
-            <div className="events-bento">
-                <div className="bento-item">
+            </motion.div>
+            <motion.div className="events-bento" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+                <motion.div className="bento-item" variants={fadeInUp}>
                     <i className="fas fa-walking"></i>
                     <h4>CURATED BRAJ YATRA EXPERIENCES</h4>
                     <p>Explore sacred temples, spiritual landmarks, and the divine heritage of Braj through thoughtfully guided experiences.</p>
-                </div>
-                <div className="bento-item">
+                </motion.div>
+                <motion.div className="bento-item" variants={fadeInUp}>
                     <i className="fas fa-spa"></i>
                     <h4>SOULFUL KIRTANS & WELLNESS</h4>
                     <p>Reconnect through peaceful kirtans, meditation sessions, and calming wellness experiences designed to refresh the mind and spirit.</p>
-                </div>
-                <div className="bento-item">
+                </motion.div>
+                <motion.div className="bento-item" variants={fadeInUp}>
                     <i className="fas fa-hands-helping"></i>
                     <h4>GAUSHALA & SEVA EXPERIENCES</h4>
                     <p>Experience the simplicity and warmth of Braj through peaceful gaushala visits, seva activities, and meaningful cultural interactions unique to Braj Nidhi.</p>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </section>
 
         {/* Amenities Auto-Scrolling Marquee */}
@@ -1045,7 +1081,13 @@ export default function Corporate() {
             <div className="inquiry-layout">
 
                 {/* Left Info Panel */}
-                <div className="inquiry-info-panel">
+                <motion.div 
+                    className="inquiry-info-panel"
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                >
                     <div className="inquiry-eyebrow"><i className="fas fa-briefcase"></i> Corporate Inquiries</div>
                     <h2>Plan Your Corporate Event</h2>
                     <p>Tell us about your event requirements. Our corporate team will craft a tailored proposal and reach out within 24 hours.</p>
@@ -1077,10 +1119,16 @@ export default function Corporate() {
                     <a href="#" className="inquiry-download-link">
                         <i className="fas fa-file-pdf"></i> Download Corporate Brochure
                     </a>
-                </div>
+                </motion.div>
 
                 {/* Right Form Card */}
-                <div className="inquiry-form-card">
+                <motion.div 
+                    className="inquiry-form-card"
+                    initial={{ opacity: 0, x: 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                >
                     <div className="form-card-title">Fill in Your Details</div>
                     <form className="inquiry-form">
                         <div className="form-group">
@@ -1123,7 +1171,7 @@ export default function Corporate() {
                         <button type="submit">Send Inquiry <i className="fas fa-paper-plane"></i></button>
                     </form>
 <p className="form-footer-note"><i className="fas fa-lock"></i> Your information is secure and confidential</p>
-                </div>
+                </motion.div>
             </div>
         </section>
 
