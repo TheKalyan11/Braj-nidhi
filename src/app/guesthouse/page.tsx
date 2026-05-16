@@ -8,6 +8,25 @@ export default function Guesthouse() {
   const [checkOut, setCheckOut] = useState("");
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+  
+  // Slideshow state for Rooms
+  const [deluxe2ImgIndex, setDeluxe2ImgIndex] = useState(0);
+  const deluxe2Images = ["DSC05818-HDR.png", "DSC05963-HDR.png"];
+  
+  const [deluxe3ImgIndex, setDeluxe3ImgIndex] = useState(0);
+  const deluxe3Images = ["d3.png", "d31.png"];
+  
+  const [deluxe4ImgIndex, setDeluxe4ImgIndex] = useState(0);
+  const deluxe4Images = ["DSC05963-HDR.png", "d31.png"];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDeluxe2ImgIndex((prev) => (prev + 1) % deluxe2Images.length);
+      setDeluxe3ImgIndex((prev) => (prev + 1) % deluxe3Images.length);
+      setDeluxe4ImgIndex((prev) => (prev + 1) % deluxe4Images.length);
+    }, 4000); // Change every 4 seconds
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     // Swiper initialization for subpages
@@ -1129,7 +1148,22 @@ export default function Guesthouse() {
                     <div className="property-list">
                         {/* Card 1 */}
                         <div className="room-card new-style">
-                            <img src="DSC05818-HDR.png" alt="Deluxe 2" className="room-bg-img" />
+                            <AnimatePresence>
+                                <motion.img 
+                                    key={deluxe2ImgIndex}
+                                    src={deluxe2Images[deluxe2ImgIndex]} 
+                                    alt="Deluxe 2" 
+                                    className="room-bg-img"
+                                    initial={{ opacity: 0, scale: 1.2 }}
+                                    animate={{ opacity: 1, scale: 1.05 }}
+                                    exit={{ opacity: 0, scale: 1 }}
+                                    transition={{ 
+                                        opacity: { duration: 1.5, ease: "easeInOut" },
+                                        scale: { duration: 6, ease: "linear" } 
+                                    }}
+                                    style={{ position: 'absolute', top: 0, left: 0 }}
+                                />
+                            </AnimatePresence>
                             <div className="card-gradient"></div>
                             <div className="room-content">
                                 <h3>Deluxe 2 – Twin Bedded Room</h3>
@@ -1145,7 +1179,22 @@ export default function Guesthouse() {
 
                         {/* Card 2 */}
                         <div className="room-card new-style">
-                            <img src="DSC05963-HDR.png" alt="Deluxe 3" className="room-bg-img" />
+                            <AnimatePresence>
+                                <motion.img 
+                                    key={deluxe3ImgIndex}
+                                    src={deluxe3Images[deluxe3ImgIndex]} 
+                                    alt="Deluxe 3" 
+                                    className="room-bg-img"
+                                    initial={{ opacity: 0, scale: 1.2 }}
+                                    animate={{ opacity: 1, scale: 1.05 }}
+                                    exit={{ opacity: 0, scale: 1 }}
+                                    transition={{ 
+                                        opacity: { duration: 1.5, ease: "easeInOut" },
+                                        scale: { duration: 6, ease: "linear" } 
+                                    }}
+                                    style={{ position: 'absolute', top: 0, left: 0 }}
+                                />
+                            </AnimatePresence>
                             <div className="card-gradient"></div>
                             <div className="room-content">
                                 <h3>Deluxe 3 – 3 Bedded Room</h3>
@@ -1161,7 +1210,22 @@ export default function Guesthouse() {
 
                         {/* Card 3 */}
                         <div className="room-card new-style">
-                            <img src="room_royal.png" alt="Deluxe 4" className="room-bg-img" />
+                            <AnimatePresence>
+                                <motion.img 
+                                    key={deluxe4ImgIndex}
+                                    src={deluxe4Images[deluxe4ImgIndex]} 
+                                    alt="Deluxe 4" 
+                                    className="room-bg-img"
+                                    initial={{ opacity: 0, scale: 1.2 }}
+                                    animate={{ opacity: 1, scale: 1.05 }}
+                                    exit={{ opacity: 0, scale: 1 }}
+                                    transition={{ 
+                                        opacity: { duration: 1.5, ease: "easeInOut" },
+                                        scale: { duration: 6, ease: "linear" } 
+                                    }}
+                                    style={{ position: 'absolute', top: 0, left: 0 }}
+                                />
+                            </AnimatePresence>
                             <div className="card-gradient"></div>
                             <div className="room-content">
                                 <h3>Deluxe 4 – 4 Bedded Room</h3>

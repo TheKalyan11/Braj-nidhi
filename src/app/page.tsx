@@ -2,6 +2,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
@@ -11,6 +12,25 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  // Slideshow state for Deluxe Rooms
+  const [deluxe2ImgIndex, setDeluxe2ImgIndex] = useState(0);
+  const deluxe2Images = ["DSC05818-HDR.png", "DSC05963-HDR.png"];
+  
+  const [deluxe3ImgIndex, setDeluxe3ImgIndex] = useState(0);
+  const deluxe3Images = ["d3.png", "d31.png"];
+  
+  const [deluxe4ImgIndex, setDeluxe4ImgIndex] = useState(0);
+  const deluxe4Images = ["DSC05963-HDR.png", "d31.png"];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDeluxe2ImgIndex((prev) => (prev + 1) % deluxe2Images.length);
+      setDeluxe3ImgIndex((prev) => (prev + 1) % deluxe3Images.length);
+      setDeluxe4ImgIndex((prev) => (prev + 1) % deluxe4Images.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   const roomPrices: Record<string, number> = {
     'Luxury Suite': 8500,
@@ -409,56 +429,92 @@ export default function Home() {
                 <p>Choose the perfect sanctuary for your stay.</p>
             </div>
             <div className="room-grid">
-                {/*  Room Card 1  */}
+                {/* Card 1 */}
                 <div className="room-card new-style">
-                    <img src="room_deluxe.png" alt="Deluxe Room" className="room-bg-img" />
+                    <AnimatePresence>
+                        <motion.img 
+                            key={deluxe2ImgIndex}
+                            src={deluxe2Images[deluxe2ImgIndex]} 
+                            alt="Deluxe 2" 
+                            className="room-bg-img"
+                            initial={{ opacity: 0, scale: 1.2 }}
+                            animate={{ opacity: 1, scale: 1.05 }}
+                            exit={{ opacity: 0, scale: 1 }}
+                            transition={{ 
+                                opacity: { duration: 1.5, ease: "easeInOut" },
+                                scale: { duration: 6, ease: "linear" } 
+                            }}
+                            style={{ position: 'absolute', top: 0, left: 0 }}
+                        />
+                    </AnimatePresence>
                     <div className="card-gradient"></div>
-                    
                     <div className="room-content">
-                        <h3>Deluxe Temple View</h3>
-                        
+                        <h3>Deluxe 2 – Twin Bedded Room</h3>
                         <div className="room-amenities">
-                            <span><i className="fas fa-bed"></i> King Bed</span>
+                            <span><i className="fas fa-bed"></i> Twin Beds</span>
                             <span><i className="fas fa-wifi"></i> Free WiFi</span>
                             <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                         </div>
-                        
                         <button className="btn-availability">Book for ₹3,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
 
-                {/*  Room Card 2  */}
+                {/* Card 2 */}
                 <div className="room-card new-style">
-                    <img src="room_executive.png" alt="Executive Suite" className="room-bg-img" />
+                    <AnimatePresence>
+                        <motion.img 
+                            key={deluxe3ImgIndex}
+                            src={deluxe3Images[deluxe3ImgIndex]} 
+                            alt="Deluxe 3" 
+                            className="room-bg-img"
+                            initial={{ opacity: 0, scale: 1.2 }}
+                            animate={{ opacity: 1, scale: 1.05 }}
+                            exit={{ opacity: 0, scale: 1 }}
+                            transition={{ 
+                                opacity: { duration: 1.5, ease: "easeInOut" },
+                                scale: { duration: 6, ease: "linear" } 
+                            }}
+                            style={{ position: 'absolute', top: 0, left: 0 }}
+                        />
+                    </AnimatePresence>
                     <div className="card-gradient"></div>
-                    
                     <div className="room-content">
-                        <h3>Executive Suite</h3>
-                        
+                        <h3>Deluxe 3 – 3 Bedded Room</h3>
                         <div className="room-amenities">
                             <span><i className="fas fa-couch"></i> Living Area</span>
                             <span><i className="fas fa-bath"></i> Deep Tub</span>
                             <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                         </div>
-                        
                         <button className="btn-availability">Book for ₹4,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
 
-                {/*  Room Card 3  */}
+                {/* Card 3 */}
                 <div className="room-card new-style">
-                    <img src="room_royal.png" alt="Royal Heritage Suite" className="room-bg-img" />
+                    <AnimatePresence>
+                        <motion.img 
+                            key={deluxe4ImgIndex}
+                            src={deluxe4Images[deluxe4ImgIndex]} 
+                            alt="Deluxe 4" 
+                            className="room-bg-img"
+                            initial={{ opacity: 0, scale: 1.2 }}
+                            animate={{ opacity: 1, scale: 1.05 }}
+                            exit={{ opacity: 0, scale: 1 }}
+                            transition={{ 
+                                opacity: { duration: 1.5, ease: "easeInOut" },
+                                scale: { duration: 6, ease: "linear" } 
+                            }}
+                            style={{ position: 'absolute', top: 0, left: 0 }}
+                        />
+                    </AnimatePresence>
                     <div className="card-gradient"></div>
-                    
                     <div className="room-content">
-                        <h3>Royal Heritage Suite</h3>
-                        
+                        <h3>Deluxe 4 – 4 Bedded Room</h3>
                         <div className="room-amenities">
                             <span><i className="fas fa-crown"></i> Four-Poster Bed</span>
-                            <span><i className="fas fa-bell"></i> Personal Attendant</span>
+                            <span><i className="fas fa-user-tie"></i> Personal Attendant</span>
                             <span><i className="fas fa-hot-tub"></i> Jacuzzi</span>
                         </div>
-                        
                         <a href="/booking" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></a>
                     </div>
                 </div>
