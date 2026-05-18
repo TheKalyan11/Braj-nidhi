@@ -67,6 +67,18 @@ const Navbar = () => {
         {/* CTA Buttons */}
         <div className="hidden md:flex items-center space-x-4">
           <Link
+            href="/login"
+            className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+          >
+            <span>Login</span>
+          </Link>
+          <Link
+            href="/register"
+            className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+          >
+            <span>Create Account</span>
+          </Link>
+          <Link
             href="tel:+911234567890"
             className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
           >
@@ -112,6 +124,20 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="pt-4 flex flex-col gap-4">
+                <Link
+                  href="/login"
+                  className="border border-border text-center py-3 rounded-xl font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="border border-border text-center py-3 rounded-xl font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Create Account
+                </Link>
                 <Link
                   href="/booking"
                   className="bg-primary text-white text-center py-3 rounded-xl font-bold uppercase"

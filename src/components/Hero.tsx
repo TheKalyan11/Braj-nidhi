@@ -42,7 +42,7 @@ const Hero = () => {
               className="group bg-primary text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-gold transition-all flex items-center gap-3 shadow-2xl hover:shadow-gold/20"
             >
               <Calendar size={20} />
-              Book Your Stay
+              Search
             </Link>
             <Link
               href="/rooms"

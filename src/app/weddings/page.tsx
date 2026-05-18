@@ -1,8 +1,37 @@
-
 "use client";
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import FloatingWidgets from '@/components/FloatingWidgets';
+import Link from 'next/link';
+import LoginModal from '@/components/LoginModal';
 
 export default function Weddings() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+      setUserName(localStorage.getItem('userName') || 'User');
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userName');
+    setIsLoggedIn(false);
+    window.location.reload();
+  };
+
+  const getUserInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0][0].toUpperCase();
+  };
+
   useEffect(() => {
     // Swiper initialization for subpages
     if (typeof window !== 'undefined' && (window as any).Swiper) {
@@ -699,8 +728,8 @@ export default function Weddings() {
                 <path d="M50,0 L50,95" stroke="#006400" strokeWidth="2"/>
             </g>
             <g id="krishna-flute-feather">
-                <path d="M10,75 L90,45" stroke="#DAA520" strokeWidth="12" stroke-linecap="round"/>
-                <path d="M12,73 L88,44" stroke="#F0E68C" strokeWidth="6" stroke-linecap="round"/>
+                <path d="M10,75 L90,45" stroke="#DAA520" strokeWidth="12" strokeLinecap="round"/>
+                <path d="M12,73 L88,44" stroke="#F0E68C" strokeWidth="6" strokeLinecap="round"/>
                 <line x1="20" y1="76" x2="25" y2="63" stroke="#DC143C" strokeWidth="3"/>
                 <line x1="23" y1="75" x2="28" y2="62" stroke="#DC143C" strokeWidth="3"/>
                 <circle cx="40" cy="62" r="2.5" fill="#3e2723"/>
@@ -715,17 +744,34 @@ export default function Weddings() {
     </svg>
 
     <header id="main-header" className="scrolled">
-        <a href="/" className="logo" style={{textDecoration: "none"}}><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  /></a>
+        <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
+            <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "60px", width: "auto" }} />
+        </Link>
         <nav>
             <ul>
                 <li><a href="/guesthouse">Guesthouse</a></li>
                 <li><a href="/weddings">Weddings</a></li>
                 <li><a href="/corporate">Corporate</a></li>
-                <li><a href="/#contact">Contact</a></li>
+                <li><a href="/braj-yatra">Braj Yatra</a></li>
+                <li><a href="/contact">Contact</a></li>
             </ul>
         </nav>
         <div className="nav-btns">
-            <a href="/#contact" className="btn-book">Book Now</a>
+            {isLoggedIn ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div className="user-info-text">
+                        <span className="user-label">Braj Club Member</span>
+                        <span className="user-name">{userName}</span>
+                    </div>
+                    <div className="user-profile-badge">
+                        {getUserInitials(userName)}
+                    </div>
+                    <button onClick={handleLogout} className="btn-login" style={{ padding: '8px 16px', fontSize: '0.8rem', height: '36px' }}>Logout</button>
+                </div>
+            ) : (
+                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login" style={{ border: 'none', cursor: 'pointer' }}>Login / Create Account</button>
+            )}
+            <a href="/booking" className="btn-book">Book Now</a>
         </div>
     </header>
 
@@ -1191,7 +1237,7 @@ export default function Weddings() {
             <div className="footer-col">
                 <h3>Help & Support</h3>
                 <a href="#">FAQ</a>
-                <a href="/#contact">Contact Us</a>
+                <a href="/contact">Contact Us</a>
                 <a href="#">Direction Map</a>
                 <a href="#">Group Inquiries</a>
             </div>
@@ -1215,8 +1261,8 @@ export default function Weddings() {
         </div>
     </footer>
 
-
-    {/* Swiper JS */}
+    <FloatingWidgets />
+    <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     
     </div>
   );

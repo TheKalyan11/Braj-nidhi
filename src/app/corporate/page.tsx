@@ -1,11 +1,40 @@
-
 "use client";
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FloatingWidgets from '@/components/FloatingWidgets';
+import Link from 'next/link';
+import LoginModal from '@/components/LoginModal';
 
 export default function Corporate() {
   const [heroImgIndex, setHeroImgIndex] = useState(0);
   const heroImages = ["/DSC09652.webp", "/DSC09672.webp"];
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+      setUserName(localStorage.getItem('userName') || 'User');
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userName');
+    setIsLoggedIn(false);
+    window.location.reload();
+  };
+
+  const getUserInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0][0].toUpperCase();
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -36,21 +65,21 @@ export default function Corporate() {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true },
-    transition: { duration: 0.8, ease: "easeOut" }
+    transition: { duration: 0.8, ease: "easeOut" as const }
   };
 
   const slideInLeft = {
     initial: { opacity: 0, x: -70 },
     whileInView: { opacity: 1, x: 0 },
     viewport: { once: true },
-    transition: { duration: 1, ease: "easeOut" }
+    transition: { duration: 1, ease: "easeOut" as const }
   };
 
   const slideInRight = {
     initial: { opacity: 0, x: 70 },
     whileInView: { opacity: 1, x: 0 },
     viewport: { once: true },
-    transition: { duration: 1, ease: "easeOut" }
+    transition: { duration: 1, ease: "easeOut" as const }
   };
 
   const staggerContainer = {
@@ -112,6 +141,7 @@ export default function Corporate() {
             overflow: hidden;
             border-radius: 4px;
             margin-top: 20px;
+            background-color: #1a1a1a;
         }
 
         .hero-single-card img {
@@ -718,8 +748,8 @@ export default function Corporate() {
                 <path d="M50,0 L50,95" stroke="#006400" strokeWidth="2"/>
             </g>
             <g id="krishna-flute-feather">
-                <path d="M10,75 L90,45" stroke="#DAA520" strokeWidth="12" stroke-linecap="round"/>
-                <path d="M12,73 L88,44" stroke="#F0E68C" strokeWidth="6" stroke-linecap="round"/>
+                <path d="M10,75 L90,45" stroke="#DAA520" strokeWidth="12" strokeLinecap="round"/>
+                <path d="M12,73 L88,44" stroke="#F0E68C" strokeWidth="6" strokeLinecap="round"/>
                 <line x1="20" y1="76" x2="25" y2="63" stroke="#DC143C" strokeWidth="3"/>
                 <line x1="23" y1="75" x2="28" y2="62" stroke="#DC143C" strokeWidth="3"/>
                 <circle cx="40" cy="62" r="2.5" fill="#3e2723"/>
@@ -734,17 +764,34 @@ export default function Corporate() {
     </svg>
 
     <header id="main-header" className="scrolled">
-        <a href="/" className="logo" style={{textDecoration: "none"}}><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  /></a>
+        <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
+            <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "60px", width: "auto" }} />
+        </Link>
         <nav>
             <ul>
                 <li><a href="/guesthouse">Guesthouse</a></li>
                 <li><a href="/weddings">Weddings</a></li>
                 <li><a href="/corporate">Corporate</a></li>
-                <li><a href="/#contact">Contact</a></li>
+                <li><a href="/braj-yatra">Braj Yatra</a></li>
+                <li><a href="/contact">Contact</a></li>
             </ul>
         </nav>
         <div className="nav-btns">
-            <a href="/#contact" className="btn-book">Book Now</a>
+            {isLoggedIn ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div className="user-info-text">
+                        <span className="user-label">Braj Club Member</span>
+                        <span className="user-name">{userName}</span>
+                    </div>
+                    <div className="user-profile-badge">
+                        {getUserInitials(userName)}
+                    </div>
+                    <button onClick={handleLogout} className="btn-login" style={{ padding: '8px 16px', fontSize: '0.8rem', height: '36px' }}>Logout</button>
+                </div>
+            ) : (
+                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login" style={{ border: 'none', cursor: 'pointer' }}>Login / Create Account</button>
+            )}
+            <a href="/booking" className="btn-book">Book Now</a>
         </div>
     </header>
 
@@ -755,7 +802,7 @@ export default function Corporate() {
                 <div className="hero-title-large">CORPORATE RETREATS & CONFERENCES</div>
                 
                 <div className="hero-single-card">
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence>
                         <motion.img 
                             key={heroImgIndex}
                             src={heroImages[heroImgIndex]}
@@ -1215,7 +1262,7 @@ export default function Corporate() {
             <div className="footer-col">
                 <h3>Help & Support</h3>
                 <a href="#">FAQ</a>
-                <a href="/#contact">Contact Us</a>
+                <a href="/contact">Contact Us</a>
                 <a href="#">Direction Map</a>
                 <a href="#">Group Inquiries</a>
             </div>
@@ -1239,8 +1286,8 @@ export default function Corporate() {
         </div>
     </footer>
 
-
-    {/* Swiper JS */}
+    <FloatingWidgets />
+    <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     
     </div>
   );

@@ -1,15 +1,55 @@
-
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import FloatingWidgets from '@/components/FloatingWidgets';
+import LoginModal from '@/components/LoginModal';
+import PremiumDoubleCalendar from '@/components/PremiumDoubleCalendar';
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+  
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  const formatDateFriendly = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${d} ${months[dateObj.getMonth()]} '${dateObj.getFullYear().toString().slice(-2)}`;
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+      setUserName(localStorage.getItem('userName') || 'User');
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userName');
+    setIsLoggedIn(false);
+    window.location.reload();
+  };
+
+  const getUserInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0][0].toUpperCase();
+  };
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
@@ -33,15 +73,15 @@ export default function Home() {
   }, []);
 
   const roomPrices: Record<string, number> = {
-    'Luxury Suite': 8500,
-    'Executive Room': 6000,
-    'Royal Heritage Suite': 12500
+    'Deluxe 2 – Twin Bedded Room': 3500,
+    'Deluxe 3 – 3 Bedded Room': 4500,
+    'Deluxe 4 – 4 Bedded Room': 4999
   };
 
   const roomOccupancy: Record<string, string> = {
-    'Luxury Suite': '2-3 guests',
-    'Executive Room': '1-2 guests',
-    'Royal Heritage Suite': '2-4 guests'
+    'Deluxe 2 – Twin Bedded Room': '2 guests',
+    'Deluxe 3 – 3 Bedded Room': '3 guests',
+    'Deluxe 4 – 4 Bedded Room': '4 guests'
   };
 
   const getGuestCount = (guestsStr: string) => {
@@ -52,10 +92,10 @@ export default function Home() {
   };
 
   const [bookingData, setBookingData] = useState({
-    checkIn: '2026-05-12',
-    checkOut: '2026-05-18',
-    guests: '2 Adults, 1 Child',
-    roomType: 'Royal Heritage Suite',
+    checkIn: '2026-05-18',
+    checkOut: '2026-05-20',
+    guests: '2 Adults',
+    roomType: 'Deluxe 2 – Twin Bedded Room',
     eventType: 'Corporate Offsite'
   });
 
@@ -67,9 +107,13 @@ export default function Home() {
   const CustomSelect = ({ label, value, options, field }: { label: string, value: string, options: string[], field: string }) => (
     <div className="custom-select-container">
       <label>{label}</label>
-      <div className={"custom-select-trigger " + (openDropdown === field ? "active" : "")} onClick={() => setOpenDropdown(openDropdown === field ? null : field)}>
-        <span>{value}</span>
-        <i className="fas fa-chevron-down"></i>
+      <div 
+        className={"custom-select-trigger " + (openDropdown === field ? "active" : "")} 
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: '4px' }}
+        onClick={() => setOpenDropdown(openDropdown === field ? null : field)}
+      >
+        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginRight: '4px', display: 'block', maxWidth: 'calc(100% - 16px)' }}>{value}</span>
+        <i className="fas fa-chevron-down" style={{ flexShrink: 0, fontSize: '0.8rem' }}></i>
       </div>
       {openDropdown === field && (
         <div className="custom-options">
@@ -161,40 +205,7 @@ export default function Home() {
     currentItem.classList.toggle('active');
   };
 
-  const toggleMusic = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-    } else {
-      try {
-        // Load audio if it hasn't started yet
-        if (audio.readyState < 2) {
-          audio.load();
-        }
-        await audio.play();
-        setIsPlaying(true);
-      } catch (err) {
-        console.warn('Primary audio source failed, trying fallback:', err);
-        // Try local file as fallback
-        audio.src = '/hare-krishna-original.mp3';
-        audio.load();
-        try {
-          await audio.play();
-          setIsPlaying(true);
-        } catch (fallbackErr) {
-          console.error('Fallback audio also failed:', fallbackErr);
-          setIsPlaying(false);
-        }
-      }
-    }
-  };
 
-  // Keep isPlaying in sync when audio ends or is paused externally
-  const handleAudioEnd = () => setIsPlaying(false);
-  const handleAudioPause = () => setIsPlaying(false);
-  const handleAudioPlay = () => setIsPlaying(true);
 
   return (
     <div className="index-page">
@@ -212,8 +223,8 @@ export default function Home() {
 
             <g id="krishna-flute-feather">
                 {/*  Flute Body  */}
-                <path d="M10,75 L90,45" stroke="#DAA520" strokeWidth="12" stroke-linecap="round"/>
-                <path d="M12,73 L88,44" stroke="#F0E68C" strokeWidth="6" stroke-linecap="round"/>
+                <path d="M10,75 L90,45" stroke="#DAA520" strokeWidth="12" strokeLinecap="round"/>
+                <path d="M12,73 L88,44" stroke="#F0E68C" strokeWidth="6" strokeLinecap="round"/>
                 
                 {/*  Red Details / Bindings  */}
                 <line x1="20" y1="76" x2="25" y2="63" stroke="#DC143C" strokeWidth="3"/>
@@ -241,19 +252,36 @@ export default function Home() {
     </svg>
 
     <header id="main-header" className={scrolled ? "scrolled" : ""}>
-        <div className="logo"><img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}}  /></div>
+        <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
+            <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{height: "60px", width: "auto"}} />
+        </Link>
         
         <nav>
             <ul>
                 <li><a href="/guesthouse">Guesthouse</a></li>
                 <li><a href="/weddings">Weddings</a></li>
                 <li><a href="/corporate">Corporate</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="/braj-yatra">Braj Yatra</a></li>
+                <li><a href="/contact">Contact</a></li>
             </ul>
         </nav>
 
         <div className="nav-btns">
-            <a href="#contact" className="btn-book">Book Now</a>
+            {isLoggedIn ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div className="user-info-text">
+                        <span className="user-label">Braj Club Member</span>
+                        <span className="user-name">{userName}</span>
+                    </div>
+                    <div className="user-profile-badge">
+                        {getUserInitials(userName)}
+                    </div>
+                    <button onClick={handleLogout} className="btn-login" style={{ padding: '8px 16px', fontSize: '0.8rem', height: '36px' }}>Logout</button>
+                </div>
+            ) : (
+                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login" style={{ border: 'none', cursor: 'pointer' }}>Login / Create Account</button>
+            )}
+            <a href="/booking" className="btn-book">Book Now</a>
         </div>
     </header>
 
@@ -272,7 +300,7 @@ export default function Home() {
             <div className="booking-widget">
                 <div className="widget-header">
                     <div>
-                        <h3>The Royal Heritage Suite</h3>
+                        <h3>{bookingData.roomType}</h3>
                         <div className="rating">
                             <i className="fas fa-star"></i>
                             <i className="fas fa-star"></i>
@@ -286,13 +314,33 @@ export default function Home() {
                     </div>
                 </div>
 
-                <div className="booking-form">
-                    <div className="form-group"><label>Check-in</label><input type="date" value={bookingData.checkIn} onChange={(e) => handleBookingChange('checkIn', e.target.value)} />
+                <div className="booking-form" style={{ position: 'relative' }}>
+                    <div className="form-group full-width" style={{ position: 'relative' }}>
+                      <label>Check-in / Check-out</label>
+                      <div 
+                        className="custom-select-trigger mmt-date-trigger" 
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', minHeight: '44px' }}
+                        onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                      >
+                        <i className="far fa-calendar-alt" style={{ color: '#eab308' }}></i>
+                        <span style={{ fontWeight: 600 }}>
+                          {formatDateFriendly(bookingData.checkIn)} - {formatDateFriendly(bookingData.checkOut)}
+                        </span>
+                      </div>
+                      
+                      <PremiumDoubleCalendar 
+                        checkIn={bookingData.checkIn} 
+                        checkOut={bookingData.checkOut} 
+                        isOpen={isCalendarOpen} 
+                        onChange={(start, end) => {
+                          setBookingData(prev => ({ ...prev, checkIn: start, checkOut: end }));
+                        }}
+                        onClose={() => setIsCalendarOpen(false)}
+                      />
                     </div>
-                    <div className="form-group"><label>Check-out</label><input type="date" value={bookingData.checkOut} onChange={(e) => handleBookingChange('checkOut', e.target.value)} />
-                    </div>
+                    
                     <CustomSelect label="Guests" value={bookingData.guests} options={["1 Adult", "2 Adults", "2 Adults, 1 Child", "2 Adults, 2 Children"]} field="guests" />
-                    <CustomSelect label="Room Type" value={bookingData.roomType} options={["Luxury Suite", "Executive Room", "Royal Heritage Suite"]} field="roomType" />
+                    <CustomSelect label="Room Type" value={bookingData.roomType} options={["Deluxe 2 – Twin Bedded Room", "Deluxe 3 – 3 Bedded Room", "Deluxe 4 – 4 Bedded Room"]} field="roomType" />
                 </div>
 
                 <div className="price-row">
@@ -300,7 +348,17 @@ export default function Home() {
                     <div className="occupancy">{getGuestCount(bookingData.guests)}</div>
                 </div>
 
-                <a href="#contact" className="btn-reserve" style={{"display":"block","textAlign":"center","textDecoration":"none","position":"relative","zIndex":"5"}}>Request Reservation</a>
+                <Link 
+                  href={`/booking?roomType=${
+                    bookingData.roomType === 'Deluxe 3 – 3 Bedded Room' ? 'deluxe3' : 
+                    bookingData.roomType === 'Deluxe 4 – 4 Bedded Room' ? 'deluxe4' : 
+                    'deluxe2'
+                  }&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&guests=${encodeURIComponent(bookingData.guests)}`}
+                  className="btn-reserve" 
+                  style={{ display: "block", textAlign: "center", textDecoration: "none", position: "relative", zIndex: 5 }}
+                >
+                  Search
+                </Link>
             </div>
         </section>
 
@@ -382,8 +440,8 @@ export default function Home() {
                     <a href="/booking" className="btn-outline">Book Corporate Hall <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
-                    <img src="corporate-1.jpg" alt="AV Hall" className="main-img" />
-                    <img src="corporate-2.jpg" alt="Collaborative Space" className="secondary-img" />
+                    <img src="DSC09652.webp" alt="Premium AV Hall" className="main-img" />
+                    <img src="DSC09672.webp" alt="Corporate Collaborative Space" className="secondary-img" />
                 </div>
             </div>
         </section>
@@ -455,7 +513,7 @@ export default function Home() {
                             <span><i className="fas fa-wifi"></i> Free WiFi</span>
                             <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                         </div>
-                        <button className="btn-availability">Book for ₹3,500 <i className="fas fa-chevron-right"></i></button>
+                        <Link href="/booking?roomType=deluxe2" className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></Link>
                     </div>
                 </div>
 
@@ -485,7 +543,7 @@ export default function Home() {
                             <span><i className="fas fa-bath"></i> Deep Tub</span>
                             <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                         </div>
-                        <button className="btn-availability">Book for ₹4,500 <i className="fas fa-chevron-right"></i></button>
+                        <Link href="/booking?roomType=deluxe3" className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></Link>
                     </div>
                 </div>
 
@@ -515,7 +573,7 @@ export default function Home() {
                             <span><i className="fas fa-user-tie"></i> Personal Attendant</span>
                             <span><i className="fas fa-hot-tub"></i> Jacuzzi</span>
                         </div>
-                        <a href="/booking" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></a>
+                        <Link href="/booking?roomType=deluxe4" className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></Link>
                     </div>
                 </div>
             </div>
@@ -1098,7 +1156,7 @@ export default function Home() {
             <div className="footer-col">
                 <h3>Help & Support</h3>
                 <a href="#">FAQ</a>
-                <a href="/#contact">Contact Us</a>
+                <a href="/contact">Contact Us</a>
                 <a href="#">Direction Map</a>
                 <a href="#">Group Inquiries</a>
             </div>
@@ -1122,65 +1180,10 @@ export default function Home() {
         </div>
     </footer>
 
+    <FloatingWidgets />
 
-    {/* Left Floating Social Stack: Instagram (top) → WhatsApp (middle) → Music (bottom) */}
-    <div className="float-social-stack">
-        <a href="https://www.instagram.com/brajnidhi/" target="_blank" rel="noopener noreferrer" className="float-btn float-instagram" title="Follow us on Instagram">
-            <i className="fab fa-instagram"></i>
-        </a>
-        <a href="https://wa.me/910000000000" target="_blank" rel="noopener noreferrer" className="float-btn float-whatsapp" title="Chat on WhatsApp">
-            <i className="fab fa-whatsapp"></i>
-        </a>
-    </div>
+    <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
 
-    {/* Music Player — Hare Krishna Mahamantra */}
-    <div className="premium-music-player" id="musicPlayer">
-        <div className="player-glass" title="Hare Krishna Mahamantra">
-            <button className={"play-btn " + (isPlaying ? "playing" : "")} onClick={toggleMusic}>
-                <i className={"fas " + (isPlaying ? "fa-pause" : "fa-play")}></i>
-            </button>
-            <div className="liquid-shine"></div>
-        </div>
-        <audio
-            ref={audioRef}
-            id="bgMusic"
-            loop
-            preload="auto"
-            onEnded={handleAudioEnd}
-            onPause={handleAudioPause}
-            onPlay={handleAudioPlay}
-        >
-            {/* Local file — always works, no CORS/network issues */}
-            <source src="/hare-krishna-original.mp3" type="audio/mpeg" />
-            {/* External fallbacks */}
-            <source src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3" type="audio/mpeg" />
-            <source src="https://cdn.pixabay.com/audio/2022/02/22/audio_d0a13e6912.mp3" type="audio/mpeg" />
-        </audio>
-    </div>
-
-    {/* Chatbot */}
-    <div className={"chatbot-container " + (isChatOpen ? "active" : "")}>
-        <div className="chatbot-btn" onClick={() => setIsChatOpen(!isChatOpen)}>
-            <i className="fas fa-robot"></i>
-        </div>
-        <div className={"chat-window " + (isChatOpen ? "active" : "")}>
-            <div className="chat-header">
-                <div className="bot-img"><i className="fas fa-om"></i></div>
-                <div>
-                    <h4>Braj Nidhi Guide</h4>
-                    <span>Online | AI Assistant</span>
-                </div>
-                <i className="fas fa-times" onClick={() => setIsChatOpen(false)} style={{marginLeft: "auto", cursor: "pointer"}}></i>
-            </div>
-            <div className="chat-messages">
-                <div className="msg bot">Radhe Radhe! Welcome to Braj Nidhi. I am your AI guide for Vrindavan. How may I help you today?</div>
-            </div>
-            <div className="chat-input">
-                <input type="text" placeholder="Ask me anything..." />
-                <button><i className="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </div>
     </div>
   );
 }
