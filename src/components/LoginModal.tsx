@@ -8,16 +8,17 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoginSuccess?: (userName: string) => void;
+  initialIsRegistering?: boolean;
 }
 
-export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialIsRegistering = false }: LoginModalProps) {
   const [activeAccountType, setActiveAccountType] = useState<'personal' | 'mybiz'>('personal');
   const [authMethod, setAuthMethod] = useState<'phone' | 'email'>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(initialIsRegistering);
   
   const [countryCode, setCountryCode] = useState('+91');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
@@ -27,6 +28,15 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
   const [successMessage, setSuccessMessage] = useState('');
   
   const [activeSlide, setActiveSlide] = useState(0);
+
+  // Sync state with prop when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setIsRegistering(initialIsRegistering);
+      setErrorMessage('');
+      setSuccessMessage('');
+    }
+  }, [isOpen, initialIsRegistering]);
 
   // Auto scroll the promo slider
   useEffect(() => {

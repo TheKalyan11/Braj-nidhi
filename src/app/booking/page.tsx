@@ -25,6 +25,7 @@ import {
   Clock
 } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
+import LoginModal from '@/components/LoginModal';
 
 // Types for booking details
 interface GuestDetails {
@@ -68,9 +69,7 @@ export default function BookingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userName, setUserName] = useState<string>('Kalyan Sharma');
   const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
-  const [loginEmailOrPhone, setLoginEmailOrPhone] = useState<string>('');
-  const [loginPassword, setLoginPassword] = useState<string>('');
-  const [loginError, setLoginError] = useState<string>('');
+  const [loginModalInitialRegister, setLoginModalInitialRegister] = useState<boolean>(false);
   
   // Guest Details Form State
   const [guestDetails, setGuestDetails] = useState<GuestDetails>({
@@ -246,31 +245,22 @@ export default function BookingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle auto-fill if user logs in
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!loginEmailOrPhone || !loginPassword) {
-      setLoginError('Please enter all fields');
-      return;
-    }
-    
-    // Simulate API Login
+  // Handle auto-fill if user logs in via shared LoginModal
+  const handleLoginSuccess = (name: string) => {
     setIsLoggedIn(true);
-    setLoginModalOpen(false);
-    setLoginError('');
-    
-    // Save to localStorage so headers on other pages update
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userName', 'Kalyan Sharma');
-    setUserName('Kalyan Sharma');
+    setUserName(name);
     
     // Auto-populate guest details
+    const emailVal = localStorage.getItem('userEmail') || '';
+    const phoneVal = localStorage.getItem('userPhone') || '';
+    
+    const parts = name.split(' ');
     setGuestDetails(prev => ({
       ...prev,
-      firstName: 'Kalyan',
-      lastName: 'Sharma',
-      email: loginEmailOrPhone.includes('@') ? loginEmailOrPhone : 'kalyan@brajnidhi.com',
-      phone: !isNaN(Number(loginEmailOrPhone)) ? loginEmailOrPhone : '+91 98765 43210'
+      firstName: parts[0] || '',
+      lastName: parts[1] || '',
+      email: emailVal,
+      phone: phoneVal
     }));
   };
 
@@ -1304,10 +1294,30 @@ export default function BookingPage() {
               </button>
             </div>
           ) : (
-            <button onClick={() => setLoginModalOpen(true)} className="btn-login-mmt">
-              <User size={14} />
-              Login / Sign Up
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button 
+                onClick={() => {
+                  setLoginModalInitialRegister(false);
+                  setLoginModalOpen(true);
+                }} 
+                className="btn-login-mmt"
+                style={{ background: 'transparent', border: '1.5px solid #8b0000', color: '#8b0000', padding: '8px 16px' }}
+              >
+                <User size={13} />
+                <span>Login</span>
+              </button>
+              <button 
+                onClick={() => {
+                  setLoginModalInitialRegister(true);
+                  setLoginModalOpen(true);
+                }} 
+                className="btn-login-mmt"
+                style={{ padding: '8px 16px' }}
+              >
+                <Sparkles size={13} />
+                <span>Create Account</span>
+              </button>
+            </div>
           )}
         </div>
       </header>
@@ -1329,13 +1339,33 @@ export default function BookingPage() {
                       <Sparkles size={20} />
                     </div>
                     <div className="login-banner-text">
-                      <h4>Log in for an Extra 10% Member Discount!</h4>
-                      <p>Sign in to unlock exclusive heritage member pricing and instant guest autofill.</p>
+                      <h4>Log in or Create an Account for an Extra 10% Member Discount!</h4>
+                      <p>Unlock exclusive heritage member pricing and instant guest details autofill.</p>
                     </div>
                   </div>
-                  <button onClick={() => setLoginModalOpen(true)} className="btn-login-mmt">
-                    Log In Now
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <button 
+                      onClick={() => {
+                        setLoginModalInitialRegister(false);
+                        setLoginModalOpen(true);
+                      }} 
+                      className="btn-login-mmt"
+                      style={{ background: 'transparent', border: '1.5px solid #8b0000', color: '#8b0000', padding: '8px 16px' }}
+                    >
+                      <span>Login</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setLoginModalInitialRegister(true);
+                        setLoginModalOpen(true);
+                      }} 
+                      className="btn-login-mmt"
+                      style={{ padding: '8px 16px' }}
+                    >
+                      <Sparkles size={13} />
+                      <span>Create Account</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -2104,66 +2134,13 @@ export default function BookingPage() {
 
       </main>
 
-      {/* 5. ANMATED PREMIUM INLINE LOGIN MODAL (MMT STYLED) */}
-      {loginModalOpen && (
-        <div className="mmt-modal-overlay">
-          <div className="mmt-modal-content" style={{ animation: 'fadeIn 0.3s ease' }}>
-            <button className="mmt-modal-close" onClick={() => setLoginModalOpen(false)}>×</button>
-            
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(139, 0, 0, 0.05)', border: '1px solid rgba(139, 0, 0, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b0000', margin: '0 auto 12px' }}>
-                <Sparkles size={20} />
-              </div>
-              <h3 style={{ fontSize: '20px', fontWeight: '800', color: '#8b0000', margin: '0 0 6px' }}>Braj Club Members Area</h3>
-              <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', margin: 0 }}>
-                Access exclusive hotel tariffs, pre-filled guest accounts, & instant secure bookings.
-              </p>
-            </div>
-
-            <form onSubmit={handleLoginSubmit}>
-              <div className="input-wrapper-mmt" style={{ marginBottom: '16px' }}>
-                <label>Email Address or Phone *</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. kalyan@gmail.com" 
-                  required
-                  value={loginEmailOrPhone}
-                  onChange={(e) => setLoginEmailOrPhone(e.target.value)}
-                />
-              </div>
-
-              <div className="input-wrapper-mmt" style={{ marginBottom: '20px' }}>
-                <label>Password *</label>
-                <input 
-                  type="password" 
-                  placeholder="••••••••" 
-                  required
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                />
-              </div>
-
-              {loginError && <p style={{ color: '#f87171', fontSize: '12px', margin: '0 0 16px', textAlign: 'center', fontWeight: '500' }}>{loginError}</p>}
-
-              <button 
-                type="submit" 
-                className="btn-primary-mmt"
-                style={{ width: '100%', margin: 0 }}
-              >
-                <span>Access Premium Club Account</span>
-                <ChevronRight size={18} />
-              </button>
-
-              <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '11px', color: 'rgba(44, 37, 32, 0.5)' }}>
-                <span>By continuing, you agree to our </span>
-                <span style={{ textDecoration: 'underline', cursor: 'pointer', color: '#8b0000' }}>Tariff Policy</span>
-                <span> & </span>
-                <span style={{ textDecoration: 'underline', cursor: 'pointer', color: '#8b0000' }}>Terms</span>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* 5. UNIFIED PREMIUM SHARED LOGIN MODAL */}
+      <LoginModal 
+        isOpen={loginModalOpen} 
+        onClose={() => setLoginModalOpen(false)} 
+        onLoginSuccess={handleLoginSuccess}
+        initialIsRegistering={loginModalInitialRegister}
+      />
 
       {/* FOOTER COHESIVE WITH REST OF THE BRAND */}
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: '#080706', padding: '60px 0 30px', marginTop: '80px' }}>
