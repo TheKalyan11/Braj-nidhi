@@ -469,7 +469,7 @@ export default function FloatingWidgets() {
 
       {/* Instagram - Left */}
       <motion.a
-        href="https://instagram.com/brajnidhi"
+        href="https://www.instagram.com/braj.nidhi_/"
         target="_blank" rel="noopener noreferrer"
         title="Follow on Instagram"
         className="fixed left-5 bottom-[138px] z-50 w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] hover:shadow-[0_0_25px_rgba(238,42,123,0.6)]"

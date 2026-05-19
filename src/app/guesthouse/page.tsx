@@ -1,14 +1,12 @@
 
 "use client";
 import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Guesthouse() {
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [adults, setAdults] = useState(2);
-  const [children, setChildren] = useState(0);
-  
+
   // Slideshow state for Rooms
   const [deluxe2ImgIndex, setDeluxe2ImgIndex] = useState(0);
   const deluxe2Images = ["DSC05818-HDR.webp", "DSC05963-HDR.webp"];
@@ -18,6 +16,7 @@ export default function Guesthouse() {
   
   const [deluxe4ImgIndex, setDeluxe4ImgIndex] = useState(0);
   const deluxe4Images = ["DSC05963-HDR.webp", "d31.webp"];
+  const [showSuiteCards, setShowSuiteCards] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -48,6 +47,11 @@ export default function Guesthouse() {
 
   return (
     <div className="guesthouse-page">
+      <Head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cause:wght@100..900&display=swap" rel="stylesheet" />
+      </Head>
       <style dangerouslySetInnerHTML={{ __html: `
         .guesthouse-hero {
             background-color: #ffffff;
@@ -65,28 +69,29 @@ export default function Guesthouse() {
         }
 
         .hero-title-large {
-            font-size: 2.2rem;
-            font-weight: 900;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3rem;
+            font-weight: 700;
             color: #1a1a1a;
             background-color: #ffffff;
             display: inline-block;
             align-self: center;
-            padding: 12px 30px;
+            padding: 14px 34px;
             text-transform: uppercase;
             text-align: center;
             line-height: 1;
             margin-bottom: -25px;
             position: relative;
             z-index: 2;
-            font-family: 'Arial Black', Impact, sans-serif;
-            letter-spacing: 2px;
+            letter-spacing: 0.18em;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         }
 
         .hero-main-img-wrap {
             position: relative;
             width: 100%;
-            height: 500px;
+            height: 520px;
+            max-height: 560px;
             z-index: 1;
         }
 
@@ -147,13 +152,27 @@ export default function Guesthouse() {
             bottom: -10px;
             right: 0;
             width: 100%;
-            height: 100px;
+            height: 800px;
             opacity: 0.5;
         }
 
         .bento-pink {
             background: #edd2cc;
             color: #1a1a1a;
+            cursor: pointer;
+        }
+
+        .bento-pink:focus {
+            outline: 2px solid #3b1d6b;
+            outline-offset: 4px;
+        }
+
+        .suite-toggle-note {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            opacity: 0.88;
+            color: #3b1d6b;
+            font-weight: 700;
         }
 
         .bento-beige {
@@ -202,6 +221,152 @@ export default function Guesthouse() {
             margin-bottom: 30px;
         }
 
+        .featured-rooms-section {
+            background: #ffffff;
+            padding: 70px 0 60px;
+        }
+
+        .featured-rooms-inner {
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .featured-rooms-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .featured-rooms-header h2 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            color: #3b1d6b;
+        }
+
+        .featured-rooms-header p {
+            max-width: 760px;
+            margin: 0 auto 18px;
+            color: #393939;
+            font-size: 1rem;
+            line-height: 1.8;
+            opacity: 0.92;
+        }
+
+        .featured-rooms-header a {
+            color: #3b1d6b;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .featured-rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            justify-content: center;
+        }
+
+        .featured-room-card {
+            max-width: 300px;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #f7f4ee;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            margin: 0 auto;
+        }
+
+        .featured-room-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 28px 55px rgba(0,0,0,0.12);
+        }
+
+        .featured-room-img-wrap {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            background: #e6e2d8;
+        }
+
+        .featured-room-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.35s ease;
+        }
+
+        .featured-room-card:hover .featured-room-img-wrap img {
+            transform: scale(1.05);
+        }
+
+        .featured-room-title {
+            padding: 18px 16px 22px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Cause', sans-serif;
+            text-align: center;
+            color: #1a1a1a;
+            line-height: 1.3;
+            background: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .suite-preview-section {
+            margin-top: 28px;
+            padding: 30px 0 0;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .suite-preview-header {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .suite-preview-header h3 {
+            font-size: 1.9rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #3b1d6b;
+        }
+
+        .suite-preview-header p {
+            color: #4f4f4f;
+            opacity: 0.92;
+            margin: 0 auto;
+            max-width: 720px;
+            line-height: 1.7;
+        }
+
+        .suite-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            justify-content: center;
+        }
+
+        .suite-card .featured-room-title {
+            background: #f4f0e8;
+        }
+
+        .featured-room-title span {
+            display: block;
+            font-weight: 500;
+            color: #6d6d6d;
+            margin-top: 6px;
+            font-size: 0.92rem;
+        }
+
         .bento-btn {
             display: inline-block;
             border: 2px solid #1a1a1a;
@@ -246,7 +411,7 @@ export default function Guesthouse() {
                 margin-bottom: -6vw;
             }
             .hero-main-img-wrap {
-                min-height: 300px;
+                min-height: 420px;
             }
         }
 
@@ -363,7 +528,7 @@ export default function Guesthouse() {
         }
         .promo-tour-img {
             width: 80px;
-            height: 100px;
+            height: 800px;
             object-fit: cover;
         }
         .promo-tour-text {
@@ -381,7 +546,7 @@ export default function Guesthouse() {
         .promo-col-center img {
             width: 100%;
             height: auto;
-            max-height: 600px;
+            max-height: 800px;
             object-fit: cover;
             display: block;
             margin: 0 auto;
@@ -487,7 +652,7 @@ export default function Guesthouse() {
         }
         .promo2-col-right > img {
             width: 100%;
-            height: 450px;
+            height: 800px;
             object-fit: cover;
             display: block;
             border-radius: 4px;
@@ -546,12 +711,12 @@ export default function Guesthouse() {
 
         /* New Listing Layout Styles */
         .listing-container {
-            max-width: 1200px;
+            max-width: 1380px;
             margin: 0 auto;
             padding: 20px 20px;
             display: grid;
-            grid-template-columns: 290px 1fr;
-            gap: 40px;
+            grid-template-columns: 1fr;
+            gap: 0;
         }
 
         /* Sidebar Filters — Refined Luxury Design */
@@ -570,7 +735,7 @@ export default function Guesthouse() {
         .filter-sidebar::before {
             content: '';
             display: block;
-            height: 3px;
+            height: 800px;
             background: linear-gradient(90deg, #3b1212, #d4af37, #3b1212);
             border-radius: 3px 3px 0 0;
             margin: -28px -24px 24px -24px;
@@ -593,7 +758,7 @@ export default function Guesthouse() {
         .filter-sidebar h3::after {
             content: '';
             flex: 1;
-            height: 1px;
+            height: 800px;
             background: linear-gradient(90deg, rgba(212,175,55,0.5), transparent);
         }
 
@@ -677,7 +842,7 @@ export default function Guesthouse() {
 
         /* Divider between sections */
         .filter-divider {
-            height: 1px;
+            height: 800px;
             background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
             margin: 16px 0;
         }
@@ -737,7 +902,7 @@ export default function Guesthouse() {
 
         .guest-btn {
             width: 28px;
-            height: 28px;
+            height: 800px;
             border-radius: 50%;
             border: 1.5px solid #3b1212;
             background: transparent;
@@ -804,7 +969,7 @@ export default function Guesthouse() {
             appearance: none;
             -webkit-appearance: none;
             width: 17px;
-            height: 17px;
+            height: 800px;
             background: #ffffff;
             border: 1.5px solid rgba(59, 18, 18, 0.2);
             border-radius: 4px;
@@ -882,6 +1047,7 @@ export default function Guesthouse() {
             display: grid;
             grid-template-columns: 1fr;
             gap: 28px;
+            width: 100%;
         }
 
         @media (max-width: 900px) {
@@ -892,16 +1058,18 @@ export default function Guesthouse() {
 
         .room-card {
             position: relative;
-            height: 400px;
-            border-radius: 15px;
+            height: 700px;
+            border-radius: 28px;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            transition: all 0.5s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.22);
+            transition: transform 0.45s ease, box-shadow 0.45s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.04);
         }
 
         .room-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 45px rgba(0,0,0,0.3);
+            transform: translateY(-12px);
+            box-shadow: 0 28px 60px rgba(0,0,0,0.28);
         }
 
         .room-bg-img {
@@ -913,10 +1081,14 @@ export default function Guesthouse() {
             object-fit: cover;
             z-index: 0;
             transition: transform 0.8s ease;
+            image-rendering: auto;
+            filter: none;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
         }
 
         .room-card:hover .room-bg-img {
-            transform: scale(1.1);
+            transform: scale(1.03);
         }
 
         .card-gradient {
@@ -925,7 +1097,7 @@ export default function Guesthouse() {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
+            background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0.03) 100%);
             z-index: 1;
         }
 
@@ -934,41 +1106,77 @@ export default function Guesthouse() {
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 40px;
+            padding: 44px;
             z-index: 2;
             color: #fff;
+            background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.75) 100%);
         }
 
         .room-content h3 {
-            font-size: 2rem;
+            font-size: 2.35rem;
             font-weight: 800;
-            margin-bottom: 10px;
-            font-family: 'Playfair Display', serif;
-            color: #c5a059;
+            margin-bottom: 14px;
+            font-family: 'Cause', sans-serif;
+            letter-spacing: 0.18em;
+            color: #f7e5b8;
+            line-height: 1.05;
+            text-transform: uppercase;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.25);
         }
 
         .room-location {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 0.95rem;
+            opacity: 0.88;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: rgba(255,255,255,0.85);
         }
 
         .room-amenities {
             display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 14px;
+            margin-bottom: 32px;
             flex-wrap: wrap;
         }
 
         .room-amenities span {
-            font-size: 0.85rem;
-            display: flex;
+            font-size: 0.92rem;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
-            color: #eee;
+            gap: 10px;
+            color: #fff;
+            background: rgba(255,255,255,0.12);
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.22);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-availability {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            padding: 16px 34px;
+            color: #fff;
+            background: rgba(255,255,255,0.16);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 999px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.18);
+            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-availability:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.22);
+            box-shadow: 0 14px 45px rgba(0,0,0,0.24);
         }
 
         .favorite-btn {
@@ -976,7 +1184,7 @@ export default function Guesthouse() {
             top: 25px;
             right: 25px;
             width: 45px;
-            height: 45px;
+            height: 800px;
             border-radius: 50%;
             background: rgba(255,255,255,0.2);
             backdrop-filter: blur(5px);
@@ -1057,10 +1265,16 @@ export default function Guesthouse() {
                         </svg>
                     </div>
 
-                    <div className="bento-box bento-pink">
+                    <div
+                        className="bento-box bento-pink"
+                        onClick={() => setShowSuiteCards(!showSuiteCards)}
+                        role="button"
+                        tabIndex={0}
+                    >
                         <i className="far fa-heart bento-icon"></i>
                         <h4>YOUR DIVINE CELEBRATION</h4>
                         <p>We love orchestrating your spiritual and wedding events</p>
+                        <p className="suite-toggle-note">Click here to reveal Deluxe Suite cards.</p>
                     </div>
 
                     <div className="bento-box bento-beige">
@@ -1078,71 +1292,60 @@ export default function Guesthouse() {
             </div>
         </section>
 
-
+        <section className="featured-rooms-section">
+            <div className="featured-rooms-inner">
+                <div className="featured-rooms-header">
+                    <h2>ROOMS AND SUITES</h2>
+                    <p>Braj Nidhi offers elegant rooms and suites designed for calm, mindful stays in Vrindavan. Each space is thoughtfully planned with modern comforts and a peaceful spiritual ambience.</p>
+                </div>
+                <div className="featured-rooms-grid">
+                    <Link href="/booking?roomType=deluxe2" className="featured-room-card">
+                        <div className="featured-room-img-wrap">
+                            <img src="DSC05818-HDR.webp" alt="Deluxe 2 – Twin Bedded Room" />
+                        </div>
+                        <div className="featured-room-title">Deluxe 2 – Twin Bedded Room</div>
+                    </Link>
+                    <Link href="/booking?roomType=deluxe3" className="featured-room-card">
+                        <div className="featured-room-img-wrap">
+                            <img src="DSC05963-HDR.webp" alt="Deluxe 3 – 3 Bedded Room" />
+                        </div>
+                        <div className="featured-room-title">Deluxe 3 – 3 Bedded Room</div>
+                    </Link>
+                    <Link href="/booking?roomType=deluxe4" className="featured-room-card">
+                        <div className="featured-room-img-wrap">
+                            <img src="d3.webp" alt="Deluxe 4 – 4 Bedded Room" />
+                        </div>
+                        <div className="featured-room-title">Deluxe 4 – 4 Bedded Room</div>
+                    </Link>
+                </div>
+                {showSuiteCards && (
+                    <div className="suite-preview-section">
+                        <div className="suite-preview-header">
+                            <h3>Deluxe Suite Picks</h3>
+                            <p>Discover premium suite options curated for a luxurious Vrindavan stay.</p>
+                        </div>
+                        <div className="suite-cards-grid">
+                            <Link href="/booking?roomType=deluxe4" className="featured-room-card suite-card">
+                                <div className="featured-room-img-wrap">
+                                    <img src="DSC05963-HDR.webp" alt="Deluxe Suite" />
+                                </div>
+                                <div className="featured-room-title">Deluxe Suite</div>
+                            </Link>
+                            <Link href="/booking?roomType=deluxe4" className="featured-room-card suite-card">
+                                <div className="featured-room-img-wrap">
+                                    <img src="d31.webp" alt="Heritage Suite" />
+                                </div>
+                                <div className="featured-room-title">Heritage Suite</div>
+                            </Link>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </section>
 
         {/* Room Types Section (New Sidebar Layout) */}
         <section className="room-types-section" style={{"background":"#fdfbf7"}}>
             <div className="listing-container">
-                {/* Sidebar */}
-                <aside className="filter-sidebar">
-                    <h3>Filter Stay</h3>
-                    
-                    <div className="filter-group">
-                        <label>CHECK-IN DATE</label>
-                        <div className="filter-input-wrap">
-                            <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
-                        </div>
-                    </div>
-
-                    <div className="filter-group">
-                        <label>CHECK-OUT DATE</label>
-                        <div className="filter-input-wrap">
-                            <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
-                        </div>
-                    </div>
-
-                    <div className="filter-divider"></div>
-
-                    <div className="filter-group">
-                        <label>GUESTS</label>
-                        <div className="guest-counter-wrap">
-                            <div className="guest-row">
-                                <div className="guest-row-label">
-                                    Adults
-                                    <small>Age 13+</small>
-                                </div>
-                                <div className="guest-stepper">
-                                    <button className="guest-btn" onClick={() => setAdults(a => Math.max(1, a - 1))} disabled={adults <= 1}>−</button>
-                                    <span className="guest-count">{adults}</span>
-                                    <button className="guest-btn" onClick={() => setAdults(a => Math.min(10, a + 1))} disabled={adults >= 10}>+</button>
-                                </div>
-                            </div>
-                            <div className="guest-row">
-                                <div className="guest-row-label">
-                                    Children
-                                    <small>Age 0–12</small>
-                                </div>
-                                <div className="guest-stepper">
-                                    <button className="guest-btn" onClick={() => setChildren(c => Math.max(0, c - 1))} disabled={children <= 0}>−</button>
-                                    <span className="guest-count">{children}</span>
-                                    <button className="guest-btn" onClick={() => setChildren(c => Math.min(6, c + 1))} disabled={children >= 6}>+</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="filter-divider"></div>
-
-                    <div className="filter-group checkbox-group">
-                        <label style={{color: "#8b6914", textTransform: "uppercase", fontSize: "0.65rem", fontWeight: "700", marginBottom: "10px"}}>ROOM TYPE</label>
-                        <label><input type="checkbox" defaultChecked /> Royal Heritage Suite</label>
-                        <label><input type="checkbox" defaultChecked /> Executive Suite</label>
-                        <label><input type="checkbox" defaultChecked /> Deluxe Temple View</label>
-                    </div>
-
-                    <button className="btn-apply"><span>Apply Filters</span></button>
-                </aside>
-
                 {/* Main Listing */}
                 <div className="listing-main">
                     <div className="property-list">
@@ -1173,7 +1376,7 @@ export default function Guesthouse() {
                                     <span><i className="fas fa-wifi"></i> Free WiFi</span>
                                     <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                                 </div>
-                                <a href="/#contact" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none","color":"#fff", "background": "rgba(255, 255, 255, 0.15)", "backdropFilter": "blur(12px)", "border": "1px solid rgba(255, 255, 255, 0.3)", "borderRadius": "30px", "boxShadow": "0 4px 15px rgba(0,0,0,0.2)"}}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></a>
+                                <a href="/#contact" className="btn-availability">Book for ₹3,500 <i className="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
 
@@ -1204,7 +1407,7 @@ export default function Guesthouse() {
                                     <span><i className="fas fa-bath"></i> Deep Tub</span>
                                     <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                                 </div>
-                                <a href="/#contact" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none","color":"#fff", "background": "rgba(255, 255, 255, 0.15)", "backdropFilter": "blur(12px)", "border": "1px solid rgba(255, 255, 255, 0.3)", "borderRadius": "30px", "boxShadow": "0 4px 15px rgba(0,0,0,0.2)"}}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></a>
+                                <a href="/#contact" className="btn-availability">Book for ₹4,500 <i className="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
 
@@ -1231,11 +1434,11 @@ export default function Guesthouse() {
                                 <h3>Deluxe 4 – 4 Bedded Room</h3>
                                 <p className="room-location" style={{color: "rgba(255,255,255,0.8)", fontSize: "0.9rem", marginBottom: "15px"}}>Ideal for 3 Adults + 1 Child OR 4 Adults</p>
                                 <div className="room-amenities">
-                                    <span><i className="fas fa-crown"></i> Four-Poster Bed</span>
-                                    <span><i className="fas fa-user-tie"></i> Personal Attendant</span>
-                                    <span><i className="fas fa-hot-tub"></i> Jacuzzi</span>
+                                    <span><i className="fas fa-crown"></i> 4-Poster Bed</span>
+                                    <span><i className="fas fa-bed"></i> Living Area</span>
+                                    <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                                 </div>
-                                <a href="/#contact" className="btn-availability" style={{"display":"block","textAlign":"center","textDecoration":"none","color":"#fff", "background": "rgba(255, 255, 255, 0.15)", "backdropFilter": "blur(12px)", "border": "1px solid rgba(255, 255, 255, 0.3)", "borderRadius": "30px", "boxShadow": "0 4px 15px rgba(0,0,0,0.2)"}}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></a>
+                                <a href="/#contact" className="btn-availability">Book for ₹4,999 <i className="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -1453,3 +1656,5 @@ export default function Guesthouse() {
     </div>
   );
 }
+
+

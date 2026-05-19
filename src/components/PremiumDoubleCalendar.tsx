@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon } from 'lucide-react';
 
 interface PremiumDoubleCalendarProps {
   checkIn: string; // Format: 'YYYY-MM-DD'
@@ -43,9 +43,12 @@ export default function PremiumDoubleCalendar({
 
   // Keep calendar view in sync when checkIn changes externally
   useEffect(() => {
-    const d = parseDateStr(checkIn);
-    setCurrentMonth(d.getMonth());
-    setCurrentYear(d.getFullYear());
+    const frame = window.requestAnimationFrame(() => {
+      const d = parseDateStr(checkIn);
+      setCurrentMonth(d.getMonth());
+      setCurrentYear(d.getFullYear());
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [checkIn]);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -55,8 +58,7 @@ export default function PremiumDoubleCalendar({
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        // Prevent toggle conflict if they click the trigger itself
-        const trigger = document.querySelector('.mmt-date-trigger');
+        const trigger = containerRef.current.closest('.mmt-date-trigger') || document.querySelector('.block-trigger-wrapper');
         if (trigger && trigger.contains(event.target as Node)) {
           return;
         }
@@ -80,20 +82,14 @@ export default function PremiumDoubleCalendar({
   const festivals: FestivalEvent[] = [];
 
   // Helper date parsing and formatting
-  const formatDateToShortString = (d: Date) => {
-    const day = d.getDate();
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const yrStr = d.getFullYear().toString().slice(-2);
-    return `${day} ${months[d.getMonth()]} ${yrStr}`;
-  };
-
-  const formatDateToTwoLines = (d: Date) => {
+  const formatDateParts = (d: Date) => {
     const day = d.getDate();
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const yrStr = d.getFullYear().toString().slice(-2);
     return {
-      top: `${day} ${months[d.getMonth()]}`,
-      bottom: yrStr
+      day,
+      month: months[d.getMonth()],
+      year: yrStr
     };
   };
 
@@ -210,33 +206,42 @@ export default function PremiumDoubleCalendar({
   };
 
   return (
-    <div ref={containerRef} className="mmt-calendar-overlay animate-fadeIn" onClick={(e) => e.stopPropagation()}>
+    <div
+      ref={containerRef}
+      className="mmt-calendar-overlay animate-fadeIn"
+      onClick={(e) => e.stopPropagation()}
+    >
       <style dangerouslySetInnerHTML={{
         __html: `
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
         .animate-fadeIn {
           animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .mmt-calendar-overlay {
           background: #ffffff !important;
-          border-radius: 16px;
+          border-radius: 20px;
           border: 1px solid rgba(0, 0, 0, 0.08) !important;
-          box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12) !important;
-          width: 630px;
-          max-width: 95vw;
-          padding: 18px 22px;
+          box-shadow: 0 18px 60px rgba(0, 0, 0, 0.14) !important;
+          box-sizing: border-box;
+          width: min(650px, calc(100vw - 32px));
+          max-width: none;
+          padding: 18px 22px 20px;
           color: #1f2937 !important;
           font-family: 'Outfit', sans-serif;
           position: absolute;
-          top: calc(100% + 8px);
-          right: 0;
-          left: auto;
-          transform: none;
-          z-index: 1000;
+          top: auto;
+          bottom: calc(100% + 18px);
+          left: 50%;
+          right: auto;
+          transform: translateX(-50%);
+          z-index: 9999;
           user-select: none;
+        }
+        .mmt-calendar-overlay::before {
+          display: none;
         }
         
         /* Premium date tabs at top matching MMT image */
@@ -244,9 +249,10 @@ export default function PremiumDoubleCalendar({
           display: flex;
           align-items: center;
           border-bottom: 1.5px solid rgba(0, 0, 0, 0.06) !important;
-          padding-bottom: 10px;
-          margin-bottom: 16px;
-          gap: 16px;
+          justify-content: space-between;
+          padding-bottom: 14px;
+          margin-bottom: 14px;
+          gap: 18px;
         }
         .mmt-cal-tab {
           display: flex;
@@ -255,11 +261,20 @@ export default function PremiumDoubleCalendar({
           padding: 4px 0;
           position: relative;
           transition: all 0.25s ease;
+          min-width: 72px;
         }
         .mmt-cal-tab-icon {
           color: rgba(0, 0, 0, 0.3) !important;
-          margin-right: 8px;
+          margin-right: 10px;
           transition: all 0.25s ease;
+        }
+        .mmt-cal-tab:last-of-type {
+          justify-content: flex-end;
+        }
+        .mmt-cal-tab:last-of-type .mmt-cal-tab-icon {
+          order: 2;
+          margin-left: 10px;
+          margin-right: 0;
         }
         .mmt-cal-tab.active .mmt-cal-tab-icon {
           color: #eab308 !important;
@@ -268,18 +283,21 @@ export default function PremiumDoubleCalendar({
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          line-height: 1.1;
+          line-height: 1.02;
+        }
+        .mmt-cal-tab:last-of-type .mmt-cal-tab-text {
+          align-items: flex-end;
         }
         .mmt-cal-tab-date-top {
-          font-size: 13px;
-          font-weight: 700;
-          color: rgba(0, 0, 0, 0.6) !important;
+          font-size: 16px;
+          font-weight: 800;
+          color: #111827 !important;
           transition: all 0.25s ease;
         }
         .mmt-cal-tab-date-bottom {
-          font-size: 11px;
-          font-weight: 500;
-          color: rgba(0, 0, 0, 0.4) !important;
+          font-size: 16px;
+          font-weight: 800;
+          color: rgba(17, 24, 39, 0.62) !important;
           transition: all 0.25s ease;
         }
         .mmt-cal-tab.active .mmt-cal-tab-date-top {
@@ -293,10 +311,10 @@ export default function PremiumDoubleCalendar({
         .mmt-cal-tab.active::after {
           content: '';
           position: absolute;
-          bottom: -11.5px;
+          bottom: -15.5px;
           left: 0;
           right: 0;
-          height: 2.5px;
+          height: 3px;
           background: #eab308 !important;
           border-radius: 2px 2px 0 0;
         }
@@ -304,7 +322,7 @@ export default function PremiumDoubleCalendar({
           font-size: 16px;
           color: rgba(0, 0, 0, 0.2) !important;
           font-weight: 400;
-          margin: 0 2px;
+          margin: 0 auto;
         }
 
         /* Two Columns side-by-side */
@@ -327,16 +345,19 @@ export default function PremiumDoubleCalendar({
           margin-bottom: 14px;
         }
         .mmt-cal-month-name {
-          font-size: 15px;
-          font-weight: 700;
+          font-size: 16px;
+          font-weight: 800;
           color: #1f2937 !important;
-          letter-spacing: -0.3px;
+          letter-spacing: 0;
         }
         .mmt-cal-month-name span {
-          font-weight: 300;
-          margin-left: 4px;
+          display: block;
+          font-weight: 400;
+          margin-left: 0;
+          margin-top: 3px;
           color: rgba(0, 0, 0, 0.4) !important;
           font-size: 13px;
+          text-align: center;
         }
         .mmt-cal-arrow {
           position: absolute;
@@ -359,10 +380,10 @@ export default function PremiumDoubleCalendar({
           color: #b45309 !important;
         }
         .mmt-cal-arrow.left {
-          left: -4px;
+          left: -2px;
         }
         .mmt-cal-arrow.right {
-          right: -4px;
+          right: -2px;
         }
         
         /* Days layout */
@@ -370,31 +391,31 @@ export default function PremiumDoubleCalendar({
           display: grid;
           grid-template-columns: repeat(7, 1fr);
           text-align: center;
-          margin-bottom: 8px;
+          margin-bottom: 10px;
         }
         .mmt-cal-weekday {
           font-size: 11px;
           font-weight: 600;
           color: rgba(0, 0, 0, 0.4) !important;
-          height: 18px;
+          height: 20px;
         }
         
         .mmt-cal-days-grid {
           display: grid;
           grid-template-columns: repeat(7, 1fr);
-          row-gap: 4px;
+          row-gap: 5px;
         }
         
         .mmt-cal-day-cell {
-          height: 38px;
+          height: 34px;
           position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          font-size: 12px;
-          font-weight: 600;
+          font-size: 15px;
+          font-weight: 500;
           color: #1f2937 !important;
           border-radius: 4px;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -410,14 +431,14 @@ export default function PremiumDoubleCalendar({
           background: #eab308 !important;
           color: #111827 !important;
           border-radius: 4px 0 0 4px !important;
-          font-weight: 800;
+          font-weight: 500;
         }
         
         .mmt-cal-day-cell.selected-end {
           background: #eab308 !important;
           color: #111827 !important;
           border-radius: 0 4px 4px 0 !important;
-          font-weight: 800;
+          font-weight: 500;
         }
         
         .mmt-cal-day-cell.selected-start.selected-end {
@@ -443,8 +464,8 @@ export default function PremiumDoubleCalendar({
         
         .mmt-day-num {
           z-index: 10;
-          font-weight: 600;
-          margin-top: 4px;
+          font-weight: inherit;
+          margin-top: 0;
         }
         
         /* Hide arrows on opposite cols to make it look exactly like image */
@@ -463,17 +484,20 @@ export default function PremiumDoubleCalendar({
             right: auto !important;
             transform: translateX(-50%) !important;
             padding: 16px;
-            top: calc(100% + 8px);
           }
           .mmt-cal-header-tabs {
             gap: 12px;
             margin-bottom: 16px;
+            padding-bottom: 14px;
           }
           .mmt-cal-tab-date-top {
-            font-size: 12px;
+            font-size: 15px;
           }
           .mmt-cal-tab-date-bottom {
-            font-size: 10px;
+            font-size: 15px;
+          }
+          .mmt-cal-tab.active::after {
+            bottom: -15.5px;
           }
           .mmt-cal-dual-months {
             flex-direction: column;
@@ -481,6 +505,10 @@ export default function PremiumDoubleCalendar({
           }
           .mmt-cal-month-col {
             width: 100% !important;
+          }
+          .mmt-cal-day-cell {
+            font-size: 16px;
+            height: 34px;
           }
           .mmt-cal-month-col:first-of-type .mmt-cal-arrow.right {
             display: flex;
@@ -500,8 +528,9 @@ export default function PremiumDoubleCalendar({
         >
           <CalendarIcon size={16} className="mmt-cal-tab-icon" />
           <div className="mmt-cal-tab-text">
-            <span className="mmt-cal-tab-date-top">{formatDateToTwoLines(checkInDate).top}</span>
-            <span className="mmt-cal-tab-date-bottom">{formatDateToTwoLines(checkInDate).bottom}</span>
+            <span className="mmt-cal-tab-date-top">{formatDateParts(checkInDate).day}</span>
+            <span className="mmt-cal-tab-date-top">{formatDateParts(checkInDate).month}</span>
+            <span className="mmt-cal-tab-date-bottom">{formatDateParts(checkInDate).year}</span>
           </div>
         </div>
         
@@ -513,8 +542,9 @@ export default function PremiumDoubleCalendar({
         >
           <CalendarIcon size={16} className="mmt-cal-tab-icon" />
           <div className="mmt-cal-tab-text">
-            <span className="mmt-cal-tab-date-top">{formatDateToTwoLines(checkOutDate).top}</span>
-            <span className="mmt-cal-tab-date-bottom">{formatDateToTwoLines(checkOutDate).bottom}</span>
+            <span className="mmt-cal-tab-date-top">{formatDateParts(checkOutDate).day}</span>
+            <span className="mmt-cal-tab-date-top">{formatDateParts(checkOutDate).month}</span>
+            <span className="mmt-cal-tab-date-bottom">{formatDateParts(checkOutDate).year}</span>
           </div>
         </div>
       </div>

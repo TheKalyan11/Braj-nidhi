@@ -1,15 +1,14 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { 
   Calendar, 
   Users, 
-  User, 
   Mail, 
   Phone, 
   ShieldCheck, 
   Percent, 
-  ChevronRight, 
   Check, 
   MapPin, 
   Compass, 
@@ -18,11 +17,12 @@ import {
   CreditCard, 
   CheckCircle2, 
   Sparkles, 
-  LogOut, 
   Lock,
   ArrowRight,
   Info,
-  Clock
+  Clock,
+  Menu,
+  X
 } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
@@ -70,6 +70,8 @@ export default function BookingPage() {
   const [userName, setUserName] = useState<string>('Kalyan Sharma');
   const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
   const [loginModalInitialRegister, setLoginModalInitialRegister] = useState<boolean>(false);
+  const [headerScrolled, setHeaderScrolled] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   
   // Guest Details Form State
   const [guestDetails, setGuestDetails] = useState<GuestDetails>({
@@ -162,85 +164,87 @@ export default function BookingPage() {
   // Load URL query parameters on mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    
-    // 1. Room Type Selection
-    const paramRoom = params.get('roomType') || params.get('room') || params.get('room_type') || params.get('hotelId');
-    if (paramRoom) {
-      const roomLower = paramRoom.toLowerCase();
-      if (roomLower.includes('royal') || roomLower.includes('deluxe4') || roomLower.includes('deluxe-4') || roomLower.includes('family')) setRoomType('deluxe4');
-      else if (roomLower.includes('deluxe3') || roomLower.includes('deluxe-3') || roomLower.includes('triple')) setRoomType('deluxe3');
-      else setRoomType('deluxe2');
-    }
 
-    // Helper to parse date
-    const parseDateParam = (val: string | null): string | null => {
-      if (!val) return null;
-      if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
-      if (/^\d{8}$/.test(val)) {
-        const mm = val.substring(0, 2);
-        const dd = val.substring(2, 4);
-        const yyyy = val.substring(4, 8);
-        return `${yyyy}-${mm}-${dd}`;
+    const initializeFromQuery = () => {
+      const params = new URLSearchParams(window.location.search);
+      
+      // 1. Room Type Selection
+      const paramRoom = params.get('roomType') || params.get('room') || params.get('room_type') || params.get('hotelId');
+      if (paramRoom) {
+        const roomLower = paramRoom.toLowerCase();
+        if (roomLower.includes('royal') || roomLower.includes('deluxe4') || roomLower.includes('deluxe-4') || roomLower.includes('family')) setRoomType('deluxe4');
+        else if (roomLower.includes('deluxe3') || roomLower.includes('deluxe-3') || roomLower.includes('triple')) setRoomType('deluxe3');
+        else setRoomType('deluxe2');
       }
-      return null;
+
+      // Helper to parse date
+      const parseDateParam = (val: string | null): string | null => {
+        if (!val) return null;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+        if (/^\d{8}$/.test(val)) {
+          const mm = val.substring(0, 2);
+          const dd = val.substring(2, 4);
+          const yyyy = val.substring(4, 8);
+          return `${yyyy}-${mm}-${dd}`;
+        }
+        return null;
+      };
+
+      // 2. Dates
+      const paramCheckIn = params.get('checkin') || params.get('checkIn') || params.get('check_in');
+      const parsedCheckIn = parseDateParam(paramCheckIn);
+      if (parsedCheckIn) setCheckIn(parsedCheckIn);
+
+      const paramCheckOut = params.get('checkout') || params.get('checkOut') || params.get('check_out');
+      const parsedCheckOut = parseDateParam(paramCheckOut);
+      if (parsedCheckOut) setCheckOut(parsedCheckOut);
+
+      // 3. Guests
+      const paramAdults = params.get('adults');
+      if (paramAdults && !isNaN(Number(paramAdults))) {
+        setAdults(Math.max(1, Number(paramAdults)));
+      }
+      const paramChildren = params.get('children');
+      if (paramChildren && !isNaN(Number(paramChildren))) {
+        setChildren(Math.max(0, Number(paramChildren)));
+      }
+
+      // MMT Format e.g., roomStayQualifier=2e0e
+      const rsq = params.get('roomStayQualifier') || params.get('rsc');
+      if (rsq) {
+        const match = rsq.match(/^(\d+)e(\d+)e?/);
+        if (match) {
+          setAdults(Math.max(1, Number(match[1])));
+          setChildren(Math.max(0, Number(match[2])));
+        }
+      }
+
+      // Load login state from localStorage
+      const storedLogin = localStorage.getItem('isLoggedIn') === 'true';
+      if (storedLogin) {
+        setIsLoggedIn(true);
+        const storedName = localStorage.getItem('userName') || 'Kalyan Sharma';
+        setUserName(storedName);
+        const parts = storedName.split(' ');
+        setGuestDetails(prev => ({
+          ...prev,
+          firstName: parts[0] || 'Kalyan',
+          lastName: parts[1] || 'Sharma',
+          email: localStorage.getItem('userEmail') || 'kalyan@brajnidhi.com',
+          phone: localStorage.getItem('userPhone') || '+91 98765 43210'
+        }));
+      }
     };
 
-    // 2. Dates
-    const paramCheckIn = params.get('checkin') || params.get('checkIn') || params.get('check_in');
-    const parsedCheckIn = parseDateParam(paramCheckIn);
-    if (parsedCheckIn) setCheckIn(parsedCheckIn);
-
-    const paramCheckOut = params.get('checkout') || params.get('checkOut') || params.get('check_out');
-    const parsedCheckOut = parseDateParam(paramCheckOut);
-    if (parsedCheckOut) setCheckOut(parsedCheckOut);
-
-    // 3. Guests
-    const paramAdults = params.get('adults');
-    if (paramAdults && !isNaN(Number(paramAdults))) {
-      setAdults(Math.max(1, Number(paramAdults)));
-    }
-    const paramChildren = params.get('children');
-    if (paramChildren && !isNaN(Number(paramChildren))) {
-      setChildren(Math.max(0, Number(paramChildren)));
-    }
-
-    // MMT Format e.g., roomStayQualifier=2e0e
-    const rsq = params.get('roomStayQualifier') || params.get('rsc');
-    if (rsq) {
-      const match = rsq.match(/^(\d+)e(\d+)e?/);
-      if (match) {
-        setAdults(Math.max(1, Number(match[1])));
-        setChildren(Math.max(0, Number(match[2])));
-      }
-    }
-
-    // Load login state from localStorage
-    const storedLogin = localStorage.getItem('isLoggedIn') === 'true';
-    if (storedLogin) {
-      setIsLoggedIn(true);
-      const storedName = localStorage.getItem('userName') || 'Kalyan Sharma';
-      setUserName(storedName);
-      const parts = storedName.split(' ');
-      setGuestDetails(prev => ({
-        ...prev,
-        firstName: parts[0] || 'Kalyan',
-        lastName: parts[1] || 'Sharma',
-        email: localStorage.getItem('userEmail') || 'kalyan@brajnidhi.com',
-        phone: localStorage.getItem('userPhone') || '+91 98765 43210'
-      }));
-    }
+    window.requestAnimationFrame(initializeFromQuery);
   }, []);
 
   // Sync scroll class for transparent/solid header
   useEffect(() => {
     const handleScroll = () => {
-      const header = document.getElementById('main-header');
-      if (header) {
-        if (window.scrollY > 30) header.classList.add('scrolled');
-        else header.classList.remove('scrolled');
-      }
+      setHeaderScrolled(window.scrollY > 30);
     };
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -322,6 +326,13 @@ export default function BookingPage() {
 
   // Step Navigations
   const proceedToPayment = () => {
+    if (!isLoggedIn) {
+      alert('Please login or create an account to proceed to secure checkout.');
+      setLoginModalInitialRegister(false);
+      setLoginModalOpen(true);
+      return;
+    }
+
     if (!guestDetails.firstName || !guestDetails.lastName || !guestDetails.email || !guestDetails.phone) {
       alert('Please fill out all required guest information fields before proceeding.');
       return;
@@ -374,35 +385,70 @@ export default function BookingPage() {
       {/* Dynamic Scoped CSS Stylesheet */}
       <style dangerouslySetInnerHTML={{ __html: `
         .booking-page-mmt {
-          background-color: #ffffff; /* Solid premium white background */
-          color: #2c2520; /* Dark elegant brown-charcoal */
+          background: linear-gradient(180deg, #f7f0e5 0%, #ffffff 62%);
+          color: #000000;
           font-family: 'Inter', sans-serif;
           min-height: 100vh;
-          padding-top: 100px;
+          padding-top: 120px;
           padding-bottom: 80px;
+        }
+
+        .booking-page-mmt h1,
+        .booking-page-mmt h2,
+        .booking-page-mmt h3,
+        .booking-page-mmt h4,
+        .booking-page-mmt h5,
+        .booking-page-mmt h6,
+        .booking-page-mmt p,
+        .booking-page-mmt span,
+        .booking-page-mmt label,
+        .booking-page-mmt li,
+        .booking-page-mmt small,
+        .booking-page-mmt strong,
+        .booking-page-mmt a {
+          color: #000000;
+        }
+
+        /* Booking page override for reused home header on light background */
+        .booking-page-mmt #main-header {
+          background: rgba(255, 255, 255, 0.96);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .booking-page-mmt #main-header nav ul li a,
+        .booking-page-mmt #main-header .nav-btns .btn-login {
+          color: #111111 !important;
+        }
+        .booking-page-mmt #main-header .nav-btns .btn-book {
+          color: #ffffff !important;
+          background: #111111;
+          border: 1px solid #111111;
         }
 
         /* PREMIUM MMT LIGHT HEADER */
         .booking-header-bar {
           position: fixed;
           top: 0; left: 0; right: 0;
-          height: 80px;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(25px);
-          -webkit-backdrop-filter: blur(25px);
-          border-bottom: 1px solid rgba(139, 0, 0, 0.08);
+          height: 90px;
+          background: rgba(255, 255, 255, 0.96);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
           z-index: 1000;
           display: flex;
+          flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
+          gap: 16px;
           padding: 0 6%;
           transition: all 0.3s ease;
         }
         
         .booking-header-bar.scrolled {
-          background: rgba(255, 255, 255, 0.98);
-          border-bottom: 1.5px solid rgba(139, 0, 0, 0.12);
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+          background: rgba(255, 255, 255, 0.99);
+          border-bottom-color: rgba(212, 175, 55, 0.18);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
         }
 
         .booking-logo img {
@@ -411,7 +457,7 @@ export default function BookingPage() {
           transition: transform 0.3s;
         }
         .booking-logo img:hover {
-          transform: scale(1.03);
+          transform: scale(1.04);
         }
 
         /* STEPPER DESIGN */
@@ -479,24 +525,85 @@ export default function BookingPage() {
           padding: 0 20px;
           display: grid;
           grid-template-columns: 8fr 4fr;
-          gap: 28px;
+          gap: 30px;
           align-items: start;
+        }
+
+        .hero-banner {
+          max-width: 1240px;
+          margin: 0 auto 32px;
+          padding: 32px;
+          background: linear-gradient(135deg, rgba(255, 247, 233, 0.96), rgba(243, 225, 196, 0.88));
+          border: 1px solid rgba(212, 175, 55, 0.22);
+          border-radius: 28px;
+          box-shadow: 0 22px 50px rgba(0, 0, 0, 0.06);
+          display: grid;
+          grid-template-columns: 1.5fr 1fr;
+          gap: 24px;
+          align-items: center;
+        }
+
+        .hero-copy h1 {
+          font-size: 2.8rem;
+          line-height: 1.02;
+          margin: 0 0 14px;
+          color: #7b3f0a;
+        }
+
+        .hero-copy p {
+          font-size: 1rem;
+          color: #5f4c42;
+          line-height: 1.7;
+          margin: 0 0 24px;
+          max-width: 620px;
+        }
+
+        .hero-stats {
+          display: flex;
+          gap: 14px;
+          flex-wrap: wrap;
+        }
+
+        .hero-stat {
+          flex: 1;
+          min-width: 160px;
+          padding: 18px 20px;
+          background: rgba(255, 255, 255, 0.94);
+          border-radius: 18px;
+          border: 1px solid rgba(212, 175, 55, 0.16);
+          color: #4c3e35;
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04);
+        }
+
+        .hero-stat h3 {
+          margin: 0 0 6px;
+          font-size: 1.15rem;
+          font-weight: 800;
+          color: #8b0000;
+        }
+
+        .hero-stat p {
+          margin: 0;
+          font-size: 0.92rem;
+          color: #6e5b4e;
+          line-height: 1.5;
         }
 
         /* LEFT SIDE CARDS */
         .mmt-card {
           background: #ffffff;
-          border: 1px solid rgba(139, 0, 0, 0.08);
-          border-radius: 18px;
-          padding: 24px;
-          margin-bottom: 24px;
-          box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
-          transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+          border: 1px solid rgba(212, 175, 55, 0.14);
+          border-radius: 20px;
+          padding: 26px;
+          margin-bottom: 26px;
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.05);
+          transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
         .mmt-card:hover {
-          border-color: rgba(139, 0, 0, 0.15);
-          box-shadow: 0 8px 35px rgba(139, 0, 0, 0.04);
+          transform: translateY(-2px);
+          border-color: rgba(212, 175, 55, 0.24);
+          box-shadow: 0 22px 45px rgba(0, 0, 0, 0.08);
         }
 
         .card-header-mmt {
@@ -942,6 +1049,9 @@ export default function BookingPage() {
         /* 11. SIDEBAR & RECEIPT STYLES */
         .mmt-sidebar {
           position: sticky;
+          top: 130px;
+          align-self: start;
+        }
 
         .summary-card-header {
           border-bottom: 1.5px solid rgba(212, 175, 55, 0.2);
@@ -1069,20 +1179,20 @@ export default function BookingPage() {
         .btn-primary-mmt {
           width: 100%;
           padding: 16px;
-          background: linear-gradient(135deg, #a82c2c 0%, #8b0000 100%);
+          background: linear-gradient(135deg, #d4af37 0%, #8b0000 100%);
           color: #ffffff;
           border: none;
-          border-radius: 12px;
+          border-radius: 14px;
           font-weight: 800;
           font-size: 16px;
           cursor: pointer;
-          margin-top: 20px;
+          margin-top: 24px;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 8px 25px rgba(139, 0, 0, 0.2);
+          box-shadow: 0 14px 30px rgba(212, 175, 55, 0.24);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 10px;
         }
 
         .btn-primary-mmt:hover {
@@ -1235,6 +1345,16 @@ export default function BookingPage() {
         }
 
         /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+          .booking-page-mmt {
+            padding-top: 100px;
+          }
+          .hero-banner {
+            padding: 30px;
+            gap: 25px;
+          }
+        }
+
         @media (max-width: 900px) {
           .booking-grid-mmt {
             grid-template-columns: 1fr;
@@ -1246,87 +1366,353 @@ export default function BookingPage() {
             grid-template-columns: 1fr;
           }
         }
+
+        @media (max-width: 768px) {
+          .booking-page-mmt {
+            padding-top: 90px;
+            padding-bottom: 40px;
+          }
+          .booking-page-mmt #main-header {
+            padding: 10px 4% !important;
+          }
+          .booking-page-mmt #main-header nav {
+            display: none !important;
+          }
+          .booking-page-mmt #main-header .nav-btns {
+            display: none !important;
+          }
+          .booking-page-mmt #main-header .mobile-menu-btn {
+            display: flex !important;
+          }
+          .hero-banner {
+            grid-template-columns: 1fr;
+            text-align: center;
+            padding: 24px 20px;
+            border-radius: 16px;
+          }
+          .hero-banner div:last-child {
+            text-align: center !important;
+            margin-top: 20px;
+          }
+          .hero-banner div:last-child img {
+            max-width: 100% !important;
+          }
+          .hero-stats {
+            flex-direction: column;
+            gap: 16px;
+            text-align: left;
+            margin-top: 24px;
+          }
+          .hero-stat {
+            min-width: 100%;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+          }
+          .hero-stat:last-child {
+            border-bottom: none;
+          }
+          .room-review-split {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .room-review-image {
+            height: 200px;
+          }
+          .form-grid-mmt {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .stepper-container {
+            gap: 8px;
+            justify-content: space-between;
+            width: 100%;
+          }
+          .stepper-item span:last-child {
+            display: none;
+          }
+          .stepper-item.active span:last-child {
+            display: inline-block;
+            font-size: 11px;
+          }
+          .stepper-circle {
+            width: 26px !important;
+            height: 26px !important;
+            font-size: 11px !important;
+          }
+          .form-grid-dual-mmt {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+          .stay-dates-strip {
+            grid-template-columns: 1fr;
+            gap: 12px;
+            text-align: center;
+          }
+          .stay-date-box {
+            text-align: center !important;
+          }
+          .stay-duration-circle {
+            margin: 0 auto;
+            width: fit-content;
+          }
+          .mmt-card {
+            padding: 20px 16px;
+          }
+          .special-requests-badges {
+            gap: 8px;
+          }
+          .request-badge-item {
+            padding: 8px 12px;
+            font-size: 11px;
+          }
+        }
+
+        @media (max-width: 500px) {
+          .addon-item-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+          }
+          .addon-price-action {
+            width: 100%;
+            justify-content: space-between;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 8px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .payment-tabs {
+            flex-direction: column;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            padding: 0;
+          }
+          .payment-tab-btn {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+            width: 100%;
+          }
+        }
+
+        /* MOBILE MENU DRAWER STYLES */
+        .mobile-menu-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(26, 21, 18, 0.4);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          z-index: 2000;
+          display: flex;
+          justify-content: flex-end;
+          animation: fadeInMmt 0.25s ease;
+        }
+
+        .mobile-menu-drawer {
+          width: 80%;
+          max-width: 320px;
+          height: 100%;
+          background: #ffffff;
+          box-shadow: -10px 0 40px rgba(0, 0, 0, 0.12);
+          padding: 30px 24px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          animation: slideInMmt 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-menu-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 40px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          padding-bottom: 20px;
+        }
+
+        .mobile-menu-close {
+          background: none;
+          border: none;
+          color: #1a1512;
+          cursor: pointer;
+          padding: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .mobile-nav-links ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
+
+        .mobile-nav-links ul li a {
+          font-size: 18px;
+          font-weight: 600;
+          color: #1a1512 !important;
+          text-decoration: none !important;
+          transition: color 0.3s;
+          display: block;
+        }
+
+        .mobile-nav-links ul li a:hover {
+          color: #8b0000 !important;
+        }
+
+        .mobile-menu-footer {
+          border-top: 1px solid rgba(0, 0, 0, 0.06);
+          padding-top: 24px;
+          margin-top: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .mobile-user-profile {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+        }
+
+        @keyframes fadeInMmt {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slideInMmt {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
       ` }} />
 
       {/* 1. STUNNING HEADER NAVIGATION IN MMT STYLE */}
-      <header className="booking-header-bar scrolled" id="main-header">
-        <Link href="/" className="booking-logo">
-          <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" />
+      <header id="main-header" className={headerScrolled ? "scrolled" : ""}>
+        <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
+          <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "60px", width: "auto" }} />
         </Link>
         
-        {/* Stepper display in header */}
-        <div className="stepper-container">
-          <div className={`stepper-item ${currentStep >= 1 ? 'active' : ''} ${currentStep > 1 ? 'completed' : ''}`}>
-            <div className="stepper-circle">
-              {currentStep > 1 ? <Check size={12} strokeWidth={3} /> : "1"}
-            </div>
-            <span>Review Stay</span>
-          </div>
-          <ChevronRight size={14} className="stepper-arrow" />
-          <div className={`stepper-item ${currentStep >= 2 ? 'active' : ''} ${currentStep > 2 ? 'completed' : ''}`}>
-            <div className="stepper-circle">
-              {currentStep > 2 ? <Check size={12} strokeWidth={3} /> : "2"}
-            </div>
-            <span>Payment Secure</span>
-          </div>
-          <ChevronRight size={14} className="stepper-arrow" />
-          <div className={`stepper-item ${currentStep === 3 ? 'active' : ''}`}>
-            <div className="stepper-circle">3</div>
-            <span>Confirmed</span>
-          </div>
-        </div>
+        <nav>
+          <ul>
+            <li><a href="/guesthouse">Guesthouse</a></li>
+            <li><a href="/weddings">Weddings</a></li>
+            <li><a href="/corporate">Corporate</a></li>
+            <li><a href="/braj-yatra">Braj Yatra</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </nav>
 
-        {/* Member Profile/Logout area */}
-        <div>
+        <div className="nav-btns">
           {isLoggedIn ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.6)', margin: 0 }}>Braj Club Premium Member</p>
-                <p style={{ fontSize: '14px', fontWeight: '700', color: '#8b0000', margin: 0 }}>{userName}</p>
+              <div className="user-info-text">
+                <span className="user-label">Braj Club Member</span>
+                <span className="user-name">{userName}</span>
               </div>
-              <button 
-                onClick={handleLogout} 
-                className="btn-login-mmt" 
-                style={{ background: 'rgba(139, 0, 0, 0.05)', border: '1px solid rgba(139, 0, 0, 0.15)', color: '#8b0000' }}
-              >
-                <LogOut size={13} />
-                Logout
-              </button>
+              <button onClick={handleLogout} className="btn-login" style={{ padding: '8px 16px', fontSize: '0.8rem', height: '36px' }}>Logout</button>
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <button 
-                onClick={() => {
-                  setLoginModalInitialRegister(false);
-                  setLoginModalOpen(true);
-                }} 
-                className="btn-login-mmt"
-                style={{ background: 'transparent', border: '1.5px solid #8b0000', color: '#8b0000', padding: '8px 16px' }}
-              >
-                <User size={13} />
-                <span>Login</span>
-              </button>
-              <button 
-                onClick={() => {
-                  setLoginModalInitialRegister(true);
-                  setLoginModalOpen(true);
-                }} 
-                className="btn-login-mmt"
-                style={{ padding: '8px 16px' }}
-              >
-                <Sparkles size={13} />
-                <span>Create Account</span>
+            <button onClick={() => setLoginModalOpen(true)} className="btn-login" style={{ border: 'none', cursor: 'pointer' }}>Login / Create Account</button>
+          )}
+          <a href="/booking" className="btn-book">Book Now</a>
+        </div>
+
+        {/* Hamburger Toggle Button */}
+        <button 
+          className="mobile-menu-btn" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'none', // Overridden to flex in media query
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#1a1512',
+            padding: '8px',
+            zIndex: 1001
+          }}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </header>
+
+      {/* Mobile Menu Drawer Overlay */}
+      {isMobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-menu-header">
+              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto" }} />
+              <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
+                <X size={24} />
               </button>
             </div>
-          )}
+            <div className="mobile-nav-links">
+              <ul>
+                <li><a href="/guesthouse" onClick={() => setIsMobileMenuOpen(false)}>Guesthouse</a></li>
+                <li><a href="/weddings" onClick={() => setIsMobileMenuOpen(false)}>Weddings</a></li>
+                <li><a href="/corporate" onClick={() => setIsMobileMenuOpen(false)}>Corporate</a></li>
+                <li><a href="/braj-yatra" onClick={() => setIsMobileMenuOpen(false)}>Braj Yatra</a></li>
+                <li><a href="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</a></li>
+              </ul>
+            </div>
+            <div className="mobile-menu-footer">
+              {isLoggedIn ? (
+                <div className="mobile-user-profile">
+                  <span className="user-label">Braj Club Member</span>
+                  <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
+                  <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}>Logout</button>
+                </div>
+              ) : (
+                <button onClick={() => { setLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
+              )}
+              <a href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="btn-book" style={{ display: 'block', textAlign: 'center', marginTop: '4px' }}>Book Now</a>
+            </div>
+          </div>
         </div>
-      </header>
+      )}
 
       {/* 2. BODY CONTENT SECTION */}
       <main style={{ marginTop: '20px' }}>
         
         {currentStep === 1 && (
-          <div className="booking-grid-mmt">
+          <>
+            <div className="hero-banner">
+              <div className="hero-copy">
+                <h1>Reserve Your Heritage Stay with Comfort & Devotion</h1>
+                <p>Complete your premium booking with curated guest services, secure payment, and exclusive member rewards crafted for the perfect Vrindavan retreat.</p>
+                <div className="hero-stats">
+                  <div className="hero-stat">
+                    <h3>{getRoomTitle(roomType)}</h3>
+                    <p>Luxury suite tailored for your selected group size with heritage-inspired décor.</p>
+                  </div>
+                  <div className="hero-stat">
+                    <h3>{nights} Nights</h3>
+                    <p>Flexible stay dates with welcome breakfast and spiritual amenities.</p>
+                  </div>
+                  <div className="hero-stat">
+                    <h3>{adults} Adults / {children} Children</h3>
+                    <p>Choose your ideal family or friends configuration for a seamless check-in.</p>
+                  </div>
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <Image src="/DSC05963-HDR.webp" alt="Premium suite preview" width={420} height={300} style={{ width: '100%', height: 'auto', borderRadius: '20px', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }} />
+              </div>
+            </div>
+            <div className="booking-grid-mmt">
             
             {/* LEFT SIDE CONTENT - GUEST & ROOM SELECTIONS */}
             <div>
@@ -1380,10 +1766,12 @@ export default function BookingPage() {
                 </div>
 
                 <div className="room-review-split">
-                  <div className="room-review-image">
-                    <img 
+                  <div className="room-review-image" style={{ position: 'relative', minHeight: '220px' }}>
+                    <Image 
                       src={getRoomImage(roomType)} 
                       alt="Selected suite room" 
+                      fill
+                      style={{ objectFit: 'cover', borderRadius: '18px' }}
                     />
                     <div className="room-review-badge">Best Choice</div>
                   </div>
@@ -1818,6 +2206,7 @@ export default function BookingPage() {
             </div>
 
           </div>
+          </>
         )}
 
         {/* 3. STEP 2: SECURE MAKE-MY-TRIP PAYMENT SYSTEM SCREEN */}
@@ -2142,35 +2531,20 @@ export default function BookingPage() {
         initialIsRegistering={loginModalInitialRegister}
       />
 
-      {/* FOOTER COHESIVE WITH REST OF THE BRAND */}
-      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: '#080706', padding: '60px 0 30px', marginTop: '80px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '40px' }}>
-          <div>
-            <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '56px', width: 'auto', marginBottom: '16px' }} />
-            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.6', maxWidth: '340px' }}>
-              Experience the divine blend of heritage and luxury in the heart of Vrindavan.
-            </p>
-          </div>
-          <div>
-            <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#d4af37', textTransform: 'uppercase', marginBottom: '16px' }}>Suite Selections</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <li><Link href="/guesthouse" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '13px' }}>Royal Heritage Suite</Link></li>
-              <li><Link href="/guesthouse" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '13px' }}>Executive Suite Rooms</Link></li>
-              <li><Link href="/weddings" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '13px' }}>Spiritual Marriages</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#d4af37', textTransform: 'uppercase', marginBottom: '16px' }}>Help & Security</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <li><Link href="/contact" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '13px' }}>Reach out to Guesthouse</Link></li>
-              <li><span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>SSL Encrypted Checkout</span></li>
-              <li><span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>24/7 Spiritual Desk Support</span></li>
-            </ul>
-          </div>
+      <footer className="site-footer">
+        <div className="footer-top-links">
+          <div className="footer-col"><h3>Company</h3><Link href="/#home">Home</Link><Link href="/#about">Our Story</Link><Link href="/guesthouse">Rooms & Suites</Link><Link href="/#testimonials">Guest Reviews</Link></div>
+          <div className="footer-col"><h3>Explore Vrindavan</h3><a href="#">Bankey Bihari Mandir</a><a href="#">Prem Mandir</a><a href="#">ISKCON Temple</a><a href="#">Local Attractions</a></div>
+          <div className="footer-col"><h3>Stay & Book</h3><Link href="/booking">Book Your Stay</Link><Link href="/weddings">Wedding Packages</Link><Link href="/corporate">Corporate Stays</Link><a href="#">Refund Policy</a></div>
+          <div className="footer-col"><h3>Help & Support</h3><a href="#">FAQ</a><Link href="/contact">Contact Us</Link><a href="#">Direction Map</a><a href="#">Group Inquiries</a></div>
+          <div className="footer-col"><h3>Information</h3><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Guest Policy</a><a href="#">Cancellation Policy</a></div>
         </div>
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.03)', marginTop: '40px', paddingTop: '20px', textAlign: 'center', fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>
-          &copy; 2026 Braj Nidhi. All rights reserved. Razorpay Secured payment.
+        <div className="footer-middle-bar">
+          <span>Privacy Policy</span>
+          <span>Copyright &copy; BRAJNIDHI 2026</span>
+          <span>Terms Of Use</span>
         </div>
+        <div className="footer-massive-text">BRAJNIDHI</div>
       </footer>
 
       <FloatingWidgets />

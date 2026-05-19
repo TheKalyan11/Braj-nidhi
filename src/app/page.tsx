@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
 import PremiumDoubleCalendar from '@/components/PremiumDoubleCalendar';
@@ -63,12 +64,28 @@ export default function Home() {
   const [deluxe4ImgIndex, setDeluxe4ImgIndex] = useState(0);
   const deluxe4Images = ["DSC05963-HDR.webp", "d31.webp"];
 
+  // Slideshow state for Hero Background
+  const [heroBgIndex, setHeroBgIndex] = useState(0);
+  const heroImages = [
+    "DSC09652.JPG",
+    "DSC09672.JPG",
+    "hero.png",
+    "DSC02591.JPG",
+    "DSC06003-HDR.png",
+    "hero.webp",
+    "DSC05818-HDR.webp",
+    "DSC05963-HDR.webp",
+    "DSC06003-HDR.webp",
+    "wedding-1.webp"
+  ];
+
   useEffect(() => {
     const timer = setInterval(() => {
       setDeluxe2ImgIndex((prev) => (prev + 1) % deluxe2Images.length);
       setDeluxe3ImgIndex((prev) => (prev + 1) % deluxe3Images.length);
       setDeluxe4ImgIndex((prev) => (prev + 1) % deluxe4Images.length);
-    }, 4000);
+      setHeroBgIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
@@ -283,122 +300,216 @@ export default function Home() {
             )}
             <a href="/booking" className="btn-book">Book Now</a>
         </div>
+
+        {/* Hamburger Toggle Button */}
+        <button 
+          className="mobile-menu-btn" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
     </header>
+
+    {/* Mobile Menu Drawer Overlay */}
+    {isMobileMenuOpen && (
+      <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
+        <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
+          <div className="mobile-menu-header">
+            <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto" }} />
+            <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
+              <X size={24} />
+            </button>
+          </div>
+          <div className="mobile-nav-links">
+            <ul>
+              <li><a href="/guesthouse" onClick={() => setIsMobileMenuOpen(false)}>Guesthouse</a></li>
+              <li><a href="/weddings" onClick={() => setIsMobileMenuOpen(false)}>Weddings</a></li>
+              <li><a href="/corporate" onClick={() => setIsMobileMenuOpen(false)}>Corporate</a></li>
+              <li><a href="/braj-yatra" onClick={() => setIsMobileMenuOpen(false)}>Braj Yatra</a></li>
+              <li><a href="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</a></li>
+            </ul>
+          </div>
+          <div className="mobile-menu-footer">
+            {isLoggedIn ? (
+              <div className="mobile-user-profile">
+                <span className="user-label">Braj Club Member</span>
+                <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
+                <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}>Logout</button>
+              </div>
+            ) : (
+              <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
+            )}
+            <a href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="btn-book" style={{ display: 'block', textAlign: 'center', marginTop: '4px' }}>Book Now</a>
+          </div>
+        </div>
+      </div>
+    )}
 
     <main>
         <section className="hero">
-            <div className="hero-content">
-                <h1>Timeless Luxury. Divine Serenity.</h1>
-                <p>Experience the finest hospitality in the heart of the city. Our heritage suites offer an oasis of calm amidst the vibrant urban landscape.</p>
-                
-                <div className="rating-info">
-                    <span className="stars"><i className="fas fa-star"></i> 4.9</span>
-                    <span className="reviews">from 2,400+ stays</span>
-                </div>
+            {/* Background Slideshow */}
+            <div className="hero-slider-container">
+                <AnimatePresence>
+                    <motion.div
+                        key={heroBgIndex}
+                        className="hero-slider-bg"
+                        initial={{ opacity: 0, scale: 1.05 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 1.8, ease: "easeInOut" }}
+                        style={{ 
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            backgroundImage: `linear-gradient(to bottom, rgba(10, 14, 20, 0.45), rgba(10, 14, 20, 0.75)), url(/${heroImages[heroBgIndex]})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat'
+                        }}
+                    />
+                </AnimatePresence>
             </div>
 
-            <div className="booking-widget">
-                <div className="widget-header">
-                    <div>
-                        <h3>{bookingData.roomType}</h3>
-                        <div className="rating">
-                            <i className="fas fa-star"></i>
-                            <i className="fas fa-star"></i>
-                            <i className="fas fa-star"></i>
-                            <i className="fas fa-star"></i>
-                            <i className="fas fa-star"></i>
-                        </div>
-                    </div>
-                    <div className="edit-icon">
-                        <i className="fas fa-pen-to-square"></i>
-                    </div>
-                </div>
-
-                <div className="booking-form" style={{ position: 'relative' }}>
-                    <div className="form-group full-width" style={{ position: 'relative' }}>
-                      <label>Check-in / Check-out</label>
-                      <div 
-                        className="custom-select-trigger mmt-date-trigger" 
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', minHeight: '44px' }}
-                        onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-                      >
-                        <i className="far fa-calendar-alt" style={{ color: '#eab308' }}></i>
-                        <span style={{ fontWeight: 600 }}>
-                          {formatDateFriendly(bookingData.checkIn)} - {formatDateFriendly(bookingData.checkOut)}
-                        </span>
-                      </div>
-                      
-                      <PremiumDoubleCalendar 
-                        checkIn={bookingData.checkIn} 
-                        checkOut={bookingData.checkOut} 
-                        isOpen={isCalendarOpen} 
-                        onChange={(start, end) => {
-                          setBookingData(prev => ({ ...prev, checkIn: start, checkOut: end }));
-                        }}
-                        onClose={() => setIsCalendarOpen(false)}
-                      />
-                    </div>
+            {/* Luxury Yacht Style Horizontal Booking widget */}
+              <div className="luxury-search-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 'auto', marginBottom: '0px', zIndex: 10 }}>
+                <div className="search-label-above" style={{ margin: '0 0 15px 0', textAlign: 'center' }}>Find now your luxury suites</div>
+                <div className="luxury-search-bar" style={{ maxWidth: '850px', margin: '0 auto' }}>
                     
-                    <CustomSelect label="Guests" value={bookingData.guests} options={["1 Adult", "2 Adults", "2 Adults, 1 Child", "2 Adults, 2 Children"]} field="guests" />
-                    <CustomSelect label="Room Type" value={bookingData.roomType} options={["Deluxe 2 – Twin Bedded Room", "Deluxe 3 – 3 Bedded Room", "Deluxe 4 – 4 Bedded Room"]} field="roomType" />
-                </div>
+                    {/* Suite Type (Active Dark Selection Block) */}
+                    <div 
+                      className="search-block active-dark"
+                      onClick={() => setOpenDropdown(openDropdown === 'roomType' ? null : 'roomType')}
+                    >
+                        <div className="block-icon">
+                            <i className="fas fa-crown"></i>
+                        </div>
+                        <div className="block-info">
+                            <span className="block-label">Suite Type</span>
+                            <span className="block-value">{bookingData.roomType.replace(' – Twin Bedded Room', '').replace(' – 3 Bedded Room', '').replace(' – 4 Bedded Room', '')}</span>
+                        </div>
+                        <i className="fas fa-chevron-down block-chevron"></i>
 
-                <div className="price-row">
-                    <div className="price">₹{roomPrices[bookingData.roomType].toLocaleString()}<span>/night</span></div>
-                    <div className="occupancy">{getGuestCount(bookingData.guests)}</div>
-                </div>
+                        {openDropdown === 'roomType' && (
+                            <div className="luxury-dropdown-options" onClick={(e) => e.stopPropagation()}>
+                                {["Deluxe 2 – Twin Bedded Room", "Deluxe 3 – 3 Bedded Room", "Deluxe 4 – 4 Bedded Room"].map((opt) => (
+                                    <div 
+                                        key={opt}
+                                        className={`luxury-dropdown-option ${bookingData.roomType === opt ? 'selected' : ''}`}
+                                        onClick={() => {
+                                            setBookingData(prev => ({ ...prev, roomType: opt }));
+                                            setOpenDropdown(null);
+                                        }}
+                                    >
+                                        {opt.split(' – ')[0]}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
-                <Link 
-                  href={`/booking?roomType=${
-                    bookingData.roomType === 'Deluxe 3 – 3 Bedded Room' ? 'deluxe3' : 
-                    bookingData.roomType === 'Deluxe 4 – 4 Bedded Room' ? 'deluxe4' : 
-                    'deluxe2'
-                  }&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&guests=${encodeURIComponent(bookingData.guests)}`}
-                  className="btn-reserve" 
-                  style={{ display: "block", textAlign: "center", textDecoration: "none", position: "relative", zIndex: 5 }}
-                >
-                  Search
-                </Link>
+                    {/* Dates block */}
+                    <div className="search-block mmt-date-trigger" style={{ position: 'relative' }}>
+                          <div 
+                            className="block-trigger-wrapper" 
+                            style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '12px' }}
+                            onClick={() => {
+                              setOpenDropdown(null);
+                              setIsCalendarOpen(!isCalendarOpen);
+                            }}
+                          >
+                            <div className="block-icon gold-icon">
+                                <i className="far fa-calendar-alt"></i>
+                            </div>
+                            <div className="block-info">
+                                <span className="block-label">Dates</span>
+                                <span className="block-value">{formatDateFriendly(bookingData.checkIn)} - {formatDateFriendly(bookingData.checkOut)}</span>
+                            </div>
+                            <i className="fas fa-chevron-down block-chevron"></i>
+                        </div>
+
+                        <PremiumDoubleCalendar 
+                          checkIn={bookingData.checkIn} 
+                          checkOut={bookingData.checkOut} 
+                          isOpen={isCalendarOpen} 
+                          onChange={(start, end) => {
+                            setBookingData(prev => ({ ...prev, checkIn: start, checkOut: end }));
+                          }}
+                          onClose={() => setIsCalendarOpen(false)}
+                        />
+                    </div>
+
+                    {/* Guests block */}
+                    <div 
+                      className="search-block"
+                      onClick={() => setOpenDropdown(openDropdown === 'guests' ? null : 'guests')}
+                    >
+                        <div className="block-icon gold-icon">
+                            <i className="fas fa-user-friends"></i>
+                        </div>
+                        <div className="block-info">
+                            <span className="block-label">Guests</span>
+                            <span className="block-value">{bookingData.guests}</span>
+                        </div>
+                        <i className="fas fa-chevron-down block-chevron"></i>
+
+                        {openDropdown === 'guests' && (
+                            <div className="luxury-dropdown-options" onClick={(e) => e.stopPropagation()}>
+                                {["1 Adult", "2 Adults", "2 Adults, 1 Child", "2 Adults, 2 Children"].map((opt) => (
+                                    <div 
+                                        key={opt}
+                                        className={`luxury-dropdown-option ${bookingData.guests === opt ? 'selected' : ''}`}
+                                        onClick={() => {
+                                            setBookingData(prev => ({ ...prev, guests: opt }));
+                                            setOpenDropdown(null);
+                                        }}
+                                    >
+                                        {opt}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Search Button block */}
+                    <div className="search-action-block" style={{ paddingLeft: '8px', borderLeft: '1px solid rgba(0, 0, 0, 0.08)' }}>
+                        <Link 
+                          href={`/booking?roomType=${
+                            bookingData.roomType === 'Deluxe 3 – 3 Bedded Room' ? 'deluxe3' : 
+                            bookingData.roomType === 'Deluxe 4 – 4 Bedded Room' ? 'deluxe4' : 
+                            'deluxe2'
+                          }&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&guests=${encodeURIComponent(bookingData.guests)}`}
+                          className="search-circle-button"
+                          aria-label="Search Suites"
+                        >
+                            <i className="fas fa-search"></i>
+                        </Link>
+                    </div>
+
+                </div>
             </div>
         </section>
 
         <section className="banner-section">
             <div className="scrolling-banner">
                 <div className="banner-track">
-                    <div className="logo-item"><i className="fas fa-bed"></i> Luxury Suites</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-ring"></i> Scenic Weddings</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-laptop-house"></i> Corporate Offsites</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-landmark"></i> Heritage Living</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-glass-cheers"></i> Grand Banquets</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-video"></i> Modern AV Halls</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-star"></i> Boutique Stays</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-spa"></i> Wellness Retreats</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    
-                    {/*  Duplicate for infinite effect  */}
-                    <div className="logo-item"><i className="fas fa-bed"></i> Luxury Suites</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-ring"></i> Scenic Weddings</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-laptop-house"></i> Corporate Offsites</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-landmark"></i> Heritage Living</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-glass-cheers"></i> Grand Banquets</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-video"></i> Modern AV Halls</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-star"></i> Boutique Stays</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
-                    <div className="logo-item"><i className="fas fa-spa"></i> Wellness Retreats</div>
-                    <div className="banner-divider"><svg viewBox="0 0 100 100"><use href="#peacock-feather"  /></svg></div>
+                    <div className="logo-item">DIVINE HOSPITALITY</div>
+                    <div className="logo-item">LUXURY SUITES</div>
+                    <div className="logo-item">WEDDINGS & CELEBRATIONS</div>
+                    <div className="logo-item">CORPORATE OFFSITES</div>
+                    <div className="logo-item">PREMIUM AV HALL</div>
+                    <div className="logo-item">SATTVIC DINING</div>
+                    <div className="logo-item">SPIRITUAL RETREATS</div>
+                    <div className="logo-item">VRINDAVAN EXPERIENCE</div>
+                    <div className="logo-item">DIVINE HOSPITALITY</div>
+                    <div className="logo-item">LUXURY SUITES</div>
+                    <div className="logo-item">WEDDINGS & CELEBRATIONS</div>
+                    <div className="logo-item">CORPORATE OFFSITES</div>
+                    <div className="logo-item">PREMIUM AV HALL</div>
+                    <div className="logo-item">SATTVIC DINING</div>
+                    <div className="logo-item">SPIRITUAL RETREATS</div>
+                    <div className="logo-item">VRINDAVAN EXPERIENCE</div>
                 </div>
             </div>
         </section>
@@ -481,10 +592,9 @@ export default function Home() {
             <div className="section-header">
                 <h2 className="divine-header">
                     <span className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
-                    <span className="divine-text">Exquisite Accommodations</span>
+                    <span className="divine-text">ROOMS AND SUITES</span>
                     <span className="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
                 </h2>
-                <p>Choose the perfect sanctuary for your stay.</p>
             </div>
             <div className="room-grid">
                 {/* Card 1 */}
@@ -569,9 +679,9 @@ export default function Home() {
                     <div className="room-content">
                         <h3>Deluxe 4 – 4 Bedded Room</h3>
                         <div className="room-amenities">
-                            <span><i className="fas fa-crown"></i> Four-Poster Bed</span>
-                            <span><i className="fas fa-user-tie"></i> Personal Attendant</span>
-                            <span><i className="fas fa-hot-tub"></i> Jacuzzi</span>
+                            <span><i className="fas fa-crown"></i> 4-Poster Bed</span>
+                            <span><i className="fas fa-bed"></i> Living Area</span>
+                            <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                         </div>
                         <Link href="/booking?roomType=deluxe4" className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></Link>
                     </div>

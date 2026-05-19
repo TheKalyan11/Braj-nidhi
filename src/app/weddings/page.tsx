@@ -1,10 +1,16 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import Link from 'next/link';
 import LoginModal from '@/components/LoginModal';
 
 export default function Weddings() {
+  const [heroImgIndex, setHeroImgIndex] = useState(0);
+  const heroImages = ["/DSC02591.webp", "/DSC06003-HDR.webp"];
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -33,6 +39,13 @@ export default function Weddings() {
   };
 
   useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroImgIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
     // Swiper initialization for subpages
     if (typeof window !== 'undefined' && (window as any).Swiper) {
       const swiperElements = document.querySelectorAll('.swiper');
@@ -49,6 +62,36 @@ export default function Weddings() {
       }
     }
   }, []);
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 30 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true },
+    transition: { duration: 0.8, ease: "easeOut" as const }
+  };
+
+  const slideInLeft = {
+    initial: { opacity: 0, x: -70 },
+    whileInView: { opacity: 1, x: 0 },
+    viewport: { once: true },
+    transition: { duration: 1, ease: "easeOut" as const }
+  };
+
+  const slideInRight = {
+    initial: { opacity: 0, x: 70 },
+    whileInView: { opacity: 1, x: 0 },
+    viewport: { once: true },
+    transition: { duration: 1, ease: "easeOut" as const }
+  };
+
+  const staggerContainer = {
+    initial: { opacity: 0 },
+    whileInView: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.2 }
+    },
+    viewport: { once: true }
+  };
 
   return (
     <div className="weddings-page">
@@ -773,7 +816,50 @@ export default function Weddings() {
             )}
             <a href="/booking" className="btn-book">Book Now</a>
         </div>
+
+        {/* Hamburger Toggle Button */}
+        <button 
+          className="mobile-menu-btn" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
     </header>
+
+    {/* Mobile Menu Drawer Overlay */}
+    {isMobileMenuOpen && (
+      <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
+        <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
+          <div className="mobile-menu-header">
+            <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto" }} />
+            <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
+              <X size={24} />
+            </button>
+          </div>
+          <div className="mobile-nav-links">
+            <ul>
+              <li><a href="/guesthouse" onClick={() => setIsMobileMenuOpen(false)}>Guesthouse</a></li>
+              <li><a href="/weddings" onClick={() => setIsMobileMenuOpen(false)}>Weddings</a></li>
+              <li><a href="/corporate" onClick={() => setIsMobileMenuOpen(false)}>Corporate</a></li>
+              <li><a href="/braj-yatra" onClick={() => setIsMobileMenuOpen(false)}>Braj Yatra</a></li>
+              <li><a href="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</a></li>
+            </ul>
+          </div>
+          <div className="mobile-menu-footer">
+            {isLoggedIn ? (
+              <div className="mobile-user-profile">
+                <span className="user-label">Braj Club Member</span>
+                <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
+                <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}>Logout</button>
+              </div>
+            ) : (
+              <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
+            )}
+            <a href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="btn-book" style={{ display: 'block', textAlign: 'center', marginTop: '4px' }}>Book Now</a>
+          </div>
+        </div>
+      </div>
+    )}
 
     <main>
         {/* Hero Section */}
@@ -782,42 +868,59 @@ export default function Weddings() {
                 <div className="hero-title-large">DIVINE CELEBRATIONS</div>
                 
                 <div className="hero-single-card">
-                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1200&auto=format&fit=crop" alt="Divine Weddings" />
-                    <div className="hero-single-content">
+                    <AnimatePresence>
+                        <motion.img 
+                            key={heroImgIndex}
+                            src={heroImages[heroImgIndex]}
+                            alt="Divine Weddings"
+                            initial={{ opacity: 0, scale: 1.1 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 1.5, ease: "easeInOut" }}
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                    </AnimatePresence>
+                    <motion.div 
+                        className="hero-single-content"
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, delay: 0.5 }}
+                    >
                         <h3>Your Divine Journey Begins</h3>
                         <p>Experience the spiritual heart of Vrindavan with our bespoke wedding venues and personalized services designed for your special day.</p>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         </section>
 
         {/* Weddings & Events Module */}
         <section id="weddings" className="module-section">
-            <div className="module-header">
+            <motion.div className="module-header" {...fadeInUp}>
                 <h2>Wedding Venues</h2>
                 <p>From intimate spiritual ceremonies to grand celebrations, our venues offer the perfect blend of heritage charm and modern luxury.</p>
-            </div>
+            </motion.div>
 
-            <div className="events-bento">
-                <div className="bento-item">
+            <motion.div className="events-bento" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+                <motion.div className="bento-item" variants={slideInLeft}>
                     <i className="fas fa-om"></i>
                     <h4>The Grand Courtyard</h4>
                     <p>An open-air venue perfect for traditional ceremonies under the stars. Accommodates up to 500 guests with customized mandap setups.</p>
-                </div>
-                <div className="bento-item">
+                </motion.div>
+                <motion.div className="bento-item" variants={fadeInUp}>
                     <i className="fas fa-glass-cheers"></i>
                     <h4>Royal Banquet</h4>
                     <p>A fully air-conditioned, pillar-less hall designed for grand receptions and sangeet nights. Premium acoustics and lighting included.</p>
-                </div>
-                <div className="bento-item">
+                </motion.div>
+                <motion.div className="bento-item" variants={slideInRight}>
                     <i className="fas fa-camera"></i>
                     <h4>Pre-Wedding Spaces</h4>
                     <p>Beautifully landscaped gardens and heritage architecture providing stunning backdrops for your pre-wedding photography.</p>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
-            <div className="packages-grid">
-                <div className="package-card">
+            <motion.div className="packages-grid" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+                <motion.div className="package-card" variants={slideInLeft}>
                     <div className="package-badge">Popular</div>
                     <h3>The Eternal Vows</h3>
                     <ul className="package-features">
@@ -828,9 +931,9 @@ export default function Weddings() {
                         <li><i className="fas fa-check"></i> Basic Sound & Lighting System</li>
                     </ul>
                     <a href="#inquiry" className="btn-outline" style={{"border":"2px solid #1a1a1a","padding":"15px 30px","textDecoration":"none","color":"#1a1a1a","fontWeight":"800","textTransform":"uppercase","display":"inline-block"}}>Request Quote</a>
-                </div>
+                </motion.div>
                 
-                <div className="package-card">
+                <motion.div className="package-card" variants={slideInRight}>
                     <h3>The Heritage Royale</h3>
                     <ul className="package-features">
                         <li><i className="fas fa-check"></i> Full Property Exclusive Access (2 Days)</li>
@@ -840,13 +943,13 @@ export default function Weddings() {
                         <li><i className="fas fa-check"></i> Dedicated Event Manager</li>
                     </ul>
                     <a href="#inquiry" className="btn-outline" style={{"border":"2px solid #1a1a1a","padding":"15px 30px","textDecoration":"none","color":"#1a1a1a","fontWeight":"800","textTransform":"uppercase","display":"inline-block"}}>Request Quote</a>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </section>
 
         {/* Culinary Excellence Split Section */}
-        <section className="split-section">
-            <div className="split-content">
+        <motion.section className="split-section" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+            <motion.div className="split-content" variants={slideInLeft}>
                 <h3>Sattvic Culinary Excellence</h3>
                 <p>Delight your guests with our exquisite, pure vegetarian catering. From traditional regional delicacies to global cuisines, our master chefs craft menus that are both divinely delicious and culturally respectful.</p>
                 <p>Experience interactive live counters, artisanal sweets, and customized wedding cakes, all prepared in our state-of-the-art hygienic kitchens without onion or garlic.</p>
@@ -855,48 +958,48 @@ export default function Weddings() {
                     <li><i className="fas fa-check"></i> Customized Menus & Live Counters</li>
                     <li><i className="fas fa-check"></i> Specialized Artisanal Sweets</li>
                 </ul>
-            </div>
-            <div className="split-image">
+            </motion.div>
+            <motion.div className="split-image" variants={slideInRight}>
                 <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop" alt="Fine Dining" />
-            </div>
-        </section>
+            </motion.div>
+        </motion.section>
 
         {/* Guest Accommodation Split Section (Reverse) */}
-        <section className="split-section reverse">
-            <div className="split-content">
+        <motion.section className="split-section reverse" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+            <motion.div className="split-content" variants={slideInRight}>
                 <h3>Luxury Guest Accommodation</h3>
                 <p>Ensure your family and friends experience the utmost comfort during your multi-day celebrations. Braj Nidhi offers premium rooms and expansive suites designed with spiritual luxury in mind.</p>
                 <p>Our dedicated hospitality team ensures seamless check-ins, personalized welcome hampers, and 24/7 room service for your esteemed guests.</p>
                 <a href="/guesthouse" className="btn-outline" style={{"border":"2px solid #1a1a1a","padding":"12px 25px","textDecoration":"none","color":"#1a1a1a","fontWeight":"800","textTransform":"uppercase","display":"inline-block","marginTop":"15px"}}>View Rooms & Suites</a>
-            </div>
-            <div className="split-image">
+            </motion.div>
+            <motion.div className="split-image" variants={slideInLeft}>
                 <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1000&auto=format&fit=crop" alt="Luxury Suites" />
-            </div>
-        </section>
+            </motion.div>
+        </motion.section>
 
         {/* Wedding Gallery */}
         <section className="module-section" style={{"paddingTop":"20px"}}>
-            <div className="module-header">
+            <motion.div className="module-header" {...fadeInUp}>
                 <h2>Moments of Magic</h2>
                 <p>A glimpse into the beautiful memories crafted at Braj Nidhi.</p>
-            </div>
-            <div className="gallery-grid">
-                <div className="gallery-item large">
+            </motion.div>
+            <motion.div className="gallery-grid" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
+                <motion.div className="gallery-item large" variants={fadeInUp}>
                     <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000&auto=format&fit=crop" alt="Wedding Couple" />
-                </div>
-                <div className="gallery-item">
+                </motion.div>
+                <motion.div className="gallery-item" variants={fadeInUp}>
                     <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1000&auto=format&fit=crop" alt="Wedding Decor" />
-                </div>
-                <div className="gallery-item tall">
+                </motion.div>
+                <motion.div className="gallery-item tall" variants={fadeInUp}>
                     <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop" alt="Wedding Ceremony" />
-                </div>
-                <div className="gallery-item">
+                </motion.div>
+                <motion.div className="gallery-item" variants={fadeInUp}>
                     <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop" alt="Wedding Mandap" />
-                </div>
-                <div className="gallery-item wide">
+                </motion.div>
+                <motion.div className="gallery-item wide" variants={fadeInUp}>
                     <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1000&auto=format&fit=crop" alt="Wedding Reception" />
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </section>
 
         {/* Amenities Auto-Scrolling Marquee */}
@@ -1126,7 +1229,13 @@ export default function Weddings() {
             <div className="inquiry-layout">
 
                 {/* Left Info Panel */}
-                <div className="inquiry-info-panel">
+                <motion.div 
+                    className="inquiry-info-panel"
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                >
                     <div className="inquiry-eyebrow"><i className="fas fa-ring"></i> Wedding Inquiries</div>
                     <h2>Plan Your Wedding</h2>
                     <p>Let us help you craft an unforgettable, divine celebration. Share your vision and our wedding experts will reach out within 24 hours.</p>
@@ -1158,10 +1267,16 @@ export default function Weddings() {
                     <a href="#" className="inquiry-download-link">
                         <i className="fas fa-file-pdf"></i> Download Wedding Brochure
                     </a>
-                </div>
+                </motion.div>
 
                 {/* Right Form Card */}
-                <div className="inquiry-form-card">
+                <motion.div 
+                    className="inquiry-form-card"
+                    initial={{ opacity: 0, x: 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                >
                     <div className="form-card-title">Fill in Your Details</div>
                     <form className="inquiry-form">
                         <div className="form-group">
@@ -1203,7 +1318,7 @@ export default function Weddings() {
                         <button type="submit">Send Inquiry <i className="fas fa-paper-plane"></i></button>
                     </form>
                     <p className="form-footer-note"><i className="fas fa-lock"></i> Your information is secure and confidential</p>
-                </div>
+                </motion.div>
 
             </div>
         </section>

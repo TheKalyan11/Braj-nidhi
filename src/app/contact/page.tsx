@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import NearbyAttractions from "@/components/NearbyAttractions";
 import FloatingWidgets from "@/components/FloatingWidgets";
 import LoginModal from "@/components/LoginModal";
@@ -18,6 +19,7 @@ const visitRows = [
 ];
 
 export default function Contact() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');

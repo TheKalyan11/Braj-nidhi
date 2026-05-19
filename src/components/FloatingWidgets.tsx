@@ -48,7 +48,7 @@ export default function FloatingWidgets() {
       {/* Left Floating Social Stack: Instagram (top) → WhatsApp (middle) → Music (bottom) */}
       <div className="float-social-stack">
         <a
-          href="https://www.instagram.com/brajnidhi/"
+          href="https://www.instagram.com/braj.nidhi_/"
           target="_blank"
           rel="noopener noreferrer"
           className="float-btn float-instagram"
