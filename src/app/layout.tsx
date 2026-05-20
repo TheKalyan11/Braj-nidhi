@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: "Experience the divine and royal hospitality at Braj Nidhi Guesthouse, located in the heart of Vrindavan near Bankey Bihari Temple.",
 };
 
+import LoadingTransition from "@/components/LoadingTransition";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,6 +27,7 @@ export default function RootLayout({
         <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js" async></script>
       </head>
       <body className="index-page antialiased">
+        <LoadingTransition />
         {children}
       </body>
     </html>

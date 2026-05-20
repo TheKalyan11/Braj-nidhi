@@ -153,27 +153,64 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).Swiper) {
-      new (window as any).Swiper('.gallery-slider', {
-        effect: 'coverflow',
-        grabCursor: true,
-        centeredSlides: true,
-        slidesPerView: 'auto',
-        loop: true,
-        autoplay: { delay: 2000, disableOnInteraction: false },
-        coverflowEffect: { rotate: 0, stretch: 0, depth: 100, modifier: 2, slideShadows: true },
-        navigation: { nextEl: '.swiper-button-next-custom', prevEl: '.swiper-button-prev-custom' },
-      });
-      new (window as any).Swiper('.testimonials-slider', {
-        slidesPerView: 'auto',
-        spaceBetween: 24,
-        loop: true,
-        speed: 5000,
-        autoplay: { delay: 0, disableOnInteraction: false },
-        grabCursor: true,
-        freeMode: true,
-      });
+    let gallerySwiper: any;
+    let testimonialsSwiper: any;
+    let checkInterval: any;
+
+    const initSwiper = () => {
+      if (typeof window !== 'undefined' && (window as any).Swiper) {
+        try {
+          gallerySwiper = new (window as any).Swiper('.gallery-slider', {
+            effect: 'coverflow',
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: 'auto',
+            loop: true,
+            autoplay: { delay: 2000, disableOnInteraction: false },
+            coverflowEffect: { rotate: 0, stretch: 0, depth: 100, modifier: 2, slideShadows: true },
+            navigation: { nextEl: '.swiper-button-next-custom', prevEl: '.swiper-button-prev-custom' },
+            observer: true,
+            observeParents: true,
+          });
+          testimonialsSwiper = new (window as any).Swiper('.testimonials-slider', {
+            slidesPerView: 'auto',
+            spaceBetween: 24,
+            loop: true,
+            speed: 5000,
+            autoplay: { delay: 0, disableOnInteraction: false },
+            grabCursor: true,
+            freeMode: true,
+            observer: true,
+            observeParents: true,
+          });
+        } catch (e) {
+          console.error("Error initializing Swiper:", e);
+        }
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      if ((window as any).Swiper) {
+        initSwiper();
+      } else {
+        checkInterval = setInterval(() => {
+          if ((window as any).Swiper) {
+            clearInterval(checkInterval);
+            initSwiper();
+          }
+        }, 100);
+      }
     }
+
+    return () => {
+      if (checkInterval) clearInterval(checkInterval);
+      try {
+        if (gallerySwiper && typeof gallerySwiper.destroy === 'function') gallerySwiper.destroy(true, false);
+        if (testimonialsSwiper && typeof testimonialsSwiper.destroy === 'function') testimonialsSwiper.destroy(true, false);
+      } catch (e) {
+        console.error("Error destroying Swiper:", e);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -754,235 +791,44 @@ export default function Home() {
                 </div>
             </div>
         </section>
-        
-        {/*  Nearby Attractions Section  */}
-        <section className="attractions-section">
-            <div className="section-header">
-                <h2 className="divine-header">
-                    <span className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
-                    <span className="divine-text">Nearby Attractions</span>
-                    <span className="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
-                </h2>
-                <p>Discover the divine landmarks and heritage sites around Braj Nidhi. <span className="click-hint">(Click any card to flip for location)</span></p>
-            </div>
-            <div className="attractions-grid">
-                {/*  Attraction 1  */}
-                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
-                    <div className="flip-card-inner">
-                        <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Banke_Bihari_Vrindavan.jpg/960px-Banke_Bihari_Vrindavan.jpg" alt="Banke Bihari Temple" className="attraction-bg" />
-                            <div className="card-overlay-gradient"></div>
-                            <div className="distance-pill">3.69 km</div>
-                            <div className="attraction-content">
-                                <div className="title-row">
-                                    <h3>Banke Bihari Temple</h3>
-                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
-                                </div>
-                                <div className="location-line">
-                                    <i className="fas fa-map-marker-alt"></i>
-                                    <span>Bihari Pura, Vrindavan</span>
-                                </div>
-                                <div className="flip-hint-text">
-                                    <i className="fas fa-sync-alt"></i> Click for Map
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flip-card-back">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6974793!3d27.5815647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736fc201c10711%3A0xbcc1c54b2ce8f41e!2sShri%20Bankey%20Bihari%20Ji%20Temple%2C%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
-                        </div>
-                    </div>
-                </div>
 
-                {/*  Attraction 2  */}
-                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
-                    <div className="flip-card-inner">
-                        <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/PremMandirSideViewFromCanteen.jpg/960px-PremMandirSideViewFromCanteen.jpg" alt="Prem Mandir" className="attraction-bg" />
-                            <div className="card-overlay-gradient"></div>
-                            <div className="distance-pill">0.69 km</div>
-                            <div className="attraction-content">
-                                <div className="title-row">
-                                    <h3>Prem Mandir</h3>
-                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 5.0</span>
-                                </div>
-                                <div className="location-line">
-                                    <i className="fas fa-map-marker-alt"></i>
-                                    <span>Chattikara Road, Vrindavan</span>
-                                </div>
-                                <div className="flip-hint-text">
-                                    <i className="fas fa-sync-alt"></i> Click for Map
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flip-card-back">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6774793!3d27.5615647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPrem%20Mandir!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
-                        </div>
-                    </div>
+        {/* About Hotel Section */}
+        <section className="about-hotel-section">
+            <div className="about-hotel-container">
+                <div className="about-hotel-title-wrapper">
+                    <h2 className="about-hotel-title">BRAJ NIDHI GUESTHOUSE</h2>
                 </div>
-
-                {/*  Attraction 3  */}
-                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
-                    <div className="flip-card-inner">
-                        <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Iskon_Temple%2C_Vrindawan.jpg/960px-Iskon_Temple%2C_Vrindawan.jpg" alt="ISKCON Temple" className="attraction-bg" />
-                            <div className="card-overlay-gradient"></div>
-                            <div className="distance-pill">1.20 km</div>
-                            <div className="attraction-content">
-                                <div className="title-row">
-                                    <h3>ISKCON Vrindavan</h3>
-                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.8</span>
-                                </div>
-                                <div className="location-line">
-                                    <i className="fas fa-map-marker-alt"></i>
-                                    <span>Raman Reti, Vrindavan</span>
-                                </div>
-                                <div className="flip-hint-text">
-                                    <i className="fas fa-sync-alt"></i> Click for Map
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flip-card-back">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6874793!3d27.5715647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sISKCON%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
-                        </div>
+                <div className="about-hotel-content">
+                    <div className="about-hotel-text">
+                        <p>Situated about 25 minutes' walk from the Gaudiya Vaishnava Krishna Balaram Temple Complex, Braj Nidhi Guesthouse offers a peaceful sanctuary with a range of modern amenities. The guesthouse features cars for rent, as well as Wi-Fi in public areas.</p>
+                        <p>The Pagal Baba Temple is 2.5 km away, and the Shri Radha Vallabh Temple is 2.9 km from this Vrindavan stay. Religious sights in the area include the Shri Rang Ji Temple (3.9 km) and the Vrindavan Chandrodaya Mandir (2.1 km). You will find the Braj Nidhi Guesthouse 75 km from Agra airport.</p>
+                        <p>Offering a multi-channel TV, the rooms come with air conditioning to ensure a comfortable stay. Also, there is a personal safe, a minibar fridge and coffee/tea making facilities provided. Bathroom amenities include a modern shower and separate toilet, along with premium comforts.</p>
+                        <p>The Guesthouse features a daily continental breakfast. You can visit our in-house restaurant for breakfast and eat authentic vegetarian dishes. Offering city views, an Indian restaurant is located onsite. There are also various dining options serving multiple cuisines approximately a 5-minute walk away.</p>
                     </div>
-                </div>
-
-                {/*  Attraction 4  */}
-                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
-                    <div className="flip-card-inner">
-                        <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Nidhivan.jpg/960px-Nidhivan.jpg" alt="Nidhivan" className="attraction-bg" />
-                            <div className="card-overlay-gradient"></div>
-                            <div className="distance-pill">3.55 km</div>
-                            <div className="attraction-content">
-                                <div className="title-row">
-                                    <h3>Nidhivan</h3>
-                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.7</span>
-                                </div>
-                                <div className="location-line">
-                                    <i className="fas fa-map-marker-alt"></i>
-                                    <span>Goshala Nagar, Vrindavan</span>
-                                </div>
-                                <div className="flip-hint-text">
-                                    <i className="fas fa-sync-alt"></i> Click for Map
-                                </div>
-                            </div>
+                    <div className="about-hotel-amenities">
+                        <div className="amenity-card">
+                            <i className="fa-solid fa-wifi"></i>
+                            <span>Free Wi-Fi in rooms</span>
                         </div>
-                        <div className="flip-card-back">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6984793!3d27.5825647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNidhivan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        <div className="amenity-card">
+                            <i className="fa-solid fa-car"></i>
+                            <span>Valet parking</span>
                         </div>
-                    </div>
-                </div>
-
-                {/*  Attraction 5  */}
-                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
-                    <div className="flip-card-inner">
-                        <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Radha_Raman_Temple_2.jpg/960px-Radha_Raman_Temple_2.jpg" alt="Radha Raman Temple" className="attraction-bg" />
-                            <div className="card-overlay-gradient"></div>
-                            <div className="distance-pill">3.45 km</div>
-                            <div className="attraction-content">
-                                <div className="title-row">
-                                    <h3>Radha Raman Temple</h3>
-                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
-                                </div>
-                                <div className="location-line">
-                                    <i className="fas fa-map-marker-alt"></i>
-                                    <span>Pancayatana, Vrindavan</span>
-                                </div>
-                                <div className="flip-hint-text">
-                                    <i className="fas fa-sync-alt"></i> Click for Map
-                                </div>
-                            </div>
+                        <div className="amenity-card">
+                            <i className="fa-solid fa-clock"></i>
+                            <span>24-hour reception</span>
                         </div>
-                        <div className="flip-card-back">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6994793!3d27.5835647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRadha%20Raman%20Temple!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        <div className="amenity-card">
+                            <i className="fa-solid fa-bell-concierge"></i>
+                            <span>Express check-in/ -out</span>
                         </div>
-                    </div>
-                </div>
-
-                {/*  Attraction 6  */}
-                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
-                    <div className="flip-card-inner">
-                        <div className="flip-card-front">
-                            <img src="neem_karoli.png" alt="Neem Karoli Ashram" className="attraction-bg" />
-                            <div className="card-overlay-gradient"></div>
-                            <div className="distance-pill">2.72 km</div>
-                            <div className="attraction-content">
-                                <div className="title-row">
-                                    <h3>Neem Karoli Ashram</h3>
-                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
-                                </div>
-                                <div className="location-line">
-                                    <i className="fas fa-map-marker-alt"></i>
-                                    <span>Mathura Road, Vrindavan</span>
-                                </div>
-                                <div className="flip-hint-text">
-                                    <i className="fas fa-sync-alt"></i> Click for Map
-                                </div>
-                            </div>
+                        <div className="amenity-card">
+                            <i className="fa-solid fa-utensils"></i>
+                            <span>Restaurant</span>
                         </div>
-                        <div className="flip-card-back">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6914793!3d27.5845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNeem%20Karoli%20Baba%20Ashram!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/*  Attraction 7  */}
-                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
-                    <div className="flip-card-inner">
-                        <div className="flip-card-front">
-                            <img src="raman_reti.png" alt="Raman Reti" className="attraction-bg" />
-                            <div className="card-overlay-gradient"></div>
-                            <div className="distance-pill">15.39 km</div>
-                            <div className="attraction-content">
-                                <div className="title-row">
-                                    <h3>Raman Reti</h3>
-                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.8</span>
-                                </div>
-                                <div className="location-line">
-                                    <i className="fas fa-map-marker-alt"></i>
-                                    <span>Gokul, Uttar Pradesh</span>
-                                </div>
-                                <div className="flip-hint-text">
-                                    <i className="fas fa-sync-alt"></i> Click for Map
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flip-card-back">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.7214793!3d27.4845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRaman%20Reti!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/*  Attraction 8  */}
-                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
-                    <div className="flip-card-inner">
-                        <div className="flip-card-front">
-                            <img src="nand_baba.webp" alt="Shri Nand Baba Temple" className="attraction-bg" />
-                            <div className="card-overlay-gradient"></div>
-                            <div className="distance-pill">31.64 km</div>
-                            <div className="attraction-content">
-                                <div className="title-row">
-                                    <h3>Shri Nand Baba Temple</h3>
-                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
-                                </div>
-                                <div className="location-line">
-                                    <i className="fas fa-map-marker-alt"></i>
-                                    <span>Nandgaon, Mathura</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flip-card-back">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.4214793!3d27.7845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sShri%20Nand%20Baba%20Temple!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        <div className="amenity-card">
+                            <i className="fa-solid fa-briefcase"></i>
+                            <span>Meeting/ Banquet facilities</span>
                         </div>
                     </div>
                 </div>
@@ -997,22 +843,31 @@ export default function Home() {
             <div className="gallery-slider swiper">
                 <div className="swiper-wrapper">
                     <div className="swiper-slide">
-                        <img src="images/temple_darshan.png" alt="Temple Darshan" />
+                        <img src="/hero.png" alt="Braj Nidhi Hero View" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="images/luxurious_stay.png" alt="Luxurious Stays" />
+                        <img src="/DSC09672.webp" alt="Gallery View 1" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="images/sacred_gardens.png" alt="Divine Gardens" />
+                        <img src="/DSC09652.JPG" alt="Gallery View 2" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="images/spiritual_workshop.png" alt="Spiritual Workshops" />
+                        <img src="/DSC02591.JPG" alt="Gallery View 3" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="images/evening_aarti.png" alt="Evening Aarti" />
+                        <img src="/DSC06003-HDR.png" alt="Gallery View 4" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="images/heritage_architecture.png" alt="Heritage Architecture" />
+                        <img src="/DSC05963-HDR.webp" alt="Gallery View 5" />
+                    </div>
+                    <div className="swiper-slide">
+                        <img src="/d3.webp" alt="Gallery View 6" />
+                    </div>
+                    <div className="swiper-slide">
+                        <img src="/351.png" alt="Gallery View 7" />
+                    </div>
+                    <div className="swiper-slide">
+                        <img src="/352.png" alt="Gallery View 8" />
                     </div>
                 </div>
                 {/*  Navigation Buttons  */}
@@ -1224,6 +1079,241 @@ export default function Home() {
             </div>
         </section>
 
+
+
+        {/*  Nearby Attractions Section  */}
+        <section className="attractions-section">
+            <div className="section-header">
+                <h2 className="divine-header">
+                    <span className="krishna-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
+                    <span className="divine-text">Nearby Attractions</span>
+                    <span className="krishna-feather right-feather"><svg viewBox="0 0 100 100"><use href="#krishna-flute-feather"  /></svg></span>
+                </h2>
+                <p>Discover the divine landmarks and heritage sites around Braj Nidhi. <span className="click-hint">(Click any card to flip for location)</span></p>
+            </div>
+            <div className="attractions-grid">
+                {/*  Attraction 1  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Banke_Bihari_Vrindavan.jpg/960px-Banke_Bihari_Vrindavan.jpg" alt="Banke Bihari Temple" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">3.69 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Banke Bihari Temple</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Bihari Pura, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6974793!3d27.5815647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736fc201c10711%3A0xbcc1c54b2ce8f41e!2sShri%20Bankey%20Bihari%20Ji%20Temple%2C%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 2  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/PremMandirSideViewFromCanteen.jpg/960px-PremMandirSideViewFromCanteen.jpg" alt="Prem Mandir" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">0.69 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Prem Mandir</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 5.0</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Chattikara Road, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6774793!3d27.5615647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPrem%20Mandir!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 3  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Iskon_Temple%2C_Vrindawan.jpg/960px-Iskon_Temple%2C_Vrindawan.jpg" alt="ISKCON Temple" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">1.20 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>ISKCON Vrindavan</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.8</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Raman Reti, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6874793!3d27.5715647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sISKCON%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 4  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Nidhivan.jpg/960px-Nidhivan.jpg" alt="Nidhivan" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">3.55 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Nidhivan</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.7</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Goshala Nagar, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6984793!3d27.5825647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNidhivan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 5  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Radha_Raman_Temple_2.jpg/960px-Radha_Raman_Temple_2.jpg" alt="Radha Raman Temple" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">3.45 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Radha Raman Temple</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Pancayatana, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6994793!3d27.5835647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRadha%20Raman%20Temple!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 6  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="/neem_karoli.png" alt="Neem Karoli Ashram" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">2.72 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Neem Karoli Ashram</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Mathura Road, Vrindavan</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6914793!3d27.5845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNeem%20Karoli%20Baba%20Ashram!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 7  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="/raman_reti.png" alt="Raman Reti" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">15.39 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Raman Reti</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.8</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Gokul, Uttar Pradesh</span>
+                                </div>
+                                <div className="flip-hint-text">
+                                    <i className="fas fa-sync-alt"></i> Click for Map
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.7214793!3d27.4845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRaman%20Reti!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 8  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img src="/nand_baba.webp" alt="Shri Nand Baba Temple" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">31.64 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Shri Nand Baba Temple</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Nandgaon, Mathura</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.4214793!3d27.7845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sShri%20Nand%20Baba%20Temple!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
 
         {/*  CTA Section  */}

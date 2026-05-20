@@ -31,6 +31,11 @@ body {
     overflow-x: hidden;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Bebas Neue', cursive !important;
+    font-weight: 400 !important;
+}
+
 /* --- Header --- */
 header {
     position: fixed;
@@ -87,6 +92,32 @@ header.scrolled .btn-book:hover {
     color: #ffffff;
 }
 
+header.scrolled .btn-login {
+    background: rgba(0, 0, 0, 0.07);
+    color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow:
+        0 2px 16px rgba(0, 0, 0, 0.08),
+        0 1.5px 0 0 rgba(255, 255, 255, 0.7) inset,
+        0 -1px 0 0 rgba(0, 0, 0, 0.06) inset,
+        2px 0 0 0 rgba(255, 255, 255, 0.4) inset,
+        -2px 0 0 0 rgba(255, 255, 255, 0.4) inset;
+}
+
+header.scrolled .btn-login:hover {
+    background: rgba(0, 0, 0, 0.13);
+    border-color: rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow:
+        0 6px 24px rgba(0, 0, 0, 0.12),
+        0 1.5px 0 0 rgba(255, 255, 255, 0.8) inset,
+        0 -1px 0 0 rgba(0, 0, 0, 0.08) inset,
+        2px 0 0 0 rgba(255, 255, 255, 0.5) inset,
+        -2px 0 0 0 rgba(255, 255, 255, 0.5) inset;
+}
+
 .logo {
     font-size: 1.8rem;
     font-weight: 700;
@@ -108,8 +139,10 @@ nav ul {
 nav ul li a {
     text-decoration: none;
     color: #000000;
-    font-weight: 500;
-    font-size: 0.95rem;
+    font-family: 'Bebas Neue', cursive;
+    font-weight: 400;
+    font-size: 1.25rem;
+    letter-spacing: 0.05em;
     transition: var(--transition);
     position: relative;
 }
@@ -155,8 +188,10 @@ header.scrolled nav ul li a:hover {
     padding: 12px 28px;
     border-radius: 50px;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-family: 'Bebas Neue', cursive;
+    font-weight: 400;
+    font-size: 1.25rem;
+    letter-spacing: 0.05em;
     transition: var(--transition);
 }
 
@@ -166,25 +201,66 @@ header.scrolled nav ul li a:hover {
 }
 
 .btn-login {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.15);
     color: #000000;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.45);
     padding: 12px 24px;
     border-radius: 50px;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: var(--transition);
+    font-family: 'Bebas Neue', cursive;
+    font-weight: 400;
+    font-size: 1.25rem;
+    letter-spacing: 0.05em;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    box-shadow:
+        0 4px 20px rgba(255, 255, 255, 0.18),
+        0 1.5px 0 0 rgba(255, 255, 255, 0.55) inset,
+        0 -1px 0 0 rgba(255, 255, 255, 0.1) inset,
+        2px 0 0 0 rgba(255, 255, 255, 0.15) inset,
+        -2px 0 0 0 rgba(255, 255, 255, 0.15) inset;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -80%;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.5) 50%,
+        transparent 100%
+    );
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+    pointer-events: none;
+    border-radius: 50px;
+}
+
+.btn-login:hover::before {
+    left: 135%;
 }
 
 .btn-login:hover {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: #000000;
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.28);
+    border-color: rgba(255, 255, 255, 0.7);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow:
+        0 8px 32px rgba(255, 255, 255, 0.25),
+        0 1.5px 0 0 rgba(255, 255, 255, 0.7) inset,
+        0 -1px 0 0 rgba(255, 255, 255, 0.15) inset,
+        2px 0 0 0 rgba(255, 255, 255, 0.2) inset,
+        -2px 0 0 0 rgba(255, 255, 255, 0.2) inset;
 }
 
 .user-profile-badge {
@@ -313,7 +389,8 @@ header.scrolled nav ul li a:hover {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    transition: transform 10s ease-out;
+    transition: transform 15s ease-out, opacity 1.8s ease-in-out;
+    will-change: opacity, transform;
 }
 
 .hero-content {
@@ -739,7 +816,7 @@ header.scrolled nav ul li a:hover {
     font-family: 'Bebas Neue', cursive;
     font-size: 3.4rem;
     color: #1a1a1a;
-    font-weight: 700;
+    font-weight: 400;
     margin-bottom: 15px;
     text-transform: uppercase;
     letter-spacing: 0.16em;
@@ -757,10 +834,10 @@ header.scrolled nav ul li a:hover {
     font-family: 'Bebas Neue', cursive;
     font-size: 3.4rem;
     letter-spacing: 0.18em;
-    color: #777777;
     text-transform: uppercase;
-    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.12);
     display: inline-block;
+    color: #d4af37; /* Solid gold color */
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .krishna-feather {
@@ -1480,6 +1557,7 @@ header.scrolled nav ul li a:hover {
     50% { transform: rotate(-2deg) scale(1.05); opacity: 1; }
     100% { transform: rotate(-2deg) scale(0.95); opacity: 0.8; }
 }
+
 
 .flip-hint-text {
     margin-top: 15px;
@@ -2773,4 +2851,287 @@ header.scrolled nav ul li a:hover {
     }
 }
 
+/* About Hotel Section */
+.about-hotel-section {
+    background-color: #ffffff;
+    padding: 60px 8%;
+    font-family: Arial, sans-serif;
+}
 
+.about-hotel-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+/* Chat Window */
+.chat-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 500px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-window.active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.chat-header {
+    background: #1a1a1a;
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-header .bot-img {
+    width: 40px;
+    height: 40px;
+    background: #e95d35;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.chat-header h4 {
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.chat-header span {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: #fdfbf7;
+}
+
+.msg {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.msg.bot {
+    align-self: flex-start;
+    background: #fff;
+    border: 1px solid #eee;
+    color: #333;
+    border-bottom-left-radius: 2px;
+}
+
+.msg.user {
+    align-self: flex-end;
+    background: #e95d35;
+    color: #fff;
+    border-bottom-right-radius: 2px;
+}
+
+.chat-input {
+    padding: 15px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.chat-input button {
+    background: #e95d35;
+    color: #fff;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.chat-input button:hover {
+    background: #d14d2a;
+}
+
+/* Dark page adjustments */
+.index-page .music-btn {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* Custom Select Styling */
+.custom-select-container { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 12px; position: relative; cursor: pointer; transition: all 0.3s ease; } .custom-select-container:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--gold); } .custom-select-container label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; pointer-events: none; } .custom-select-trigger { display: flex; justify-content: space-between; align-items: center; color: var(--white); font-weight: 500; font-size: 1rem; } .custom-select-trigger i { font-size: 0.8rem; color: var(--gold); transition: transform 0.3s ease; } .custom-select-trigger.active i { transform: rotate(180deg); } .custom-options { position: absolute; top: 105%; left: 0; right: 0; background: #1a1a1a; border: 1px solid var(--glass-border); border-radius: 12px; z-index: 1000; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.8); animation: slideDown 0.3s ease; } @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } } .custom-option { padding: 12px 15px; font-size: 0.95rem; transition: all 0.2s ease; color: var(--white); } .custom-option:hover { background: rgba(255, 255, 255, 0.1); color: var(--gold); } .custom-option.selected { background: rgba(212, 175, 55, 0.2); color: var(--gold); border-left: 3px solid var(--gold); }
+
+.image-grid:hover .main-img { transform: scale(1.02); }
+.image-grid:hover .secondary-img { transform: scale(1.05) translateY(-10px); }
+
+/* Typing Indicator Bubble */
+.typing-indicator-bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 18px !important;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 15px;
+    width: fit-content;
+    align-self: flex-start;
+}
+
+.typing-indicator-bubble .dot {
+    width: 6px;
+    height: 6px;
+    background-color: #666;
+    border-radius: 50%;
+    display: inline-block;
+    animation: typingBlink 1.4s infinite both;
+}
+
+.typing-indicator-bubble .dot:nth-child(2) {
+    animation-delay: .2s;
+}
+
+.typing-indicator-bubble .dot:nth-child(3) {
+    animation-delay: .4s;
+}
+
+@keyframes typingBlink {
+    0% {
+        opacity: .2;
+        transform: scale(0.8);
+    }
+    20% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: .2;
+        transform: scale(0.8);
+    }
+}
+
+/* About Hotel Section */
+.about-hotel-section {
+    background-color: #ffffff;
+    padding: 60px 8%;
+    font-family: Arial, sans-serif;
+}
+
+.about-hotel-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.about-hotel-title-wrapper {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.about-hotel-title {
+    font-size: 2.2rem;
+    color: #2d3748;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Bebas Neue', cursive;
+    font-weight: 400;
+}
+
+.about-hotel-content {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.about-hotel-text {
+    flex: 1.2;
+    color: #718096;
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+.about-hotel-text p {
+    margin-bottom: 20px;
+}
+
+.about-hotel-amenities {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.amenity-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 30px 15px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.amenity-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.amenity-card i {
+    font-size: 2.2rem;
+    color: #dca838;
+    margin-bottom: 18px;
+}
+
+.amenity-card span {
+    font-size: 0.9rem;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .about-hotel-content {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    .about-hotel-amenities {
+        grid-template-columns: 1fr;
+    }
+}
