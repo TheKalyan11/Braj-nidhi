@@ -1772,7 +1772,7 @@ export default function Guesthouse() {
     
     <AnimatePresence>
         {isLoginModalOpen && (
-            <LoginModal onClose={() => setIsLoginModalOpen(false)} />
+            <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
         )}
     </AnimatePresence>
 
