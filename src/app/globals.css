@@ -3135,3 +3135,1237 @@ header.scrolled nav ul li a:hover {
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================================
+   MOBILE-FIRST STYLES — comprehensive overrides
+   ============================================================ */
+
+/* --- Mobile Drawer Menu --- */
+.mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.mobile-menu-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 85vw;
+    max-width: 340px;
+    height: 100dvh;
+    background: #ffffff;
+    z-index: 2001;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -20px 0 60px rgba(0, 0, 0, 0.2);
+    animation: slideInRight 0.32s cubic-bezier(0.23, 1, 0.32, 1);
+    overflow-y: auto;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+}
+
+.mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.mobile-menu-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #1a1a1a;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.mobile-menu-close:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.mobile-nav-links {
+    flex: 1;
+    padding: 24px 22px 12px;
+}
+
+.mobile-nav-links ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.mobile-nav-links ul li a {
+    display: block;
+    padding: 16px 0;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.6rem;
+    letter-spacing: 0.08em;
+    color: #1a1a1a;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    transition: color 0.2s, padding-left 0.2s;
+}
+
+.mobile-nav-links ul li a:hover {
+    color: #d4af37;
+    padding-left: 8px;
+}
+
+.mobile-menu-footer {
+    padding: 20px 22px 30px;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mobile-user-profile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+/* --- Luxury Search Bar — mobile stacking --- */
+@media (max-width: 768px) {
+    .luxury-search-container {
+        bottom: 24px;
+        width: 94%;
+    }
+
+    .luxury-search-bar {
+        flex-direction: column;
+        border-radius: 24px;
+        padding: 6px;
+        gap: 0;
+    }
+
+    .search-block {
+        width: 100%;
+        padding: 14px 18px;
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    }
+
+    .search-block:last-of-type {
+        border-bottom: none;
+    }
+
+    .search-block.active-dark {
+        border-radius: 18px 18px 0 0;
+        flex: unset;
+    }
+
+    .search-action-block {
+        width: 100%;
+        justify-content: space-between;
+        padding: 12px 18px;
+        border-top: 1px solid rgba(0, 0, 0, 0.07);
+    }
+
+    .search-circle-button {
+        width: 48px;
+        height: 48px;
+        font-size: 1rem;
+    }
+
+    .block-value {
+        white-space: normal;
+    }
+
+    .search-label-above {
+        margin-left: 8px;
+        font-size: 0.75rem;
+    }
+}
+
+/* --- Hero --- */
+@media (max-width: 768px) {
+    .hero {
+        padding-top: 100px;
+        min-height: 100svh;
+    }
+
+    .hero-content {
+        margin-top: 0;
+        padding: 0 5%;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem !important;
+        line-height: 1.15;
+    }
+
+    .hero-content p {
+        font-size: 0.9rem;
+    }
+}
+
+/* --- Section Headers --- */
+@media (max-width: 768px) {
+    .section-header h2 {
+        font-size: 2rem !important;
+        letter-spacing: 0.08em;
+    }
+
+    .section-header p {
+        font-size: 0.95rem;
+    }
+
+    .divine-text {
+        font-size: 2rem !important;
+    }
+
+    .content-box h2 {
+        font-size: 2rem !important;
+    }
+
+    .faq-left h2 {
+        font-size: 2rem !important;
+    }
+
+    .stat-item h2,
+    .stat-item span {
+        font-size: 2rem !important;
+    }
+
+    .stat-item p {
+        font-size: 0.8rem;
+    }
+}
+
+/* --- Room / Offer Cards --- */
+@media (max-width: 768px) {
+    .room-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .room-card.new-style {
+        height: 360px;
+        border-radius: 24px;
+    }
+
+    .offers-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .offer-card.immersive {
+        height: 300px;
+    }
+}
+
+/* --- Split / About Sections --- */
+@media (max-width: 1024px) {
+    .image-grid {
+        height: 320px !important;
+    }
+
+    .content-box {
+        padding-right: 0 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .image-grid {
+        height: 260px !important;
+    }
+
+    .split-container {
+        gap: 30px !important;
+    }
+
+    .room-types-section,
+    .about-section,
+    .offers-section {
+        padding: 40px 5%;
+    }
+}
+
+/* --- Promo Sections (Guesthouse) --- */
+@media (max-width: 768px) {
+    .promo-section-1,
+    .promo-section-2 {
+        flex-direction: column;
+        padding: 50px 5%;
+        gap: 36px;
+    }
+
+    .promo-col-center img,
+    .promo2-col-right > img {
+        height: 260px !important;
+        border-radius: 16px;
+    }
+
+    .promo2-price-badge {
+        position: static;
+        width: 100%;
+        margin-top: 16px;
+    }
+
+    .promo-col-right h2,
+    .promo2-col-left h2 {
+        font-size: 2rem;
+    }
+}
+
+/* --- Gallery & Testimonials --- */
+@media (max-width: 768px) {
+    .gallery-slider .swiper-slide,
+    .testimonials-slider .swiper-slide {
+        width: 85vw !important;
+    }
+
+    .gallery-section,
+    .testimonials-section {
+        padding: 40px 0;
+    }
+
+    .center-header h2 {
+        font-size: 2rem !important;
+    }
+
+    .gallery-header h2 {
+        font-size: 2rem;
+    }
+}
+
+/* --- FAQ Section --- */
+@media (max-width: 768px) {
+    .faq-container {
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    .faq-right {
+        width: 100%;
+    }
+}
+
+/* --- CTA Section --- */
+@media (max-width: 768px) {
+    .cta-section {
+        padding: 60px 5%;
+    }
+
+    .cta-content h1 {
+        font-size: 2rem !important;
+    }
+}
+
+/* --- Footer --- */
+@media (max-width: 768px) {
+    .footer-top-links {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 30px 20px;
+    }
+
+    .site-footer {
+        padding: 50px 5% 30px;
+    }
+
+    .footer-massive-text {
+        font-size: 18vw !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-top-links {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* --- Chat Window --- */
+.chat-window {
+    width: calc(100vw - 40px) !important;
+    max-width: 380px !important;
+}
+
+/* --- About Hotel Section --- */
+@media (max-width: 768px) {
+    .about-hotel-section {
+        padding: 40px 5%;
+    }
+
+    .about-hotel-title {
+        font-size: 1.6rem !important;
+    }
+
+    .about-hotel-amenities {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* --- Stats Container --- */
+@media (max-width: 768px) {
+    .stats-container {
+        padding: 40px 5%;
+        gap: 32px;
+    }
+}
+
+/* --- Guesthouse Bento Grid --- */
+@media (max-width: 768px) {
+    .hero-bento-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .bento-yellow {
+        margin-top: 0 !important;
+        grid-column: unset !important;
+    }
+
+    .hero-main-img-wrap {
+        height: 280px !important;
+    }
+
+    .hero-title-large {
+        font-size: 1.4rem !important;
+        margin-bottom: 0 !important;
+    }
+
+    .guesthouse-hero {
+        padding: 100px 0 40px 0 !important;
+    }
+
+    .featured-rooms-grid,
+    .suite-cards-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .featured-room-card {
+        max-width: 100% !important;
+    }
+}
+
+/* --- Header scrolled pill on mobile --- */
+@media (max-width: 768px) {
+    header.scrolled {
+        top: 10px;
+        width: 94%;
+        left: 3%;
+        padding: 10px 5%;
+    }
+
+    header {
+        padding: 16px 5%;
+    }
+}
+
+/* --- Prevent horizontal overflow globally --- */
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+/* --- Fine-tune for very small phones (375px) --- */
+@media (max-width: 400px) {
+    .hero-content h1 {
+        font-size: 1.7rem !important;
+    }
+
+    .section-header h2,
+    .divine-text,
+    .content-box h2 {
+        font-size: 1.7rem !important;
+    }
+
+    .mobile-menu-drawer {
+        width: 92vw;
+    }
+
+    .bento-box {
+        padding: 28px 20px !important;
+    }
+
+    .room-card.new-style {
+        height: 300px;
+    }
+}
+
+/* ============================================================
+   DEEP MOBILE OPTIMIZATION — All Remaining Sections
+   ============================================================ */
+
+/* === Floating Widgets — Mobile Positioning === */
+@media (max-width: 768px) {
+    /* Push social stack higher so it clears bottom browser UI */
+    .float-social-stack {
+        bottom: 90px;
+        left: 16px;
+        gap: 10px;
+    }
+
+    .float-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+
+    /* Music player — tighter to bottom-left */
+    .premium-music-player {
+        bottom: 16px;
+        left: 16px;
+    }
+
+    .player-glass {
+        width: 48px;
+        height: 48px;
+    }
+
+    /* Chatbot — tighter to bottom-right */
+    .chatbot-container {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .chatbot-btn {
+        width: 52px;
+        height: 52px;
+    }
+
+    /* Chat window — full width on mobile */
+    .chat-window {
+        right: 0 !important;
+        bottom: 74px !important;
+        left: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-width: 100% !important;
+        border-radius: 20px !important;
+    }
+}
+
+/* === Hero — Mobile Complete Fix === */
+@media (max-width: 768px) {
+    .hero {
+        padding-top: 80px;
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .hero-content {
+        padding: 0 5%;
+        margin-top: 0;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 2.2rem !important;
+        line-height: 1.1;
+        margin-bottom: 12px;
+    }
+
+    .hero-content p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 24px;
+    }
+
+    .hero-badges {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* Booking bar — stacked card style */
+    .luxury-search-container {
+        position: relative !important;
+        bottom: unset !important;
+        left: unset !important;
+        transform: none !important;
+        width: 100% !important;
+        margin-top: 24px;
+        padding: 0 4%;
+    }
+
+    .luxury-search-bar {
+        flex-direction: column !important;
+        border-radius: 20px !important;
+        padding: 4px !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.25) !important;
+    }
+
+    .search-block {
+        width: 100% !important;
+        padding: 14px 16px !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(0,0,0,0.07) !important;
+        min-height: 56px;
+    }
+
+    .search-block:last-of-type {
+        border-bottom: none !important;
+    }
+
+    .search-block.active-dark {
+        border-radius: 16px 16px 0 0 !important;
+    }
+
+    .search-action-block {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        justify-content: space-between !important;
+        border-left: none !important;
+        border-top: 1px solid rgba(0,0,0,0.07) !important;
+    }
+
+    .search-circle-button {
+        width: 44px !important;
+        height: 44px !important;
+    }
+
+    .block-value {
+        white-space: normal !important;
+        font-size: 0.82rem;
+    }
+
+    .search-label-above {
+        margin-left: 4px;
+        font-size: 0.72rem;
+        margin-bottom: 8px !important;
+    }
+
+    /* PremiumDoubleCalendar — needs to be full width on mobile */
+    .calendar-panel,
+    .premium-calendar-container {
+        width: calc(100vw - 32px) !important;
+        left: 0 !important;
+        right: unset !important;
+        border-radius: 16px !important;
+    }
+}
+
+/* === Section Spacing — Mobile === */
+@media (max-width: 768px) {
+    section {
+        padding-left: 5% !important;
+        padding-right: 5% !important;
+    }
+
+    /* But fullwidth sections like gallery/banner keep edge-to-edge */
+    .banner-section,
+    .gallery-section,
+    .testimonials-section,
+    .amenities-banner {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
+
+/* === Room Types Section — Mobile === */
+@media (max-width: 768px) {
+    .room-types-section {
+        padding: 40px 5% 50px !important;
+    }
+
+    .room-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .room-card.new-style {
+        height: 320px !important;
+        border-radius: 20px !important;
+    }
+
+    .room-card-overlay {
+        padding: 20px 18px !important;
+    }
+
+    .room-card-title {
+        font-size: 1.3rem !important;
+    }
+
+    .room-card-price {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* === About / Split Section — Mobile === */
+@media (max-width: 768px) {
+    .about-section {
+        padding: 40px 5% !important;
+    }
+
+    .split-container {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
+    }
+
+    .image-grid {
+        height: 240px !important;
+        border-radius: 16px !important;
+    }
+
+    .content-box {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    .content-box h2 {
+        font-size: 1.9rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    .content-box p {
+        font-size: 0.92rem !important;
+        line-height: 1.65;
+    }
+
+    .btn-outline {
+        padding: 12px 24px !important;
+        font-size: 0.85rem !important;
+        display: inline-block;
+    }
+}
+
+/* === Offers Section — Mobile === */
+@media (max-width: 768px) {
+    .offers-section {
+        padding: 40px 5% !important;
+    }
+
+    .offers-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .offer-card.immersive {
+        height: 260px !important;
+        border-radius: 20px !important;
+    }
+}
+
+/* === Stats Section — Mobile === */
+@media (max-width: 768px) {
+    .stats-container {
+        flex-direction: column !important;
+        gap: 28px !important;
+        padding: 40px 5% !important;
+    }
+
+    .stat-divider {
+        display: none !important;
+    }
+
+    .stat-item h2,
+    .stat-item span {
+        font-size: 2.4rem !important;
+    }
+}
+
+/* === Gallery Section — Mobile === */
+@media (max-width: 768px) {
+    .gallery-section {
+        padding: 40px 0 !important;
+    }
+
+    .gallery-header {
+        padding: 0 5%;
+        margin-bottom: 20px;
+    }
+
+    .gallery-header h2 {
+        font-size: 1.9rem !important;
+    }
+
+    .gallery-slider .swiper-slide {
+        width: 80vw !important;
+        border-radius: 16px !important;
+    }
+
+    .gallery-slide-img {
+        height: 220px !important;
+        border-radius: 16px !important;
+    }
+}
+
+/* === Testimonials — Mobile === */
+@media (max-width: 768px) {
+    .testimonials-section {
+        padding: 40px 0 !important;
+    }
+
+    .center-header {
+        padding: 0 5%;
+        margin-bottom: 20px;
+    }
+
+    .center-header h2 {
+        font-size: 1.9rem !important;
+    }
+
+    .testimonials-slider .swiper-slide {
+        width: 88vw !important;
+    }
+
+    .testimonial-card {
+        padding: 24px 20px !important;
+        border-radius: 16px !important;
+    }
+
+    .testimonial-text {
+        font-size: 0.9rem !important;
+    }
+}
+
+/* === FAQ Section — Mobile === */
+@media (max-width: 768px) {
+    .faq-container {
+        flex-direction: column !important;
+        gap: 28px !important;
+    }
+
+    .faq-left,
+    .faq-right {
+        width: 100% !important;
+    }
+
+    .faq-left h2 {
+        font-size: 1.9rem !important;
+    }
+
+    .faq-item {
+        border-radius: 12px !important;
+    }
+}
+
+/* === CTA Section — Mobile === */
+@media (max-width: 768px) {
+    .cta-section {
+        padding: 60px 5% !important;
+        text-align: center;
+    }
+
+    .cta-content h1 {
+        font-size: 1.9rem !important;
+        line-height: 1.15;
+    }
+
+    .cta-content p {
+        font-size: 0.9rem !important;
+    }
+
+    .cta-buttons {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+}
+
+/* === Footer — Mobile === */
+@media (max-width: 768px) {
+    .site-footer {
+        padding: 40px 5% 100px !important;
+    }
+
+    .footer-top-links {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 32px 20px !important;
+    }
+
+    .footer-col h3 {
+        font-size: 1rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    .footer-col a {
+        font-size: 0.85rem !important;
+        padding: 4px 0 !important;
+        display: block;
+        min-height: 32px;
+        line-height: 2;
+    }
+
+    .footer-middle-bar {
+        flex-direction: column !important;
+        gap: 16px !important;
+        text-align: center !important;
+        padding: 24px 0 !important;
+    }
+
+    .footer-massive-text {
+        font-size: 20vw !important;
+        letter-spacing: 0.05em !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .footer-top-links {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* === Login Modal — Mobile === */
+@media (max-width: 768px) {
+    .modal-container,
+    .login-modal-inner,
+    .login-panel {
+        width: calc(100vw - 24px) !important;
+        max-width: 100% !important;
+        border-radius: 20px !important;
+        padding: 28px 20px !important;
+    }
+}
+
+/* === Guesthouse Page — Mobile === */
+@media (max-width: 768px) {
+    /* Guesthouse has no hamburger state wired — add mobile menu button display */
+    .guesthouse-page .mobile-menu-btn {
+        display: flex !important;
+    }
+
+    .guesthouse-page nav,
+    .guesthouse-page .nav-btns {
+        display: none !important;
+    }
+
+    .guesthouse-hero {
+        padding: 90px 0 30px 0 !important;
+    }
+
+    .hero-bento-container {
+        padding: 0 4% !important;
+    }
+
+    .hero-title-large {
+        font-size: 1.2rem !important;
+        padding: 10px 20px !important;
+        margin-bottom: 0 !important;
+    }
+
+    .hero-main-img-wrap {
+        height: 220px !important;
+    }
+
+    .hero-bento-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .bento-yellow {
+        margin-top: 0 !important;
+        grid-column: unset !important;
+        padding-top: 30px !important;
+    }
+
+    .bento-green h3,
+    .bento-yellow h3 {
+        font-size: 1.4rem !important;
+    }
+
+    .featured-rooms-section {
+        padding: 40px 4% !important;
+    }
+
+    .featured-rooms-header h2 {
+        font-size: 1.9rem !important;
+    }
+
+    .featured-rooms-grid,
+    .suite-cards-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .featured-room-card {
+        max-width: 100% !important;
+    }
+
+    .featured-room-img-wrap {
+        aspect-ratio: 16 / 9 !important;
+    }
+
+    /* Promo sections in guesthouse */
+    .promo-section-1 {
+        flex-direction: column !important;
+        padding: 40px 4% !important;
+        gap: 28px !important;
+    }
+
+    .promo-section-2 {
+        flex-direction: column !important;
+        padding: 40px 4% !important;
+        gap: 28px !important;
+    }
+
+    .promo-col-right h2,
+    .promo2-col-left h2 {
+        font-size: 1.8rem !important;
+    }
+
+    .promo2-col-right > img {
+        height: 220px !important;
+        border-radius: 16px !important;
+    }
+
+    .promo2-price-badge {
+        position: static !important;
+        width: 100% !important;
+        margin-top: 16px !important;
+    }
+
+    /* Amenities */
+    .amenities-section {
+        padding: 30px 4% !important;
+    }
+
+    .amenities-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* Filter sidebar */
+    .listing-container {
+        padding: 16px 4% !important;
+    }
+
+    .filter-sidebar {
+        display: none !important;
+    }
+
+    .listing-main {
+        width: 100% !important;
+    }
+}
+
+/* === Global touch targets — min 44px height === */
+@media (max-width: 768px) {
+    a, button {
+        min-height: 44px;
+    }
+
+    /* Exceptions for inline text links */
+    nav a, .footer-col a, .mobile-nav-links ul li a {
+        min-height: unset;
+    }
+}
+
+/* === Scrollbar hidden on mobile for horizontal scrollers === */
+@media (max-width: 768px) {
+    .swiper,
+    .banner-track,
+    .scroller-container {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* === About Hotel Section — Mobile === */
+@media (max-width: 768px) {
+    .about-hotel-section {
+        padding: 40px 5% !important;
+    }
+
+    .about-hotel-title {
+        font-size: 1.6rem !important;
+    }
+
+    .about-hotel-content {
+        flex-direction: column !important;
+        gap: 28px !important;
+    }
+
+    .about-hotel-amenities {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .amenity-card {
+        padding: 16px !important;
+    }
+}
+
+/* === Prevent any overflow from fixed-width elements === */
+@media (max-width: 768px) {
+    * {
+        max-width: 100vw;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Tables on mobile */
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* === Typography — Final Mobile Polish === */
+@media (max-width: 768px) {
+    .section-header {
+        margin-bottom: 24px !important;
+    }
+
+    .section-header h2 {
+        font-size: 1.9rem !important;
+        letter-spacing: 0.06em !important;
+        line-height: 1.1 !important;
+    }
+
+    .section-header p {
+        font-size: 0.9rem !important;
+        line-height: 1.6 !important;
+    }
+
+    h1 { font-size: 2rem !important; }
+    h2 { font-size: 1.7rem !important; }
+    h3 { font-size: 1.4rem !important; }
+}
+
+/* === 360px — Absolute minimum phones === */
+@media (max-width: 380px) {
+    header {
+        padding: 14px 4% !important;
+    }
+
+    header .logo img {
+        height: 40px !important;
+    }
+
+    .hero-content h1 {
+        font-size: 1.7rem !important;
+    }
+
+    .section-header h2 {
+        font-size: 1.6rem !important;
+    }
+
+    .float-btn {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 1.1rem !important;
+    }
+
+    .chatbot-btn,
+    .player-glass {
+        width: 44px !important;
+        height: 44px !important;
+    }
+}
+
+/* ============================================================
+   PAGE-SPECIFIC MOBILE FIXES — Weddings / Corporate / Contact
+   ============================================================ */
+
+@media (max-width: 768px) {
+    /* Weddings & Corporate — Testi cards */
+    .testi-card {
+        width: min(340px, 85vw) !important;
+        flex-shrink: 0;
+    }
+
+    .hero-single-card {
+        height: 260px !important;
+        border-radius: 20px !important;
+    }
+
+    .hero-single-content h3 {
+        font-size: 1.8rem !important;
+    }
+
+    .split-image {
+        height: 240px !important;
+        border-radius: 16px !important;
+    }
+
+    .module-header h2,
+    .split-content h2 {
+        font-size: 1.9rem !important;
+    }
+
+    .events-bento,
+    .packages-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .inquiry-layout {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+    }
+
+    .inquiry-info-panel {
+        position: static !important;
+    }
+
+    .inquiry-form {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* Corporate specific */
+    .conf-inner {
+        grid-template-columns: 1fr !important;
+    }
+
+    .conf-badge {
+        width: 160px !important;
+        height: 160px !important;
+        margin: 0 auto !important;
+    }
+
+    /* Contact page */
+    .contact-hero-split {
+        padding: 110px 5% 50px !important;
+        min-height: unset !important;
+    }
+
+    .contact-hero-grid {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
+    }
+
+    .contact-hero-image {
+        min-height: 220px !important;
+        border-radius: 16px !important;
+    }
+
+    .quick-booking-bar {
+        margin: 16px auto 0 !important;
+        border-radius: 16px !important;
+        padding: 20px !important;
+    }
+
+    .booking-fields {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .inquiry-container,
+    .location-container {
+        grid-template-columns: 1fr !important;
+    }
+
+    .location-map {
+        height: 300px !important;
+        border-radius: 16px !important;
+    }
+}

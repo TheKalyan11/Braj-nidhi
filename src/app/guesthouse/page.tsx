@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
 
 export default function Guesthouse() {
   const [scrolled, setScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -1329,7 +1331,47 @@ export default function Guesthouse() {
             )}
             <a href="/booking" className="btn-book">Book Now</a>
         </div>
+
+        {/* Hamburger Button */}
+        <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
     </header>
+
+    {/* Mobile Menu Drawer */}
+    {isMobileMenuOpen && (
+      <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
+        <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
+          <div className="mobile-menu-header">
+            <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto" }} />
+            <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
+              <X size={24} />
+            </button>
+          </div>
+          <div className="mobile-nav-links">
+            <ul>
+              <li><a href="/guesthouse" onClick={() => setIsMobileMenuOpen(false)}>Guesthouse</a></li>
+              <li><a href="/weddings" onClick={() => setIsMobileMenuOpen(false)}>Weddings</a></li>
+              <li><a href="/corporate" onClick={() => setIsMobileMenuOpen(false)}>Corporate</a></li>
+              <li><a href="/braj-yatra" onClick={() => setIsMobileMenuOpen(false)}>Braj Yatra</a></li>
+              <li><a href="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</a></li>
+            </ul>
+          </div>
+          <div className="mobile-menu-footer">
+            {isLoggedIn ? (
+              <div className="mobile-user-profile">
+                <span className="user-label">Braj Club Member</span>
+                <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
+                <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}>Logout</button>
+              </div>
+            ) : (
+              <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
+            )}
+            <a href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="btn-book" style={{ display: 'block', textAlign: 'center', marginTop: '4px' }}>Book Now</a>
+          </div>
+        </div>
+      </div>
+    )}
 
     <main>
         <section className="guesthouse-hero">
