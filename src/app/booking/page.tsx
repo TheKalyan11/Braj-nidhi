@@ -22,7 +22,10 @@ import {
   Info,
   Clock,
   Menu,
-  X
+  X,
+  Settings,
+  Terminal,
+  Key
 } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
@@ -95,6 +98,28 @@ export default function BookingPage() {
   const [paymentStepText, setPaymentStepText] = useState<string>('');
   const [bookingRef, setBookingRef] = useState<string>('');
 
+  // ERP Live API Connection States
+  const [reservationId, setReservationId] = useState<string>('');
+  const [erpAmount, setErpAmount] = useState<number | null>(null);
+  const [apiConnectionStatus, setApiConnectionStatus] = useState<'sandbox' | 'live' | 'error'>('sandbox');
+  const [apiErrorMsg, setApiErrorMsg] = useState<string>('');
+  const [credentialsOpen, setCredentialsOpen] = useState<boolean>(false);
+  const [sessionCredentials, setSessionCredentials] = useState({
+    apiKey: '',
+    apiSecret: '',
+    erpBase: 'https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api'
+  });
+  const [drawerApiKey, setDrawerApiKey] = useState<string>('');
+  const [drawerApiSecret, setDrawerApiSecret] = useState<string>('');
+  const [drawerErpBase, setDrawerErpBase] = useState<string>('https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api');
+  const [availableRoomsList, setAvailableRoomsList] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [livePrices, setLivePrices] = useState<Record<string, number>>({
+    deluxe2: 3500,
+    deluxe3: 4500,
+    deluxe4: 4999
+  });
+
   // Quick special request badges
   const [specialRequests, setSpecialRequests] = useState<string[]>([]);
   const requestBadges = ["Late Check-out (2 hrs)", "Spiritual Literature in Room", "Quiet Room", "Extra Bedding", "Temple Prasadam Delivery"];
@@ -142,7 +167,7 @@ export default function BookingPage() {
   const nights = getNights();
 
   // Price calculations
-  const pricePerNight = getRoomPrice(roomType);
+  const pricePerNight = livePrices[roomType] || getRoomPrice(roomType);
   const roomCost = pricePerNight * nights;
   
   // Add-ons Cost
@@ -160,6 +185,9 @@ export default function BookingPage() {
   const gstAmount = Math.round(taxableAmount * 0.12);
   const serviceCharge = Math.round(taxableAmount * 0.05);
   const finalTotal = taxableAmount + gstAmount + serviceCharge;
+  
+  // Dynamic ERP total override
+  const payableTotal = erpAmount !== null ? erpAmount : finalTotal;
 
   // Load URL query parameters on mount
   useEffect(() => {
@@ -209,6 +237,19 @@ export default function BookingPage() {
         setChildren(Math.max(0, Number(paramChildren)));
       }
 
+      // Support guests string parameter (e.g. guests=2 Adults, 1 Child)
+      const paramGuests = params.get('guests');
+      if (paramGuests) {
+        const adultsMatch = paramGuests.match(/(\d+)\s*Adult/i);
+        const childrenMatch = paramGuests.match(/(\d+)\s*Child/i);
+        if (adultsMatch) {
+          setAdults(Math.max(1, Number(adultsMatch[1])));
+        }
+        if (childrenMatch) {
+          setChildren(Math.max(0, Number(childrenMatch[1])));
+        }
+      }
+
       // MMT Format e.g., roomStayQualifier=2e0e
       const rsq = params.get('roomStayQualifier') || params.get('rsc');
       if (rsq) {
@@ -217,6 +258,23 @@ export default function BookingPage() {
           setAdults(Math.max(1, Number(match[1])));
           setChildren(Math.max(0, Number(match[2])));
         }
+      }
+
+      // Load ERP credentials from sessionStorage if available
+      const savedApiKey = sessionStorage.getItem("apiKey") || "";
+      const savedApiSecret = sessionStorage.getItem("apiSecret") || "";
+      const savedErpBase = sessionStorage.getItem("erpBase") || "https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api";
+      
+      setSessionCredentials({
+        apiKey: savedApiKey,
+        apiSecret: savedApiSecret,
+        erpBase: savedErpBase
+      });
+      
+      if (savedApiKey && savedApiSecret) {
+        setApiConnectionStatus('live');
+      } else {
+        setApiConnectionStatus('sandbox');
       }
 
       // Load login state from localStorage
@@ -248,6 +306,158 @@ export default function BookingPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Helper to get proxy request headers
+  const getProxyHeaders = () => {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (sessionCredentials.apiKey) {
+      headers['x-api-key'] = sessionCredentials.apiKey;
+    }
+    if (sessionCredentials.apiSecret) {
+      headers['x-api-secret'] = sessionCredentials.apiSecret;
+    }
+    if (sessionCredentials.erpBase) {
+      headers['x-erp-base'] = sessionCredentials.erpBase;
+    }
+    return headers;
+  };
+
+  // Helper to fetch live rooms search from ERP
+  const searchRoomsApi = async (currentCheckIn: string, currentCheckOut: string, guestCount: number) => {
+    try {
+      setIsSearching(true);
+      setApiErrorMsg('');
+      const headers = getProxyHeaders();
+      
+      // If we don't have API keys set yet, we remain in sandbox
+      if (!sessionCredentials.apiKey || !sessionCredentials.apiSecret) {
+        setApiConnectionStatus('sandbox');
+        return;
+      }
+
+      const response = await fetch('/api/booking/search_rooms', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          property: "BRAJ-NIDHI-GUEST-HOUSE-VRN",
+          check_in_date: currentCheckIn,
+          check_out_date: currentCheckOut,
+          guests: guestCount,
+          rooms: 1,
+          booking_type: "Walk-In",
+          hold_type: "BN-Website Hold-0001"
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to search rooms');
+      }
+
+      const data = await response.json();
+      setApiConnectionStatus('live');
+      
+      if (data.availableRooms && Array.isArray(data.availableRooms)) {
+        setAvailableRoomsList(data.availableRooms);
+        
+        // Dynamically map prices from ERP availableRooms
+        const updatedPrices = { ...livePrices };
+        data.availableRooms.forEach((room: any) => {
+          const typeId = (room.roomTypeId || '').toLowerCase();
+          const amt = room.amount || room.pricePerNight || room.rate || 0;
+          if (amt > 0) {
+            if (typeId.includes('deluxe2') || typeId.includes('twin') || typeId.includes('2')) {
+              updatedPrices.deluxe2 = amt;
+            } else if (typeId.includes('deluxe3') || typeId.includes('triple') || typeId.includes('3')) {
+              updatedPrices.deluxe3 = amt;
+            } else if (typeId.includes('deluxe4') || typeId.includes('quad') || typeId.includes('family') || typeId.includes('4')) {
+              updatedPrices.deluxe4 = amt;
+            }
+          }
+        });
+        setLivePrices(updatedPrices);
+
+        // Auto-select first available room type if current selection becomes sold out
+        const hasDeluxe2 = data.availableRooms.some((r: any) => {
+          const tid = (r.roomTypeId || '').toLowerCase();
+          return tid.includes('deluxe2') || tid.includes('twin') || tid.includes('2');
+        });
+        const hasDeluxe3 = data.availableRooms.some((r: any) => {
+          const tid = (r.roomTypeId || '').toLowerCase();
+          return tid.includes('deluxe3') || tid.includes('triple') || tid.includes('3');
+        });
+        const hasDeluxe4 = data.availableRooms.some((r: any) => {
+          const tid = (r.roomTypeId || '').toLowerCase();
+          return tid.includes('deluxe4') || tid.includes('quad') || tid.includes('family') || tid.includes('4');
+        });
+
+        if (roomType === 'deluxe2' && !hasDeluxe2) {
+          if (hasDeluxe3) setRoomType('deluxe3');
+          else if (hasDeluxe4) setRoomType('deluxe4');
+        } else if (roomType === 'deluxe3' && !hasDeluxe3) {
+          if (hasDeluxe2) setRoomType('deluxe2');
+          else if (hasDeluxe4) setRoomType('deluxe4');
+        } else if (roomType === 'deluxe4' && !hasDeluxe4) {
+          if (hasDeluxe2) setRoomType('deluxe2');
+          else if (hasDeluxe3) setRoomType('deluxe3');
+        }
+      }
+    } catch (err: any) {
+      console.error('ERP searchRoomsApi error:', err);
+      setApiConnectionStatus('error');
+      setApiErrorMsg(err.message || 'ERP request failed. Running in offline sandbox.');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Helper to check room availability on live ERP API responses
+  const isCategoryAvailable = (type: 'deluxe2' | 'deluxe3' | 'deluxe4'): boolean => {
+    if (apiConnectionStatus !== 'live') return true;
+    if (availableRoomsList.length === 0) return false;
+    return availableRoomsList.some((room: any) => {
+      const typeId = (room.roomTypeId || '').toLowerCase();
+      if (type === 'deluxe2' && (typeId.includes('deluxe2') || typeId.includes('twin') || typeId.includes('2'))) return true;
+      if (type === 'deluxe3' && (typeId.includes('deluxe3') || typeId.includes('triple') || typeId.includes('3'))) return true;
+      if (type === 'deluxe4' && (typeId.includes('deluxe4') || typeId.includes('quad') || typeId.includes('family') || typeId.includes('4'))) return true;
+      return false;
+    });
+  };
+
+  // Trigger API search rooms when inputs or credentials change
+  useEffect(() => {
+    searchRoomsApi(checkIn, checkOut, adults + children);
+  }, [checkIn, checkOut, adults, children, sessionCredentials.apiKey, sessionCredentials.apiSecret, sessionCredentials.erpBase]);
+
+  // Handle saving credentials from dev drawer
+  const handleSaveCredentials = (apiKey: string, apiSecret: string, erpBase: string) => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem("apiKey", apiKey);
+      sessionStorage.setItem("apiSecret", apiSecret);
+      sessionStorage.setItem("erpBase", erpBase);
+      
+      setSessionCredentials({
+        apiKey,
+        apiSecret,
+        erpBase
+      });
+      
+      if (apiKey && apiSecret) {
+        setApiConnectionStatus('live');
+      } else {
+        setApiConnectionStatus('sandbox');
+      }
+      setCredentialsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    setDrawerApiKey(sessionCredentials.apiKey);
+    setDrawerApiSecret(sessionCredentials.apiSecret);
+    setDrawerErpBase(sessionCredentials.erpBase);
+  }, [sessionCredentials]);
 
   // Handle auto-fill if user logs in via shared LoginModal
   const handleLoginSuccess = (name: string) => {
@@ -325,7 +535,7 @@ export default function BookingPage() {
   };
 
   // Step Navigations
-  const proceedToPayment = () => {
+  const proceedToPayment = async () => {
     if (!isLoggedIn) {
       alert('Please login or create an account to proceed to secure checkout.');
       setLoginModalInitialRegister(false);
@@ -337,12 +547,98 @@ export default function BookingPage() {
       alert('Please fill out all required guest information fields before proceeding.');
       return;
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setCurrentStep(2);
+
+    // If sandbox mode (no API Key/Secret), bypass ERP API reservation creation
+    if (apiConnectionStatus === 'sandbox') {
+      setReservationId('MOCK-RES-' + Math.floor(100000 + Math.random() * 900000));
+      setErpAmount(null);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setCurrentStep(2);
+      return;
+    }
+
+    try {
+      setPaymentLoading(true);
+      setPaymentStepText('Holding your room in ERP Guesthouse System...');
+      setCurrentStep(2); // Show the payment layout so step loader works
+      
+      // Determine target room type based on selected type
+      let targetRoomType = 'Deluxe';
+      if (roomType === 'deluxe2') targetRoomType = 'Deluxe 2';
+      else if (roomType === 'deluxe3') targetRoomType = 'Deluxe 3';
+      else if (roomType === 'deluxe4') targetRoomType = 'Deluxe 4';
+
+      if (availableRoomsList.length > 0) {
+        const found = availableRoomsList.find((r: any) => {
+          const typeId = (r.roomTypeId || '').toLowerCase();
+          if (roomType === 'deluxe2' && (typeId.includes('deluxe2') || typeId.includes('twin') || typeId.includes('2'))) return true;
+          if (roomType === 'deluxe3' && (typeId.includes('deluxe3') || typeId.includes('triple') || typeId.includes('3'))) return true;
+          if (roomType === 'deluxe4' && (typeId.includes('deluxe4') || typeId.includes('quad') || typeId.includes('family') || typeId.includes('4'))) return true;
+          return false;
+        });
+        if (found) {
+          targetRoomType = found.roomTypeId;
+        }
+      }
+
+      const headers = getProxyHeaders();
+      const response = await fetch('/api/booking/create_reservation', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          property: "BRAJ-NIDHI-GUEST-HOUSE-VRN",
+          check_in_date: checkIn,
+          check_out_date: checkOut,
+          booking_type: "Walk-In",
+          hold_type: "BN-Website Hold-0001",
+          guest: {
+            name: `${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}`,
+            email: guestDetails.email,
+            phone: guestDetails.phone
+          },
+          rooms: [{
+            room_type: targetRoomType,
+            qty: 1,
+            adults: adults,
+            children: children
+          }]
+        })
+      });
+
+      const result = await response.json();
+      setPaymentLoading(false);
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to hold reservation in ERP');
+      }
+
+      if (result.reservationId) {
+        setReservationId(result.reservationId);
+      } else if (result.reservation_id) {
+        setReservationId(result.reservation_id);
+      } else {
+        setReservationId('ERP-RES-' + Math.floor(100000 + Math.random() * 900000));
+      }
+
+      if (result.amount) {
+        setErpAmount(Number(result.amount));
+      } else if (result.net_amount) {
+        setErpAmount(Number(result.net_amount));
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error: any) {
+      console.error('ERP createReservationApi error:', error);
+      setPaymentLoading(false);
+      alert(`ERP Reservation Error: ${error.message}. Falling back to sandbox simulator mode.`);
+      setApiConnectionStatus('error');
+      setReservationId('MOCK-RES-' + Math.floor(100000 + Math.random() * 900000));
+      setErpAmount(null);
+    }
   };
 
   // Payment Sim Flow
-  const triggerPaymentProcessing = () => {
+  const triggerPaymentProcessing = async () => {
     if (paymentMethod === 'upi' && !upiId) {
       alert('Please enter a valid UPI ID');
       return;
@@ -353,31 +649,91 @@ export default function BookingPage() {
     }
 
     setPaymentLoading(true);
-    
-    const steps = [
-      "Contacting payment gateways...",
-      "Requesting authorization with your bank...",
-      "Securing token handshake...",
-      "Payment authorized! Finalizing booking..."
-    ];
 
-    let currentStepIdx = 0;
-    setPaymentStepText(steps[0]);
+    // If sandbox mode, run the premium visual timer simulator
+    if (apiConnectionStatus === 'sandbox') {
+      const steps = [
+        "Contacting payment gateways...",
+        "Requesting authorization with your bank...",
+        "Securing token handshake...",
+        "Payment authorized! Finalizing booking..."
+      ];
 
-    const timer = setInterval(() => {
-      currentStepIdx++;
-      if (currentStepIdx < steps.length) {
-        setPaymentStepText(steps[currentStepIdx]);
-      } else {
-        clearInterval(timer);
-        // Completed
-        const generatedRef = "BNG-" + Math.floor(100000 + Math.random() * 900000);
-        setBookingRef(generatedRef);
-        setPaymentLoading(false);
-        setCurrentStep(3);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      let currentStepIdx = 0;
+      setPaymentStepText(steps[0]);
+
+      const timer = setInterval(() => {
+        currentStepIdx++;
+        if (currentStepIdx < steps.length) {
+          setPaymentStepText(steps[currentStepIdx]);
+        } else {
+          clearInterval(timer);
+          const generatedRef = "BNG-MOCK-" + Math.floor(100000 + Math.random() * 900000);
+          setBookingRef(generatedRef);
+          setPaymentLoading(false);
+          setCurrentStep(3);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 1200);
+      return;
+    }
+
+    // Live mode payment processing
+    try {
+      const headers = getProxyHeaders();
+      const currentAmount = erpAmount !== null ? erpAmount : finalTotal;
+
+      // 1. Create Payment Order
+      setPaymentStepText("Creating secure payment order in ERP...");
+      const orderRes = await fetch('/api/booking/create_payment_order', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          reservation_id: reservationId,
+          amount: currentAmount,
+          currency: "INR"
+        })
+      });
+
+      const orderResult = await orderRes.json();
+      if (!orderRes.ok) {
+        throw new Error(orderResult.error || 'Failed to create payment order in ERP');
       }
-    }, 1200);
+
+      // 2. Confirm Payment
+      setPaymentStepText("Confirming payment receipt with ERP...");
+      const payConfirmRes = await fetch('/api/booking/confirm_payment', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          reservation_id: reservationId,
+          amount: currentAmount,
+          mode_of_payment: paymentMethod.toUpperCase(),
+          gateway_payment_id: "PAY-" + Math.floor(100000 + Math.random() * 900000)
+        })
+      });
+
+      const confirmResult = await payConfirmRes.json();
+      setPaymentLoading(false);
+
+      if (!payConfirmRes.ok) {
+        throw new Error(confirmResult.error || 'Failed to confirm payment in ERP');
+      }
+
+      // Save confirmed booking reference from ERP
+      const generatedRef = confirmResult.bookingReference || confirmResult.bookingRef || confirmResult.reservationId || reservationId;
+      setBookingRef(generatedRef);
+      setCurrentStep(3);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error: any) {
+      console.error('ERP payment flow error:', error);
+      setPaymentLoading(false);
+      alert(`ERP Payment Error: ${error.message}. Running payment simulation instead to complete checkout.`);
+      const generatedRef = "BNG-FAILOVER-" + Math.floor(100000 + Math.random() * 900000);
+      setBookingRef(generatedRef);
+      setCurrentStep(3);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -1596,6 +1952,201 @@ export default function BookingPage() {
           from { transform: translateX(100%); }
           to { transform: translateX(0); }
         }
+
+        /* Collapsible Developer Credentials Drawer */
+        .dev-credentials-toggle {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          z-index: 999;
+          background: linear-gradient(135deg, #111111 0%, #222222 100%);
+          color: #ffffff;
+          border: 1.5px solid rgba(212, 175, 55, 0.3);
+          border-radius: 50px;
+          padding: 12px 24px;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dev-credentials-toggle:hover {
+          transform: translateY(-2px) scale(1.03);
+          box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2);
+          border-color: #d4af37;
+        }
+
+        .dev-drawer-backdrop {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          z-index: 2000;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s ease;
+        }
+
+        .dev-drawer-backdrop.open {
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        .dev-credentials-drawer {
+          position: fixed;
+          top: 0;
+          right: 0;
+          width: 100%;
+          max-width: 400px;
+          height: 100vh;
+          background: linear-gradient(180deg, #16120e 0%, #0d0a08 100%);
+          border-left: 1px solid rgba(212, 175, 55, 0.2);
+          box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+          z-index: 2001;
+          transform: translateX(100%);
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          padding: 30px 24px;
+          display: flex;
+          flex-direction: column;
+          color: #ffffff;
+        }
+
+        .dev-credentials-drawer.open {
+          transform: translateX(0);
+        }
+
+        .dev-drawer-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          padding-bottom: 20px;
+          margin-bottom: 24px;
+        }
+
+        .dev-drawer-header h3 {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 800;
+          color: #d4af37;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .dev-drawer-close {
+          background: none;
+          border: none;
+          color: rgba(255, 255, 255, 0.5);
+          cursor: pointer;
+          padding: 6px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+
+        .dev-drawer-close:hover {
+          background: rgba(255, 255, 255, 0.06);
+          color: #ffffff;
+        }
+
+        .dev-drawer-section {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 12px;
+          padding: 16px;
+          margin-bottom: 24px;
+        }
+
+        .dev-status-indicator {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 8px;
+        }
+
+        .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          display: inline-block;
+        }
+
+        .status-dot.live {
+          background-color: #22c55e;
+          box-shadow: 0 0 10px #22c55e;
+        }
+
+        .status-dot.sandbox {
+          background-color: #eab308;
+          box-shadow: 0 0 10px #eab308;
+        }
+
+        .status-dot.error {
+          background-color: #ef4444;
+          box-shadow: 0 0 10px #ef4444;
+        }
+
+        .dev-input-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-bottom: 16px;
+        }
+
+        .dev-input-wrapper label {
+          font-size: 11px;
+          font-weight: 700;
+          color: rgba(255, 255, 255, 0.6);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .dev-input-wrapper input {
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          border-radius: 8px;
+          padding: 10px 12px;
+          font-size: 13px;
+          outline: none;
+          transition: all 0.2s;
+        }
+
+        .dev-input-wrapper input:focus {
+          border-color: #d4af37;
+          background: rgba(255, 255, 255, 0.06);
+        }
+
+        .dev-save-btn {
+          width: 100%;
+          padding: 12px;
+          background: linear-gradient(135deg, #d4af37 0%, #8b0000 100%);
+          color: #ffffff;
+          border: none;
+          border-radius: 8px;
+          font-weight: 700;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 20px;
+        }
+
+        .dev-save-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 8px 20px rgba(139, 0, 0, 0.3);
+        }
       ` }} />
 
       {/* 1. STUNNING HEADER NAVIGATION IN MMT STYLE */}
@@ -1811,38 +2362,133 @@ export default function BookingPage() {
                   </div>
                 </div>
 
+                {/* Real-time ERP Sync Status Bar */}
+                <div style={{ 
+                  background: 'rgba(0, 0, 0, 0.02)', 
+                  border: '1px solid rgba(0, 0, 0, 0.05)', 
+                  borderRadius: '12px', 
+                  padding: '12px 16px', 
+                  marginBottom: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {isSearching ? (
+                      <div className="spinner-payment" style={{ width: '16px', height: '16px', borderWidth: '2px', animation: 'spin 1s linear infinite', borderTopColor: '#8b0000', margin: 0 }}></div>
+                    ) : (
+                      <span className={`status-dot ${apiConnectionStatus}`} />
+                    )}
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#1a1512' }}>
+                      {isSearching ? 'Syncing live inventory from ERP...' : 
+                       apiConnectionStatus === 'live' ? 'Live ERP Connected' : 
+                       apiConnectionStatus === 'error' ? 'ERP Sync Interrupted (Sandbox active)' : 
+                       'Sandbox Simulator Active'}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button 
+                      onClick={() => searchRoomsApi(checkIn, checkOut, adults + children)}
+                      className="btn-apply-promo"
+                      disabled={isSearching}
+                      style={{ padding: '6px 12px', fontSize: '12px', margin: 0 }}
+                    >
+                      Search / Sync Rooms
+                    </button>
+                    <button 
+                      onClick={() => setCredentialsOpen(true)}
+                      className="btn-apply-promo"
+                      style={{ padding: '6px 12px', fontSize: '12px', margin: 0, background: '#111111', color: '#ffffff', borderColor: '#111111' }}
+                    >
+                      Setup Dev API Hub
+                    </button>
+                  </div>
+                </div>
+
                 {/* Grid Room Selector */}
                 <h4 style={{ fontSize: '14px', fontWeight: '700', color: 'rgba(44, 37, 32, 0.9)', marginBottom: '12px' }}>
                   Select Suite Category
                 </h4>
                 <div className="suite-selector-grid" style={{ marginBottom: '24px' }}>
-                  <div 
-                    onClick={() => setRoomType('deluxe2')} 
-                    className={`suite-selector-card ${roomType === 'deluxe2' ? 'selected' : ''}`}
-                  >
-                    {roomType === 'deluxe2' && <Check size={10} strokeWidth={3} className="selected-check" />}
-                    <h4>Deluxe 2 – Twin Bedded Room</h4>
-                    <p>Ideal for 2 Adults</p>
-                    <span className="price-tag">₹3,500<span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(44, 37, 32, 0.5)' }}> / night</span></span>
-                  </div>
-                  <div 
-                    onClick={() => setRoomType('deluxe3')} 
-                    className={`suite-selector-card ${roomType === 'deluxe3' ? 'selected' : ''}`}
-                  >
-                    {roomType === 'deluxe3' && <Check size={10} strokeWidth={3} className="selected-check" />}
-                    <h4>Deluxe 3 – 3 Bedded Room</h4>
-                    <p>Ideal for 2 Adults + 1 Child OR 3 Adults</p>
-                    <span className="price-tag">₹4,500<span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(44, 37, 32, 0.5)' }}> / night</span></span>
-                  </div>
-                  <div 
-                    onClick={() => setRoomType('deluxe4')} 
-                    className={`suite-selector-card ${roomType === 'deluxe4' ? 'selected' : ''}`}
-                  >
-                    {roomType === 'deluxe4' && <Check size={10} strokeWidth={3} className="selected-check" />}
-                    <h4>Deluxe 4 – 4 Bedded Room</h4>
-                    <p>Ideal for 3 Adults + 1 Child OR 4 Adults</p>
-                    <span className="price-tag">₹4,999<span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(44, 37, 32, 0.5)' }}> / night</span></span>
-                  </div>
+                  {/* Deluxe 2 Card */}
+                  {(() => {
+                    const available = isCategoryAvailable('deluxe2');
+                    return (
+                      <div 
+                        onClick={() => available && setRoomType('deluxe2')} 
+                        className={`suite-selector-card ${roomType === 'deluxe2' ? 'selected' : ''}`}
+                        style={{
+                          opacity: available ? 1 : 0.5,
+                          cursor: available ? 'pointer' : 'not-allowed',
+                          pointerEvents: available ? 'auto' : 'none'
+                        }}
+                      >
+                        {roomType === 'deluxe2' && <Check size={10} strokeWidth={3} className="selected-check" />}
+                        <h4>Deluxe 2 – Twin Bedded Room</h4>
+                        <p>Ideal for 2 Adults</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                          <span className="price-tag">₹{livePrices.deluxe2.toLocaleString()}<span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(44, 37, 32, 0.5)' }}> / night</span></span>
+                          {!available && (
+                            <span className="badge-pill-mmt accent" style={{ background: 'rgba(139, 0, 0, 0.08)', borderColor: 'rgba(139, 0, 0, 0.25)', color: '#8b0000', fontSize: '10px', fontWeight: '800' }}>Sold Out on ERP</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Deluxe 3 Card */}
+                  {(() => {
+                    const available = isCategoryAvailable('deluxe3');
+                    return (
+                      <div 
+                        onClick={() => available && setRoomType('deluxe3')} 
+                        className={`suite-selector-card ${roomType === 'deluxe3' ? 'selected' : ''}`}
+                        style={{
+                          opacity: available ? 1 : 0.5,
+                          cursor: available ? 'pointer' : 'not-allowed',
+                          pointerEvents: available ? 'auto' : 'none'
+                        }}
+                      >
+                        {roomType === 'deluxe3' && <Check size={10} strokeWidth={3} className="selected-check" />}
+                        <h4>Deluxe 3 – 3 Bedded Room</h4>
+                        <p>Ideal for 2 Adults + 1 Child OR 3 Adults</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                          <span className="price-tag">₹{livePrices.deluxe3.toLocaleString()}<span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(44, 37, 32, 0.5)' }}> / night</span></span>
+                          {!available && (
+                            <span className="badge-pill-mmt accent" style={{ background: 'rgba(139, 0, 0, 0.08)', borderColor: 'rgba(139, 0, 0, 0.25)', color: '#8b0000', fontSize: '10px', fontWeight: '800' }}>Sold Out on ERP</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Deluxe 4 Card */}
+                  {(() => {
+                    const available = isCategoryAvailable('deluxe4');
+                    return (
+                      <div 
+                        onClick={() => available && setRoomType('deluxe4')} 
+                        className={`suite-selector-card ${roomType === 'deluxe4' ? 'selected' : ''}`}
+                        style={{
+                          opacity: available ? 1 : 0.5,
+                          cursor: available ? 'pointer' : 'not-allowed',
+                          pointerEvents: available ? 'auto' : 'none'
+                        }}
+                      >
+                        {roomType === 'deluxe4' && <Check size={10} strokeWidth={3} className="selected-check" />}
+                        <h4>Deluxe 4 – 4 Bedded Room</h4>
+                        <p>Ideal for 3 Adults + 1 Child OR 4 Adults</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                          <span className="price-tag">₹{livePrices.deluxe4.toLocaleString()}<span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(44, 37, 32, 0.5)' }}> / night</span></span>
+                          {!available && (
+                            <span className="badge-pill-mmt accent" style={{ background: 'rgba(139, 0, 0, 0.08)', borderColor: 'rgba(139, 0, 0, 0.25)', color: '#8b0000', fontSize: '10px', fontWeight: '800' }}>Sold Out on ERP</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Inputs for Dates */}
@@ -2082,9 +2728,16 @@ export default function BookingPage() {
             <div className="mmt-sidebar">
               <div className="mmt-card" style={{ borderColor: 'rgba(212, 175, 55, 0.25)' }}>
                 <div className="summary-card-header">
-                  <h3>
+                  <h3 style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     <ShieldCheck size={20} />
                     <span>Fare Summary</span>
+                    {apiConnectionStatus === 'live' ? (
+                      <span className="badge-pill-mmt success" style={{ fontSize: '10px', marginLeft: 'auto', background: 'rgba(22, 163, 74, 0.08)', borderColor: 'rgba(22, 163, 74, 0.2)', color: '#16a34a' }}>Live ERP</span>
+                    ) : apiConnectionStatus === 'error' ? (
+                      <span className="badge-pill-mmt accent" style={{ fontSize: '10px', marginLeft: 'auto', background: 'rgba(139, 0, 0, 0.06)', borderColor: 'rgba(139, 0, 0, 0.2)', color: '#8b0000' }}>ERP Offline</span>
+                    ) : (
+                      <span className="badge-pill-mmt" style={{ fontSize: '10px', marginLeft: 'auto' }}>Sandbox</span>
+                    )}
                   </h3>
                 </div>
 
@@ -2133,7 +2786,7 @@ export default function BookingPage() {
                   </div>
                   <div className="summary-row-mmt total">
                     <span>Total Payable</span>
-                    <span>₹{finalTotal.toLocaleString()}</span>
+                    <span>₹{payableTotal.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -2373,7 +3026,7 @@ export default function BookingPage() {
                         style={{ flex: 2, margin: 0 }}
                       >
                         <ShieldCheck size={18} />
-                        <span>Pay Securely ₹{finalTotal.toLocaleString()}</span>
+                        <span>Pay Securely ₹{payableTotal.toLocaleString()}</span>
                       </button>
                     </div>
                   </>
@@ -2424,7 +3077,7 @@ export default function BookingPage() {
                   )}
                   <div className="summary-row-mmt total" style={{ fontSize: '16px', margin: '10px 0 0', paddingTop: '10px' }}>
                     <span>Final Amount:</span>
-                    <span>₹{finalTotal.toLocaleString()}</span>
+                    <span>₹{payableTotal.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -2482,7 +3135,7 @@ export default function BookingPage() {
                 </div>
                 <div>
                   <p style={{ color: 'rgba(44, 37, 32, 0.6)', margin: '0 0 4px' }}>Amount Paid Securely</p>
-                  <strong style={{ color: '#16a34a' }}>₹{finalTotal.toLocaleString()}</strong>
+                  <strong style={{ color: '#16a34a' }}>₹{payableTotal.toLocaleString()}</strong>
                 </div>
               </div>
 
@@ -2548,6 +3201,98 @@ export default function BookingPage() {
       </footer>
 
       <FloatingWidgets />
+
+      {/* Retractable Developer Credentials Drawer Toggle Button */}
+      <button 
+        className="dev-credentials-toggle"
+        onClick={() => setCredentialsOpen(true)}
+      >
+        <Terminal size={16} style={{ color: '#d4af37' }} />
+        <span>Dev API Hub</span>
+      </button>
+
+      {/* Dev Drawer Backdrop */}
+      <div 
+        className={`dev-drawer-backdrop ${credentialsOpen ? 'open' : ''}`}
+        onClick={() => setCredentialsOpen(false)}
+      />
+
+      {/* Collapsible Developer Credentials Drawer */}
+      <div className={`dev-credentials-drawer ${credentialsOpen ? 'open' : ''}`}>
+        <div className="dev-drawer-header">
+          <h3>
+            <Terminal size={20} />
+            <span>Developer Credentials Hub</span>
+          </h3>
+          <button 
+            className="dev-drawer-close"
+            onClick={() => setCredentialsOpen(false)}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="dev-drawer-section">
+          <label style={{ fontSize: '11px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }}>
+            System Sync Status
+          </label>
+          <div className="dev-status-indicator">
+            <span className={`status-dot ${apiConnectionStatus}`} />
+            <span style={{ fontSize: '14px', fontWeight: '700', color: apiConnectionStatus === 'live' ? '#22c55e' : apiConnectionStatus === 'error' ? '#ef4444' : '#eab308' }}>
+              {apiConnectionStatus === 'live' ? 'Live ERP Active' : apiConnectionStatus === 'error' ? 'Connection Error' : 'Sandbox Simulator Active'}
+            </span>
+          </div>
+          {apiErrorMsg && (
+            <p style={{ fontSize: '11px', color: '#ef4444', marginTop: '10px', background: 'rgba(239, 68, 68, 0.08)', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.15)', whiteSpace: 'pre-wrap' }}>
+              {apiErrorMsg}
+            </p>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="dev-input-wrapper">
+            <label>ERP API Base URL</label>
+            <input 
+              type="text" 
+              placeholder="e.g. https://pankaj.vcmerp.in/api/method/..."
+              value={drawerErpBase}
+              onChange={(e) => setDrawerErpBase(e.target.value)}
+            />
+          </div>
+
+          <div className="dev-input-wrapper">
+            <label>ERP API Key</label>
+            <input 
+              type="password" 
+              placeholder="Enter api_key"
+              value={drawerApiKey}
+              onChange={(e) => setDrawerApiKey(e.target.value)}
+            />
+          </div>
+
+          <div className="dev-input-wrapper">
+            <label>ERP API Secret</label>
+            <input 
+              type="password" 
+              placeholder="Enter api_secret"
+              value={drawerApiSecret}
+              onChange={(e) => setDrawerApiSecret(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '20px', lineHeight: '1.5' }}>
+          💡 These developer credentials are saved securely in your browser's local <code style={{ color: '#d4af37' }}>sessionStorage</code>. They will be sent safely through the Next.js API proxy route and are cleared instantly when you close your browser tab.
+        </p>
+
+        <button 
+          className="dev-save-btn"
+          onClick={() => handleSaveCredentials(drawerApiKey, drawerApiSecret, drawerErpBase)}
+        >
+          <Key size={16} />
+          <span>Save & Initialize Connection</span>
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,392 @@
+<h1>The Braj Nidhi website is coming soon</h1>
+<p>Please contact VCM Guesthouse team or ERP Team for more details.</p>
+<!-- sudo chown -R ubuntu:ubuntu /var/www/thebrajnidhi.com -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Braj Nidhi API Test (Proxy Routed)</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, sans-serif;
+      --border: #d8dee6;
+      --ink: #172033;
+      --muted: #667085;
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --accent: #1f6feb;
+      --danger: #b42318;
+      --ok: #067647;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      margin: 0 0 18px;
+      font-size: 28px;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    input, textarea, select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 10px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--ink);
+    }
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+      font-family: Consolas, monospace;
+    }
+    button {
+      margin-top: 14px;
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #475467;
+    }
+    .full {
+      grid-column: 1 / -1;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #101828;
+      color: #d0d5dd;
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 180px;
+      overflow: auto;
+    }
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .status {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .ok {
+      color: var(--ok);
+    }
+    .error {
+      color: var(--danger);
+    }
+    @media (max-width: 760px) {
+      main {
+        padding: 16px;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Braj Nidhi Guesthouse API Test (Proxy Routed)</h1>
+
+    <div class="grid">
+      <section class="panel full">
+        <h2>ERP Connection & Proxy Config</h2>
+        <p class="note">
+          This test page is served locally by your Next.js server. Fetch requests are automatically routed through the Next.js API proxy (<code>/api/booking/[method]</code>) to securely bypass browser CORS errors.
+        </p>
+
+        <label for="erpBase">ERP API Base</label>
+        <input id="erpBase" value="https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api" />
+
+        <label for="apiKey">API Key</label>
+        <input id="apiKey" placeholder="Paste API Key here" autocomplete="off" />
+
+        <label for="apiSecret">API Secret</label>
+        <input id="apiSecret" placeholder="Paste API Secret here" type="password" autocomplete="off" />
+
+        <button class="secondary" onclick="saveToSession()">Save For This Browser Session</button>
+        <div id="sessionStatus" class="status"></div>
+      </section>
+
+      <section class="panel">
+        <h2>1. Search Rooms</h2>
+
+        <label for="property">Property</label>
+        <input id="property" value="BRAJ-NIDHI-GUEST-HOUSE-VRN" />
+
+        <label for="checkIn">Check-in Date</label>
+        <input id="checkIn" type="date" value="2026-05-20" />
+
+        <label for="checkOut">Check-out Date</label>
+        <input id="checkOut" type="date" value="2026-05-22" />
+
+        <label for="guests">Guests</label>
+        <input id="guests" type="number" min="1" value="2" />
+
+	<label for="roomQty">Rooms</label>
+        <input id="roomQty" type="number" min="1" value="1" />
+
+        <label for="bookingType">Booking Type</label>
+        <input id="bookingType" value="Walk-In" />
+
+        <label for="holdType">Hold Type</label>
+        <input id="holdType" value="BN-Website Hold-0001" />
+
+        <button onclick="searchRooms()">Search Rooms</button>
+      </section>
+
+      <section class="panel">
+        <h2>2. Create Reservation</h2>
+
+        <label for="reservationRoomType">Room Type</label>
+        <input id="reservationRoomType" placeholder="Example: Deluxe" />
+
+        <label for="ratePlan">Rate Plan, optional</label>
+        <input id="ratePlan" placeholder="Leave blank to use Room Type default" />
+
+        <label for="guestName">Guest Name</label>
+        <input id="guestName" value="Test Guest" />
+
+        <label for="guestEmail">Guest Email</label>
+        <input id="guestEmail" value="test@example.com" />
+
+        <label for="guestPhone">Guest Phone</label>
+        <input id="guestPhone" value="+919999999999" />
+
+        <button onclick="createReservation()">Create Reservation</button>
+      </section>
+
+      <section class="panel">
+        <h2>3. Create Payment Order</h2>
+
+        <label for="reservationId">Reservation ID</label>
+        <input id="reservationId" placeholder="Auto-filled after reservation" />
+
+        <label for="amount">Amount</label>
+        <input id="amount" type="number" min="1" value="1" />
+
+        <button onclick="createPaymentOrder()">Create Payment Order</button>
+      </section>
+
+      <section class="panel">
+        <h2>4. Confirm Payment</h2>
+
+        <label for="modeOfPayment">Mode of Payment</label>
+        <input id="modeOfPayment" value="UPI" />
+
+        <label for="gatewayPaymentId">Gateway Payment ID / UTR </label>
+        <input id="gatewayPaymentId" value="TEST-PAYMENT-123" />
+
+        <button onclick="confirmPayment()">Confirm Payment</button>
+      </section>
+
+      <section class="panel full">
+        <h2>Response</h2>
+        <pre id="output">Ready.</pre>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    function value(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function numberValue(id) {
+      return Number(value(id) || 0);
+    }
+
+    function output(data, isError = false) {
+      const el = document.getElementById("output");
+      el.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+      el.className = isError ? "error" : "";
+    }
+
+    function saveToSession() {
+      sessionStorage.setItem("erpBase", value("erpBase"));
+      sessionStorage.setItem("apiKey", value("apiKey"));
+      sessionStorage.setItem("apiSecret", value("apiSecret"));
+      document.getElementById("sessionStatus").textContent = "Saved for this browser tab/session.";
+      document.getElementById("sessionStatus").className = "status ok";
+    }
+
+    function loadFromSession() {
+      ["erpBase", "apiKey", "apiSecret"].forEach((id) => {
+        const saved = sessionStorage.getItem(id);
+        if (saved) document.getElementById(id).value = saved;
+      });
+    }
+
+    async function callApi(method, body) {
+      const apiKey = value("apiKey");
+      const apiSecret = value("apiSecret");
+      const erpBase = value("erpBase");
+      
+      if (!apiKey || !apiSecret) {
+        throw new Error("Enter API Key and API Secret first.");
+      }
+
+      // Secure fetch routed through local Next.js proxy to bypass CORS blocks!
+      const response = await fetch(`/api/booking/${method}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "x-api-secret": apiSecret,
+          "x-erp-base": erpBase
+        },
+        body: JSON.stringify(body)
+      });
+
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (_e) {
+        data = { raw: text };
+      }
+
+      if (!response.ok || data.exc || data.exception) {
+        throw new Error(JSON.stringify(data, null, 2));
+      }
+
+      return data.message !== undefined ? data.message : data;
+    }
+
+    async function searchRooms() {
+      try {
+        output("Searching rooms...");
+        const result = await callApi("search_rooms", {
+          property: value("property"),
+          check_in_date: value("checkIn"),
+          check_out_date: value("checkOut"),
+          guests: numberValue("guests"),
+          rooms: numberValue("roomQty"),
+          booking_type: value("bookingType"),
+          hold_type: value("holdType")
+        });
+
+        const firstRoom = result.availableRooms && result.availableRooms[0];
+        if (firstRoom && !value("reservationRoomType")) {
+          document.getElementById("reservationRoomType").value = firstRoom.roomTypeId;
+          document.getElementById("amount").value = firstRoom.amount || firstRoom.pricePerNight || 1;
+        }
+
+        output(result);
+      } catch (error) {
+        output(error.message, true);
+      }
+    }
+
+    async function createReservation() {
+      try {
+        output("Creating reservation...");
+        const room = {
+          room_type: value("reservationRoomType"),
+          qty: numberValue("roomQty"),
+          adults: numberValue("guests"),
+          children: 0
+        };
+
+        if (value("ratePlan")) {
+          room.rate_plan = value("ratePlan");
+        }
+
+        const result = await callApi("create_reservation", {
+          property: value("property"),
+          check_in_date: value("checkIn"),
+          check_out_date: value("checkOut"),
+          booking_type: value("bookingType"),
+          hold_type: value("holdType"),
+          guest: {
+            name: value("guestName"),
+            email: value("guestEmail"),
+            phone: value("guestPhone")
+          },
+          rooms: [room]
+        });
+
+        if (result.reservationId) {
+          document.getElementById("reservationId").value = result.reservationId;
+        }
+        if (result.amount) {
+          document.getElementById("amount").value = result.amount;
+        }
+
+        output(result);
+      } catch (error) {
+        output(error.message, true);
+      }
+    }
+
+    async function createPaymentOrder() {
+      try {
+        output("Creating payment order...");
+        const result = await callApi("create_payment_order", {
+          reservation_id: value("reservationId"),
+          amount: numberValue("amount"),
+          currency: "INR"
+        });
+        output(result);
+      } catch (error) {
+        output(error.message, true);
+      }
+    }
+
+    async function confirmPayment() {
+      try {
+        output("Confirming payment...");
+        const result = await callApi("confirm_payment", {
+          reservation_id: value("reservationId"),
+          amount: numberValue("amount"),
+          mode_of_payment: value("modeOfPayment"),
+          gateway_payment_id: value("gatewayPaymentId")
+        });
+        output(result);
+      } catch (error) {
+        output(error.message, true);
+      }
+    }
+
+    loadFromSession();
+  </script>
+</body>
+</html>
