@@ -7,6 +7,73 @@ import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
 import PremiumDoubleCalendar from '@/components/PremiumDoubleCalendar';
 
+// Self-contained Hero Slideshow Component to prevent top-level page re-renders
+const HeroSlideshow = ({ images }: { images: string[] }) => {
+  const [heroBgIndex, setHeroBgIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroBgIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
+  return (
+    <AnimatePresence mode="popLayout">
+      <motion.div
+        key={heroBgIndex}
+        className="hero-slider-bg"
+        initial={{ opacity: 0, scale: 1.05 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 1.8, ease: "easeInOut" }}
+        style={{ 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundImage: `linear-gradient(to bottom, rgba(10, 14, 20, 0.45), rgba(10, 14, 20, 0.75)), url(/${images[heroBgIndex]})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+    </AnimatePresence>
+  );
+};
+
+// Self-contained Room Card Slideshow to isolate slide re-renders
+const RoomCardSlideshow = ({ images, alt, interval = 4000 }: { images: string[]; alt: string; interval?: number }) => {
+  const [imgIndex, setImgIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setImgIndex((prev) => (prev + 1) % images.length);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [images.length, interval]);
+
+  return (
+    <AnimatePresence mode="popLayout">
+      <motion.img
+        key={imgIndex}
+        src={images[imgIndex]}
+        alt={alt}
+        className="room-bg-img"
+        initial={{ opacity: 0, scale: 1.2 }}
+        animate={{ opacity: 1, scale: 1.05 }}
+        exit={{ opacity: 0, scale: 1 }}
+        transition={{ 
+          opacity: { duration: 1.5, ease: "easeInOut" },
+          scale: { duration: 6, ease: "linear" } 
+        }}
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    </AnimatePresence>
+  );
+};
+
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -54,18 +121,10 @@ export default function Home() {
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  // Slideshow state for Deluxe Rooms
-  const [deluxe2ImgIndex, setDeluxe2ImgIndex] = useState(0);
+  // Slideshow image arrays
   const deluxe2Images = ["DSC05818-HDR.webp", "DSC05963-HDR.webp"];
-  
-  const [deluxe3ImgIndex, setDeluxe3ImgIndex] = useState(0);
   const deluxe3Images = ["d3.webp", "d31.webp"];
-  
-  const [deluxe4ImgIndex, setDeluxe4ImgIndex] = useState(0);
   const deluxe4Images = ["DSC05963-HDR.webp", "d31.webp"];
-
-  // Slideshow state for Hero Background
-  const [heroBgIndex, setHeroBgIndex] = useState(0);
   const heroImages = [
     "DSC09652.webp",
     "DSC09672.webp",
@@ -83,16 +142,6 @@ export default function Home() {
       const img = new Image();
       img.src = `/${imgSrc}`;
     });
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setDeluxe2ImgIndex((prev) => (prev + 1) % deluxe2Images.length);
-      setDeluxe3ImgIndex((prev) => (prev + 1) % deluxe3Images.length);
-      setDeluxe4ImgIndex((prev) => (prev + 1) % deluxe4Images.length);
-      setHeroBgIndex((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
   }, []);
 
   const roomPrices: Record<string, number> = {
@@ -383,13 +432,24 @@ export default function Home() {
             <a href="/booking" className="btn-book">Book Now</a>
         </div>
 
-        {/* Hamburger Toggle Button */}
-        <button 
-          className="mobile-menu-btn" 
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile Header Actions Flex Wrapper */}
+        <div className="mobile-header-actions">
+            {isLoggedIn ? (
+                <button onClick={handleLogout} className="mobile-logout-btn">
+                    Logout
+                </button>
+            ) : (
+                <button onClick={() => setIsLoginModalOpen(true)} className="mobile-login-join">
+                    Login / Join
+                </button>
+            )}
+            <button 
+              className="mobile-menu-btn" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+        </div>
     </header>
 
     {/* Mobile Menu Drawer Overlay */}
@@ -429,33 +489,12 @@ export default function Home() {
 
     <main>
         <section className="hero">
-            {/* Background Slideshow */}
             <div className="hero-slider-container">
-                <AnimatePresence>
-                    <motion.div
-                        key={heroBgIndex}
-                        className="hero-slider-bg"
-                        initial={{ opacity: 0, scale: 1.05 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 1.8, ease: "easeInOut" }}
-                        style={{ 
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            backgroundImage: `linear-gradient(to bottom, rgba(10, 14, 20, 0.45), rgba(10, 14, 20, 0.75)), url(/${heroImages[heroBgIndex]})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            backgroundRepeat: 'no-repeat'
-                        }}
-                    />
-                </AnimatePresence>
+                <HeroSlideshow images={heroImages} />
             </div>
 
             {/* Luxury Yacht Style Horizontal Booking widget */}
-              <div className="luxury-search-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 'auto', marginBottom: '0px', zIndex: 10 }}>
+            <div className="luxury-search-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 'auto', marginBottom: '0px', zIndex: 10 }}>
                 <div className="search-label-above" style={{ margin: '0 0 15px 0', textAlign: 'center' }}>Find now your luxury suites</div>
                 <div className="luxury-search-bar" style={{ maxWidth: '850px', margin: '0 auto' }}>
                     
@@ -685,22 +724,7 @@ export default function Home() {
             <div className="room-grid">
                 {/* Card 1 */}
                 <div className="room-card new-style">
-                    <AnimatePresence>
-                        <motion.img 
-                            key={deluxe2ImgIndex}
-                            src={deluxe2Images[deluxe2ImgIndex]} 
-                            alt="Deluxe 2" 
-                            className="room-bg-img"
-                            initial={{ opacity: 0, scale: 1.2 }}
-                            animate={{ opacity: 1, scale: 1.05 }}
-                            exit={{ opacity: 0, scale: 1 }}
-                            transition={{ 
-                                opacity: { duration: 1.5, ease: "easeInOut" },
-                                scale: { duration: 6, ease: "linear" } 
-                            }}
-                            style={{ position: 'absolute', top: 0, left: 0 }}
-                        />
-                    </AnimatePresence>
+                    <RoomCardSlideshow images={deluxe2Images} alt="Deluxe 2" interval={4000} />
                     <div className="card-gradient"></div>
                     <div className="room-content">
                         <h3>Deluxe 2 – Twin Bedded Room</h3>
@@ -715,22 +739,7 @@ export default function Home() {
 
                 {/* Card 2 */}
                 <div className="room-card new-style">
-                    <AnimatePresence>
-                        <motion.img 
-                            key={deluxe3ImgIndex}
-                            src={deluxe3Images[deluxe3ImgIndex]} 
-                            alt="Deluxe 3" 
-                            className="room-bg-img"
-                            initial={{ opacity: 0, scale: 1.2 }}
-                            animate={{ opacity: 1, scale: 1.05 }}
-                            exit={{ opacity: 0, scale: 1 }}
-                            transition={{ 
-                                opacity: { duration: 1.5, ease: "easeInOut" },
-                                scale: { duration: 6, ease: "linear" } 
-                            }}
-                            style={{ position: 'absolute', top: 0, left: 0 }}
-                        />
-                    </AnimatePresence>
+                    <RoomCardSlideshow images={deluxe3Images} alt="Deluxe 3" interval={4500} />
                     <div className="card-gradient"></div>
                     <div className="room-content">
                         <h3>Deluxe 3 – 3 Bedded Room</h3>
@@ -745,22 +754,7 @@ export default function Home() {
 
                 {/* Card 3 */}
                 <div className="room-card new-style">
-                    <AnimatePresence>
-                        <motion.img 
-                            key={deluxe4ImgIndex}
-                            src={deluxe4Images[deluxe4ImgIndex]} 
-                            alt="Deluxe 4" 
-                            className="room-bg-img"
-                            initial={{ opacity: 0, scale: 1.2 }}
-                            animate={{ opacity: 1, scale: 1.05 }}
-                            exit={{ opacity: 0, scale: 1 }}
-                            transition={{ 
-                                opacity: { duration: 1.5, ease: "easeInOut" },
-                                scale: { duration: 6, ease: "linear" } 
-                            }}
-                            style={{ position: 'absolute', top: 0, left: 0 }}
-                        />
-                    </AnimatePresence>
+                    <RoomCardSlideshow images={deluxe4Images} alt="Deluxe 4" interval={5000} />
                     <div className="card-gradient"></div>
                     <div className="room-content">
                         <h3>Deluxe 4 – 4 Bedded Room</h3>

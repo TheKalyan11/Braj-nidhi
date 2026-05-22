@@ -864,12 +864,19 @@ export default function Corporate() {
         </div>
 
         {/* Hamburger Toggle Button */}
-        <button 
-          className="mobile-menu-btn" 
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="mobile-header-actions">
+            {isLoggedIn ? (
+                <button onClick={handleLogout} className="mobile-logout-btn">Logout</button>
+            ) : (
+                <button onClick={() => setIsLoginModalOpen(true)} className="mobile-login-join">Login / Join</button>
+            )}
+            <button 
+              className="mobile-menu-btn" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+        </div>
     </header>
 
     {/* Mobile Menu Drawer Overlay */}

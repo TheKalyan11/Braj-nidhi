@@ -2180,24 +2180,17 @@ export default function BookingPage() {
           <a href="/booking" className="btn-book">Book Now</a>
         </div>
 
-        {/* Hamburger Toggle Button */}
-        <button 
-          className="mobile-menu-btn" 
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'none', // Overridden to flex in media query
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#1a1512',
-            padding: '8px',
-            zIndex: 1001
-          }}
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile Header Actions Wrapper */}
+        <div className="mobile-header-actions">
+            {isLoggedIn ? (
+                <button onClick={handleLogout} className="mobile-logout-btn">Logout</button>
+            ) : (
+                <button onClick={() => setLoginModalOpen(true)} className="mobile-login-join">Login / Join</button>
+            )}
+            <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+        </div>
       </header>
 
       {/* Mobile Menu Drawer Overlay */}

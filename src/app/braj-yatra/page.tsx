@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import Link from 'next/link';
@@ -119,16 +119,81 @@ function useCounter(end: number, duration: number = 2000) {
   return { count, ref };
 }
 
+const sliderImages = [
+  { url: "/yamuna_ghat.png", title: "Yamuna Ghat, Mathura" },
+  { url: "/temple_tour_1.webp", title: "Banke Bihari, Vrindavan" },
+  { url: "/nand_baba.webp", title: "Nand Bhavan, Nandgaon" },
+  { url: "/spiritual_5.webp", title: "Radha Rani Temple, Barsana" },
+  { url: "/temple_tour_3.webp", title: "Prem Mandir, Vrindavan" }
+];
+
+function HeroSlider() {
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide(prev => (prev + 1) % sliderImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const nextSlide = () => {
+    setActiveSlide(prev => (prev + 1) % sliderImages.length);
+  };
+
+  const prevSlide = () => {
+    setActiveSlide(prev => (prev - 1 + sliderImages.length) % sliderImages.length);
+  };
+
+  return (
+    <div className="y-slider-inner">
+      <AnimatePresence initial={false} mode="wait">
+        <motion.img
+          key={activeSlide}
+          src={sliderImages[activeSlide].url}
+          alt={sliderImages[activeSlide].title}
+          className="y-slider-slide"
+          initial={{ opacity: 0, scale: 1.04 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+        />
+      </AnimatePresence>
+
+      {/* Inset white border outline overlay */}
+      <div className="y-slider-border-overlay" />
+
+      {/* Bottom legibility gradient overlay */}
+      <div className="y-slider-gradient" />
+
+      {/* Centered bold title */}
+      <div className="y-slider-title-overlay">
+        {sliderImages[activeSlide].title}
+      </div>
+
+      {/* Circular Navigation Arrows */}
+      <button
+        type="button"
+        className="y-slider-arrow y-left"
+        onClick={prevSlide}
+        aria-label="Previous Slide"
+      >
+        <ChevronLeft size={22} />
+      </button>
+      <button
+        type="button"
+        className="y-slider-arrow y-right"
+        onClick={nextSlide}
+        aria-label="Next Slide"
+      >
+        <ChevronRight size={22} />
+      </button>
+    </div>
+  );
+}
+
 /* ─── COMPONENT ─── */
 export default function BrajYatra() {
-  const [activeSlide, setActiveSlide] = useState(0);
-  const sliderImages = [
-    { url: "/yamuna_ghat.png", title: "Yamuna Ghat, Mathura" },
-    { url: "/temple_tour_1.webp", title: "Banke Bihari, Vrindavan" },
-    { url: "/nand_baba.webp", title: "Nand Bhavan, Nandgaon" },
-    { url: "/spiritual_5.webp", title: "Radha Rani Temple, Barsana" },
-    { url: "/temple_tour_3.webp", title: "Prem Mandir, Vrindavan" }
-  ];
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -164,9 +229,6 @@ export default function BrajYatra() {
   const counter2 = useCounter(5000, 2200);
   const counter3 = useCounter(98, 2000);
 
-  const { scrollYProgress } = useScroll();
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 50, damping: 20 });
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
@@ -176,13 +238,6 @@ export default function BrajYatra() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveSlide(prev => (prev + 1) % sliderImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [sliderImages.length]);
 
   // Auto-cycle packages
   const [pkgPaused, setPkgPaused] = useState(false);
@@ -268,14 +323,6 @@ export default function BrajYatra() {
 
   const nextPackage = () => setActivePackage(prev => (prev + 1) % packages.length);
   const prevPackage = () => setActivePackage(prev => (prev - 1 + packages.length) % packages.length);
-
-  const nextSlide = () => {
-    setActiveSlide(prev => (prev + 1) % sliderImages.length);
-  };
-
-  const prevSlide = () => {
-    setActiveSlide(prev => (prev - 1 + sliderImages.length) % sliderImages.length);
-  };
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     setMousePos({ x: (e.clientX / window.innerWidth - 0.5) * 20, y: (e.clientY / window.innerHeight - 0.5) * 20 });
@@ -1229,8 +1276,7 @@ export default function BrajYatra() {
         }
       `}} />
 
-      {/* Scroll progress bar */}
-      <motion.div className="scroll-progress" style={{ scaleX: smoothProgress }} />
+
 
       {/* ═══ HEADER ═══ */}
       <header id="main-header" className={scrolled ? "scrolled" : ""}>
@@ -1261,9 +1307,16 @@ export default function BrajYatra() {
           )}
           <a href="/booking" className="btn-book">Book Now</a>
         </div>
-        <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="mobile-header-actions">
+          {isLoggedIn ? (
+            <button onClick={handleLogout} className="mobile-logout-btn">Logout</button>
+          ) : (
+            <button onClick={() => setIsLoginModalOpen(true)} className="mobile-login-join">Login / Join</button>
+          )}
+          <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </header>
 
       {/* Mobile Menu */}
@@ -1343,49 +1396,7 @@ export default function BrajYatra() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.0, delay: 0.6, ease: "easeOut" as const }}
           >
-            <div className="y-slider-inner">
-              <AnimatePresence initial={false} mode="wait">
-                <motion.img
-                  key={activeSlide}
-                  src={sliderImages[activeSlide].url}
-                  alt={sliderImages[activeSlide].title}
-                  className="y-slider-slide"
-                  initial={{ opacity: 0, scale: 1.04 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                />
-              </AnimatePresence>
-
-              {/* Inset white border outline overlay */}
-              <div className="y-slider-border-overlay" />
-
-              {/* Bottom legibility gradient overlay */}
-              <div className="y-slider-gradient" />
-
-              {/* Centered bold title */}
-              <div className="y-slider-title-overlay">
-                {sliderImages[activeSlide].title}
-              </div>
-
-              {/* Circular Navigation Arrows */}
-              <button
-                type="button"
-                className="y-slider-arrow y-left"
-                onClick={prevSlide}
-                aria-label="Previous Slide"
-              >
-                <ChevronLeft size={22} />
-              </button>
-              <button
-                type="button"
-                className="y-slider-arrow y-right"
-                onClick={nextSlide}
-                aria-label="Next Slide"
-              >
-                <ChevronRight size={22} />
-              </button>
-            </div>
+            <HeroSlider />
           </motion.div>
 
           {/* Floating Search Packages widget (Bottom Right) */}
