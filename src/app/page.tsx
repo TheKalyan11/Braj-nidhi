@@ -67,17 +67,23 @@ export default function Home() {
   // Slideshow state for Hero Background
   const [heroBgIndex, setHeroBgIndex] = useState(0);
   const heroImages = [
-    "DSC09652.JPG",
-    "DSC09672.JPG",
-    "hero.png",
-    "DSC02591.JPG",
-    "DSC06003-HDR.png",
+    "DSC09652.webp",
+    "DSC09672.webp",
     "hero.webp",
+    "DSC02591.webp",
+    "DSC06003-HDR.webp",
     "DSC05818-HDR.webp",
     "DSC05963-HDR.webp",
-    "DSC06003-HDR.webp",
     "wedding-1.webp"
   ];
+
+  // Preload hero images on mount to ensure smooth, flicker-free transitions
+  useEffect(() => {
+    heroImages.forEach((imgSrc) => {
+      const img = new Image();
+      img.src = `/${imgSrc}`;
+    });
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -156,6 +162,7 @@ export default function Home() {
     let gallerySwiper: any;
     let testimonialsSwiper: any;
     let checkInterval: any;
+    let resumeAutoplayFn: any;
 
     const initSwiper = () => {
       if (typeof window !== 'undefined' && (window as any).Swiper) {
@@ -172,17 +179,49 @@ export default function Home() {
             observer: true,
             observeParents: true,
           });
+          
           testimonialsSwiper = new (window as any).Swiper('.testimonials-slider', {
             slidesPerView: 'auto',
             spaceBetween: 24,
             loop: true,
             speed: 5000,
-            autoplay: { delay: 0, disableOnInteraction: false },
+            autoplay: { 
+              delay: 0, 
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false
+            },
             grabCursor: true,
             freeMode: true,
             observer: true,
             observeParents: true,
+            on: {
+              touchEnd: function(swiper: any) {
+                if (swiper && swiper.autoplay) {
+                  swiper.autoplay.start();
+                }
+              },
+              touchStart: function(swiper: any) {
+                if (swiper && swiper.autoplay) {
+                  swiper.autoplay.start();
+                }
+              }
+            }
           });
+
+          // Extra layer of protection using native DOM touch events to handle vertical scrolls cleanly
+          const sliderEl = document.querySelector('.testimonials-slider');
+          if (sliderEl) {
+            resumeAutoplayFn = () => {
+              if (testimonialsSwiper && testimonialsSwiper.autoplay) {
+                try {
+                  testimonialsSwiper.autoplay.start();
+                } catch (err) {}
+              }
+            };
+            sliderEl.addEventListener('touchstart', resumeAutoplayFn, { passive: true });
+            sliderEl.addEventListener('touchend', resumeAutoplayFn, { passive: true });
+            sliderEl.addEventListener('touchcancel', resumeAutoplayFn, { passive: true });
+          }
         } catch (e) {
           console.error("Error initializing Swiper:", e);
         }
@@ -205,6 +244,12 @@ export default function Home() {
     return () => {
       if (checkInterval) clearInterval(checkInterval);
       try {
+        const sliderEl = document.querySelector('.testimonials-slider');
+        if (sliderEl && resumeAutoplayFn) {
+          sliderEl.removeEventListener('touchstart', resumeAutoplayFn);
+          sliderEl.removeEventListener('touchend', resumeAutoplayFn);
+          sliderEl.removeEventListener('touchcancel', resumeAutoplayFn);
+        }
         if (gallerySwiper && typeof gallerySwiper.destroy === 'function') gallerySwiper.destroy(true, false);
         if (testimonialsSwiper && typeof testimonialsSwiper.destroy === 'function') testimonialsSwiper.destroy(true, false);
       } catch (e) {
@@ -530,23 +575,27 @@ export default function Home() {
 
         <section className="banner-section">
             <div className="scrolling-banner">
-                <div className="banner-track">
-                    <div className="logo-item">DIVINE HOSPITALITY</div>
-                    <div className="logo-item">LUXURY SUITES</div>
-                    <div className="logo-item">WEDDINGS & CELEBRATIONS</div>
-                    <div className="logo-item">CORPORATE OFFSITES</div>
-                    <div className="logo-item">PREMIUM AV HALL</div>
-                    <div className="logo-item">SATTVIC DINING</div>
-                    <div className="logo-item">SPIRITUAL RETREATS</div>
-                    <div className="logo-item">VRINDAVAN EXPERIENCE</div>
-                    <div className="logo-item">DIVINE HOSPITALITY</div>
-                    <div className="logo-item">LUXURY SUITES</div>
-                    <div className="logo-item">WEDDINGS & CELEBRATIONS</div>
-                    <div className="logo-item">CORPORATE OFFSITES</div>
-                    <div className="logo-item">PREMIUM AV HALL</div>
-                    <div className="logo-item">SATTVIC DINING</div>
-                    <div className="logo-item">SPIRITUAL RETREATS</div>
-                    <div className="logo-item">VRINDAVAN EXPERIENCE</div>
+                <div className="banner-track" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', width: 'max-content', maxWidth: 'none' }}>
+                    <div className="scrolling-banner-content" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', gap: '56px', paddingRight: '56px', maxWidth: 'none', flexShrink: 0 }}>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>DIVINE HOSPITALITY</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>LUXURY SUITES</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>WEDDINGS & CELEBRATIONS</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>CORPORATE OFFSITES</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>PREMIUM AV HALL</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>SATTVIC DINING</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>SPIRITUAL RETREATS</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>VRINDAVAN EXPERIENCE</div>
+                    </div>
+                    <div className="scrolling-banner-content" aria-hidden="true" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', gap: '56px', paddingRight: '56px', maxWidth: 'none', flexShrink: 0 }}>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>DIVINE HOSPITALITY</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>LUXURY SUITES</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>WEDDINGS & CELEBRATIONS</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>CORPORATE OFFSITES</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>PREMIUM AV HALL</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>SATTVIC DINING</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>SPIRITUAL RETREATS</div>
+                        <div className="logo-item" style={{ whiteSpace: 'nowrap', flexShrink: 0, maxWidth: 'none' }}>VRINDAVAN EXPERIENCE</div>
+                    </div>
                 </div>
             </div>
         </section>

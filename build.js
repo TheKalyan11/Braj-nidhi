@@ -189,9 +189,25 @@ export default function Home() {
         spaceBetween: 24,
         loop: true,
         speed: 5000,
-        autoplay: { delay: 0, disableOnInteraction: false },
+        autoplay: { 
+          delay: 0, 
+          disableOnInteraction: false,
+          pauseOnMouseEnter: false
+        },
         grabCursor: true,
         freeMode: true,
+        on: {
+          touchEnd: function(swiper: any) {
+            if (swiper && swiper.autoplay) {
+              swiper.autoplay.start();
+            }
+          },
+          touchStart: function(swiper: any) {
+            if (swiper && swiper.autoplay) {
+              swiper.autoplay.start();
+            }
+          }
+        }
       });
     }
   }, []);

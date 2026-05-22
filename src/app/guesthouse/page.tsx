@@ -67,21 +67,75 @@ export default function Guesthouse() {
   }, []);
 
   useEffect(() => {
+    let testimonialsSwiper: any;
+    let resumeAutoplayFn: any;
+
     // Swiper initialization for subpages
     if (typeof window !== 'undefined' && (window as any).Swiper) {
       const swiperElements = document.querySelectorAll('.swiper');
       if (swiperElements.length > 0) {
-        new (window as any).Swiper('.testimonials-slider', {
-          slidesPerView: 'auto',
-          spaceBetween: 24,
-          loop: true,
-          speed: 5000,
-          autoplay: { delay: 0, disableOnInteraction: false },
-          grabCursor: true,
-          freeMode: true,
-        });
+        try {
+          testimonialsSwiper = new (window as any).Swiper('.testimonials-slider', {
+            slidesPerView: 'auto',
+            spaceBetween: 24,
+            loop: true,
+            speed: 5000,
+            autoplay: { 
+              delay: 0, 
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false
+            },
+            grabCursor: true,
+            freeMode: true,
+            on: {
+              touchEnd: function(swiper: any) {
+                if (swiper && swiper.autoplay) {
+                  swiper.autoplay.start();
+                }
+              },
+              touchStart: function(swiper: any) {
+                if (swiper && swiper.autoplay) {
+                  swiper.autoplay.start();
+                }
+              }
+            }
+          });
+
+          // Extra layer of protection using native DOM touch events to handle vertical scrolls cleanly
+          const sliderEl = document.querySelector('.testimonials-slider');
+          if (sliderEl) {
+            resumeAutoplayFn = () => {
+              if (testimonialsSwiper && testimonialsSwiper.autoplay) {
+                try {
+                  testimonialsSwiper.autoplay.start();
+                } catch (err) {}
+              }
+            };
+            sliderEl.addEventListener('touchstart', resumeAutoplayFn, { passive: true });
+            sliderEl.addEventListener('touchend', resumeAutoplayFn, { passive: true });
+            sliderEl.addEventListener('touchcancel', resumeAutoplayFn, { passive: true });
+          }
+        } catch (e) {
+          console.error("Error initializing Swiper:", e);
+        }
       }
     }
+
+    return () => {
+      try {
+        const sliderEl = document.querySelector('.testimonials-slider');
+        if (sliderEl && resumeAutoplayFn) {
+          sliderEl.removeEventListener('touchstart', resumeAutoplayFn);
+          sliderEl.removeEventListener('touchend', resumeAutoplayFn);
+          sliderEl.removeEventListener('touchcancel', resumeAutoplayFn);
+        }
+        if (testimonialsSwiper && typeof testimonialsSwiper.destroy === 'function') {
+          testimonialsSwiper.destroy(true, false);
+        }
+      } catch (e) {
+        console.error("Error destroying Swiper:", e);
+      }
+    };
   }, []);
 
   return (

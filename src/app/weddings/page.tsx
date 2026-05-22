@@ -45,23 +45,7 @@ export default function Weddings() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    // Swiper initialization for subpages
-    if (typeof window !== 'undefined' && (window as any).Swiper) {
-      const swiperElements = document.querySelectorAll('.swiper');
-      if (swiperElements.length > 0) {
-        new (window as any).Swiper('.testimonials-slider', {
-          slidesPerView: 'auto',
-          spaceBetween: 24,
-          loop: true,
-          speed: 5000,
-          autoplay: { delay: 0, disableOnInteraction: false },
-          grabCursor: true,
-          freeMode: true,
-        });
-      }
-    }
-  }, []);
+
 
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
@@ -745,19 +729,72 @@ export default function Weddings() {
         /* Testimonial Auto-Scroll */
         .testi-track-wrap { overflow: hidden; position: relative; padding: 20px 0; }
         .testi-track { display: flex; gap: 24px; animation: scrollTestimonials 30s linear infinite; width: max-content; }
-        .testi-track:hover { animation-play-state: paused; }
+        @media (hover: hover) {
+            .testi-track:hover { animation-play-state: paused; }
+        }
         @keyframes scrollTestimonials {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-        .testi-card { flex-shrink: 0; width: 380px; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 32px; position: relative; }
+        .testi-card {
+            flex-shrink: 0;
+            width: 380px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 32px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
         .testi-quote { font-size: 1.5rem; color: #fbc434; margin-bottom: 16px; }
         .testi-stars { color: #fbc434; font-size: 0.9rem; margin-bottom: 12px; letter-spacing: 2px; }
         .testi-text { font-size: 0.95rem; color: #555; line-height: 1.6; font-style: italic; margin-bottom: 20px; }
-        .testi-user { display: flex; align-items: center; gap: 12px; }
+        .testi-user { display: flex; align-items: center; gap: 12px; margin-top: auto; }
         .testi-user img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
         .testi-user h4 { font-family: 'Arial Black', sans-serif; font-size: 0.9rem; text-transform: uppercase; margin: 0; color: #1a1a1a; }
         .testi-user span { font-size: 0.8rem; color: #888; }
+
+        /* Responsive Styles */
+        .testi-container-outer {
+            position: relative;
+            padding: 0 40px;
+        }
+        .testi-gradient-overlay {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100px;
+            z-index: 2;
+            pointer-events: none;
+            filter: blur(3px);
+        }
+        .testi-gradient-overlay.left {
+            left: 0;
+            background: linear-gradient(to right, #fdfcf8 0%, transparent 100%);
+        }
+        .testi-gradient-overlay.right {
+            right: 0;
+            background: linear-gradient(to left, #fdfcf8 0%, transparent 100%);
+        }
+
+        @media (max-width: 768px) {
+            .testi-track { gap: 16px; }
+            .testi-container-outer {
+                padding: 0 16px;
+            }
+            .testi-gradient-overlay {
+                width: 40px;
+            }
+            .testi-card { width: 290px; padding: 20px; border-radius: 12px; }
+            .testi-quote { font-size: 1.25rem; margin-bottom: 10px; }
+            .testi-stars { font-size: 0.8rem; margin-bottom: 8px; }
+            .testi-text { font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px; }
+            .testi-user img { width: 40px; height: 40px; }
+            .testi-user h4 { font-size: 0.8rem; }
+            .testi-user span { font-size: 0.75rem; }
+        }
     ` }} />
       
     {/* SVG Definitions */}
@@ -1063,10 +1100,10 @@ export default function Weddings() {
                 <p style={{color:'#666', fontSize:'1.05rem'}}>Hear from those who began their forever journey with us.</p>
             </div>
 
-            <div style={{position:'relative', padding:'0 40px'}}>
-                <div style={{position:'absolute', top:0, bottom:0, left:0, width:'100px', background:'linear-gradient(to right, #fdfcf8 0%, transparent 100%)', zIndex:2, pointerEvents:'none', filter:'blur(3px)'}}></div>
-                <div style={{position:'absolute', top:0, bottom:0, right:0, width:'100px', background:'linear-gradient(to left, #fdfcf8 0%, transparent 100%)', zIndex:2, pointerEvents:'none', filter:'blur(3px)'}}></div>
-                <div className="testi-track-wrap" style={{overflow:'hidden'}}>
+            <div className="testi-container-outer">
+                <div className="testi-gradient-overlay left"></div>
+                <div className="testi-gradient-overlay right"></div>
+                <div className="testi-track-wrap">
                     <div className="testi-track">
                         {/* Card 1 - Priya & Aarav */}
                         <div className="testi-card">

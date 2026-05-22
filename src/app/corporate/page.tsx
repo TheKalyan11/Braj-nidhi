@@ -46,21 +46,75 @@ export default function Corporate() {
   }, []);
 
   useEffect(() => {
+    let testimonialsSwiper: any;
+    let resumeAutoplayFn: any;
+
     // Swiper initialization for subpages
     if (typeof window !== 'undefined' && (window as any).Swiper) {
       const swiperElements = document.querySelectorAll('.swiper');
       if (swiperElements.length > 0) {
-        new (window as any).Swiper('.testimonials-slider', {
-          slidesPerView: 'auto',
-          spaceBetween: 24,
-          loop: true,
-          speed: 5000,
-          autoplay: { delay: 0, disableOnInteraction: false },
-          grabCursor: true,
-          freeMode: true,
-        });
+        try {
+          testimonialsSwiper = new (window as any).Swiper('.testimonials-slider', {
+            slidesPerView: 'auto',
+            spaceBetween: 24,
+            loop: true,
+            speed: 5000,
+            autoplay: { 
+              delay: 0, 
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false
+            },
+            grabCursor: true,
+            freeMode: true,
+            on: {
+              touchEnd: function(swiper: any) {
+                if (swiper && swiper.autoplay) {
+                  swiper.autoplay.start();
+                }
+              },
+              touchStart: function(swiper: any) {
+                if (swiper && swiper.autoplay) {
+                  swiper.autoplay.start();
+                }
+              }
+            }
+          });
+
+          // Extra layer of protection using native DOM touch events to handle vertical scrolls cleanly
+          const sliderEl = document.querySelector('.testimonials-slider');
+          if (sliderEl) {
+            resumeAutoplayFn = () => {
+              if (testimonialsSwiper && testimonialsSwiper.autoplay) {
+                try {
+                  testimonialsSwiper.autoplay.start();
+                } catch (err) {}
+              }
+            };
+            sliderEl.addEventListener('touchstart', resumeAutoplayFn, { passive: true });
+            sliderEl.addEventListener('touchend', resumeAutoplayFn, { passive: true });
+            sliderEl.addEventListener('touchcancel', resumeAutoplayFn, { passive: true });
+          }
+        } catch (e) {
+          console.error("Error initializing Swiper:", e);
+        }
       }
     }
+
+    return () => {
+      try {
+        const sliderEl = document.querySelector('.testimonials-slider');
+        if (sliderEl && resumeAutoplayFn) {
+          sliderEl.removeEventListener('touchstart', resumeAutoplayFn);
+          sliderEl.removeEventListener('touchend', resumeAutoplayFn);
+          sliderEl.removeEventListener('touchcancel', resumeAutoplayFn);
+        }
+        if (testimonialsSwiper && typeof testimonialsSwiper.destroy === 'function') {
+          testimonialsSwiper.destroy(true, false);
+        }
+      } catch (e) {
+        console.error("Error destroying Swiper:", e);
+      }
+    };
   }, []);
 
   const fadeInUp = {
@@ -724,7 +778,9 @@ export default function Corporate() {
         /* Testimonial Auto-Scroll */
         .testi-track-wrap { overflow: hidden; position: relative; padding: 20px 0; }
         .testi-track { display: flex; gap: 24px; animation: scrollTestimonials 30s linear infinite; width: max-content; }
-        .testi-track:hover { animation-play-state: paused; }
+        @media (hover: hover) {
+            .testi-track:hover { animation-play-state: paused; }
+        }
         @keyframes scrollTestimonials {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
@@ -737,6 +793,17 @@ export default function Corporate() {
         .testi-user img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
         .testi-user h4 { font-family: 'Arial Black', sans-serif; font-size: 0.9rem; text-transform: uppercase; margin: 0; color: #1a1a1a; }
         .testi-user span { font-size: 0.8rem; color: #888; }
+
+        @media (max-width: 768px) {
+            .testi-track { gap: 16px; }
+            .testi-card { width: 290px; padding: 20px; border-radius: 12px; }
+            .testi-quote { font-size: 1.25rem; margin-bottom: 10px; }
+            .testi-stars { font-size: 0.8rem; margin-bottom: 8px; }
+            .testi-text { font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px; }
+            .testi-user img { width: 40px; height: 40px; }
+            .testi-user h4 { font-size: 0.8rem; }
+            .testi-user span { font-size: 0.75rem; }
+        }
     ` }} />
       
     {/* SVG Definitions */}
