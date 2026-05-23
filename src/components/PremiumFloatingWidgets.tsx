@@ -457,9 +457,8 @@ export default function FloatingWidgets() {
     <>
       {/* WhatsApp - Left */}
       <motion.a
-        href="https://wa.me/919876543210"
-        target="_blank" rel="noopener noreferrer"
-        title="Chat on WhatsApp"
+        href="#"
+        title="WhatsApp Chat (Coming Soon)"
         className="fixed left-5 bottom-[196px] z-50 w-12 h-12 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_25px_rgba(37,211,102,0.6)]"
         whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.9 }}
         initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
@@ -728,9 +727,8 @@ export default function FloatingWidgets() {
 
                             <div className="flex gap-2.5 mt-5">
                               <a
-                                href={`https://wa.me/919876543210?text=${waMsg}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href="#"
+                                title="WhatsApp Chat (Coming Soon)"
                                 className="flex-1 bg-[#25D366] hover:bg-[#20ba56] text-white text-xs font-bold py-3 rounded-2xl text-center flex items-center justify-center gap-1.5 transition-all duration-300 shadow-sm"
                               >
                                 <WhatsAppIcon className="w-3.5 h-3.5" /> WhatsApp

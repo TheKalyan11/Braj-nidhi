@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
 
@@ -82,6 +82,59 @@ export default function Guesthouse() {
   const deluxe3Images = ["d3.webp", "d31.webp"];
   const deluxe4Images = ["DSC05963-HDR.webp", "d31.webp"];
   const [showSuiteCards, setShowSuiteCards] = useState(false);
+
+  // Hero section image slider
+  const heroImages = ["/z.png", "/DSC05963-HDR.webp", "/d3.png"];
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [heroIndex, heroImages.length]);
+
+  const handleNextHero = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setHeroIndex((prev) => (prev + 1) % heroImages.length);
+  };
+
+  const handlePrevHero = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setHeroIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  };
+
+  const scrollToSection = (id: string, e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      const headerOffset = 100; // Account for the sticky header height
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - headerOffset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Promo Section 1 image slider
+  const promoImages = [
+    "/temple_tour_1.webp",
+    "/temple_tour_3.webp",
+    "/yamuna_ghat.png",
+    "/nand_baba.webp",
+    "/spiritual_5.webp"
+  ];
+  const [promoIndex, setPromoIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPromoIndex((prev) => (prev + 1) % promoImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [promoImages.length]);
 
   useEffect(() => {
     let testimonialsSwiper: any;
@@ -233,6 +286,7 @@ export default function Guesthouse() {
             height: 520px;
             max-height: 560px;
             z-index: 1;
+            overflow: hidden;
         }
 
         .hero-main-img-wrap img {
@@ -255,6 +309,70 @@ export default function Guesthouse() {
             gap: 12px;
             font-size: 1.1rem;
             letter-spacing: 1px;
+            z-index: 6;
+        }
+
+        .hero-slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .hero-slider-arrow:hover {
+            background: #ffffff;
+            color: #e95d35;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 8px 25px rgba(233, 93, 53, 0.3);
+        }
+
+        .hero-slider-arrow:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .hero-slider-arrow.left {
+            left: 20px;
+        }
+
+        .hero-slider-arrow.right {
+            right: 20px;
+        }
+
+        .hero-slider-dots {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .hero-slider-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hero-slider-dot.active {
+            background: #ffffff;
+            width: 24px;
+            border-radius: 4px;
         }
 
         .hero-bento-grid {
@@ -682,16 +800,20 @@ export default function Guesthouse() {
             flex: 1;
             min-width: 300px;
             position: relative;
+            aspect-ratio: 4 / 5;
+            max-height: 600px;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+            background: #faf8f5;
         }
-        .promo-col-center img {
+        .promo-slider-img {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: auto;
-            max-height: 800px;
+            height: 100%;
             object-fit: cover;
-            display: block;
-            margin: 0 auto;
-            border-radius: 8px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
         .promo-col-right {
             flex: 1;
@@ -1387,18 +1509,20 @@ export default function Guesthouse() {
 
         <div className="nav-btns">
             {isLoggedIn ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <div className="user-info-text">
-                        <span className="user-label">Braj Club Member</span>
-                        <span className="user-name">{userName}</span>
+                <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
+                        <div className="user-info-text">
+                            <span className="user-label">Braj Club Member</span>
+                            <span className="user-name">{userName}</span>
+                        </div>
+                        <div className="user-profile-badge">
+                            {getUserInitials(userName)}
+                        </div>
                     </div>
-                    <div className="user-profile-badge">
-                        {getUserInitials(userName)}
-                    </div>
-                    <button onClick={handleLogout} className="btn-login" style={{ padding: '8px 16px', fontSize: '0.8rem', height: '36px' }}>Logout</button>
-                </div>
+                    <button onClick={handleLogout} className="btn-login">Logout</button>
+                </>
             ) : (
-                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login" style={{ border: 'none', cursor: 'pointer' }}>Login / Create Account</button>
+                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login">Login / Join</button>
             )}
             <a href="/booking" className="btn-book">Book Now</a>
         </div>
@@ -1464,7 +1588,61 @@ export default function Guesthouse() {
                 <div className="hero-title-large">Luxury Guestrooms & Divine Suites</div>
                 
                 <div className="hero-main-img-wrap">
-                    <img src="DSC05818-HDR.webp" alt="Resort View" />
+                    <AnimatePresence initial={false}>
+                        <motion.img
+                            key={heroIndex}
+                            src={heroImages[heroIndex]}
+                            alt="Luxury Resort View"
+                            initial={{ opacity: 0, scale: 1.02 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 1.2, ease: "easeInOut" }}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                zIndex: 1
+                            }}
+                        />
+                    </AnimatePresence>
+
+                    {/* Circular Navigation Arrows */}
+                    <button
+                        type="button"
+                        className="hero-slider-arrow left"
+                        onClick={handlePrevHero}
+                        aria-label="Previous Slide"
+                        style={{ border: 'none' }}
+                    >
+                        <ChevronLeft size={24} />
+                    </button>
+                    <button
+                        type="button"
+                        className="hero-slider-arrow right"
+                        onClick={handleNextHero}
+                        aria-label="Next Slide"
+                        style={{ border: 'none' }}
+                    >
+                        <ChevronRight size={24} />
+                    </button>
+
+                    {/* Active Slide Indicators / Dots */}
+                    <div className="hero-slider-dots">
+                        {heroImages.map((_, i) => (
+                            <button
+                                key={i}
+                                type="button"
+                                className={`hero-slider-dot${heroIndex === i ? ' active' : ''}`}
+                                onClick={() => setHeroIndex(i)}
+                                aria-label={`Go to slide ${i + 1}`}
+                                style={{ border: 'none', padding: 0 }}
+                            />
+                        ))}
+                    </div>
+
                     <div className="hero-orange-banner">
                         FIND ROOMS FOR A STAY <i className="fas fa-binoculars"></i>
                     </div>
@@ -1512,24 +1690,36 @@ export default function Guesthouse() {
                     <p>Braj Nidhi offers elegant rooms and suites designed for calm, mindful stays in Vrindavan. Each space is thoughtfully planned with modern comforts and a peaceful spiritual ambience.</p>
                 </div>
                 <div className="featured-rooms-grid">
-                    <Link href="/booking?roomType=deluxe2" className="featured-room-card">
+                    <a 
+                        href="#deluxe2-detail" 
+                        className="featured-room-card"
+                        onClick={(e) => scrollToSection('deluxe2-detail', e)}
+                    >
                         <div className="featured-room-img-wrap">
                             <img src="DSC05818-HDR.webp" alt="Deluxe 2 – Twin Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 2 – Twin Bedded Room</div>
-                    </Link>
-                    <Link href="/booking?roomType=deluxe3" className="featured-room-card">
+                    </a>
+                    <a 
+                        href="#deluxe3-detail" 
+                        className="featured-room-card"
+                        onClick={(e) => scrollToSection('deluxe3-detail', e)}
+                    >
                         <div className="featured-room-img-wrap">
                             <img src="DSC05963-HDR.webp" alt="Deluxe 3 – 3 Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 3 – 3 Bedded Room</div>
-                    </Link>
-                    <Link href="/booking?roomType=deluxe4" className="featured-room-card">
+                    </a>
+                    <a 
+                        href="#deluxe4-detail" 
+                        className="featured-room-card"
+                        onClick={(e) => scrollToSection('deluxe4-detail', e)}
+                    >
                         <div className="featured-room-img-wrap">
                             <img src="d3.webp" alt="Deluxe 4 – 4 Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 4 – 4 Bedded Room</div>
-                    </Link>
+                    </a>
                 </div>
                 {showSuiteCards && (
                     <div className="suite-preview-section">
@@ -1538,18 +1728,26 @@ export default function Guesthouse() {
                             <p>Discover premium suite options curated for a luxurious Vrindavan stay.</p>
                         </div>
                         <div className="suite-cards-grid">
-                            <Link href="/booking?roomType=deluxe4" className="featured-room-card suite-card">
+                            <a 
+                                href="#deluxe4-detail" 
+                                className="featured-room-card suite-card"
+                                onClick={(e) => scrollToSection('deluxe4-detail', e)}
+                            >
                                 <div className="featured-room-img-wrap">
                                     <img src="DSC05963-HDR.webp" alt="Deluxe Suite" />
                                 </div>
                                 <div className="featured-room-title">Deluxe Suite</div>
-                            </Link>
-                            <Link href="/booking?roomType=deluxe4" className="featured-room-card suite-card">
+                            </a>
+                            <a 
+                                href="#deluxe4-detail" 
+                                className="featured-room-card suite-card"
+                                onClick={(e) => scrollToSection('deluxe4-detail', e)}
+                            >
                                 <div className="featured-room-img-wrap">
                                     <img src="d31.webp" alt="Heritage Suite" />
                                 </div>
                                 <div className="featured-room-title">Heritage Suite</div>
-                            </Link>
+                            </a>
                         </div>
                     </div>
                 )}
@@ -1563,7 +1761,7 @@ export default function Guesthouse() {
                 <div className="listing-main">
                     <div className="property-list">
                         {/* Card 1 */}
-                        <div className="room-card new-style">
+                        <div id="deluxe2-detail" className="room-card new-style">
                             <RoomCardSlideshow images={deluxe2Images} alt="Deluxe 2" interval={4000} />
                             <div className="card-gradient"></div>
                             <div className="room-content">
@@ -1579,7 +1777,7 @@ export default function Guesthouse() {
                         </div>
 
                         {/* Card 2 */}
-                        <div className="room-card new-style">
+                        <div id="deluxe3-detail" className="room-card new-style">
                             <RoomCardSlideshow images={deluxe3Images} alt="Deluxe 3" interval={4500} />
                             <div className="card-gradient"></div>
                             <div className="room-content">
@@ -1595,7 +1793,7 @@ export default function Guesthouse() {
                         </div>
 
                         {/* Card 3 */}
-                        <div className="room-card new-style">
+                        <div id="deluxe4-detail" className="room-card new-style">
                             <RoomCardSlideshow images={deluxe4Images} alt="Deluxe 4" interval={5000} />
                             <div className="card-gradient"></div>
                             <div className="room-content">
@@ -1720,7 +1918,18 @@ export default function Guesthouse() {
             </div>
             
             <div className="promo-col-center">
-                <img src="spiritual_wide.png" alt="Spiritual Architecture" />
+                <AnimatePresence initial={false}>
+                    <motion.img
+                        key={promoIndex}
+                        src={promoImages[promoIndex]}
+                        alt="Divine Temple of Vrindavan, Mathura, Nandgaon, Barsana"
+                        className="promo-slider-img"
+                        initial={{ opacity: 0, scale: 1.05 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.5, ease: "easeInOut" }}
+                    />
+                </AnimatePresence>
             </div>
 
             <div className="promo-col-right">
@@ -1758,18 +1967,18 @@ export default function Guesthouse() {
     <footer className="site-footer" id="contact">
         <div className="footer-top-links">
             <div className="footer-col">
-                <h3>Company</h3>
-                <a href="/#home">Home</a>
-                <a href="/#about">Our Story</a>
-                <a href="/guesthouse">Rooms & Suites</a>
-                <a href="/#testimonials">Guest Reviews</a>
+                <h3>Our Services</h3>
+                <a href="/guesthouse">Guesthouse</a>
+                <a href="/weddings">Weddings</a>
+                <a href="/corporate">Corporate</a>
+                <a href="/braj-yatra">Braj Yatra</a>
             </div>
             <div className="footer-col">
                 <h3>Explore Vrindavan</h3>
-                <a href="#">Bankey Bihari Mandir</a>
-                <a href="#">Prem Mandir</a>
-                <a href="#">ISKCON Temple</a>
-                <a href="#">Local Attractions</a>
+                <a href="/braj-yatra#packages">Sapt Devalaya Yatra</a>
+                <a href="/braj-yatra#packages">Chaurasi Kos Yatra</a>
+                <a href="/braj-yatra">Govardhan Parikrama</a>
+                <a href="/braj-yatra">Barsana & Nandgaon</a>
             </div>
             <div className="footer-col">
                 <h3>Stay & Book</h3>

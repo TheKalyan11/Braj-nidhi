@@ -629,18 +629,20 @@ export default function Contact() {
         </nav>
         <div className="nav-btns">
             {isLoggedIn ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <div className="user-info-text">
-                        <span className="user-label">Braj Club Member</span>
-                        <span className="user-name">{userName}</span>
+                <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
+                        <div className="user-info-text">
+                            <span className="user-label">Braj Club Member</span>
+                            <span className="user-name">{userName}</span>
+                        </div>
+                        <div className="user-profile-badge">
+                            {getUserInitials(userName)}
+                        </div>
                     </div>
-                    <div className="user-profile-badge">
-                        {getUserInitials(userName)}
-                    </div>
-                    <button onClick={handleLogout} className="btn-login" style={{ padding: '8px 16px', fontSize: '0.8rem', height: '36px' }}>Logout</button>
-                </div>
+                    <button onClick={handleLogout} className="btn-login">Logout</button>
+                </>
             ) : (
-                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login" style={{ border: 'none', cursor: 'pointer' }}>Login / Create Account</button>
+                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login">Login / Join</button>
             )}
             <a href="/booking" className="btn-book">Book Now</a>
         </div>
@@ -1019,18 +1021,18 @@ export default function Contact() {
       <footer className="site-footer">
         <div className="footer-top-links">
           <div className="footer-col">
-            <h3>Company</h3>
-            <Link href="/#home">Home</Link>
-            <Link href="/#about">Our Story</Link>
-            <Link href="/guesthouse">Rooms & Suites</Link>
-            <Link href="/#testimonials">Guest Reviews</Link>
+            <h3>Our Services</h3>
+            <Link href="/guesthouse">Guesthouse</Link>
+            <Link href="/weddings">Weddings</Link>
+            <Link href="/corporate">Corporate</Link>
+            <Link href="/braj-yatra">Braj Yatra</Link>
           </div>
           <div className="footer-col">
             <h3>Explore Vrindavan</h3>
-            <a href="#">Bankey Bihari Mandir</a>
-            <a href="#">Prem Mandir</a>
-            <a href="#">ISKCON Temple</a>
-            <a href="#">Local Attractions</a>
+            <a href="/braj-yatra#packages">Sapt Devalaya Yatra</a>
+            <a href="/braj-yatra#packages">Chaurasi Kos Yatra</a>
+            <a href="/braj-yatra">Govardhan Parikrama</a>
+            <a href="/braj-yatra">Barsana & Nandgaon</a>
           </div>
           <motion.div className="footer-col">
             <h3>Stay & Book</h3>

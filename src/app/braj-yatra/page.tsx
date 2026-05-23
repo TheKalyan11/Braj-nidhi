@@ -254,57 +254,76 @@ export default function BrajYatra() {
     let testimonialsSwiper: any;
     let resumeAutoplayFn: any;
 
-    if (typeof window !== 'undefined' && (window as any).Swiper) {
-      const swiperElements = document.querySelectorAll('.swiper');
-      if (swiperElements.length > 0) {
-        try {
-          testimonialsSwiper = new (window as any).Swiper('.testimonials-slider', {
-            slidesPerView: 'auto',
-            spaceBetween: 24,
-            loop: true,
-            speed: 5000,
-            autoplay: { 
-              delay: 0, 
-              disableOnInteraction: false,
-              pauseOnMouseEnter: false
-            },
-            grabCursor: true,
-            freeMode: true,
-            on: {
-              touchEnd: function(swiper: any) {
-                if (swiper && swiper.autoplay) {
-                  swiper.autoplay.start();
-                }
+    const initTestimonialsSwiper = () => {
+      if (typeof window !== 'undefined' && (window as any).Swiper) {
+        const swiperElements = document.querySelectorAll('.swiper');
+        if (swiperElements.length > 0) {
+          try {
+            testimonialsSwiper = new (window as any).Swiper('.testimonials-slider', {
+              slidesPerView: 'auto',
+              spaceBetween: 24,
+              loop: true,
+              speed: 5000,
+              autoplay: { 
+                delay: 0, 
+                disableOnInteraction: false,
+                pauseOnMouseEnter: false
               },
-              touchStart: function(swiper: any) {
-                if (swiper && swiper.autoplay) {
-                  swiper.autoplay.start();
+              grabCursor: true,
+              freeMode: true,
+              observer: true,
+              observeParents: true,
+              on: {
+                touchEnd: function(swiper: any) {
+                  if (swiper && swiper.autoplay) {
+                    swiper.autoplay.start();
+                  }
+                },
+                touchStart: function(swiper: any) {
+                  if (swiper && swiper.autoplay) {
+                    swiper.autoplay.start();
+                  }
                 }
               }
-            }
-          });
+            });
 
-          // Extra layer of protection using native DOM touch events to handle vertical scrolls cleanly
-          const sliderEl = document.querySelector('.testimonials-slider');
-          if (sliderEl) {
-            resumeAutoplayFn = () => {
-              if (testimonialsSwiper && testimonialsSwiper.autoplay) {
-                try {
-                  testimonialsSwiper.autoplay.start();
-                } catch (err) {}
-              }
-            };
-            sliderEl.addEventListener('touchstart', resumeAutoplayFn, { passive: true });
-            sliderEl.addEventListener('touchend', resumeAutoplayFn, { passive: true });
-            sliderEl.addEventListener('touchcancel', resumeAutoplayFn, { passive: true });
+            // Extra layer of protection using native DOM touch events to handle vertical scrolls cleanly
+            const sliderEl = document.querySelector('.testimonials-slider');
+            if (sliderEl) {
+              resumeAutoplayFn = () => {
+                if (testimonialsSwiper && testimonialsSwiper.autoplay) {
+                  try {
+                    testimonialsSwiper.autoplay.start();
+                  } catch (err) {}
+                }
+              };
+              sliderEl.addEventListener('touchstart', resumeAutoplayFn, { passive: true });
+              sliderEl.addEventListener('touchend', resumeAutoplayFn, { passive: true });
+              sliderEl.addEventListener('touchcancel', resumeAutoplayFn, { passive: true });
+            }
+          } catch (e) {
+            console.error("Error initializing Swiper:", e);
           }
-        } catch (e) {
-          console.error("Error initializing Swiper:", e);
         }
+      }
+    };
+
+    let pollTimer: NodeJS.Timeout;
+    if (typeof window !== 'undefined') {
+      if ((window as any).Swiper) {
+        initTestimonialsSwiper();
+      } else {
+        pollTimer = setInterval(() => {
+          if ((window as any).Swiper) {
+            clearInterval(pollTimer);
+            initTestimonialsSwiper();
+          }
+        }, 100);
       }
     }
 
     return () => {
+      if (pollTimer) clearInterval(pollTimer);
       try {
         const sliderEl = document.querySelector('.testimonials-slider');
         if (sliderEl && resumeAutoplayFn) {
@@ -1154,7 +1173,19 @@ export default function BrajYatra() {
 
         /* ═══ CTA ═══ */
         .y-cta { padding: 0 8% 70px; background: #fff; }
-        .y-cta-box { background: var(--dark); border-radius: 32px; padding: 70px 64px; display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center; position: relative; overflow: hidden; }
+        .y-cta-box {
+          background-image: linear-gradient(to right, rgba(10, 14, 20, 0.9) 0%, rgba(10, 14, 20, 0.65) 100%), url('/braj_yatra_cta_bg.png') !important;
+          background-size: cover !important;
+          background-position: center !important;
+          border-radius: 32px;
+          padding: 70px 64px;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 60px;
+          align-items: center;
+          position: relative;
+          overflow: hidden;
+        }
         .y-cta-box::before { content: ''; position: absolute; right: -80px; top: -80px; width: 500px; height: 500px; background: radial-gradient(ellipse, rgba(212,175,55,0.1) 0%, transparent 70%); pointer-events: none; }
         .y-cta-box::after { content: ''; position: absolute; left: 50px; bottom: 50px; width: 200px; height: 200px; background: radial-gradient(ellipse, rgba(212,175,55,0.06) 0%, transparent 70%); pointer-events: none; }
         .y-cta-tag { display: inline-flex; align-items: center; gap: 10px; color: var(--gold); font-size: 0.7rem; letter-spacing: 3.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 22px; font-family: 'Outfit', sans-serif; }
@@ -1235,6 +1266,9 @@ export default function BrajYatra() {
         .braj-yatra-page .testimonials-slider .swiper-slide {
           width: 310px !important;
         }
+        .braj-yatra-page .testimonials-slider .swiper-wrapper {
+          transition-timing-function: linear !important;
+        }
         .braj-yatra-page .testimonial-card {
           background: #ffffff !important; /* Pure white card for contrast */
           border: 1px solid #e2e8f0 !important;
@@ -1294,16 +1328,18 @@ export default function BrajYatra() {
         </nav>
         <div className="nav-btns">
           {isLoggedIn ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <div className="user-info-text">
-                <span className="user-label">Braj Club Member</span>
-                <span className="user-name">{userName}</span>
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
+                <div className="user-info-text">
+                  <span className="user-label">Braj Club Member</span>
+                  <span className="user-name">{userName}</span>
+                </div>
+                <div className="user-profile-badge">{getUserInitials(userName)}</div>
               </div>
-              <div className="user-profile-badge">{getUserInitials(userName)}</div>
-              <button onClick={handleLogout} className="btn-login" style={{ padding: '8px 16px', fontSize: '0.8rem', height: '36px' }}>Logout</button>
-            </div>
+              <button onClick={handleLogout} className="btn-login">Logout</button>
+            </>
           ) : (
-            <button onClick={() => setIsLoginModalOpen(true)} className="btn-login" style={{ border: 'none', cursor: 'pointer' }}>Login / Create Account</button>
+            <button onClick={() => setIsLoginModalOpen(true)} className="btn-login">Login / Join</button>
           )}
           <a href="/booking" className="btn-book">Book Now</a>
         </div>
@@ -1659,7 +1695,7 @@ export default function BrajYatra() {
           
           <div className="testimonials-slider swiper">
             <div className="swiper-wrapper">
-              {testimonials.map((t, i) => (
+              {[...testimonials, ...testimonials, ...testimonials].map((t, i) => (
                 <div className="swiper-slide testimonial-card" key={i}>
                   <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                   <p className="testimonial-text">&ldquo;{t.text}&rdquo;</p>
@@ -1741,8 +1777,8 @@ export default function BrajYatra() {
       {/* ═══ FOOTER ═══ */}
       <footer className="site-footer">
         <div className="footer-top-links">
-          <div className="footer-col"><h3>Company</h3><a href="/#home">Home</a><a href="/#about">Our Story</a><a href="/guesthouse">Rooms & Suites</a><a href="/#testimonials">Guest Reviews</a></div>
-          <div className="footer-col"><h3>Explore Vrindavan</h3><a href="#">Bankey Bihari Mandir</a><a href="#">Prem Mandir</a><a href="#">ISKCON Temple</a><a href="#">Local Attractions</a></div>
+          <div className="footer-col"><h3>Our Services</h3><a href="/guesthouse">Guesthouse</a><a href="/weddings">Weddings</a><a href="/corporate">Corporate</a><a href="/braj-yatra">Braj Yatra</a></div>
+          <div className="footer-col"><h3>Explore Vrindavan</h3><a href="/braj-yatra#packages">Sapt Devalaya Yatra</a><a href="/braj-yatra#packages">Chaurasi Kos Yatra</a><a href="/braj-yatra">Govardhan Parikrama</a><a href="/braj-yatra">Barsana & Nandgaon</a></div>
           <div className="footer-col"><h3>Stay & Book</h3><a href="/booking">Book Your Stay</a><a href="/weddings">Wedding Packages</a><a href="/corporate">Corporate Stays</a><a href="#">Refund Policy</a></div>
           <div className="footer-col"><h3>Help & Support</h3><a href="#">FAQ</a><a href="/contact">Contact Us</a><a href="#">Direction Map</a><a href="#">Group Inquiries</a></div>
           <div className="footer-col"><h3>Information</h3><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Guest Policy</a><a href="#">Cancellation Policy</a></div>

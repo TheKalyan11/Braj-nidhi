@@ -132,8 +132,7 @@ export default function Home() {
     "DSC02591.webp",
     "DSC06003-HDR.webp",
     "DSC05818-HDR.webp",
-    "DSC05963-HDR.webp",
-    "wedding-1.webp"
+    "DSC05963-HDR.webp"
   ];
 
   // Preload hero images on mount to ensure smooth, flicker-free transitions
@@ -416,18 +415,20 @@ export default function Home() {
 
         <div className="nav-btns">
             {isLoggedIn ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <div className="user-info-text">
-                        <span className="user-label">Braj Club Member</span>
-                        <span className="user-name">{userName}</span>
+                <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
+                        <div className="user-info-text">
+                            <span className="user-label">Braj Club Member</span>
+                            <span className="user-name">{userName}</span>
+                        </div>
+                        <div className="user-profile-badge">
+                            {getUserInitials(userName)}
+                        </div>
                     </div>
-                    <div className="user-profile-badge">
-                        {getUserInitials(userName)}
-                    </div>
-                    <button onClick={handleLogout} className="btn-login" style={{ padding: '8px 16px', fontSize: '0.8rem', height: '36px' }}>Logout</button>
-                </div>
+                    <button onClick={handleLogout} className="btn-login">Logout</button>
+                </>
             ) : (
-                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login" style={{ border: 'none', cursor: 'pointer' }}>Login / Create Account</button>
+                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login">Login / Join</button>
             )}
             <a href="/booking" className="btn-book">Book Now</a>
         </div>
@@ -648,8 +649,8 @@ export default function Home() {
                     <a href="/guesthouse" className="btn-outline">Explore Rooms <i className="fas fa-arrow-right"></i></a>
                 </div>
                 <div className="image-grid">
-                    <img src="DSC05818-HDR.webp" alt="Luxury Suite" className="main-img" />
-                    <img src="DSC05963-HDR.webp" alt="Modern Bathroom" className="secondary-img" />
+                    <img src="/z.png" alt="Luxury Suite Room View 1" className="main-img" />
+                    <img src="/351.webp" alt="Luxury Suite Room View 2" className="secondary-img" />
                 </div>
             </div>
         </section>
@@ -886,19 +887,19 @@ export default function Home() {
             <div className="gallery-slider swiper">
                 <div className="swiper-wrapper">
                     <div className="swiper-slide">
-                        <img src="/hero.png" alt="Braj Nidhi Hero View" />
+                        <img src="/hero.webp" alt="Braj Nidhi Hero View" />
                     </div>
                     <div className="swiper-slide">
                         <img src="/DSC09672.webp" alt="Gallery View 1" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/DSC09652.JPG" alt="Gallery View 2" />
+                        <img src="/DSC09652.webp" alt="Gallery View 2" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/DSC02591.JPG" alt="Gallery View 3" />
+                        <img src="/DSC02591.webp" alt="Gallery View 3" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/DSC06003-HDR.png" alt="Gallery View 4" />
+                        <img src="/DSC06003-HDR.webp" alt="Gallery View 4" />
                     </div>
                     <div className="swiper-slide">
                         <img src="/DSC05963-HDR.webp" alt="Gallery View 5" />
@@ -907,10 +908,10 @@ export default function Home() {
                         <img src="/d3.webp" alt="Gallery View 6" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/351.png" alt="Gallery View 7" />
+                        <img src="/351.webp" alt="Gallery View 7" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/352.png" alt="Gallery View 8" />
+                        <img src="/352.webp" alt="Gallery View 8" />
                     </div>
                 </div>
                 {/*  Navigation Buttons  */}
@@ -1376,18 +1377,18 @@ export default function Home() {
     <footer className="site-footer">
         <div className="footer-top-links">
             <div className="footer-col">
-                <h3>Company</h3>
-                <a href="/#home">Home</a>
-                <a href="/#about">Our Story</a>
-                <a href="/guesthouse">Rooms & Suites</a>
-                <a href="/#testimonials">Guest Reviews</a>
+                <h3>Our Services</h3>
+                <a href="/guesthouse">Guesthouse</a>
+                <a href="/weddings">Weddings</a>
+                <a href="/corporate">Corporate</a>
+                <a href="/braj-yatra">Braj Yatra</a>
             </div>
             <div className="footer-col">
                 <h3>Explore Vrindavan</h3>
-                <a href="#">Bankey Bihari Mandir</a>
-                <a href="#">Prem Mandir</a>
-                <a href="#">ISKCON Temple</a>
-                <a href="#">Local Attractions</a>
+                <a href="/braj-yatra#packages">Sapt Devalaya Yatra</a>
+                <a href="/braj-yatra#packages">Chaurasi Kos Yatra</a>
+                <a href="/braj-yatra">Govardhan Parikrama</a>
+                <a href="/braj-yatra">Barsana & Nandgaon</a>
             </div>
             <div className="footer-col">
                 <h3>Stay & Book</h3>

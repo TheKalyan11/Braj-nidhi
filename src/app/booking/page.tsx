@@ -2167,15 +2167,17 @@ export default function BookingPage() {
 
         <div className="nav-btns">
           {isLoggedIn ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <div className="user-info-text">
-                <span className="user-label">Braj Club Member</span>
-                <span className="user-name">{userName}</span>
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
+                <div className="user-info-text">
+                  <span className="user-label">Braj Club Member</span>
+                  <span className="user-name">{userName}</span>
+                </div>
               </div>
-              <button onClick={handleLogout} className="btn-login" style={{ padding: '8px 16px', fontSize: '0.8rem', height: '36px' }}>Logout</button>
-            </div>
+              <button onClick={handleLogout} className="btn-login">Logout</button>
+            </>
           ) : (
-            <button onClick={() => setLoginModalOpen(true)} className="btn-login" style={{ border: 'none', cursor: 'pointer' }}>Login / Create Account</button>
+            <button onClick={() => setLoginModalOpen(true)} className="btn-login">Login / Join</button>
           )}
           <a href="/booking" className="btn-book">Book Now</a>
         </div>
@@ -3179,8 +3181,8 @@ export default function BookingPage() {
 
       <footer className="site-footer">
         <div className="footer-top-links">
-          <div className="footer-col"><h3>Company</h3><Link href="/#home">Home</Link><Link href="/#about">Our Story</Link><Link href="/guesthouse">Rooms & Suites</Link><Link href="/#testimonials">Guest Reviews</Link></div>
-          <div className="footer-col"><h3>Explore Vrindavan</h3><a href="#">Bankey Bihari Mandir</a><a href="#">Prem Mandir</a><a href="#">ISKCON Temple</a><a href="#">Local Attractions</a></div>
+          <div className="footer-col"><h3>Our Services</h3><Link href="/guesthouse">Guesthouse</Link><Link href="/weddings">Weddings</Link><Link href="/corporate">Corporate</Link><Link href="/braj-yatra">Braj Yatra</Link></div>
+          <div className="footer-col"><h3>Explore Vrindavan</h3><Link href="/braj-yatra#packages">Sapt Devalaya Yatra</Link><Link href="/braj-yatra#packages">Chaurasi Kos Yatra</Link><Link href="/braj-yatra">Govardhan Parikrama</Link><Link href="/braj-yatra">Barsana & Nandgaon</Link></div>
           <div className="footer-col"><h3>Stay & Book</h3><Link href="/booking">Book Your Stay</Link><Link href="/weddings">Wedding Packages</Link><Link href="/corporate">Corporate Stays</Link><a href="#">Refund Policy</a></div>
           <div className="footer-col"><h3>Help & Support</h3><a href="#">FAQ</a><Link href="/contact">Contact Us</Link><a href="#">Direction Map</a><a href="#">Group Inquiries</a></div>
           <div className="footer-col"><h3>Information</h3><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Guest Policy</a><a href="#">Cancellation Policy</a></div>

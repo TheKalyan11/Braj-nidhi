@@ -57,11 +57,9 @@ export default function FloatingWidgets() {
           <i className="fab fa-instagram"></i>
         </a>
         <a
-          href={`https://wa.me/${BRAJ_NIDHI_KNOWLEDGE.guesthouse.phone.replace(/[^0-9]/g, "")}`}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#"
           className="float-btn float-whatsapp"
-          title="Chat on WhatsApp"
+          title="WhatsApp Chat (Coming Soon)"
         >
           <i className="fab fa-whatsapp"></i>
         </a>

@@ -1834,6 +1834,10 @@ header.scrolled nav ul li a:hover {
     overflow: hidden;
 }
 
+.testimonials-slider .swiper-wrapper {
+    transition-timing-function: linear !important;
+}
+
 .testimonials-slider::before,
 .testimonials-slider::after {
     content: '';
@@ -4470,7 +4474,7 @@ html, body {
 .mobile-header-actions {
     display: none;
     align-items: center;
-    gap: 12px;
+    gap: 20px; /* Spacious, premium spacing like luxury brands */
     z-index: 1002;
 }
 
@@ -4478,42 +4482,60 @@ html, body {
     background: none;
     border: none;
     color: #ffffff;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    font-size: 0.78rem; /* Elegant, smaller uppercase font */
+    font-weight: 600;
+    letter-spacing: 1.5px; /* Luxury letter spacing */
     cursor: pointer;
-    padding: 6px 12px;
-    transition: color 0.3s, opacity 0.3s;
+    padding: 6px 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
-    font-family: inherit;
+    font-family: 'Outfit', sans-serif;
     white-space: nowrap;
+    opacity: 0.9;
 }
 
 .mobile-logout-btn {
     background: none;
     border: none;
     color: #ffffff;
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
     cursor: pointer;
-    padding: 6px 12px;
+    padding: 6px 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
-    font-family: inherit;
+    font-family: 'Outfit', sans-serif;
     white-space: nowrap;
+    opacity: 0.9;
+}
+
+.mobile-login-join:hover,
+.mobile-logout-btn:hover {
+    opacity: 1;
+    transform: translateY(-1px);
 }
 
 header.scrolled .mobile-login-join,
 header.scrolled .mobile-logout-btn {
     color: #000000 !important;
+    opacity: 1;
 }
 
-/* Page context styling overrides */
+/* Page context styling overrides for light-background pages when not scrolled */
 .contact-page header:not(.scrolled) .mobile-login-join,
 .contact-page header:not(.scrolled) .mobile-logout-btn,
 .booking-page-mmt header:not(.scrolled) .mobile-login-join,
 .booking-page-mmt header:not(.scrolled) .mobile-logout-btn,
 .braj-yatra-page header:not(.scrolled) .mobile-login-join,
 .braj-yatra-page header:not(.scrolled) .mobile-logout-btn {
+    color: #1a1512 !important;
+    opacity: 1;
+}
+
+.contact-page header:not(.scrolled) .mobile-menu-btn,
+.booking-page-mmt header:not(.scrolled) .mobile-menu-btn,
+.braj-yatra-page header:not(.scrolled) .mobile-menu-btn {
     color: #1a1512 !important;
 }
 
