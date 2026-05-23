@@ -114,7 +114,6 @@ export default function BookingPage() {
   const [drawerErpBase, setDrawerErpBase] = useState<string>('https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api');
   const [availableRoomsList, setAvailableRoomsList] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [isDevMode, setIsDevMode] = useState<boolean>(false);
   const [livePrices, setLivePrices] = useState<Record<string, number>>({
     deluxe2: 3500,
     deluxe3: 4500,
@@ -197,10 +196,6 @@ export default function BookingPage() {
     const initializeFromQuery = () => {
       const params = new URLSearchParams(window.location.search);
       
-      // Check if developer mode is enabled via URL param (e.g. ?dev=true or ?dev=1) or localhost hostname
-      const isDev = params.get('dev') === 'true' || params.get('dev') === '1' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      setIsDevMode(isDev);
-
       // 1. Room Type Selection
       const paramRoom = params.get('roomType') || params.get('room') || params.get('room_type') || params.get('hotelId');
       if (paramRoom) {
@@ -746,12 +741,12 @@ export default function BookingPage() {
       {/* Dynamic Scoped CSS Stylesheet */}
       <style dangerouslySetInnerHTML={{ __html: `
         .booking-page-mmt {
-          background-color: #f8f7f4;
-          color: #1a1512;
-          font-family: 'Outfit', sans-serif;
+          background: linear-gradient(180deg, #f7f0e5 0%, #ffffff 62%);
+          color: #000000;
+          font-family: 'Inter', sans-serif;
           min-height: 100vh;
-          padding-top: 130px;
-          padding-bottom: 90px;
+          padding-top: 120px;
+          padding-bottom: 80px;
         }
 
         .booking-page-mmt h1,
@@ -759,83 +754,89 @@ export default function BookingPage() {
         .booking-page-mmt h3,
         .booking-page-mmt h4,
         .booking-page-mmt h5,
-        .booking-page-mmt h6 {
-          font-family: 'Bebas Neue', cursive !important;
-          font-weight: 400 !important;
-          letter-spacing: 0.05em;
-          color: #1a1512;
-        }
-
+        .booking-page-mmt h6,
         .booking-page-mmt p,
         .booking-page-mmt span,
         .booking-page-mmt label,
         .booking-page-mmt li,
         .booking-page-mmt small,
         .booking-page-mmt strong,
-        .booking-page-mmt a,
-        .booking-page-mmt button,
-        .booking-page-mmt input,
-        .booking-page-mmt select,
-        .booking-page-mmt textarea {
-          font-family: 'Outfit', sans-serif;
-          color: #1a1512;
+        .booking-page-mmt a {
+          color: #000000;
         }
 
-        /* Reused Header Styles */
+        /* Booking page override for reused home header on light background */
         .booking-page-mmt #main-header {
-          background: rgba(255, 255, 255, 0.98);
-          backdrop-filter: blur(20px);
-          border-bottom: 1px solid #e7e5df;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+          background: rgba(255, 255, 255, 0.96);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
         }
         .booking-page-mmt #main-header nav ul li a,
         .booking-page-mmt #main-header .nav-btns .btn-login {
-          color: #1a1512 !important;
-          font-family: 'Bebas Neue', cursive !important;
+          color: #111111 !important;
         }
         .booking-page-mmt #main-header .nav-btns .btn-book {
           color: #ffffff !important;
-          background: #1a1512;
-          border: 1px solid #1a1512;
-          font-family: 'Bebas Neue', cursive !important;
+          background: #111111;
+          border: 1px solid #111111;
         }
 
-        /* PREMIUM CONTROLS & STEPPER */
+        /* PREMIUM MMT LIGHT HEADER */
         .booking-header-bar {
           position: fixed;
           top: 0; left: 0; right: 0;
           height: 90px;
-          background: rgba(255, 255, 255, 0.98);
-          backdrop-filter: blur(20px);
-          border-bottom: 1px solid #e7e5df;
+          background: rgba(255, 255, 255, 0.96);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
           z-index: 1000;
           display: flex;
+          flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
+          gap: 16px;
           padding: 0 6%;
           transition: all 0.3s ease;
         }
+        
+        .booking-header-bar.scrolled {
+          background: rgba(255, 255, 255, 0.99);
+          border-bottom-color: rgba(212, 175, 55, 0.18);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
+        }
 
+        .booking-logo img {
+          height: 52px;
+          width: auto;
+          transition: transform 0.3s;
+        }
+        .booking-logo img:hover {
+          transform: scale(1.04);
+        }
+
+        /* STEPPER DESIGN */
         .stepper-container {
           display: flex;
           align-items: center;
-          gap: 30px;
+          gap: 25px;
         }
 
         .stepper-item {
           display: flex;
           align-items: center;
-          gap: 12px;
-          font-size: 14.5px;
-          font-weight: 600;
-          color: #8c857b;
+          gap: 10px;
+          font-size: 14px;
+          font-weight: 500;
+          color: rgba(44, 37, 32, 0.5);
           position: relative;
-          transition: all 0.3s ease;
+          transition: all 0.3s;
         }
 
         .stepper-item.active {
           color: #8b0000;
-          font-weight: 700;
+          font-weight: 600;
         }
 
         .stepper-item.completed {
@@ -843,25 +844,24 @@ export default function BookingPage() {
         }
 
         .stepper-circle {
-          width: 28px;
-          height: 28px;
+          width: 24px;
+          height: 24px;
           border-radius: 50%;
-          background: #edece8;
-          border: 1px solid #dcdad4;
+          background: rgba(0, 0, 0, 0.05);
+          border: 1px solid rgba(0, 0, 0, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 12px;
-          font-weight: 700;
-          transition: all 0.3s ease;
-          color: #5c554e;
+          font-size: 11px;
+          transition: all 0.3s;
+          color: #2c2520;
         }
 
         .stepper-item.active .stepper-circle {
           background: #8b0000;
           border-color: #8b0000;
           color: #ffffff;
-          box-shadow: 0 0 12px rgba(139, 0, 0, 0.2);
+          box-shadow: 0 0 10px rgba(139, 0, 0, 0.25);
         }
 
         .stepper-item.completed .stepper-circle {
@@ -871,159 +871,158 @@ export default function BookingPage() {
         }
 
         .stepper-arrow {
-          color: #c4c2ba;
+          color: rgba(0, 0, 0, 0.15);
         }
 
-        /* BOOKING GRID SYSTEM (Booking.com style) */
+        /* LAYOUT DESIGN */
         .booking-grid-mmt {
           max-width: 1240px;
           margin: 0 auto;
           padding: 0 20px;
           display: grid;
-          grid-template-columns: 7.5fr 4.5fr;
-          gap: 32px;
+          grid-template-columns: 8fr 4fr;
+          gap: 30px;
           align-items: start;
         }
 
-        /* HERO DETAILS BANNER */
         .hero-banner {
           max-width: 1240px;
-          margin: 0 auto 36px;
-          padding: 36px;
-          background: linear-gradient(135deg, #FAF7F2 0%, #F1EADF 100%);
-          border: 1px solid #e7decb;
-          border-radius: 20px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+          margin: 0 auto 32px;
+          padding: 32px;
+          background: linear-gradient(135deg, rgba(255, 247, 233, 0.96), rgba(243, 225, 196, 0.88));
+          border: 1px solid rgba(212, 175, 55, 0.22);
+          border-radius: 28px;
+          box-shadow: 0 22px 50px rgba(0, 0, 0, 0.06);
           display: grid;
-          grid-template-columns: 1.6fr 1fr;
-          gap: 32px;
+          grid-template-columns: 1.5fr 1fr;
+          gap: 24px;
           align-items: center;
         }
 
         .hero-copy h1 {
-          font-size: 3.2rem;
-          line-height: 1.05;
-          margin: 0 0 12px;
-          color: #7b4f15;
-          letter-spacing: 0.02em;
+          font-size: 2.8rem;
+          line-height: 1.02;
+          margin: 0 0 14px;
+          color: #7b3f0a;
         }
 
         .hero-copy p {
-          font-size: 15px;
-          color: #61564f;
-          line-height: 1.65;
-          margin: 0 0 28px;
+          font-size: 1rem;
+          color: #5f4c42;
+          line-height: 1.7;
+          margin: 0 0 24px;
+          max-width: 620px;
         }
 
         .hero-stats {
           display: flex;
-          gap: 16px;
+          gap: 14px;
           flex-wrap: wrap;
         }
 
         .hero-stat {
           flex: 1;
-          min-width: 170px;
-          padding: 16px 20px;
-          background: #ffffff;
-          border-radius: 12px;
-          border: 1px solid #e7decb;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.015);
+          min-width: 160px;
+          padding: 18px 20px;
+          background: rgba(255, 255, 255, 0.94);
+          border-radius: 18px;
+          border: 1px solid rgba(212, 175, 55, 0.16);
+          color: #4c3e35;
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04);
         }
 
         .hero-stat h3 {
-          margin: 0 0 4px;
-          font-size: 1.35rem;
+          margin: 0 0 6px;
+          font-size: 1.15rem;
+          font-weight: 800;
           color: #8b0000;
         }
 
         .hero-stat p {
           margin: 0;
-          font-size: 13.5px;
-          color: #6e5e52;
-          line-height: 1.45;
-          font-weight: 500;
+          font-size: 0.92rem;
+          color: #6e5b4e;
+          line-height: 1.5;
         }
 
-        /* CARDS (Booking.com premium card styling) */
+        /* LEFT SIDE CARDS */
         .mmt-card {
           background: #ffffff;
-          border: 1px solid #e3e1d9;
-          border-radius: 12px;
-          padding: 28px;
-          margin-bottom: 28px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-          transition: border-color 0.25s, box-shadow 0.25s;
+          border: 1px solid rgba(212, 175, 55, 0.14);
+          border-radius: 20px;
+          padding: 26px;
+          margin-bottom: 26px;
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.05);
+          transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
         .mmt-card:hover {
-          border-color: #d1cfc5;
-          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+          transform: translateY(-2px);
+          border-color: rgba(212, 175, 55, 0.24);
+          box-shadow: 0 22px 45px rgba(0, 0, 0, 0.08);
         }
 
         .card-header-mmt {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-bottom: 1px solid #f1efe8;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           padding-bottom: 16px;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
         }
 
         .card-header-title {
-          font-size: 20px;
+          font-size: 18px;
           font-weight: 700;
           color: #1a1512;
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
         }
 
         .card-header-title svg {
           color: #8b0000;
         }
 
-        /* MEMBERS PROMO WIDGET */
+        /* LOGIN INTEGRATION CARD */
         .login-banner-card {
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.06) 0%, rgba(139, 0, 0, 0.03) 100%);
-          border: 1.5px dashed #d6cca9;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(139, 0, 0, 0.04) 100%);
+          border: 1px dashed rgba(139, 0, 0, 0.25);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 22px;
-          border-radius: 12px;
-          margin-bottom: 28px;
-          gap: 20px;
+          padding: 20px;
+          border-radius: 16px;
+          margin-bottom: 24px;
         }
 
         .login-banner-info {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 15px;
         }
 
         .login-banner-icon {
-          width: 42px;
-          height: 42px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
           background: rgba(139, 0, 0, 0.06);
           display: flex;
           align-items: center;
           justify-content: center;
           color: #8b0000;
-          flex-shrink: 0;
         }
 
         .login-banner-text h4 {
           font-size: 15px;
           font-weight: 700;
-          margin: 0 0 3px;
+          margin: 0 0 4px;
           color: #1a1512;
         }
 
         .login-banner-text p {
-          font-size: 13.5px;
-          color: #635b54;
+          font-size: 13px;
+          color: rgba(44, 37, 32, 0.6);
           margin: 0;
         }
 
@@ -1033,185 +1032,156 @@ export default function BookingPage() {
           color: #ffffff;
           font-weight: 700;
           font-size: 13px;
-          border-radius: 6px;
+          border-radius: 30px;
           border: none;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s;
           display: flex;
           align-items: center;
           gap: 6px;
         }
 
         .btn-login-mmt:hover {
-          background: #730000;
-          box-shadow: 0 4px 12px rgba(139, 0, 0, 0.15);
+          background: #a82c2c;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(139, 0, 0, 0.2);
         }
 
-        /* ROOM DETAILS SECTION (Redesigned like Booking.com details list) */
+        /* ROOM DETAILS SPLIT CARD */
         .room-review-split {
           display: grid;
-          grid-template-columns: 3.2fr 6.8fr;
-          gap: 26px;
+          grid-template-columns: 3fr 7fr;
+          gap: 22px;
         }
 
         .room-review-image {
           position: relative;
-          border-radius: 10px;
+          border-radius: 12px;
           overflow: hidden;
-          height: 180px;
+          height: 160px;
+        }
+
+        .room-review-image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.5s;
+        }
+        .room-review-split:hover .room-review-image img {
+          transform: scale(1.05);
         }
 
         .room-review-badge {
           position: absolute;
-          top: 12px; left: 12px;
-          background: #8b0000;
-          color: #ffffff;
-          font-size: 9.5px;
+          top: 10px; left: 10px;
+          background: rgba(139, 0, 0, 0.9);
+          color: #fff;
+          font-size: 10px;
           font-weight: 700;
-          padding: 5px 10px;
+          padding: 4px 8px;
           border-radius: 4px;
           text-transform: uppercase;
-          letter-spacing: 0.8px;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          letter-spacing: 0.5px;
         }
 
         .room-review-details h3 {
-          font-size: 2.2rem;
+          font-size: 20px;
+          font-weight: 700;
           color: #1a1512;
-          margin: 0 0 10px;
-          line-height: 1.1;
-        }
-
-        /* Booking.com rating score badge style */
-        .rating-badge-container {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 16px;
-        }
-
-        .rating-score {
-          background: #003580; /* Elegant Booking.com Signature Navy Blue */
-          color: #ffffff;
-          font-weight: 700;
-          font-size: 15px;
-          padding: 6px 10px;
-          border-radius: 6px;
-          line-height: 1;
-        }
-
-        .rating-text {
-          display: flex;
-          flex-direction: column;
-          line-height: 1.25;
-        }
-
-        .rating-title {
-          font-weight: 700;
-          font-size: 13.5px;
-          color: #003580;
-        }
-
-        .rating-count {
-          font-size: 12px;
-          color: #635b54;
-          font-weight: 500;
+          margin: 0 0 8px;
         }
 
         .room-details-badges {
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
-          margin-bottom: 20px;
+          margin-bottom: 16px;
         }
 
         .badge-pill-mmt {
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 600;
-          padding: 5px 12px;
-          border-radius: 4px;
-          background: #f1efe8;
-          border: 1px solid #dcdad2;
-          color: #423b35;
+          padding: 4px 10px;
+          border-radius: 20px;
+          background: rgba(0, 0, 0, 0.04);
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          color: #2c2520;
         }
 
         .badge-pill-mmt.accent {
-          background: rgba(212, 175, 55, 0.08);
-          border-color: rgba(212, 175, 55, 0.3);
-          color: #a37f1c;
+          background: rgba(139, 0, 0, 0.06);
+          border-color: rgba(139, 0, 0, 0.2);
+          color: #8b0000;
         }
 
         .badge-pill-mmt.success {
           background: rgba(22, 163, 74, 0.08);
-          border-color: rgba(22, 163, 74, 0.25);
-          color: #15803d;
+          border-color: rgba(22, 163, 74, 0.2);
+          color: #16a34a;
         }
 
         .stay-dates-strip {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          background: #fcfbfa;
-          border: 1px solid #e3e1d9;
-          border-radius: 8px;
+          background: rgba(0, 0, 0, 0.02);
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          border-radius: 12px;
           padding: 14px 20px;
-          gap: 15px;
         }
 
         .stay-date-box h5 {
-          font-size: 10.5px;
-          color: #8c857b;
+          font-size: 11px;
+          color: rgba(44, 37, 32, 0.5);
           text-transform: uppercase;
-          margin: 0 0 3px;
-          font-weight: 700;
-          letter-spacing: 0.5px;
+          margin: 0 0 4px;
         }
 
         .stay-date-box p {
-          font-size: 14.5px;
+          font-size: 15px;
           font-weight: 700;
           color: #1a1512;
           margin: 0;
         }
 
         .stay-duration-circle {
-          padding: 5px 12px;
-          background: rgba(139, 0, 0, 0.06);
+          padding: 6px 12px;
+          background: rgba(139, 0, 0, 0.08);
           border: 1px solid rgba(139, 0, 0, 0.2);
           border-radius: 20px;
-          font-size: 11.5px;
+          font-size: 12px;
           font-weight: 700;
           color: #8b0000;
           text-align: center;
         }
 
-        /* SUITE TYPE SELECTOR GRID */
+        /* SUITE SELECTION CARDS */
         .suite-selector-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-          gap: 18px;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 16px;
         }
 
         .suite-selector-card {
-          border: 1px solid #dcdad2;
+          border: 1.5px solid rgba(0, 0, 0, 0.08);
           background: #ffffff;
-          border-radius: 8px;
-          padding: 20px;
+          border-radius: 14px;
+          padding: 18px;
           cursor: pointer;
-          transition: all 0.25s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
         }
 
         .suite-selector-card:hover {
-          border-color: #8b0000;
-          background: #fafaf9;
+          border-color: rgba(139, 0, 0, 0.3);
+          background: rgba(0, 0, 0, 0.01);
         }
 
         .suite-selector-card.selected {
           border-color: #8b0000;
-          background: rgba(139, 0, 0, 0.03);
-          box-shadow: 0 4px 16px rgba(139, 0, 0, 0.05);
+          background: rgba(139, 0, 0, 0.04);
+          box-shadow: 0 8px 25px rgba(139, 0, 0, 0.08);
         }
 
         .suite-selector-card.selected::after {
@@ -1220,48 +1190,48 @@ export default function BookingPage() {
           top: 0; right: 0;
           width: 0; height: 0;
           border-style: solid;
-          border-width: 0 30px 30px 0;
+          border-width: 0 35px 35px 0;
           border-color: transparent #8b0000 transparent transparent;
         }
 
         .suite-selector-card .selected-check {
           position: absolute;
-          top: 3px; right: 3px;
+          top: 4px; right: 4px;
           color: #ffffff;
           z-index: 5;
         }
 
         .suite-selector-card h4 {
-          font-size: 1.45rem;
+          font-size: 16px;
+          font-weight: 700;
           color: #1a1512;
-          margin: 0 0 5px;
+          margin: 0 0 6px;
         }
 
         .suite-selector-card p {
-          font-size: 13.5px;
-          color: #635b54;
-          margin: 0 0 14px;
-          font-weight: 500;
+          font-size: 13px;
+          color: rgba(44, 37, 32, 0.6);
+          margin: 0 0 12px;
         }
 
         .suite-selector-card .price-tag {
-          font-size: 20px;
-          font-weight: 700;
+          font-size: 18px;
+          font-weight: 800;
           color: #8b0000;
         }
 
-        /* BOOKING FORM ELEMENTS (Booking.com Thick Border Style) */
+        /* FORM INPUT LABELS MMT */
         .form-grid-mmt {
           display: grid;
           grid-template-columns: 2fr 5fr 5fr;
-          gap: 18px;
+          gap: 16px;
           margin-bottom: 20px;
         }
 
         .form-grid-dual-mmt {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 18px;
+          gap: 16px;
           margin-bottom: 20px;
         }
 
@@ -1273,7 +1243,7 @@ export default function BookingPage() {
 
         .input-wrapper-mmt label {
           font-size: 12px;
-          font-weight: 700;
+          font-weight: 600;
           color: #8b0000;
           margin-bottom: 6px;
           text-transform: uppercase;
@@ -1283,49 +1253,58 @@ export default function BookingPage() {
         .input-wrapper-mmt input, 
         .input-wrapper-mmt select, 
         .input-wrapper-mmt textarea {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: #ffffff;
           background: #ffffff;
-          border: 1.5px solid #b8b3a9;
-          border-radius: 6px;
-          padding: 13px 16px;
-          font-size: 14.5px;
+          border: 1px solid rgba(0, 0, 0, 0.15);
+          border-radius: 8px;
+          padding: 12px 14px;
+          font-size: 14px;
           color: #1a1512;
           outline: none;
           transition: all 0.2s ease;
           width: 100%;
-          font-weight: 500;
         }
-
         .input-wrapper-mmt input:focus,
         .input-wrapper-mmt select:focus,
         .input-wrapper-mmt textarea:focus {
           border-color: #8b0000;
-          box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.1);
+          background: #ffffff;
+          box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
         }
 
-        /* CUSTOM ADD-ONS / INCLUSIONS */
+        /* 9. SPECIAL REQUESTS */
         .special-requests-badges {
           display: flex;
           flex-wrap: wrap;
           gap: 10px;
-          margin-top: 12px;
+          margin-top: 10px;
         }
-
         .request-badge-item {
           background: #ffffff;
-          border: 1.5px solid #d1cfc5;
-          padding: 11px 18px;
-          border-radius: 30px;
-          font-size: 13px;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          padding: 10px 16px;
+          border-radius: 100px;
+          font-size: 12px;
           font-weight: 600;
-          color: #3d352e;
+          color: #2c2520;
           cursor: pointer;
           transition: all 0.2s ease;
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
         }
-
         .request-badge-item:hover {
+          border-color: rgba(139, 0, 0, 0.3);
+          background: rgba(0, 0, 0, 0.01);
+        }
+        .request-badge-item.active {
+          border-color: #8b0000;
+          background: rgba(139, 0, 0, 0.08);
+          color: #8b0000;
+          font-weight: 700;
+        }
 
         /* 10. EXTRA VALUES & ADDONS */
         .addons-grid-mmt {
@@ -2344,32 +2323,6 @@ export default function BookingPage() {
                   </div>
                   <div className="room-review-details">
                     <h3>{getRoomTitle(roomType)}</h3>
-                    
-                    <div className="rating-badge-container">
-                      <span className="rating-score">9.8</span>
-                      <div className="rating-text">
-                        <span className="rating-title">Exceptional</span>
-                        <span className="rating-count">124 reviews · Braj Nidhi Guest Favorite</span>
-                      </div>
-                    </div>
-                    
-                    <div style={{
-                      background: '#fcfbfa',
-                      border: '1px solid #e3e1d9',
-                      borderRadius: '6px',
-                      padding: '8px 12px',
-                      fontSize: '12.5px',
-                      fontWeight: '600',
-                      color: '#4C463F',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      marginBottom: '15px'
-                    }}>
-                      <span style={{ fontSize: '14px' }}>📍</span>
-                      <span>Excellent location — near Prem Mandir, Raman Reti, Vrindavan (9.5/10 location score)</span>
-                    </div>
-
                     <div className="room-details-badges">
                       <span className="badge-pill-mmt accent">Spiritual Garden View</span>
                       <span className="badge-pill-mmt">King-size Bed</span>
@@ -2405,51 +2358,49 @@ export default function BookingPage() {
                 </div>
 
                 {/* Real-time ERP Sync Status Bar */}
-                {isDevMode && (
-                  <div style={{ 
-                    background: 'rgba(0, 0, 0, 0.02)', 
-                    border: '1px solid rgba(0, 0, 0, 0.05)', 
-                    borderRadius: '12px', 
-                    padding: '12px 16px', 
-                    marginBottom: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '12px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      {isSearching ? (
-                        <div className="spinner-payment" style={{ width: '16px', height: '16px', borderWidth: '2px', animation: 'spin 1s linear infinite', borderTopColor: '#8b0000', margin: 0 }}></div>
-                      ) : (
-                        <span className={`status-dot ${apiConnectionStatus}`} />
-                      )}
-                      <span style={{ fontSize: '13px', fontWeight: '600', color: '#1a1512' }}>
-                        {isSearching ? 'Syncing live inventory from ERP...' : 
-                         apiConnectionStatus === 'live' ? 'Live ERP Connected' : 
-                         apiConnectionStatus === 'error' ? 'ERP Sync Interrupted (Sandbox active)' : 
-                         'Sandbox Simulator Active'}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <button 
-                        onClick={() => searchRoomsApi(checkIn, checkOut, adults + children)}
-                        className="btn-apply-promo"
-                        disabled={isSearching}
-                        style={{ padding: '6px 12px', fontSize: '12px', margin: 0 }}
-                      >
-                        Search / Sync Rooms
-                      </button>
-                      <button 
-                        onClick={() => setCredentialsOpen(true)}
-                        className="btn-apply-promo"
-                        style={{ padding: '6px 12px', fontSize: '12px', margin: 0, background: '#111111', color: '#ffffff', borderColor: '#111111' }}
-                      >
-                        Setup Dev API Hub
-                      </button>
-                    </div>
+                <div style={{ 
+                  background: 'rgba(0, 0, 0, 0.02)', 
+                  border: '1px solid rgba(0, 0, 0, 0.05)', 
+                  borderRadius: '12px', 
+                  padding: '12px 16px', 
+                  marginBottom: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {isSearching ? (
+                      <div className="spinner-payment" style={{ width: '16px', height: '16px', borderWidth: '2px', animation: 'spin 1s linear infinite', borderTopColor: '#8b0000', margin: 0 }}></div>
+                    ) : (
+                      <span className={`status-dot ${apiConnectionStatus}`} />
+                    )}
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#1a1512' }}>
+                      {isSearching ? 'Syncing live inventory from ERP...' : 
+                       apiConnectionStatus === 'live' ? 'Live ERP Connected' : 
+                       apiConnectionStatus === 'error' ? 'ERP Sync Interrupted (Sandbox active)' : 
+                       'Sandbox Simulator Active'}
+                    </span>
                   </div>
-                )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button 
+                      onClick={() => searchRoomsApi(checkIn, checkOut, adults + children)}
+                      className="btn-apply-promo"
+                      disabled={isSearching}
+                      style={{ padding: '6px 12px', fontSize: '12px', margin: 0 }}
+                    >
+                      Search / Sync Rooms
+                    </button>
+                    <button 
+                      onClick={() => setCredentialsOpen(true)}
+                      className="btn-apply-promo"
+                      style={{ padding: '6px 12px', fontSize: '12px', margin: 0, background: '#111111', color: '#ffffff', borderColor: '#111111' }}
+                    >
+                      Setup Dev API Hub
+                    </button>
+                  </div>
+                </div>
 
                 {/* Grid Room Selector */}
                 <h4 style={{ fontSize: '14px', fontWeight: '700', color: 'rgba(44, 37, 32, 0.9)', marginBottom: '12px' }}>
@@ -3246,101 +3197,97 @@ export default function BookingPage() {
 
       <FloatingWidgets />
 
-      {/* Retractable Developer Credentials Drawer (Visible in Dev Mode only) */}
-      {isDevMode && (
-        <>
+      {/* Retractable Developer Credentials Drawer Toggle Button */}
+      <button 
+        className="dev-credentials-toggle"
+        onClick={() => setCredentialsOpen(true)}
+      >
+        <Terminal size={16} style={{ color: '#d4af37' }} />
+        <span>Dev API Hub</span>
+      </button>
+
+      {/* Dev Drawer Backdrop */}
+      <div 
+        className={`dev-drawer-backdrop ${credentialsOpen ? 'open' : ''}`}
+        onClick={() => setCredentialsOpen(false)}
+      />
+
+      {/* Collapsible Developer Credentials Drawer */}
+      <div className={`dev-credentials-drawer ${credentialsOpen ? 'open' : ''}`}>
+        <div className="dev-drawer-header">
+          <h3>
+            <Terminal size={20} />
+            <span>Developer Credentials Hub</span>
+          </h3>
           <button 
-            className="dev-credentials-toggle"
-            onClick={() => setCredentialsOpen(true)}
-          >
-            <Terminal size={16} style={{ color: '#d4af37' }} />
-            <span>Dev API Hub</span>
-          </button>
-
-          {/* Dev Drawer Backdrop */}
-          <div 
-            className={`dev-drawer-backdrop ${credentialsOpen ? 'open' : ''}`}
+            className="dev-drawer-close"
             onClick={() => setCredentialsOpen(false)}
-          />
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-          {/* Collapsible Developer Credentials Drawer */}
-          <div className={`dev-credentials-drawer ${credentialsOpen ? 'open' : ''}`}>
-            <div className="dev-drawer-header">
-              <h3>
-                <Terminal size={20} />
-                <span>Developer Credentials Hub</span>
-              </h3>
-              <button 
-                className="dev-drawer-close"
-                onClick={() => setCredentialsOpen(false)}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="dev-drawer-section">
-              <label style={{ fontSize: '11px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }}>
-                System Sync Status
-              </label>
-              <div className="dev-status-indicator">
-                <span className={`status-dot ${apiConnectionStatus}`} />
-                <span style={{ fontSize: '14px', fontWeight: '700', color: apiConnectionStatus === 'live' ? '#22c55e' : apiConnectionStatus === 'error' ? '#ef4444' : '#eab308' }}>
-                  {apiConnectionStatus === 'live' ? 'Live ERP Active' : apiConnectionStatus === 'error' ? 'Connection Error' : 'Sandbox Simulator Active'}
-                </span>
-              </div>
-              {apiErrorMsg && (
-                <p style={{ fontSize: '11px', color: '#ef4444', marginTop: '10px', background: 'rgba(239, 68, 68, 0.08)', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.15)', whiteSpace: 'pre-wrap' }}>
-                  {apiErrorMsg}
-                </p>
-              )}
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div className="dev-input-wrapper">
-                <label>ERP API Base URL</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. https://pankaj.vcmerp.in/api/method/..."
-                  value={drawerErpBase}
-                  onChange={(e) => setDrawerErpBase(e.target.value)}
-                />
-              </div>
-
-              <div className="dev-input-wrapper">
-                <label>ERP API Key</label>
-                <input 
-                  type="password" 
-                  placeholder="Enter api_key"
-                  value={drawerApiKey}
-                  onChange={(e) => setDrawerApiKey(e.target.value)}
-                />
-              </div>
-
-              <div className="dev-input-wrapper">
-                <label>ERP API Secret</label>
-                <input 
-                  type="password" 
-                  placeholder="Enter api_secret"
-                  value={drawerApiSecret}
-                  onChange={(e) => setDrawerApiSecret(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '20px', lineHeight: '1.5' }}>
-              💡 These developer credentials are saved securely in your browser's local <code style={{ color: '#d4af37' }}>sessionStorage</code>. They will be sent safely through the Next.js API proxy route and are cleared instantly when you close your browser tab.
-            </p>
-
-            <button 
-              className="dev-save-btn"
-              onClick={() => handleSaveCredentials(drawerApiKey, drawerApiSecret, drawerErpBase)}
-            >
-              <Key size={16} />
-              <span>Save & Initialize Connection</span>
-            </button>
+        <div className="dev-drawer-section">
+          <label style={{ fontSize: '11px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }}>
+            System Sync Status
+          </label>
+          <div className="dev-status-indicator">
+            <span className={`status-dot ${apiConnectionStatus}`} />
+            <span style={{ fontSize: '14px', fontWeight: '700', color: apiConnectionStatus === 'live' ? '#22c55e' : apiConnectionStatus === 'error' ? '#ef4444' : '#eab308' }}>
+              {apiConnectionStatus === 'live' ? 'Live ERP Active' : apiConnectionStatus === 'error' ? 'Connection Error' : 'Sandbox Simulator Active'}
+            </span>
           </div>
-        </>
-      )}
+          {apiErrorMsg && (
+            <p style={{ fontSize: '11px', color: '#ef4444', marginTop: '10px', background: 'rgba(239, 68, 68, 0.08)', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.15)', whiteSpace: 'pre-wrap' }}>
+              {apiErrorMsg}
+            </p>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="dev-input-wrapper">
+            <label>ERP API Base URL</label>
+            <input 
+              type="text" 
+              placeholder="e.g. https://pankaj.vcmerp.in/api/method/..."
+              value={drawerErpBase}
+              onChange={(e) => setDrawerErpBase(e.target.value)}
+            />
+          </div>
+
+          <div className="dev-input-wrapper">
+            <label>ERP API Key</label>
+            <input 
+              type="password" 
+              placeholder="Enter api_key"
+              value={drawerApiKey}
+              onChange={(e) => setDrawerApiKey(e.target.value)}
+            />
+          </div>
+
+          <div className="dev-input-wrapper">
+            <label>ERP API Secret</label>
+            <input 
+              type="password" 
+              placeholder="Enter api_secret"
+              value={drawerApiSecret}
+              onChange={(e) => setDrawerApiSecret(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '20px', lineHeight: '1.5' }}>
+          💡 These developer credentials are saved securely in your browser's local <code style={{ color: '#d4af37' }}>sessionStorage</code>. They will be sent safely through the Next.js API proxy route and are cleared instantly when you close your browser tab.
+        </p>
+
+        <button 
+          className="dev-save-btn"
+          onClick={() => handleSaveCredentials(drawerApiKey, drawerApiSecret, drawerErpBase)}
+        >
+          <Key size={16} />
+          <span>Save & Initialize Connection</span>
+        </button>
+      </div>
     </div>
   );
 }
