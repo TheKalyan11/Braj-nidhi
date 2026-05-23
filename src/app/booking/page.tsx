@@ -114,6 +114,7 @@ export default function BookingPage() {
   const [drawerErpBase, setDrawerErpBase] = useState<string>('https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api');
   const [availableRoomsList, setAvailableRoomsList] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [isDevMode, setIsDevMode] = useState<boolean>(false);
   const [livePrices, setLivePrices] = useState<Record<string, number>>({
     deluxe2: 3500,
     deluxe3: 4500,
@@ -196,6 +197,10 @@ export default function BookingPage() {
     const initializeFromQuery = () => {
       const params = new URLSearchParams(window.location.search);
       
+      // Check if developer mode is enabled via URL param (e.g. ?dev=true or ?dev=1) or localhost hostname
+      const isDev = params.get('dev') === 'true' || params.get('dev') === '1' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      setIsDevMode(isDev);
+
       // 1. Room Type Selection
       const paramRoom = params.get('roomType') || params.get('room') || params.get('room_type') || params.get('hotelId');
       if (paramRoom) {
@@ -2358,49 +2363,51 @@ export default function BookingPage() {
                 </div>
 
                 {/* Real-time ERP Sync Status Bar */}
-                <div style={{ 
-                  background: 'rgba(0, 0, 0, 0.02)', 
-                  border: '1px solid rgba(0, 0, 0, 0.05)', 
-                  borderRadius: '12px', 
-                  padding: '12px 16px', 
-                  marginBottom: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  gap: '12px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    {isSearching ? (
-                      <div className="spinner-payment" style={{ width: '16px', height: '16px', borderWidth: '2px', animation: 'spin 1s linear infinite', borderTopColor: '#8b0000', margin: 0 }}></div>
-                    ) : (
-                      <span className={`status-dot ${apiConnectionStatus}`} />
-                    )}
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#1a1512' }}>
-                      {isSearching ? 'Syncing live inventory from ERP...' : 
-                       apiConnectionStatus === 'live' ? 'Live ERP Connected' : 
-                       apiConnectionStatus === 'error' ? 'ERP Sync Interrupted (Sandbox active)' : 
-                       'Sandbox Simulator Active'}
-                    </span>
+                {isDevMode && (
+                  <div style={{ 
+                    background: 'rgba(0, 0, 0, 0.02)', 
+                    border: '1px solid rgba(0, 0, 0, 0.05)', 
+                    borderRadius: '12px', 
+                    padding: '12px 16px', 
+                    marginBottom: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '12px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {isSearching ? (
+                        <div className="spinner-payment" style={{ width: '16px', height: '16px', borderWidth: '2px', animation: 'spin 1s linear infinite', borderTopColor: '#8b0000', margin: 0 }}></div>
+                      ) : (
+                        <span className={`status-dot ${apiConnectionStatus}`} />
+                      )}
+                      <span style={{ fontSize: '13px', fontWeight: '600', color: '#1a1512' }}>
+                        {isSearching ? 'Syncing live inventory from ERP...' : 
+                         apiConnectionStatus === 'live' ? 'Live ERP Connected' : 
+                         apiConnectionStatus === 'error' ? 'ERP Sync Interrupted (Sandbox active)' : 
+                         'Sandbox Simulator Active'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button 
+                        onClick={() => searchRoomsApi(checkIn, checkOut, adults + children)}
+                        className="btn-apply-promo"
+                        disabled={isSearching}
+                        style={{ padding: '6px 12px', fontSize: '12px', margin: 0 }}
+                      >
+                        Search / Sync Rooms
+                      </button>
+                      <button 
+                        onClick={() => setCredentialsOpen(true)}
+                        className="btn-apply-promo"
+                        style={{ padding: '6px 12px', fontSize: '12px', margin: 0, background: '#111111', color: '#ffffff', borderColor: '#111111' }}
+                      >
+                        Setup Dev API Hub
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <button 
-                      onClick={() => searchRoomsApi(checkIn, checkOut, adults + children)}
-                      className="btn-apply-promo"
-                      disabled={isSearching}
-                      style={{ padding: '6px 12px', fontSize: '12px', margin: 0 }}
-                    >
-                      Search / Sync Rooms
-                    </button>
-                    <button 
-                      onClick={() => setCredentialsOpen(true)}
-                      className="btn-apply-promo"
-                      style={{ padding: '6px 12px', fontSize: '12px', margin: 0, background: '#111111', color: '#ffffff', borderColor: '#111111' }}
-                    >
-                      Setup Dev API Hub
-                    </button>
-                  </div>
-                </div>
+                )}
 
                 {/* Grid Room Selector */}
                 <h4 style={{ fontSize: '14px', fontWeight: '700', color: 'rgba(44, 37, 32, 0.9)', marginBottom: '12px' }}>
@@ -3197,97 +3204,101 @@ export default function BookingPage() {
 
       <FloatingWidgets />
 
-      {/* Retractable Developer Credentials Drawer Toggle Button */}
-      <button 
-        className="dev-credentials-toggle"
-        onClick={() => setCredentialsOpen(true)}
-      >
-        <Terminal size={16} style={{ color: '#d4af37' }} />
-        <span>Dev API Hub</span>
-      </button>
-
-      {/* Dev Drawer Backdrop */}
-      <div 
-        className={`dev-drawer-backdrop ${credentialsOpen ? 'open' : ''}`}
-        onClick={() => setCredentialsOpen(false)}
-      />
-
-      {/* Collapsible Developer Credentials Drawer */}
-      <div className={`dev-credentials-drawer ${credentialsOpen ? 'open' : ''}`}>
-        <div className="dev-drawer-header">
-          <h3>
-            <Terminal size={20} />
-            <span>Developer Credentials Hub</span>
-          </h3>
+      {/* Retractable Developer Credentials Drawer (Visible in Dev Mode only) */}
+      {isDevMode && (
+        <>
           <button 
-            className="dev-drawer-close"
-            onClick={() => setCredentialsOpen(false)}
+            className="dev-credentials-toggle"
+            onClick={() => setCredentialsOpen(true)}
           >
-            <X size={20} />
+            <Terminal size={16} style={{ color: '#d4af37' }} />
+            <span>Dev API Hub</span>
           </button>
-        </div>
 
-        <div className="dev-drawer-section">
-          <label style={{ fontSize: '11px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }}>
-            System Sync Status
-          </label>
-          <div className="dev-status-indicator">
-            <span className={`status-dot ${apiConnectionStatus}`} />
-            <span style={{ fontSize: '14px', fontWeight: '700', color: apiConnectionStatus === 'live' ? '#22c55e' : apiConnectionStatus === 'error' ? '#ef4444' : '#eab308' }}>
-              {apiConnectionStatus === 'live' ? 'Live ERP Active' : apiConnectionStatus === 'error' ? 'Connection Error' : 'Sandbox Simulator Active'}
-            </span>
-          </div>
-          {apiErrorMsg && (
-            <p style={{ fontSize: '11px', color: '#ef4444', marginTop: '10px', background: 'rgba(239, 68, 68, 0.08)', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.15)', whiteSpace: 'pre-wrap' }}>
-              {apiErrorMsg}
+          {/* Dev Drawer Backdrop */}
+          <div 
+            className={`dev-drawer-backdrop ${credentialsOpen ? 'open' : ''}`}
+            onClick={() => setCredentialsOpen(false)}
+          />
+
+          {/* Collapsible Developer Credentials Drawer */}
+          <div className={`dev-credentials-drawer ${credentialsOpen ? 'open' : ''}`}>
+            <div className="dev-drawer-header">
+              <h3>
+                <Terminal size={20} />
+                <span>Developer Credentials Hub</span>
+              </h3>
+              <button 
+                className="dev-drawer-close"
+                onClick={() => setCredentialsOpen(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="dev-drawer-section">
+              <label style={{ fontSize: '11px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }}>
+                System Sync Status
+              </label>
+              <div className="dev-status-indicator">
+                <span className={`status-dot ${apiConnectionStatus}`} />
+                <span style={{ fontSize: '14px', fontWeight: '700', color: apiConnectionStatus === 'live' ? '#22c55e' : apiConnectionStatus === 'error' ? '#ef4444' : '#eab308' }}>
+                  {apiConnectionStatus === 'live' ? 'Live ERP Active' : apiConnectionStatus === 'error' ? 'Connection Error' : 'Sandbox Simulator Active'}
+                </span>
+              </div>
+              {apiErrorMsg && (
+                <p style={{ fontSize: '11px', color: '#ef4444', marginTop: '10px', background: 'rgba(239, 68, 68, 0.08)', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.15)', whiteSpace: 'pre-wrap' }}>
+                  {apiErrorMsg}
+                </p>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="dev-input-wrapper">
+                <label>ERP API Base URL</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. https://pankaj.vcmerp.in/api/method/..."
+                  value={drawerErpBase}
+                  onChange={(e) => setDrawerErpBase(e.target.value)}
+                />
+              </div>
+
+              <div className="dev-input-wrapper">
+                <label>ERP API Key</label>
+                <input 
+                  type="password" 
+                  placeholder="Enter api_key"
+                  value={drawerApiKey}
+                  onChange={(e) => setDrawerApiKey(e.target.value)}
+                />
+              </div>
+
+              <div className="dev-input-wrapper">
+                <label>ERP API Secret</label>
+                <input 
+                  type="password" 
+                  placeholder="Enter api_secret"
+                  value={drawerApiSecret}
+                  onChange={(e) => setDrawerApiSecret(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '20px', lineHeight: '1.5' }}>
+              💡 These developer credentials are saved securely in your browser's local <code style={{ color: '#d4af37' }}>sessionStorage</code>. They will be sent safely through the Next.js API proxy route and are cleared instantly when you close your browser tab.
             </p>
-          )}
-        </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className="dev-input-wrapper">
-            <label>ERP API Base URL</label>
-            <input 
-              type="text" 
-              placeholder="e.g. https://pankaj.vcmerp.in/api/method/..."
-              value={drawerErpBase}
-              onChange={(e) => setDrawerErpBase(e.target.value)}
-            />
+            <button 
+              className="dev-save-btn"
+              onClick={() => handleSaveCredentials(drawerApiKey, drawerApiSecret, drawerErpBase)}
+            >
+              <Key size={16} />
+              <span>Save & Initialize Connection</span>
+            </button>
           </div>
-
-          <div className="dev-input-wrapper">
-            <label>ERP API Key</label>
-            <input 
-              type="password" 
-              placeholder="Enter api_key"
-              value={drawerApiKey}
-              onChange={(e) => setDrawerApiKey(e.target.value)}
-            />
-          </div>
-
-          <div className="dev-input-wrapper">
-            <label>ERP API Secret</label>
-            <input 
-              type="password" 
-              placeholder="Enter api_secret"
-              value={drawerApiSecret}
-              onChange={(e) => setDrawerApiSecret(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '20px', lineHeight: '1.5' }}>
-          💡 These developer credentials are saved securely in your browser's local <code style={{ color: '#d4af37' }}>sessionStorage</code>. They will be sent safely through the Next.js API proxy route and are cleared instantly when you close your browser tab.
-        </p>
-
-        <button 
-          className="dev-save-btn"
-          onClick={() => handleSaveCredentials(drawerApiKey, drawerApiSecret, drawerErpBase)}
-        >
-          <Key size={16} />
-          <span>Save & Initialize Connection</span>
-        </button>
-      </div>
+        </>
+      )}
     </div>
   );
 }
