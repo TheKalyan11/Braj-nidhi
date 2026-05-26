@@ -1080,7 +1080,8 @@ export default function BookingPage() {
         }
 
         .btn-login-mmt {
-          padding: 12px 24px;
+          height: 44px;
+          width: 150px;
           background: #d4af37;
           color: #000000;
           font-weight: 800;
@@ -1091,7 +1092,10 @@ export default function BookingPage() {
           transition: all 0.3s;
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 8px;
+          white-space: nowrap;
+          box-sizing: border-box;
         }
 
         .btn-login-mmt:hover {
@@ -2381,7 +2385,7 @@ export default function BookingPage() {
                         setLoginModalOpen(true);
                       }} 
                       className="btn-login-mmt"
-                      style={{ background: 'transparent', border: '1.5px solid #d4af37', color: '#000000', padding: '10px 22px', fontWeight: '800' }}
+                      style={{ background: 'transparent', border: '1.5px solid #d4af37', color: '#000000', padding: 0 }}
                     >
                       <span>Login</span>
                     </button>
@@ -2391,7 +2395,7 @@ export default function BookingPage() {
                         setLoginModalOpen(true);
                       }} 
                       className="btn-login-mmt"
-                      style={{ background: '#d4af37', border: '1.5px solid #d4af37', color: '#000000', padding: '10px 22px', fontWeight: '800' }}
+                      style={{ background: '#d4af37', border: '1.5px solid #d4af37', color: '#000000', padding: 0 }}
                     >
                       <Sparkles size={14} style={{ color: '#000000' }} />
                       <span>Create Account</span>
