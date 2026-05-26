@@ -1642,37 +1642,58 @@ export default function BookingPage() {
           color: #8b0000;
         }
 
-        /* PAYMENT TAB SELECTORS */
+        /* PAYMENT TAB SELECTORS MMT STYLE */
+        .payment-container-split {
+          display: flex;
+          gap: 24px;
+          margin-top: 24px;
+          align-items: flex-start;
+        }
+
         .payment-tabs {
           display: flex;
-          background: rgba(0, 0, 0, 0.03);
-          border: 1px solid rgba(0, 0, 0, 0.06);
-          border-radius: 12px;
-          padding: 6px;
-          margin-bottom: 24px;
+          flex-direction: column;
+          gap: 10px;
+          min-width: 240px;
         }
 
         .payment-tab-btn {
-          flex: 1;
-          padding: 12px;
-          background: transparent;
-          border: none;
-          color: rgba(44, 37, 32, 0.6);
+          width: 100%;
+          padding: 16px;
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          color: rgba(44, 37, 32, 0.7);
           font-weight: 700;
-          font-size: 13px;
-          border-radius: 8px;
+          font-size: 14px;
+          border-radius: 12px;
           cursor: pointer;
           transition: all 0.3s;
           display: flex;
           align-items: center;
-          justify-content: center;
-          gap: 8px;
+          justify-content: flex-start;
+          gap: 12px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .payment-tab-btn:hover {
+          background: rgba(0, 0, 0, 0.02);
+          border-color: rgba(0, 0, 0, 0.15);
         }
 
         .payment-tab-btn.active {
-          background: rgba(139, 0, 0, 0.08);
-          border: 1px solid rgba(139, 0, 0, 0.2);
+          background: rgba(139, 0, 0, 0.04);
+          border: 1.5px solid #8b0000;
           color: #8b0000;
+          box-shadow: 0 4px 15px rgba(139, 0, 0, 0.08);
+        }
+
+        .payment-content-pane {
+          flex: 1;
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          border-radius: 16px;
+          padding: 24px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
         }
 
         .secure-lock-bar {
@@ -2898,8 +2919,9 @@ export default function BookingPage() {
                       <span className="badge-pill-mmt success">Secured by Razorpay</span>
                     </div>
 
-                    {/* Quick Stepper tab */}
-                    <div className="payment-tabs">
+                    <div className="payment-container-split">
+                      {/* Left Side: Payment Tabs */}
+                      <div className="payment-tabs">
                       <button 
                         onClick={() => setPaymentMethod('upi')}
                         className={`payment-tab-btn ${paymentMethod === 'upi' ? 'active' : ''}`}
@@ -2921,102 +2943,108 @@ export default function BookingPage() {
                         <CreditCard size={16} />
                         <span>Debit / Credit Card</span>
                       </button>
+                      </div>
+
+                      {/* Right Side: Payment Form Pane */}
+                      <div className="payment-content-pane">
+                        {/* Method 1: UPI */}
+                        {paymentMethod === 'upi' && (
+                          <div style={{ animation: 'fadeIn 0.4s ease' }}>
+                            <h4 style={{ fontSize: '15px', color: '#1a1512', margin: '0 0 10px' }}>Pay via Instant UPI ID</h4>
+                            <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', marginBottom: '18px' }}>
+                              Submit your registered Virtual Payment Address (e.g. username@okhdfcbank or phone@paytm).
+                            </p>
+                            
+                            <div className="input-wrapper-mmt" style={{ maxWidth: '380px' }}>
+                              <label>Enter Virtual Payment Address (VPA)</label>
+                              <input 
+                                type="text" 
+                                placeholder="e.g. kalyan@ybl" 
+                                value={upiId}
+                                onChange={(e) => setUpiId(e.target.value)}
+                              />
+                            </div>
+                            
+                            <div style={{ marginTop: '20px', background: 'rgba(0, 0, 0, 0.03)', padding: '12px 16px', borderRadius: '10px', fontSize: '12px', color: 'rgba(44, 37, 32, 0.7)', display: 'flex', gap: '10px', alignItems: 'center' }}>
+                              <Info size={16} style={{ color: '#8b0000' }} />
+                              <span>We will send a secure transaction request directly to your UPI smartphone application.</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Method 2: Scan QR */}
+                        {paymentMethod === 'qr' && (
+                          <div style={{ textAlign: 'center', padding: '15px 0', animation: 'fadeIn 0.4s ease' }}>
+                            <h4 style={{ fontSize: '16px', color: '#1a1512', margin: '0 0 6px' }}>Scan Unified BHIM Trust QR Code</h4>
+                            <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', margin: '0 0 20px' }}>
+                              Scan this official encrypted dynamic booking receipt QR using any UPI app (GPay, PhonePe, Paytm).
+                            </p>
+
+                            <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', display: 'inline-block', border: '3px solid #d4af37', boxShadow: '0 0 25px rgba(212,175,55,0.2)' }}>
+                              {/* Rich glowing simulator QR */}
+                              <QrCode size={180} style={{ color: '#0b0908' }} />
+                            </div>
+                            
+                            <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', color: '#a3e635', fontWeight: '700' }}>
+                              <Clock size={14} />
+                              <span>QR Code expires in 4 mins 52 secs</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Method 3: Cards */}
+                        {paymentMethod === 'card' && (
+                          <div style={{ animation: 'fadeIn 0.4s ease' }}>
+                            <h4 style={{ fontSize: '15px', color: '#1a1512', margin: '0 0 10px' }}>Pay via Secure Credit or Debit Card</h4>
+                            <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', marginBottom: '18px' }}>
+                              Enter card details. We encrypt this data directly via end-to-end PCI-DSS compliant secure vaults.
+                            </p>
+
+                            <div className="input-wrapper-mmt" style={{ marginBottom: '16px' }}>
+                              <label>Cardholder Full Name</label>
+                              <input 
+                                type="text" 
+                                placeholder="e.g. Kalyan Sharma" 
+                              />
+                            </div>
+
+                            <div className="input-wrapper-mmt" style={{ marginBottom: '16px' }}>
+                              <label>Debit / Credit Card Number</label>
+                              <input 
+                                type="text" 
+                                placeholder="4111 2222 3333 4444" 
+                                maxLength={19}
+                                value={cardNo}
+                                onChange={(e) => setCardNo(e.target.value)}
+                              />
+                            </div>
+
+                            <div className="form-grid-dual-mmt">
+                              <div className="input-wrapper-mmt">
+                                <label>Expiry Date (MM/YY)</label>
+                                <input 
+                                  type="text" 
+                                  placeholder="09/29" 
+                                  maxLength={5}
+                                  value={cardExpiry}
+                                  onChange={(e) => setCardExpiry(e.target.value)}
+                                />
+                              </div>
+                              <div className="input-wrapper-mmt">
+                                <label>CVV Shield (3-Digit)</label>
+                                <input 
+                                  type="password" 
+                                  placeholder="***" 
+                                  maxLength={3}
+                                  value={cardCVV}
+                                  onChange={(e) => setCardCVV(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-
-                    {/* Method 1: UPI */}
-                    {paymentMethod === 'upi' && (
-                      <div style={{ animation: 'fadeIn 0.4s ease' }}>
-                        <h4 style={{ fontSize: '15px', color: '#1a1512', margin: '0 0 10px' }}>Pay via Instant UPI ID</h4>
-                        <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', marginBottom: '18px' }}>
-                          Submit your registered Virtual Payment Address (e.g. username@okhdfcbank or phone@paytm).
-                        </p>
-                        
-                        <div className="input-wrapper-mmt" style={{ maxWidth: '380px' }}>
-                          <label>Enter Virtual Payment Address (VPA)</label>
-                          <input 
-                            type="text" 
-                            placeholder="e.g. kalyan@ybl" 
-                            value={upiId}
-                            onChange={(e) => setUpiId(e.target.value)}
-                          />
-                        </div>
-                        
-                        <div style={{ marginTop: '20px', background: 'rgba(0, 0, 0, 0.03)', padding: '12px 16px', borderRadius: '10px', fontSize: '12px', color: 'rgba(44, 37, 32, 0.7)', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                          <Info size={16} style={{ color: '#8b0000' }} />
-                          <span>We will send a secure transaction request directly to your UPI smartphone application.</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Method 2: Scan QR */}
-                    {paymentMethod === 'qr' && (
-                      <div style={{ textAlign: 'center', padding: '15px 0', animation: 'fadeIn 0.4s ease' }}>
-                        <h4 style={{ fontSize: '16px', color: '#1a1512', margin: '0 0 6px' }}>Scan Unified BHIM Trust QR Code</h4>
-                        <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', margin: '0 0 20px' }}>
-                          Scan this official encrypted dynamic booking receipt QR using any UPI app (GPay, PhonePe, Paytm).
-                        </p>
-
-                        <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', display: 'inline-block', border: '3px solid #d4af37', boxShadow: '0 0 25px rgba(212,175,55,0.2)' }}>
-                          {/* Rich glowing simulator QR */}
-                          <QrCode size={180} style={{ color: '#0b0908' }} />
-                        </div>
-                        
-                        <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', color: '#a3e635', fontWeight: '700' }}>
-                          <Clock size={14} />
-                          <span>QR Code expires in 4 mins 52 secs</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Method 3: Cards */}
-                    {paymentMethod === 'card' && (
-                      <div style={{ animation: 'fadeIn 0.4s ease' }}>
-                        <h4 style={{ fontSize: '15px', color: '#1a1512', margin: '0 0 10px' }}>Pay via Secure Credit or Debit Card</h4>
-                        <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', marginBottom: '18px' }}>
-                          Enter card details. We encrypt this data directly via end-to-end PCI-DSS compliant secure vaults.
-                        </p>
-
-                        <div className="input-wrapper-mmt" style={{ marginBottom: '16px' }}>
-                          <label>Cardholder Full Name</label>
-                          <input 
-                            type="text" 
-                            placeholder="e.g. Kalyan Sharma" 
-                          />
-                        </div>
-
-                        <div className="input-wrapper-mmt" style={{ marginBottom: '16px' }}>
-                          <label>Debit / Credit Card Number</label>
-                          <input 
-                            type="text" 
-                            placeholder="4111 2222 3333 4444" 
-                            maxLength={19}
-                            value={cardNo}
-                            onChange={(e) => setCardNo(e.target.value)}
-                          />
-                        </div>
-
-                        <div className="form-grid-dual-mmt">
-                          <div className="input-wrapper-mmt">
-                            <label>Expiry Date (MM/YY)</label>
-                            <input 
-                              type="text" 
-                              placeholder="09/29" 
-                              maxLength={5}
-                              value={cardExpiry}
-                              onChange={(e) => setCardExpiry(e.target.value)}
-                            />
-                          </div>
-                          <div className="input-wrapper-mmt">
-                            <label>CVV Shield (3-Digit)</label>
-                            <input 
-                              type="password" 
-                              placeholder="***" 
-                              maxLength={3}
-                              value={cardCVV}
-                              onChange={(e) => setCardCVV(e.target.value)}
-                            />
-                          </div>
-                        </div>
                       </div>
                     )}
 
