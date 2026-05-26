@@ -3040,7 +3040,6 @@ export default function BookingPage() {
                                   onChange={(e) => setCardCVV(e.target.value)}
                                 />
                               </div>
-                              </div>
                             </div>
                           </div>
                         )}
