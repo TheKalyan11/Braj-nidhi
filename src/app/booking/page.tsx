@@ -2268,29 +2268,6 @@ export default function BookingPage() {
         
         {currentStep === 1 && (
           <>
-            <div className="hero-banner">
-              <div className="hero-copy">
-                <h1>Reserve Your Heritage Stay with Comfort & Devotion</h1>
-                <p>Complete your premium booking with curated guest services, secure payment, and exclusive member rewards crafted for the perfect Vrindavan retreat.</p>
-                <div className="hero-stats">
-                  <div className="hero-stat">
-                    <h3>{getRoomTitle(roomType)}</h3>
-                    <p>Luxury suite tailored for your selected group size with heritage-inspired décor.</p>
-                  </div>
-                  <div className="hero-stat">
-                    <h3>{nights} Nights</h3>
-                    <p>Flexible stay dates with welcome breakfast and spiritual amenities.</p>
-                  </div>
-                  <div className="hero-stat">
-                    <h3>{adults} Adults / {children} Children</h3>
-                    <p>Choose your ideal family or friends configuration for a seamless check-in.</p>
-                  </div>
-                </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <Image src="/DSC05963-HDR.webp" alt="Premium suite preview" width={420} height={300} style={{ width: '100%', height: 'auto', borderRadius: '20px', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }} />
-              </div>
-            </div>
             <div className="booking-grid-mmt">
             
             {/* LEFT SIDE CONTENT - GUEST & ROOM SELECTIONS */}
@@ -2886,6 +2863,30 @@ export default function BookingPage() {
               </div>
             </div>
 
+          </div>
+
+          <div className="hero-banner" style={{ marginTop: '30px', marginBottom: '20px' }}>
+            <div className="hero-copy">
+              <h1>Reserve Your Heritage Stay with Comfort & Devotion</h1>
+              <p>Complete your premium booking with curated guest services, secure payment, and exclusive member rewards crafted for the perfect Vrindavan retreat.</p>
+              <div className="hero-stats">
+                <div className="hero-stat">
+                  <h3>{getRoomTitle(roomType)}</h3>
+                  <p>Luxury suite tailored for your selected group size with heritage-inspired décor.</p>
+                </div>
+                <div className="hero-stat">
+                  <h3>{nights} Nights</h3>
+                  <p>Flexible stay dates with welcome breakfast and spiritual amenities.</p>
+                </div>
+                <div className="hero-stat">
+                  <h3>{adults} Adults / {children} Children</h3>
+                  <p>Choose your ideal family or friends configuration for a seamless check-in.</p>
+                </div>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <Image src="/DSC05963-HDR.webp" alt="Premium suite preview" width={420} height={300} style={{ width: '100%', height: 'auto', borderRadius: '20px', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }} />
+            </div>
           </div>
           </>
         )}
