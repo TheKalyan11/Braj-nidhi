@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Menu, X, Shield, Sparkles, Heart, CheckCircle2, ChevronRight, Home } from "lucide-react";
+import { Menu, X, Scale, FileText, CheckCircle2, ChevronRight, Home, ShieldAlert, Heart, Ban } from "lucide-react";
 import FloatingWidgets from "@/components/FloatingWidgets";
 import LoginModal from "@/components/LoginModal";
 
@@ -108,7 +108,7 @@ export default function GuestPolicyPage() {
           color: #ffffff !important;
         }
 
-        .guest-policy-hero {
+        .policy-hero {
           background: #ffffff;
           padding: 160px 6% 60px;
           text-align: center;
@@ -116,7 +116,7 @@ export default function GuestPolicyPage() {
           border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         }
 
-        .guest-policy-hero h1 {
+        .policy-hero h1 {
           font-family: 'Bebas Neue', cursive !important;
           font-size: clamp(3rem, 8vw, 5.5rem);
           color: #8b0000;
@@ -126,7 +126,7 @@ export default function GuestPolicyPage() {
           line-height: 0.95;
         }
 
-        .guest-policy-hero p {
+        .policy-hero p {
           font-size: clamp(1rem, 2vw, 1.2rem);
           color: rgba(44, 37, 32, 0.75);
           max-width: 600px;
@@ -161,20 +161,20 @@ export default function GuestPolicyPage() {
           color: #8b0000;
         }
 
-        .guest-policy-content-section {
+        .policy-content-section {
           padding: 80px 6%;
           max-width: 1100px;
           margin: 0 auto;
         }
 
-        .guest-policy-grid {
+        .policy-grid {
           display: grid;
           grid-template-columns: 1.2fr 2fr;
           gap: 50px;
           align-items: start;
         }
 
-        .guest-policy-sidebar {
+        .policy-sidebar {
           background: #fff;
           border: 1px solid rgba(0, 0, 0, 0.06);
           border-radius: 20px;
@@ -230,7 +230,7 @@ export default function GuestPolicyPage() {
           margin: 4px 0 0;
         }
 
-        .guest-policy-main {
+        .policy-main {
           display: flex;
           flex-direction: column;
           gap: 36px;
@@ -348,18 +348,18 @@ export default function GuestPolicyPage() {
         }
 
         @media (max-width: 900px) {
-          .guest-policy-grid {
+          .policy-grid {
             grid-template-columns: 1fr;
             gap: 30px;
           }
-          .guest-policy-sidebar {
+          .policy-sidebar {
             position: relative;
             top: 0;
           }
-          .guest-policy-hero {
+          .policy-hero {
             padding: 130px 6% 60px;
           }
-          .guest-policy-content-section {
+          .policy-content-section {
             padding: 50px 6%;
           }
         }
@@ -445,7 +445,7 @@ export default function GuestPolicyPage() {
       )}
 
       <main>
-        <section className="guest-policy-hero">
+        <section className="policy-hero">
           <div className="breadcrumb">
             <Link href="/"><Home size={13} /> Home</Link>
             <ChevronRight size={12} />
@@ -463,58 +463,49 @@ export default function GuestPolicyPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
           >
-            Sustaining a peaceful, respectful, and spiritually uplifting sanctuary in Vrindavan.
+            Maintaining a peaceful and respectful atmosphere.
           </motion.p>
         </section>
 
-        <section className="guest-policy-content-section">
-          <div className="guest-policy-grid">
+        <section className="policy-content-section">
+          <div className="policy-grid">
             <motion.div
-              className="guest-policy-sidebar"
+              className="policy-sidebar"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <h3 className="sidebar-title">Policy Essentials</h3>
-              <div className="sidebar-badge">
-                <div className="sidebar-badge-icon">
-                  <Sparkles size={22} />
-                </div>
-                <div className="sidebar-badge-text">
-                  <h5>Spiritual Vibe</h5>
-                  <p>Peaceful and respectful atmosphere</p>
-                </div>
-              </div>
-              <div className="sidebar-badge">
-                <div className="sidebar-badge-icon">
-                  <Shield size={22} />
-                </div>
-                <div className="sidebar-badge-text">
-                  <h5>Mandatory ID</h5>
-                  <p>Valid government ID at check-in</p>
-                </div>
-              </div>
+              <h3 className="sidebar-title">Key Guidelines</h3>
               <div className="sidebar-badge">
                 <div className="sidebar-badge-icon">
                   <Heart size={22} />
                 </div>
                 <div className="sidebar-badge-text">
+                  <h5>Spiritual Atmosphere</h5>
+                  <p>Respectful and uplifting environment</p>
+                </div>
+              </div>
+              <div className="sidebar-badge">
+                <div className="sidebar-badge-icon">
+                  <Ban size={22} />
+                </div>
+                <div className="sidebar-badge-text">
                   <h5>Regulative Principles</h5>
-                  <p>As taught by HDG Srila Prabhupada</p>
+                  <p>Strict adherence required</p>
                 </div>
               </div>
             </motion.div>
 
             <motion.div
-              className="guest-policy-main"
+              className="policy-main"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.25 }}
             >
               <div className="policy-statement-card">
                 <div className="policy-statement-title">
-                  <Sparkles size={14} />
-                  <span>Devotional Atmosphere</span>
+                  <Heart size={14} />
+                  <span>Devotional Environment</span>
                 </div>
                 <p className="policy-statement-text">
                   Guests staying at Braj Nidhi are expected to maintain a peaceful, respectful, and spiritually uplifting atmosphere in line with the teachings of His Divine Grace A.C. Bhaktivedanta Swami Srila Prabhupada.
@@ -522,72 +513,70 @@ export default function GuestPolicyPage() {
               </div>
 
               <div className="details-card">
-                <h2>Stay Guidelines & Codes</h2>
+                <h2>Check-in & Visitors</h2>
                 <p>
-                  As this is a devotional and spiritual property, guests are expected to respect the guidelines and the four regulative principles taught by HDG Srila Prabhupada:
+                  Valid government-issued ID proof is mandatory at check-in for all guests. Visitors may be allowed only in designated areas and during permitted hours.
+                </p>
+              </div>
+
+              <div className="details-card">
+                <h2>Regulative Principles</h2>
+                <p>
+                  As this is a devotional and spiritual property, guests are expected to respect the four regulative principles taught by HDG Srila Prabhupada:
                 </p>
                 <div className="points-list">
                   <div className="point-item">
                     <div className="point-icon">
-                      1
-                    </div>
-                    <div className="point-content">
-                      <h4>Pure Vegetarian (No Meat, Fish, or Eggs)</h4>
-                      <p>Strictly no consumption or possession of meat, fish, or eggs is allowed anywhere on the premises.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">
-                      2
-                    </div>
-                    <div className="point-content">
-                      <h4>No Intoxication</h4>
-                      <p>Absolute prohibition on alcohol, smoking, tobacco, or drugs. This ensures a clean and pure physical environment.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">
-                      3
-                    </div>
-                    <div className="point-content">
-                      <h4>No Gambling</h4>
-                      <p>No card playing, wagering, or gambling activities are permitted within the guesthouse area.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">
-                      4
-                    </div>
-                    <div className="point-content">
-                      <h4>No Illicit Sexual Activity</h4>
-                      <p>Guests are expected to observe clean moral conduct and decorum suitable for a spiritual sanctuary.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item" style={{ marginTop: "12px", borderTop: "1px solid rgba(0,0,0,0.06)", paddingTop: "20px" }}>
-                    <div className="point-icon" style={{ backgroundColor: "rgba(139, 0, 0, 0.1)", color: "#8b0000" }}>
                       <CheckCircle2 size={16} />
                     </div>
                     <div className="point-content">
-                      <h4>Check-in & Visitors</h4>
-                      <p>Valid government-issued ID proof is mandatory at check-in for all guests. Visitors may be allowed only in designated areas and during permitted hours.</p>
+                      <h4>1. Diet Restrictions</h4>
+                      <p>No consumption of meat, fish, or eggs.</p>
                     </div>
                   </div>
 
                   <div className="point-item">
-                    <div className="point-icon" style={{ backgroundColor: "rgba(139, 0, 0, 0.1)", color: "#8b0000" }}>
+                    <div className="point-icon">
                       <CheckCircle2 size={16} />
                     </div>
                     <div className="point-content">
-                      <h4>Disturbance & Entry Policy</h4>
-                      <p>Any activity disturbing the spiritual atmosphere of the premises may lead to cancellation of stay without refund. Management reserves the right to deny accommodation or entry if policies are violated.</p>
+                      <h4>2. No Intoxication</h4>
+                      <p>No intoxication, including alcohol, smoking, tobacco, or drugs.</p>
+                    </div>
+                  </div>
+
+                  <div className="point-item">
+                    <div className="point-icon">
+                      <CheckCircle2 size={16} />
+                    </div>
+                    <div className="point-content">
+                      <h4>3. No Gambling</h4>
+                      <p>No gambling on the premises.</p>
+                    </div>
+                  </div>
+
+                  <div className="point-item">
+                    <div className="point-icon">
+                      <CheckCircle2 size={16} />
+                    </div>
+                    <div className="point-content">
+                      <h4>4. Respectful Conduct</h4>
+                      <p>No illicit sexual activity.</p>
                     </div>
                   </div>
                 </div>
               </div>
+
+              <div className="policy-statement-card" style={{borderColor: "rgba(139, 0, 0, 0.25)", borderLeftColor: "#8b0000"}}>
+                <div className="policy-statement-title" style={{color: "#8b0000"}}>
+                  <ShieldAlert size={14} />
+                  <span>Enforcement</span>
+                </div>
+                <p className="policy-statement-text">
+                  Any activity disturbing the spiritual atmosphere of the premises may lead to cancellation of stay without refund. Management reserves the right to deny accommodation or entry if policies are violated.
+                </p>
+              </div>
+
             </motion.div>
           </div>
         </section>

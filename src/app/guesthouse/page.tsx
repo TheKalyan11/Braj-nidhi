@@ -1772,7 +1772,7 @@ export default function Guesthouse() {
                                     <span><i className="fas fa-wifi"></i> Free WiFi</span>
                                     <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                                 </div>
-                                <a href="/#contact" className="btn-availability">Book for ₹3,500 <i className="fas fa-chevron-right"></i></a>
+                                <a href="/booking?roomType=deluxe2" className="btn-availability">Book for ₹3,500 <i className="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
 
@@ -1788,7 +1788,7 @@ export default function Guesthouse() {
                                     <span><i className="fas fa-bath"></i> Deep Tub</span>
                                     <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                                 </div>
-                                <a href="/#contact" className="btn-availability">Book for ₹4,500 <i className="fas fa-chevron-right"></i></a>
+                                <a href="/booking?roomType=deluxe3" className="btn-availability">Book for ₹4,500 <i className="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
 
@@ -1804,7 +1804,7 @@ export default function Guesthouse() {
                                     <span><i className="fas fa-bed"></i> Living Area</span>
                                     <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                                 </div>
-                                <a href="/#contact" className="btn-availability">Book for ₹4,999 <i className="fas fa-chevron-right"></i></a>
+                                <a href="/booking?roomType=deluxe4" className="btn-availability">Book for ₹4,999 <i className="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
                     </div>

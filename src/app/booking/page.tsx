@@ -2854,7 +2854,7 @@ export default function BookingPage() {
                   onClick={proceedToPayment}
                   className="btn-primary-mmt"
                 >
-                  <span>Proceed to Secure Checkout</span>
+                  <span>Confirm Book this Now</span>
                   <ArrowRight size={18} />
                 </button>
 

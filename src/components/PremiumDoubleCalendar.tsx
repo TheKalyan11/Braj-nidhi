@@ -579,8 +579,9 @@ export default function PremiumDoubleCalendar({
               const inRange = isBetweenDays(day, checkInDate, checkOutDate);
               const festival = getFestivalForDate(day);
               
-              // Dynamic check for past days compared to May 18 2026
-              const baseToday = new Date(2026, 4, 18); // Align dynamically with 18 May 2026
+              // Check for past days compared to actual current date
+              const baseToday = new Date();
+              baseToday.setHours(0, 0, 0, 0);
               const isPast = day.getTime() < baseToday.getTime();
               
               return (
@@ -634,8 +635,9 @@ export default function PremiumDoubleCalendar({
               const inRange = isBetweenDays(day, checkInDate, checkOutDate);
               const festival = getFestivalForDate(day);
               
-              // Dynamic check for past days compared to May 18 2026
-              const baseToday = new Date(2026, 4, 18);
+              // Check for past days compared to actual current date
+              const baseToday = new Date();
+              baseToday.setHours(0, 0, 0, 0);
               const isPast = day.getTime() < baseToday.getTime();
               
               return (

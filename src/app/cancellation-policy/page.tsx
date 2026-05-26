@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Menu, X, RefreshCw, Calendar, Info, CheckCircle2, ChevronRight, Home } from "lucide-react";
+import { Menu, X, Scale, FileText, CheckCircle2, ChevronRight, Home, Banknote, CalendarX } from "lucide-react";
 import FloatingWidgets from "@/components/FloatingWidgets";
 import LoginModal from "@/components/LoginModal";
 
@@ -45,11 +45,11 @@ export default function CancellationPolicyPage() {
   }, []);
 
   return (
-    <motion.div className="cancellation-policy-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div className="guest-policy-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        .cancellation-policy-page { 
+        .guest-policy-page { 
           background: #ffffff; 
           min-height: 100vh;
           font-family: 'Outfit', sans-serif;
@@ -57,58 +57,58 @@ export default function CancellationPolicyPage() {
         }
 
         /* Header visibility overrides for white background */
-        body.index-page .cancellation-policy-page header:not(.scrolled) .logo,
-        body.index-page .cancellation-policy-page header:not(.scrolled) .logo span,
-        body.index-page .cancellation-policy-page header:not(.scrolled) nav ul li a,
-        body.index-page .cancellation-policy-page header:not(.scrolled) .mobile-menu-btn {
+        body.index-page .guest-policy-page header:not(.scrolled) .logo,
+        body.index-page .guest-policy-page header:not(.scrolled) .logo span,
+        body.index-page .guest-policy-page header:not(.scrolled) nav ul li a,
+        body.index-page .guest-policy-page header:not(.scrolled) .mobile-menu-btn {
           color: #2c2520 !important;
         }
 
-        body.index-page .cancellation-policy-page header:not(.scrolled) nav ul li a:hover {
+        body.index-page .guest-policy-page header:not(.scrolled) nav ul li a:hover {
           color: #8b0000 !important;
         }
 
-        body.index-page .cancellation-policy-page header:not(.scrolled) .btn-book {
+        body.index-page .guest-policy-page header:not(.scrolled) .btn-book {
           background: #8b0000 !important;
           color: #ffffff !important;
           border: 1px solid #8b0000 !important;
         }
 
-        body.index-page .cancellation-policy-page header:not(.scrolled) .btn-book:hover {
+        body.index-page .guest-policy-page header:not(.scrolled) .btn-book:hover {
           background: #a30000 !important;
           border-color: #a30000 !important;
           color: #ffffff !important;
           transform: translateY(-2px);
         }
 
-        body.index-page .cancellation-policy-page header:not(.scrolled) .btn-login {
+        body.index-page .guest-policy-page header:not(.scrolled) .btn-login {
           background: rgba(0, 0, 0, 0.05) !important;
           color: #2c2520 !important;
           border: 1px solid rgba(0, 0, 0, 0.15) !important;
           box-shadow: none !important;
         }
 
-        body.index-page .cancellation-policy-page header:not(.scrolled) .btn-login:hover {
+        body.index-page .guest-policy-page header:not(.scrolled) .btn-login:hover {
           background: rgba(0, 0, 0, 0.1) !important;
           border-color: rgba(0, 0, 0, 0.25) !important;
           transform: translateY(-2px) scale(1.02);
         }
 
-        body.index-page .cancellation-policy-page header:not(.scrolled) .user-name {
+        body.index-page .guest-policy-page header:not(.scrolled) .user-name {
           color: #8b0000 !important;
         }
 
-        body.index-page .cancellation-policy-page header:not(.scrolled) .user-label {
+        body.index-page .guest-policy-page header:not(.scrolled) .user-label {
           color: rgba(0, 0, 0, 0.5) !important;
         }
 
-        body.index-page .cancellation-policy-page header:not(.scrolled) .user-profile-badge {
+        body.index-page .guest-policy-page header:not(.scrolled) .user-profile-badge {
           border-color: transparent !important;
           background: #8b0000 !important;
           color: #ffffff !important;
         }
 
-        .cancellation-policy-hero {
+        .policy-hero {
           background: #ffffff;
           padding: 160px 6% 60px;
           text-align: center;
@@ -116,7 +116,7 @@ export default function CancellationPolicyPage() {
           border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         }
 
-        .cancellation-policy-hero h1 {
+        .policy-hero h1 {
           font-family: 'Bebas Neue', cursive !important;
           font-size: clamp(3rem, 8vw, 5.5rem);
           color: #8b0000;
@@ -126,7 +126,7 @@ export default function CancellationPolicyPage() {
           line-height: 0.95;
         }
 
-        .cancellation-policy-hero p {
+        .policy-hero p {
           font-size: clamp(1rem, 2vw, 1.2rem);
           color: rgba(44, 37, 32, 0.75);
           max-width: 600px;
@@ -161,20 +161,20 @@ export default function CancellationPolicyPage() {
           color: #8b0000;
         }
 
-        .cancellation-policy-content-section {
+        .policy-content-section {
           padding: 80px 6%;
           max-width: 1100px;
           margin: 0 auto;
         }
 
-        .cancellation-policy-grid {
+        .policy-grid {
           display: grid;
           grid-template-columns: 1.2fr 2fr;
           gap: 50px;
           align-items: start;
         }
 
-        .cancellation-policy-sidebar {
+        .policy-sidebar {
           background: #fff;
           border: 1px solid rgba(0, 0, 0, 0.06);
           border-radius: 20px;
@@ -230,7 +230,7 @@ export default function CancellationPolicyPage() {
           margin: 4px 0 0;
         }
 
-        .cancellation-policy-main {
+        .policy-main {
           display: flex;
           flex-direction: column;
           gap: 36px;
@@ -347,42 +347,19 @@ export default function CancellationPolicyPage() {
           margin: 0;
         }
 
-        .refund-matrix {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 15px 0 25px;
-          font-size: 0.9rem;
-        }
-
-        .refund-matrix th, .refund-matrix td {
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          padding: 12px 16px;
-          text-align: left;
-        }
-
-        .refund-matrix th {
-          background-color: rgba(0, 0, 0, 0.02);
-          font-weight: 700;
-          color: #8b0000;
-        }
-
-        .refund-matrix td strong {
-          color: #2c2520;
-        }
-
         @media (max-width: 900px) {
-          .cancellation-policy-grid {
+          .policy-grid {
             grid-template-columns: 1fr;
             gap: 30px;
           }
-          .cancellation-policy-sidebar {
+          .policy-sidebar {
             position: relative;
             top: 0;
           }
-          .cancellation-policy-hero {
+          .policy-hero {
             padding: 130px 6% 60px;
           }
-          .cancellation-policy-content-section {
+          .policy-content-section {
             padding: 50px 6%;
           }
         }
@@ -468,7 +445,7 @@ export default function CancellationPolicyPage() {
       )}
 
       <main>
-        <section className="cancellation-policy-hero">
+        <section className="policy-hero">
           <div className="breadcrumb">
             <Link href="/"><Home size={13} /> Home</Link>
             <ChevronRight size={12} />
@@ -486,58 +463,49 @@ export default function CancellationPolicyPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
           >
-            Fair, transparent terms designed to protect your reservation and support our operations.
+            Fair and transparent cancellation rules.
           </motion.p>
         </section>
 
-        <section className="cancellation-policy-content-section">
-          <div className="cancellation-policy-grid">
+        <section className="policy-content-section">
+          <div className="policy-grid">
             <motion.div
-              className="cancellation-policy-sidebar"
+              className="policy-sidebar"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <h3 className="sidebar-title">Policy Highlights</h3>
+              <h3 className="sidebar-title">Key Points</h3>
               <div className="sidebar-badge">
                 <div className="sidebar-badge-icon">
-                  <RefreshCw size={22} />
+                  <Banknote size={22} />
                 </div>
                 <div className="sidebar-badge-text">
-                  <h5>Refund Processing</h5>
-                  <p>Processed within 7–14 working days</p>
+                  <h5>Refunds</h5>
+                  <p>Processed within 7-10 working days</p>
                 </div>
               </div>
               <div className="sidebar-badge">
                 <div className="sidebar-badge-icon">
-                  <Calendar size={22} />
+                  <CalendarX size={22} />
                 </div>
                 <div className="sidebar-badge-text">
-                  <h5>Rescheduling</h5>
-                  <p>Subject to room availability & rates</p>
-                </div>
-              </div>
-              <div className="sidebar-badge">
-                <div className="sidebar-badge-icon">
-                  <Info size={22} />
-                </div>
-                <div className="sidebar-badge-text">
-                  <h5>Acceptance</h5>
-                  <p>Acknowledged upon placing a booking</p>
+                  <h5>Timeline</h5>
+                  <p>Cancellations based on check-in date</p>
                 </div>
               </div>
             </motion.div>
 
             <motion.div
-              className="cancellation-policy-main"
+              className="policy-main"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.25 }}
             >
               <div className="policy-statement-card">
                 <div className="policy-statement-title">
-                  <Info size={14} />
-                  <span>Fair Cancellation Guidelines</span>
+                  <Banknote size={14} />
+                  <span>Cancellation Statement</span>
                 </div>
                 <p className="policy-statement-text">
                   At Braj Nidhi, we understand that travel plans may change unexpectedly. Our cancellation policy is designed to be fair and transparent while ensuring smooth hospitality operations. By confirming a reservation, guests agree to the following terms and conditions.
@@ -545,113 +513,69 @@ export default function CancellationPolicyPage() {
               </div>
 
               <div className="details-card">
-                <h2>Policy Terms & Conditions</h2>
+                <h2>1. Booking Confirmation</h2>
                 <div className="points-list">
                   <div className="point-item">
-                    <div className="point-icon">1</div>
-                    <div className="point-content">
-                      <h4>Booking Confirmation</h4>
-                      <p>All reservations are considered confirmed only after successful payment and confirmation from Braj Nidhi. Guests may be required to pay either full advance payment or partial advance payment depending on the booking type, season, or group size.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">2</div>
-                    <div className="point-content">
-                      <h4>Standard Cancellation Policy</h4>
-                      <p>Our standard refund matrix is based on the timing of your cancellation request relative to the scheduled check-in date:</p>
-                      <table className="refund-matrix">
-                        <thead>
-                          <tr>
-                            <th>Cancellation Timing</th>
-                            <th>Refund Eligible</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td><strong>7 days or more</strong> before check-in</td>
-                            <td>Eligible for up to <strong>90% refund</strong> (after transaction charges)</td>
-                          </tr>
-                          <tr>
-                            <td><strong>3 to 6 days</strong> before check-in</td>
-                            <td>Eligible for up to <strong>50% refund</strong></td>
-                          </tr>
-                          <tr>
-                            <td><strong>Within 48 hours</strong> of check-in</td>
-                            <td><strong>No refund</strong> shall be applicable</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">3</div>
-                    <div className="point-content">
-                      <h4>No-Show Policy</h4>
-                      <p>If the guest fails to arrive on the scheduled check-in date without prior information, the booking shall be treated as a “No-Show,” and the entire booking amount may be forfeited.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">4</div>
-                    <div className="point-content">
-                      <h4>Early Check-Out</h4>
-                      <p>In case a guest voluntarily checks out before the scheduled departure date, refund for unused nights shall generally not be applicable unless approved by management under exceptional circumstances.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">5</div>
-                    <div className="point-content">
-                      <h4>Date Modification / Rescheduling</h4>
-                      <p>Requests for change of dates are subject to room availability and management approval. Rate differences, seasonal pricing, or additional charges may apply for revised bookings.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">6</div>
-                    <div className="point-content">
-                      <h4>Refund Processing</h4>
-                      <p>Approved refunds shall generally be processed within 7–14 working days through the original mode of payment. Braj Nidhi shall not be responsible for delays caused by banks, payment gateways, or financial institutions.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">7</div>
-                    <div className="point-content">
-                      <h4>Force Majeure</h4>
-                      <p>Braj Nidhi shall not be held liable for cancellations or interruptions caused by events beyond reasonable control, including natural disasters, government restrictions, strikes, epidemics, transport disruptions, or unforeseen circumstances.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">8</div>
-                    <div className="point-content">
-                      <h4>Management Rights</h4>
-                      <p>Braj Nidhi reserves the right to refuse, cancel, or modify any booking in situations involving policy violations, inappropriate conduct, incorrect information, overbooking, safety concerns, or circumstances beyond operational control. Appropriate refund consideration may be provided at management discretion.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item">
-                    <div className="point-icon">9</div>
-                    <div className="point-content">
-                      <h4>Group Bookings & Event Reservations</h4>
-                      <p>Special cancellation terms may apply for group bookings, wedding reservations, retreats, festival periods, or corporate events. Such terms shall be communicated separately at the time of booking.</p>
-                    </div>
-                  </div>
-
-                  <div className="point-item" style={{ marginTop: "12px", borderTop: "1px solid rgba(0,0,0,0.06)", paddingTop: "20px" }}>
-                    <div className="point-icon" style={{ backgroundColor: "rgba(139, 0, 0, 0.1)", color: "#8b0000" }}>
+                    <div className="point-icon">
                       <CheckCircle2 size={16} />
                     </div>
                     <div className="point-content">
-                      <h4>Acceptance of Policy</h4>
-                      <p>By making a reservation through our website, phone, email, or any booking platform, guests acknowledge that they have read, understood, and agreed to the cancellation policy of Braj Nidhi.</p>
+                      <p>All reservations are considered confirmed only after successful payment and confirmation from Braj Nidhi.</p>
+                    </div>
+                  </div>
+                  <div className="point-item">
+                    <div className="point-icon">
+                      <CheckCircle2 size={16} />
+                    </div>
+                    <div className="point-content">
+                      <p>Guests may be required to pay either full advance payment or partial advance payment depending on the booking type, season, or group size.</p>
                     </div>
                   </div>
                 </div>
               </div>
+
+              <div className="details-card">
+                <h2>2. Standard Cancellation Policy</h2>
+                <div className="points-list">
+                  <div className="point-item">
+                    <div className="point-icon">
+                      <CheckCircle2 size={16} />
+                    </div>
+                    <div className="point-content">
+                      <h4>7 Days or More</h4>
+                      <p>Cancellation made 7 days or more before check-in: Eligible for up to 90% refund after deduction of applicable transaction or processing charges.</p>
+                    </div>
+                  </div>
+
+                  <div className="point-item">
+                    <div className="point-icon">
+                      <CheckCircle2 size={16} />
+                    </div>
+                    <div className="point-content">
+                      <h4>3 to 6 Days</h4>
+                      <p>Cancellation made 3 to 6 days before check-in: Eligible for up to 50% refund.</p>
+                    </div>
+                  </div>
+
+                  <div className="point-item">
+                    <div className="point-icon">
+                      <CheckCircle2 size={16} />
+                    </div>
+                    <div className="point-content">
+                      <h4>Within 48 Hours</h4>
+                      <p>Cancellation made within 48 hours of check-in: No refund shall be applicable.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="details-card">
+                <h2>3. No-Show Policy</h2>
+                <p>
+                  If the guest fails to arrive on the scheduled check-in date without prior information, the booking will be considered a no-show and no refund will be issued.
+                </p>
+              </div>
+
             </motion.div>
           </div>
         </section>
