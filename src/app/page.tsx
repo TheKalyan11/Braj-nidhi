@@ -203,6 +203,25 @@ export default function Home() {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
+
+    // Dynamic date sync with current date
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 2);
+
+    const formatDate = (d: Date) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+
+    setBookingData(prev => ({
+      ...prev,
+      checkIn: formatDate(today),
+      checkOut: formatDate(tomorrow)
+    }));
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

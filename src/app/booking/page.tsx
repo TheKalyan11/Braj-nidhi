@@ -221,11 +221,23 @@ export default function BookingPage() {
       // 2. Dates
       const paramCheckIn = params.get('checkin') || params.get('checkIn') || params.get('check_in');
       const parsedCheckIn = parseDateParam(paramCheckIn);
-      if (parsedCheckIn) setCheckIn(parsedCheckIn);
 
       const paramCheckOut = params.get('checkout') || params.get('checkOut') || params.get('check_out');
       const parsedCheckOut = parseDateParam(paramCheckOut);
-      if (parsedCheckOut) setCheckOut(parsedCheckOut);
+
+      const today = new Date();
+      const tomorrow = new Date();
+      tomorrow.setDate(today.getDate() + 2);
+
+      const formatDate = (d: Date) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      };
+
+      setCheckIn(parsedCheckIn || formatDate(today));
+      setCheckOut(parsedCheckOut || formatDate(tomorrow));
 
       // 3. Guests
       const paramAdults = params.get('adults');
