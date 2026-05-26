@@ -3040,13 +3040,12 @@ export default function BookingPage() {
                                   onChange={(e) => setCardCVV(e.target.value)}
                                 />
                               </div>
+                              </div>
                             </div>
                           </div>
                         )}
                       </div>
                     </div>
-                      </div>
-                    )}
 
                     <div style={{ display: 'flex', gap: '16px', marginTop: '30px' }}>
                       <button 
