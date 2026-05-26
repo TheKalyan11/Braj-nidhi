@@ -998,8 +998,8 @@ export default function BookingPage() {
 
         /* LOGIN INTEGRATION CARD */
         .login-banner-card {
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(139, 0, 0, 0.04) 100%);
-          border: 1px dashed rgba(139, 0, 0, 0.25);
+          background: #f4f4f5;
+          border: 1.5px dashed #d4af37;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -1018,30 +1018,30 @@ export default function BookingPage() {
           width: 44px;
           height: 44px;
           border-radius: 50%;
-          background: rgba(139, 0, 0, 0.06);
+          background: rgba(212, 175, 55, 0.15);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #8b0000;
+          color: #d4af37;
         }
 
         .login-banner-text h4 {
           font-size: 15px;
           font-weight: 700;
           margin: 0 0 4px;
-          color: #1a1512;
+          color: #000000;
         }
 
         .login-banner-text p {
           font-size: 13px;
-          color: rgba(44, 37, 32, 0.6);
+          color: #333333;
           margin: 0;
         }
 
         .btn-login-mmt {
           padding: 10px 20px;
-          background: #8b0000;
-          color: #ffffff;
+          background: #d4af37;
+          color: #000000;
           font-weight: 700;
           font-size: 13px;
           border-radius: 30px;
@@ -1054,9 +1054,9 @@ export default function BookingPage() {
         }
 
         .btn-login-mmt:hover {
-          background: #a82c2c;
+          background: #c39e2e;
           transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(139, 0, 0, 0.2);
+          box-shadow: 0 6px 15px rgba(212, 175, 55, 0.3);
         }
 
         /* ROOM DETAILS SPLIT CARD */
@@ -2340,7 +2340,7 @@ export default function BookingPage() {
                         setLoginModalOpen(true);
                       }} 
                       className="btn-login-mmt"
-                      style={{ background: 'transparent', border: '1.5px solid #8b0000', color: '#8b0000', padding: '8px 16px' }}
+                      style={{ background: 'transparent', border: '1.5px solid #d4af37', color: '#000000', padding: '8px 16px' }}
                     >
                       <span>Login</span>
                     </button>
@@ -2350,9 +2350,9 @@ export default function BookingPage() {
                         setLoginModalOpen(true);
                       }} 
                       className="btn-login-mmt"
-                      style={{ padding: '8px 16px' }}
+                      style={{ background: '#d4af37', border: '1.5px solid #d4af37', color: '#000000', padding: '8px 16px' }}
                     >
-                      <Sparkles size={13} />
+                      <Sparkles size={13} style={{ color: '#000000' }} />
                       <span>Create Account</span>
                     </button>
                   </div>
