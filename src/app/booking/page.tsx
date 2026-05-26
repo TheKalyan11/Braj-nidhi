@@ -25,7 +25,14 @@ import {
   X,
   Settings,
   Terminal,
-  Key
+  Key,
+  Star,
+  Leaf,
+  BedDouble,
+  Coffee,
+  Wifi,
+  CalendarDays,
+  Moon
 } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
@@ -1105,76 +1112,288 @@ export default function BookingPage() {
         }
 
         /* ROOM DETAILS SPLIT CARD */
-        .room-review-split {
-          display: grid;
-          grid-template-columns: 3fr 7fr;
-          gap: 22px;
-        }
-
-        .room-review-image {
-          position: relative;
-          border-radius: 12px;
+        .room-review-card {
+          background: #ffffff;
+          border: 1px solid rgba(0,0,0,0.07);
+          border-radius: 20px;
           overflow: hidden;
-          height: 160px;
+          box-shadow: 0 12px 36px rgba(0,0,0,0.07);
+          margin-bottom: 6px;
         }
 
-        .room-review-image img {
+        .room-review-body {
+          display: grid;
+          grid-template-columns: 2fr 3fr;
+          gap: 0;
+        }
+
+        .room-review-photo-wrap {
+          position: relative;
+          min-height: 270px;
+          overflow: hidden;
+        }
+
+        .room-review-photo-wrap img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transition: transform 0.5s;
-        }
-        .room-review-split:hover .room-review-image img {
-          transform: scale(1.05);
+          display: block;
         }
 
-        .room-review-badge {
+        .room-best-choice-ribbon {
           position: absolute;
-          top: 10px; left: 10px;
-          background: rgba(139, 0, 0, 0.9);
+          top: 0;
+          left: 0;
+          background: linear-gradient(135deg, #8b0000 0%, #b71c1c 100%);
           color: #fff;
-          font-size: 10px;
-          font-weight: 700;
-          padding: 4px 8px;
-          border-radius: 4px;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .room-review-details h3 {
-          font-size: 20px;
-          font-weight: 700;
-          color: #1a1512;
-          margin: 0 0 8px;
-        }
-
-        .room-details-badges {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-bottom: 16px;
-        }
-
-        .badge-pill-mmt {
           font-size: 11px;
+          font-weight: 800;
+          padding: 8px 20px 8px 14px;
+          clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          letter-spacing: 0.8px;
+          text-transform: uppercase;
+        }
+
+        .room-garden-view-label {
+          position: absolute;
+          bottom: 14px;
+          left: 14px;
+          background: rgba(255,255,255,0.92);
+          border-radius: 30px;
+          padding: 6px 14px;
+          font-size: 12px;
           font-weight: 600;
-          padding: 4px 10px;
-          border-radius: 20px;
-          background: rgba(0, 0, 0, 0.04);
-          border: 1px solid rgba(0, 0, 0, 0.08);
+          color: #1a1512;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          backdrop-filter: blur(8px);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .room-review-info {
+          padding: 24px 26px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .room-review-title {
+          font-size: 20px;
+          font-weight: 900;
+          color: #0f0f0f;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          margin: 0;
+          font-family: 'Bebas Neue', 'Outfit', sans-serif;
+          line-height: 1.1;
+        }
+
+        .room-feature-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+
+        .room-feature-badge {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 9px 14px;
+          border-radius: 10px;
+          border: 1px solid rgba(0,0,0,0.1);
+          background: #ffffff;
+          font-size: 13px;
+          font-weight: 600;
           color: #2c2520;
         }
 
-        .badge-pill-mmt.accent {
-          background: rgba(139, 0, 0, 0.06);
-          border-color: rgba(139, 0, 0, 0.2);
+        .room-feature-badge.red {
+          border-color: rgba(139,0,0,0.2);
           color: #8b0000;
         }
 
-        .badge-pill-mmt.success {
-          background: rgba(22, 163, 74, 0.08);
-          border-color: rgba(22, 163, 74, 0.2);
+        .room-feature-badge.red svg {
+          color: #8b0000;
+        }
+
+        .room-feature-badge.green {
+          border-color: rgba(22,163,74,0.2);
+          background: rgba(22,163,74,0.04);
           color: #16a34a;
+        }
+
+        .room-feature-badge.green svg {
+          color: #16a34a;
+        }
+
+        .date-strip-new {
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          align-items: center;
+          border: 1px solid rgba(0,0,0,0.07);
+          border-radius: 14px;
+          overflow: hidden;
+        }
+
+        .date-box-new {
+          padding: 14px 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          background: #fff;
+        }
+
+        .date-box-new-label {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 10px;
+          font-weight: 700;
+          color: rgba(44,37,32,0.5);
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+        }
+
+        .date-box-new-label svg {
+          color: #8b0000;
+        }
+
+        .date-box-new-value {
+          font-size: 16px;
+          font-weight: 800;
+          color: #0f0f0f;
+          margin: 0;
+        }
+
+        .date-nights-center {
+          padding: 16px 12px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          background: rgba(139,0,0,0.04);
+          border-left: 1px solid rgba(0,0,0,0.07);
+          border-right: 1px solid rgba(0,0,0,0.07);
+        }
+
+        .date-nights-center .nights-count {
+          font-size: 15px;
+          font-weight: 800;
+          color: #8b0000;
+        }
+
+        .date-nights-center svg {
+          color: #8b0000;
+        }
+
+        .room-review-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 16px 24px;
+          border-top: 1px solid rgba(0,0,0,0.06);
+          background: rgba(0,0,0,0.01);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .room-review-footer-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .room-review-footer-icon {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          background: rgba(139,0,0,0.06);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #8b0000;
+          flex-shrink: 0;
+        }
+
+        .room-review-footer-text h5 {
+          font-size: 13px;
+          font-weight: 700;
+          color: #0f0f0f;
+          margin: 0 0 2px;
+        }
+
+        .room-review-footer-text p {
+          font-size: 12px;
+          color: rgba(44,37,32,0.5);
+          margin: 0;
+        }
+
+        .room-review-header-outer {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          margin-bottom: 18px;
+        }
+
+        .room-review-header-left {
+          display: flex;
+          align-items: flex-start;
+          gap: 14px;
+        }
+
+        .room-review-header-icon {
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          background: rgba(139,0,0,0.08);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #8b0000;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+
+        .room-review-header-text h2 {
+          font-size: 22px;
+          font-weight: 800;
+          color: #0f0f0f;
+          margin: 0 0 4px;
+          line-height: 1.2;
+        }
+
+        .room-review-header-text p {
+          font-size: 14px;
+          color: rgba(44,37,32,0.55);
+          margin: 0;
+        }
+
+        .instant-confirm-badge {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 9px 18px;
+          border-radius: 30px;
+          border: 1.5px solid rgba(22,163,74,0.4);
+          background: rgba(22,163,74,0.05);
+          color: #16a34a;
+          font-size: 14px;
+          font-weight: 700;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+          .room-review-body { grid-template-columns: 1fr; }
+          .room-review-photo-wrap { min-height: 200px; }
+          .room-review-header-outer { flex-direction: column; gap: 14px; }
+          .room-feature-grid { grid-template-columns: 1fr; }
+          .date-strip-new { grid-template-columns: 1fr; }
         }
 
         .stay-dates-strip {
@@ -2405,49 +2624,118 @@ export default function BookingPage() {
               )}
 
               {/* Card 1: Review Room Details */}
-              <div className="mmt-card">
-                <div className="card-header-mmt">
-                  <div className="card-header-title">
-                    <Compass size={18} />
-                    <span>Review Your Spiritual Stay Details</span>
+              {/* OUTER HEADER - outside the card */}
+              <div className="room-review-header-outer">
+                <div className="room-review-header-left">
+                  <div className="room-review-header-icon">
+                    <Compass size={22} />
                   </div>
-                  <span className="badge-pill-mmt success">Instant Confirmation</span>
+                  <div className="room-review-header-text">
+                    <h2>Review Your Spiritual Stay Details</h2>
+                    <p>Please review your booking details before confirming your stay.</p>
+                  </div>
+                </div>
+                <div className="instant-confirm-badge">
+                  <CheckCircle2 size={16} />
+                  <span>Instant Confirmation</span>
+                </div>
+              </div>
+
+              {/* MAIN WHITE CARD */}
+              <div className="room-review-card">
+                {/* Body: Photo + Info */}
+                <div className="room-review-body">
+                  {/* Left: photo */}
+                  <div className="room-review-photo-wrap">
+                    <Image
+                      src={getRoomImage(roomType)}
+                      alt="Selected suite room"
+                      fill
+                      style={{ objectFit: 'cover' }}
+                    />
+                    <div className="room-best-choice-ribbon">
+                      <Star size={11} strokeWidth={2.5} />
+                      Best Choice
+                    </div>
+                    <div className="room-garden-view-label">
+                      <Leaf size={13} style={{ color: '#16a34a' }} />
+                      Spiritual Garden View
+                    </div>
+                  </div>
+
+                  {/* Right: Info */}
+                  <div className="room-review-info">
+                    <h3 className="room-review-title">{getRoomTitle(roomType)}</h3>
+
+                    {/* Feature badges 2x2 grid */}
+                    <div className="room-feature-grid">
+                      <div className="room-feature-badge red">
+                        <Leaf size={15} />
+                        <span>Spiritual Garden View</span>
+                      </div>
+                      <div className="room-feature-badge">
+                        <BedDouble size={15} style={{ color: '#555' }} />
+                        <span>King-size Bed</span>
+                      </div>
+                      <div className="room-feature-badge green">
+                        <Coffee size={15} />
+                        <span>Breakfast Included</span>
+                      </div>
+                      <div className="room-feature-badge">
+                        <Wifi size={15} style={{ color: '#555' }} />
+                        <span>Free high-speed WiFi</span>
+                      </div>
+                    </div>
+
+                    {/* Date strip with calendar icons */}
+                    <div className="date-strip-new">
+                      <div className="date-box-new">
+                        <div className="date-box-new-label">
+                          <CalendarDays size={12} />
+                          Check-In Date
+                        </div>
+                        <p className="date-box-new-value">
+                          {new Date(checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                      </div>
+                      <div className="date-nights-center">
+                        <Moon size={16} />
+                        <span className="nights-count">{nights} {nights === 1 ? 'Night' : 'Nights'}</span>
+                      </div>
+                      <div className="date-box-new">
+                        <div className="date-box-new-label">
+                          <CalendarDays size={12} />
+                          Check-Out Date
+                        </div>
+                        <p className="date-box-new-value">
+                          {new Date(checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="room-review-split">
-                  <div className="room-review-image" style={{ position: 'relative', minHeight: '220px' }}>
-                    <Image 
-                      src={getRoomImage(roomType)} 
-                      alt="Selected suite room" 
-                      fill
-                      style={{ objectFit: 'cover', borderRadius: '18px' }}
-                    />
-                    <div className="room-review-badge">Best Choice</div>
-                  </div>
-                  <div className="room-review-details">
-                    <h3>{getRoomTitle(roomType)}</h3>
-                    <div className="room-details-badges">
-                      <span className="badge-pill-mmt accent">Spiritual Garden View</span>
-                      <span className="badge-pill-mmt">King-size Bed</span>
-                      <span className="badge-pill-mmt success">Breakfast Included</span>
-                      <span className="badge-pill-mmt">Free high-speed WiFi</span>
+                {/* Footer: Secure booking strip */}
+                <div className="room-review-footer">
+                  <div className="room-review-footer-left">
+                    <div className="room-review-footer-icon">
+                      <ShieldCheck size={18} />
                     </div>
-
-                    {/* Interactive Stay Date Strip */}
-                    <div className="stay-dates-strip">
-                      <div className="stay-date-box">
-                        <h5>Check-In Date</h5>
-                        <p>{new Date(checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                      </div>
-                      <div className="stay-duration-circle">
-                        {nights} {nights === 1 ? 'Night' : 'Nights'}
-                      </div>
-                      <div className="stay-date-box" style={{ textAlign: 'right' }}>
-                        <h5>Check-Out Date</h5>
-                        <p>{new Date(checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                      </div>
+                    <div className="room-review-footer-text">
+                      <h5>Secure &amp; Hassle-Free Booking</h5>
+                      <p>Your information is safe with us.</p>
                     </div>
                   </div>
+                  {/* Temple watermark illustration */}
+                  <svg width="140" height="60" viewBox="0 0 200 80" fill="none" style={{ opacity: 0.13, flexShrink: 0 }}>
+                    <path d="M100 70 L100 40 L90 40 L90 20 L95 20 L95 10 L100 5 L105 10 L105 20 L110 20 L110 40 L100 40" stroke="#8b4513" strokeWidth="2" fill="none"/>
+                    <path d="M75 70 L75 45 L68 45 L68 30 L72 30 L72 22 L75 18 L78 22 L78 30 L82 30 L82 45 L75 45" stroke="#8b4513" strokeWidth="2" fill="none"/>
+                    <path d="M125 70 L125 45 L118 45 L118 30 L122 30 L122 22 L125 18 L128 22 L128 30 L132 30 L132 45 L125 45" stroke="#8b4513" strokeWidth="2" fill="none"/>
+                    <path d="M55 70 L55 52 L50 52 L50 42 L52 42 L52 36 L55 32 L58 36 L58 42 L60 42 L60 52 L55 52" stroke="#8b4513" strokeWidth="2" fill="none"/>
+                    <path d="M145 70 L145 52 L140 52 L140 42 L142 42 L142 36 L145 32 L148 36 L148 42 L150 42 L150 52 L145 52" stroke="#8b4513" strokeWidth="2" fill="none"/>
+                    <line x1="40" y1="70" x2="160" y2="70" stroke="#8b4513" strokeWidth="1.5"/>
+                    <path d="M85 40 Q100 30 115 40" stroke="#8b4513" strokeWidth="1.5" fill="none"/>
+                  </svg>
                 </div>
               </div>
 
