@@ -3185,12 +3185,12 @@ export default function BookingPage() {
           <div className="footer-col"><h3>Explore Vrindavan</h3><Link href="/braj-yatra#packages">Sapt Devalaya Yatra</Link><Link href="/braj-yatra#packages">Chaurasi Kos Yatra</Link><Link href="/braj-yatra">Govardhan Parikrama</Link><Link href="/braj-yatra">Barsana & Nandgaon</Link></div>
           <div className="footer-col"><h3>Stay & Book</h3><Link href="/booking">Book Your Stay</Link><Link href="/weddings">Wedding Packages</Link><Link href="/corporate">Corporate Stays</Link><a href="#">Refund Policy</a></div>
           <div className="footer-col"><h3>Help & Support</h3><a href="#">FAQ</a><Link href="/contact">Contact Us</Link><a href="#">Direction Map</a><a href="#">Group Inquiries</a></div>
-          <div className="footer-col"><h3>Information</h3><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Guest Policy</a><a href="#">Cancellation Policy</a></div>
+          <div className="footer-col"><h3>Information</h3><Link href="/privacy">Privacy Policy</Link><Link href="/terms">Terms of Service</Link><Link href="/guest-policy">Guest Policy</Link><Link href="/cancellation-policy">Cancellation Policy</Link></div>
         </div>
         <div className="footer-middle-bar">
-          <span>Privacy Policy</span>
+          <Link href="/privacy">Privacy Policy</Link>
           <span>Copyright &copy; BRAJNIDHI 2026</span>
-          <span>Terms Of Use</span>
+          <Link href="/terms">Terms Of Use</Link>
         </div>
         <div className="footer-massive-text">BRAJNIDHI</div>
       </footer>

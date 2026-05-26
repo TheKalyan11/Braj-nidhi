@@ -1401,17 +1401,17 @@ export default function Weddings() {
             </div>
             <div className="footer-col">
                 <h3>Information</h3>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Guest Policy</a>
-                <a href="#">Cancellation Policy</a>
+                <Link href="/privacy">Privacy Policy</Link>
+                <Link href="/terms">Terms of Service</Link>
+                <Link href="/guest-policy">Guest Policy</Link>
+                <Link href="/cancellation-policy">Cancellation Policy</Link>
             </div>
         </div>
         
         <div className="footer-middle-bar">
-            <span>Privacy Policy</span>
+            <Link href="/privacy">Privacy Policy</Link>
             <span>Copyright &copy; BRAJNIDHI 2026</span>
-            <span>Terms Of Use</span>
+            <Link href="/terms">Terms Of Use</Link>
         </div>
 
         <div className="footer-massive-text">

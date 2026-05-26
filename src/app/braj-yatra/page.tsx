@@ -1781,9 +1781,9 @@ export default function BrajYatra() {
           <div className="footer-col"><h3>Explore Vrindavan</h3><a href="/braj-yatra#packages">Sapt Devalaya Yatra</a><a href="/braj-yatra#packages">Chaurasi Kos Yatra</a><a href="/braj-yatra">Govardhan Parikrama</a><a href="/braj-yatra">Barsana & Nandgaon</a></div>
           <div className="footer-col"><h3>Stay & Book</h3><a href="/booking">Book Your Stay</a><a href="/weddings">Wedding Packages</a><a href="/corporate">Corporate Stays</a><a href="#">Refund Policy</a></div>
           <div className="footer-col"><h3>Help & Support</h3><a href="#">FAQ</a><a href="/contact">Contact Us</a><a href="#">Direction Map</a><a href="#">Group Inquiries</a></div>
-          <div className="footer-col"><h3>Information</h3><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Guest Policy</a><a href="#">Cancellation Policy</a></div>
+          <div className="footer-col"><h3>Information</h3><Link href="/privacy">Privacy Policy</Link><Link href="/terms">Terms of Service</Link><Link href="/guest-policy">Guest Policy</Link><Link href="/cancellation-policy">Cancellation Policy</Link></div>
         </div>
-        <div className="footer-middle-bar"><span>Privacy Policy</span><span>Copyright &copy; BRAJNIDHI 2026</span><span>Terms Of Use</span></div>
+        <div className="footer-middle-bar"><Link href="/privacy">Privacy Policy</Link><span>Copyright &copy; BRAJNIDHI 2026</span><Link href="/terms">Terms Of Use</Link></div>
         <div className="footer-massive-text">BRAJNIDHI</div>
       </footer>
 
