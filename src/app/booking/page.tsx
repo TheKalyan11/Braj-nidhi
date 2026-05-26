@@ -997,66 +997,107 @@ export default function BookingPage() {
         }
 
         /* LOGIN INTEGRATION CARD */
+        @keyframes borderPulse {
+          0% {
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.05);
+          }
+          50% {
+            border-color: rgba(212, 175, 55, 0.95);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.18);
+          }
+          100% {
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.05);
+          }
+        }
+
+        @keyframes sparkleRotate {
+          0% { transform: scale(1) rotate(0deg); }
+          50% { transform: scale(1.15) rotate(15deg); }
+          100% { transform: scale(1) rotate(0deg); }
+        }
+
         .login-banner-card {
-          background: #f4f4f5;
-          border: 1.5px dashed #d4af37;
+          background: #fcfbfa;
+          border: 2px dashed rgba(212, 175, 55, 0.5);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 20px;
-          border-radius: 16px;
-          margin-bottom: 24px;
+          padding: 24px 28px;
+          border-radius: 20px;
+          margin-bottom: 28px;
+          animation: borderPulse 4s infinite ease-in-out;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-banner-card:hover {
+          transform: translateY(-2px);
+          border-color: #d4af37;
+          background: #ffffff;
+          box-shadow: 0 15px 35px rgba(212, 175, 55, 0.25);
         }
 
         .login-banner-info {
           display: flex;
           align-items: center;
-          gap: 15px;
+          gap: 18px;
         }
 
         .login-banner-icon {
-          width: 44px;
-          height: 44px;
+          width: 52px;
+          height: 52px;
           border-radius: 50%;
-          background: rgba(212, 175, 55, 0.15);
+          background: #f9f3e3;
+          border: 1.5px solid rgba(212, 175, 55, 0.25);
           display: flex;
           align-items: center;
           justify-content: center;
           color: #d4af37;
+          flex-shrink: 0;
+          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+        }
+
+        .login-banner-icon svg {
+          animation: sparkleRotate 3s infinite ease-in-out;
         }
 
         .login-banner-text h4 {
-          font-size: 15px;
-          font-weight: 700;
-          margin: 0 0 4px;
+          font-size: 17.5px;
+          font-weight: 800;
+          margin: 0 0 6px;
           color: #000000;
+          letter-spacing: 0.2px;
+          line-height: 1.3;
         }
 
         .login-banner-text p {
-          font-size: 13px;
-          color: #333333;
+          font-size: 14.5px;
+          color: #2c2520;
+          font-weight: 500;
           margin: 0;
+          line-height: 1.4;
         }
 
         .btn-login-mmt {
-          padding: 10px 20px;
+          padding: 12px 24px;
           background: #d4af37;
           color: #000000;
-          font-weight: 700;
-          font-size: 13px;
+          font-weight: 800;
+          font-size: 14px;
           border-radius: 30px;
           border: none;
           cursor: pointer;
           transition: all 0.3s;
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
         }
 
         .btn-login-mmt:hover {
           background: #c39e2e;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(212, 175, 55, 0.3);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(212, 175, 55, 0.35);
         }
 
         /* ROOM DETAILS SPLIT CARD */
@@ -2333,14 +2374,14 @@ export default function BookingPage() {
                       <p>Unlock exclusive heritage member pricing and instant guest details autofill.</p>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <button 
                       onClick={() => {
                         setLoginModalInitialRegister(false);
                         setLoginModalOpen(true);
                       }} 
                       className="btn-login-mmt"
-                      style={{ background: 'transparent', border: '1.5px solid #d4af37', color: '#000000', padding: '8px 16px' }}
+                      style={{ background: 'transparent', border: '1.5px solid #d4af37', color: '#000000', padding: '10px 22px', fontWeight: '800' }}
                     >
                       <span>Login</span>
                     </button>
@@ -2350,9 +2391,9 @@ export default function BookingPage() {
                         setLoginModalOpen(true);
                       }} 
                       className="btn-login-mmt"
-                      style={{ background: '#d4af37', border: '1.5px solid #d4af37', color: '#000000', padding: '8px 16px' }}
+                      style={{ background: '#d4af37', border: '1.5px solid #d4af37', color: '#000000', padding: '10px 22px', fontWeight: '800' }}
                     >
-                      <Sparkles size={13} style={{ color: '#000000' }} />
+                      <Sparkles size={14} style={{ color: '#000000' }} />
                       <span>Create Account</span>
                     </button>
                   </div>
