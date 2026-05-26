@@ -2180,7 +2180,55 @@ export default function BookingPage() {
           transform: translateY(-1px);
           box-shadow: 0 8px 20px rgba(139, 0, 0, 0.3);
         }
+
+        /* STEP 3 CONFIRMATION SCREEN */
+        .confirmation-mmt-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 0 60px; }
+        .conf-status-header { display: flex; flex-direction: column; gap: 6px; padding-bottom: 24px; border-bottom: 1px solid rgba(0,0,0,0.08); margin-bottom: 22px; }
+        .conf-check-circle { width: 46px; height: 46px; border-radius: 50%; background: rgba(22,163,74,0.08); border: 2px solid rgba(22,163,74,0.2); display: flex; align-items: center; justify-content: center; color: #16a34a; margin-bottom: 6px; }
+        .conf-status-label { font-size: 13px; color: rgba(44,37,32,0.6); font-weight: 500; }
+        .conf-status-title { font-size: 32px; font-weight: 800; color: #1a1512; line-height: 1.1; margin: 0; }
+        .conf-action-pills { display: flex; gap: 10px; margin-top: 8px; }
+        .conf-action-pill { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #8b0000; font-weight: 600; cursor: pointer; background: transparent; border: none; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+        .confirmation-split { display: grid; grid-template-columns: 300px 1fr; gap: 28px; align-items: start; }
+        .conf-left-card { background: #fff; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); position: sticky; top: 100px; }
+        .conf-left-image { width: 100%; height: 160px; object-fit: cover; display: block; }
+        .conf-left-body { padding: 18px; }
+        .conf-room-title-line { display: flex; flex-direction: column; gap: 4px; padding-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,0.07); margin-bottom: 14px; }
+        .conf-room-title-line h3 { font-size: 15px; font-weight: 800; color: #1a1512; margin: 0; }
+        .conf-room-title-line span { font-size: 12px; color: rgba(44,37,32,0.55); font-weight: 500; }
+        .conf-price-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,0.07); margin-bottom: 14px; }
+        .conf-price-tag { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1512; }
+        .conf-ref-badge { font-size: 11px; background: rgba(139,0,0,0.06); border: 1px solid rgba(139,0,0,0.15); color: #8b0000; border-radius: 6px; padding: 4px 10px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+        .conf-property-box { display: flex; align-items: center; gap: 12px; padding-top: 4px; }
+        .conf-property-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(139,0,0,0.15); }
+        .conf-property-details h4 { font-size: 13px; font-weight: 800; color: #1a1512; margin: 0 0 2px; }
+        .conf-property-details span { font-size: 11px; color: rgba(44,37,32,0.55); }
+        .conf-right-side { display: flex; flex-direction: column; gap: 18px; }
+        .conf-accordion { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+        .conf-accordion-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid rgba(0,0,0,0.07); font-size: 14px; font-weight: 700; color: #1a1512; }
+        .conf-detail-row { display: flex; align-items: center; padding: 16px 22px; border-bottom: 1px solid rgba(0,0,0,0.05); gap: 16px; }
+        .conf-detail-row:last-child { border-bottom: none; }
+        .conf-detail-icon { width: 36px; display: flex; align-items: center; justify-content: center; color: rgba(44,37,32,0.35); flex-shrink: 0; }
+        .conf-detail-label { width: 130px; font-size: 13px; color: rgba(44,37,32,0.55); flex-shrink: 0; }
+        .conf-detail-value { flex: 1; font-size: 14px; font-weight: 600; color: #1a1512; }
+        .conf-detail-actions { display: flex; gap: 8px; margin-left: auto; }
+        .conf-action-btn { display: flex; align-items: center; gap: 5px; padding: 7px 14px; border: 1px solid rgba(0,0,0,0.12); border-radius: 8px; font-size: 12px; font-weight: 600; color: rgba(44,37,32,0.7); background: transparent; cursor: pointer; transition: all 0.2s; }
+        .conf-action-btn:hover { border-color: #8b0000; color: #8b0000; }
+        .conf-guest-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 18px 22px; }
+        .conf-guest-card { background: rgba(139,0,0,0.04); border: 1px solid rgba(139,0,0,0.1); border-radius: 12px; padding: 16px; display: flex; align-items: flex-start; gap: 12px; }
+        .conf-guest-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #8b0000, #d4af37); color: white; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .conf-guest-info h5 { font-size: 13px; font-weight: 700; color: #1a1512; margin: 0 0 3px; }
+        .conf-guest-info span { font-size: 11px; color: rgba(44,37,32,0.55); }
+        .conf-paid-tag { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #16a34a; font-weight: 600; margin-top: 6px; }
+        .conf-bottom-actions { display: flex; gap: 12px; margin-top: 8px; }
+        @media (max-width: 768px) {
+          .confirmation-split { grid-template-columns: 1fr; }
+          .conf-left-card { position: static; }
+          .conf-status-title { font-size: 24px; }
+          .conf-guest-cards { grid-template-columns: 1fr; }
+        }
       ` }} />
+
 
       {/* 1. STUNNING HEADER NAVIGATION IN MMT STYLE */}
       <header id="main-header" className={headerScrolled ? "scrolled" : ""}>
@@ -3124,293 +3172,7 @@ export default function BookingPage() {
         {/* 4. STEP 3: TRANSACTION SUCCESS CONFIRMATION RECEIPT SCREEN */}
         {currentStep === 3 && (
           <div className="confirmation-mmt-wrapper">
-            <style dangerouslySetInnerHTML={{ __html: `
-              .confirmation-mmt-wrapper {
-                max-width: 1100px;
-                margin: 0 auto;
-                padding: 0 0 60px;
-              }
-              .confirmation-split {
-                display: grid;
-                grid-template-columns: 300px 1fr;
-                gap: 28px;
-                align-items: start;
-              }
-              .conf-left-card {
-                background: #fff;
-                border-radius: 16px;
-                border: 1px solid rgba(0,0,0,0.08);
-                overflow: hidden;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-                position: sticky;
-                top: 100px;
-              }
-              .conf-left-image {
-                width: 100%;
-                height: 160px;
-                object-fit: cover;
-                display: block;
-              }
-              .conf-left-body {
-                padding: 18px;
-              }
-              .conf-room-title-line {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-                padding-bottom: 14px;
-                border-bottom: 1px solid rgba(0,0,0,0.07);
-                margin-bottom: 14px;
-              }
-              .conf-room-title-line h3 {
-                font-size: 15px;
-                font-weight: 800;
-                color: #1a1512;
-                margin: 0;
-              }
-              .conf-room-title-line span {
-                font-size: 12px;
-                color: rgba(44,37,32,0.55);
-                font-weight: 500;
-              }
-              .conf-price-row {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding-bottom: 14px;
-                border-bottom: 1px solid rgba(0,0,0,0.07);
-                margin-bottom: 14px;
-              }
-              .conf-price-tag {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                font-size: 14px;
-                font-weight: 700;
-                color: #1a1512;
-              }
-              .conf-ref-badge {
-                font-size: 11px;
-                background: rgba(139,0,0,0.06);
-                border: 1px solid rgba(139,0,0,0.15);
-                color: #8b0000;
-                border-radius: 6px;
-                padding: 4px 10px;
-                font-weight: 700;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-              }
-              .conf-property-box {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding-top: 4px;
-              }
-              .conf-property-avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 2px solid rgba(139,0,0,0.15);
-              }
-              .conf-property-details h4 {
-                font-size: 13px;
-                font-weight: 800;
-                color: #1a1512;
-                margin: 0 0 2px;
-              }
-              .conf-property-details span {
-                font-size: 11px;
-                color: rgba(44,37,32,0.55);
-              }
-              .conf-right-side {
-                display: flex;
-                flex-direction: column;
-                gap: 18px;
-              }
-              .conf-status-header {
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-                padding-bottom: 24px;
-                border-bottom: 1px solid rgba(0,0,0,0.08);
-                margin-bottom: 4px;
-              }
-              .conf-check-circle {
-                width: 46px;
-                height: 46px;
-                border-radius: 50%;
-                background: rgba(22,163,74,0.08);
-                border: 2px solid rgba(22,163,74,0.2);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #16a34a;
-                margin-bottom: 6px;
-              }
-              .conf-status-label {
-                font-size: 13px;
-                color: rgba(44,37,32,0.6);
-                font-weight: 500;
-              }
-              .conf-status-title {
-                font-size: 32px;
-                font-weight: 800;
-                color: #1a1512;
-                line-height: 1.1;
-                margin: 0;
-              }
-              .conf-action-pills {
-                display: flex;
-                gap: 10px;
-                margin-top: 8px;
-              }
-              .conf-action-pill {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                font-size: 13px;
-                color: #8b0000;
-                font-weight: 600;
-                cursor: pointer;
-                background: transparent;
-                border: none;
-                padding: 0;
-                text-decoration: underline;
-                text-underline-offset: 3px;
-              }
-              .conf-accordion {
-                background: #fff;
-                border: 1px solid rgba(0,0,0,0.08);
-                border-radius: 14px;
-                overflow: hidden;
-                box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-              }
-              .conf-accordion-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 18px 22px;
-                cursor: pointer;
-                user-select: none;
-                border-bottom: 1px solid rgba(0,0,0,0.07);
-                font-size: 14px;
-                font-weight: 700;
-                color: #1a1512;
-              }
-              .conf-detail-row {
-                display: flex;
-                align-items: center;
-                padding: 16px 22px;
-                border-bottom: 1px solid rgba(0,0,0,0.05);
-                gap: 16px;
-              }
-              .conf-detail-row:last-child {
-                border-bottom: none;
-              }
-              .conf-detail-icon {
-                width: 36px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: rgba(44,37,32,0.35);
-                flex-shrink: 0;
-              }
-              .conf-detail-label {
-                width: 130px;
-                font-size: 13px;
-                color: rgba(44,37,32,0.55);
-                flex-shrink: 0;
-              }
-              .conf-detail-value {
-                flex: 1;
-                font-size: 14px;
-                font-weight: 600;
-                color: #1a1512;
-              }
-              .conf-detail-actions {
-                display: flex;
-                gap: 8px;
-                margin-left: auto;
-              }
-              .conf-action-btn {
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                padding: 7px 14px;
-                border: 1px solid rgba(0,0,0,0.12);
-                border-radius: 8px;
-                font-size: 12px;
-                font-weight: 600;
-                color: rgba(44,37,32,0.7);
-                background: transparent;
-                cursor: pointer;
-                transition: all 0.2s;
-              }
-              .conf-action-btn:hover {
-                border-color: #8b0000;
-                color: #8b0000;
-              }
-              .conf-guest-cards {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 14px;
-                padding: 18px 22px;
-              }
-              .conf-guest-card {
-                background: rgba(139,0,0,0.04);
-                border: 1px solid rgba(139,0,0,0.1);
-                border-radius: 12px;
-                padding: 16px;
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-              }
-              .conf-guest-avatar {
-                width: 36px;
-                height: 36px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, #8b0000, #d4af37);
-                color: white;
-                font-size: 13px;
-                font-weight: 800;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-              }
-              .conf-guest-info h5 {
-                font-size: 13px;
-                font-weight: 700;
-                color: #1a1512;
-                margin: 0 0 3px;
-              }
-              .conf-guest-info span {
-                font-size: 11px;
-                color: rgba(44,37,32,0.55);
-              }
-              .conf-paid-tag {
-                display: flex;
-                align-items: center;
-                gap: 4px;
-                font-size: 11px;
-                color: #16a34a;
-                font-weight: 600;
-                margin-top: 6px;
-              }
-              .conf-bottom-actions {
-                display: flex;
-                gap: 12px;
-                margin-top: 8px;
-              }
-              @media (max-width: 768px) {
-                .confirmation-split { grid-template-columns: 1fr; }
-                .conf-left-card { position: static; }
-                .conf-status-title { font-size: 24px; }
-                .conf-guest-cards { grid-template-columns: 1fr; }
-              }
-            `}} />
+            
 
             {/* STATUS HEADER */}
             <div className="conf-status-header">
