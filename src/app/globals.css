@@ -3560,10 +3560,50 @@ html, body {
 
 /* === Floating Widgets — Mobile Positioning === */
 @media (max-width: 768px) {
-    /* Hide social stack on mobile — icons overlap page content at narrow widths.
-       Social links remain accessible via the site footer. */
+    /* Move social stack to right edge on mobile so it doesn't overlap
+       left-aligned content. Icons are smaller and edge-attached. */
     .float-social-stack {
-        display: none !important;
+        display: flex !important;
+        flex-direction: column;
+        bottom: auto;
+        top: 50%;
+        transform: translateY(-50%);
+        left: auto;
+        right: 0;
+        gap: 2px;
+    }
+
+    .float-social-stack .socialcontainer {
+        height: 36px;
+        overflow: hidden;
+        display: block;
+    }
+
+    .float-social-stack .icon,
+    .float-social-stack .social-icon-1,
+    .float-social-stack .social-icon-1-1,
+    .float-social-stack .social-icon-2,
+    .float-social-stack .social-icon-2-2,
+    .float-social-stack .social-icon-3,
+    .float-social-stack .social-icon-3-3,
+    .float-social-stack .social-icon-4,
+    .float-social-stack .social-icon-4-4 {
+        width: 36px;
+        height: 36px;
+        margin: 0;
+        border-radius: 6px 0 0 6px;
+    }
+
+    .float-social-stack svg {
+        width: 30px;
+    }
+
+    /* Hover slide on touch devices — slide left instead of up */
+    .float-social-stack .socialcontainer:hover .social-icon-1,
+    .float-social-stack .socialcontainer:hover .social-icon-2,
+    .float-social-stack .socialcontainer:hover .social-icon-3,
+    .float-social-stack .socialcontainer:hover .social-icon-4 {
+        transform: translateY(-36px);
     }
 
     /* Music player — tighter to bottom-left */
