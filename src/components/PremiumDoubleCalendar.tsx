@@ -169,28 +169,52 @@ export default function PremiumDoubleCalendar({
       <div className="sky-backdrop" onClick={onClose} />
       <div ref={containerRef} className="sky-cal-panel" onClick={e => e.stopPropagation()}>
         <style dangerouslySetInnerHTML={{ __html: `
+          /* Backdrop: transparent on desktop (click-outside only), dark on mobile */
           .sky-backdrop {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45);
+            background: transparent;
             z-index: 99998;
           }
+          @media (max-width: 768px) {
+            .sky-backdrop { background: rgba(0,0,0,0.45); }
+          }
+
+          /* Desktop: absolute dropdown above search bar (like Rooms & Guests) */
           .sky-cal-panel {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            position: absolute;
+            bottom: calc(100% + 15px);
+            left: 0;
             z-index: 99999;
             background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 16px 56px rgba(0,0,0,0.20);
-            width: min(420px, calc(100vw - 20px));
-            max-height: 95vh;
+            border-radius: 24px;
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.12);
+            width: 420px;
+            max-height: 92vh;
             overflow-y: auto;
             font-family: 'Outfit', sans-serif;
             animation: skyFade 0.18s ease forwards;
           }
           @keyframes skyFade {
-            from { opacity: 0; transform: translate(-50%, -46%); }
-            to   { opacity: 1; transform: translate(-50%, -50%); }
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+
+          /* Mobile: centered fixed overlay */
+          @media (max-width: 768px) {
+            .sky-cal-panel {
+              position: fixed;
+              bottom: auto;
+              top: 50%; left: 50%;
+              transform: translate(-50%, -50%);
+              width: calc(100vw - 20px);
+              border-radius: 16px;
+              animation: skyFadeMobile 0.18s ease forwards;
+            }
+            @keyframes skyFadeMobile {
+              from { opacity: 0; transform: translate(-50%, -47%); }
+              to   { opacity: 1; transform: translate(-50%, -50%); }
+            }
           }
 
           /* ── Date rows (Rooms & Guests style) ── */
