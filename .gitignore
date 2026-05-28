@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# deploy secrets
+deploy/brajnidhi.env
+
 # debug
 npm-debug.log*
 yarn-debug.log*

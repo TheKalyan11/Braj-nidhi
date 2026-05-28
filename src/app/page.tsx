@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
+import LoginJoinButton from '@/components/LoginJoinButton';
+import BookNowButton from '@/components/BookNowButton';
+import SectionLinkButton from '@/components/SectionLinkButton';
 import PremiumDoubleCalendar from '@/components/PremiumDoubleCalendar';
 
 // Self-contained Hero Slideshow Component to prevent top-level page re-renders
@@ -165,10 +168,42 @@ export default function Home() {
   const [bookingData, setBookingData] = useState({
     checkIn: '2026-05-18',
     checkOut: '2026-05-20',
-    guests: '2 Adults',
+    guests: '1 Room, 2 Guests',
+    rooms: 1,
+    adults: 2,
+    children: 0,
+    pets: false,
     roomType: 'Deluxe 2 – Twin Bedded Room',
     eventType: 'Corporate Offsite'
   });
+
+  const [tempRooms, setTempRooms] = useState(1);
+  const [tempAdults, setTempAdults] = useState(2);
+  const [tempChildren, setTempChildren] = useState(0);
+  const [tempPets, setTempPets] = useState(false);
+
+  useEffect(() => {
+    if (openDropdown === 'guests') {
+      setTempRooms(bookingData.rooms);
+      setTempAdults(bookingData.adults);
+      setTempChildren(bookingData.children);
+      setTempPets(bookingData.pets);
+    }
+  }, [openDropdown]);
+
+  const handleApplyGuests = () => {
+    const totalGuests = tempAdults + tempChildren;
+    const guestsLabel = `${tempRooms} Room${tempRooms > 1 ? 's' : ''}, ${totalGuests} Guest${totalGuests > 1 ? 's' : ''}`;
+    setBookingData(prev => ({
+      ...prev,
+      rooms: tempRooms,
+      adults: tempAdults,
+      children: tempChildren,
+      pets: tempPets,
+      guests: guestsLabel
+    }));
+    setOpenDropdown(null);
+  };
 
   const handleBookingChange = (field: string, value: string) => {
     setBookingData(prev => ({ ...prev, [field]: value }));
@@ -444,12 +479,12 @@ export default function Home() {
                             {getUserInitials(userName)}
                         </div>
                     </div>
-                    <button onClick={handleLogout} className="btn-login">Logout</button>
+                    <LoginJoinButton onClick={handleLogout} label="Logout" />
                 </>
             ) : (
-                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login">Login / Join</button>
+                <LoginJoinButton onClick={() => setIsLoginModalOpen(true)} />
             )}
-            <a href="/booking" className="btn-book">Book Now</a>
+            <BookNowButton href="/guesthouse#rooms-suites" />
         </div>
 
         {/* Mobile Header Actions Flex Wrapper */}
@@ -496,12 +531,12 @@ export default function Home() {
               <div className="mobile-user-profile">
                 <span className="user-label">Braj Club Member</span>
                 <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
-                <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}>Logout</button>
+                <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
               </div>
             ) : (
-              <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
+              <LoginJoinButton onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
             )}
-            <a href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="btn-book" style={{ display: 'block', textAlign: 'center', marginTop: '4px' }}>Book Now</a>
+            <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
           </div>
         </div>
       </div>
@@ -516,39 +551,7 @@ export default function Home() {
             {/* Luxury Yacht Style Horizontal Booking widget */}
             <div className="luxury-search-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 'auto', marginBottom: '0px', zIndex: 10 }}>
                 <div className="search-label-above" style={{ margin: '0 0 15px 0', textAlign: 'center' }}>Find now your luxury suites</div>
-                <div className="luxury-search-bar" style={{ maxWidth: '850px', margin: '0 auto' }}>
-                    
-                    {/* Suite Type (Active Dark Selection Block) */}
-                    <div 
-                      className="search-block active-dark"
-                      onClick={() => setOpenDropdown(openDropdown === 'roomType' ? null : 'roomType')}
-                    >
-                        <div className="block-icon">
-                            <i className="fas fa-crown"></i>
-                        </div>
-                        <div className="block-info">
-                            <span className="block-label">Suite Type</span>
-                            <span className="block-value">{bookingData.roomType.replace(' – Twin Bedded Room', '').replace(' – 3 Bedded Room', '').replace(' – 4 Bedded Room', '')}</span>
-                        </div>
-                        <i className="fas fa-chevron-down block-chevron"></i>
-
-                        {openDropdown === 'roomType' && (
-                            <div className="luxury-dropdown-options" onClick={(e) => e.stopPropagation()}>
-                                {["Deluxe 2 – Twin Bedded Room", "Deluxe 3 – 3 Bedded Room", "Deluxe 4 – 4 Bedded Room"].map((opt) => (
-                                    <div 
-                                        key={opt}
-                                        className={`luxury-dropdown-option ${bookingData.roomType === opt ? 'selected' : ''}`}
-                                        onClick={() => {
-                                            setBookingData(prev => ({ ...prev, roomType: opt }));
-                                            setOpenDropdown(null);
-                                        }}
-                                    >
-                                        {opt.split(' – ')[0]}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                <div className="luxury-search-bar" style={{ maxWidth: '720px', margin: '0 auto' }}>
 
                     {/* Dates block */}
                     <div className="search-block mmt-date-trigger" style={{ position: 'relative' }}>
@@ -590,37 +593,136 @@ export default function Home() {
                             <i className="fas fa-user-friends"></i>
                         </div>
                         <div className="block-info">
-                            <span className="block-label">Guests</span>
+                            <span className="block-label">Rooms & Guests</span>
                             <span className="block-value">{bookingData.guests}</span>
                         </div>
                         <i className="fas fa-chevron-down block-chevron"></i>
 
                         {openDropdown === 'guests' && (
-                            <div className="luxury-dropdown-options" onClick={(e) => e.stopPropagation()}>
-                                {["1 Adult", "2 Adults", "2 Adults, 1 Child", "2 Adults, 2 Children"].map((opt) => (
-                                    <div 
-                                        key={opt}
-                                        className={`luxury-dropdown-option ${bookingData.guests === opt ? 'selected' : ''}`}
-                                        onClick={() => {
-                                            setBookingData(prev => ({ ...prev, guests: opt }));
-                                            setOpenDropdown(null);
-                                        }}
-                                    >
-                                        {opt}
+                            <div className="luxury-dropdown-options" onClick={(e) => e.stopPropagation()} style={{
+                                position: 'absolute',
+                                bottom: 'calc(100% + 15px)',
+                                right: 0,
+                                width: '380px',
+                                maxWidth: '90vw',
+                                backgroundColor: '#ffffff',
+                                borderRadius: '24px',
+                                border: '1px solid rgba(0, 0, 0, 0.08)',
+                                boxShadow: '0 15px 45px rgba(0, 0, 0, 0.12)',
+                                padding: '24px',
+                                zIndex: 1000,
+                                animation: 'fadeInUpMini 0.3s ease forwards',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '20px'
+                            }}>
+                                {/* Row 1: Room */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Room</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '12px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setTempRooms(Math.max(1, tempRooms - 1))}
+                                            style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
+                                        >
+                                            &minus;
+                                        </button>
+                                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempRooms}</span>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setTempRooms(Math.min(9, tempRooms + 1))}
+                                            style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
+                                        >
+                                            &#43;
+                                        </button>
                                     </div>
-                                ))}
+                                </div>
+
+                                {/* Row 2: Adults */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Adults</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '12px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setTempAdults(Math.max(1, tempAdults - 1))}
+                                            style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
+                                        >
+                                            &minus;
+                                        </button>
+                                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempAdults}</span>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setTempAdults(Math.min(9, tempAdults + 1))}
+                                            style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
+                                        >
+                                            &#43;
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Row 3: Children */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+                                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Children</span>
+                                        <span style={{ fontSize: '11px', color: '#8c8272', marginTop: '2px' }}>0 - 17 Years Old</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '12px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setTempChildren(Math.max(0, tempChildren - 1))}
+                                            style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
+                                        >
+                                            &minus;
+                                        </button>
+                                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempChildren}</span>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setTempChildren(Math.min(9, tempChildren + 1))}
+                                            style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
+                                        >
+                                            &#43;
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Subtext under rows */}
+                                <div style={{ fontSize: '11px', color: '#8c8272', lineHeight: '1.4', marginTop: '-4px', textAlign: 'left' }}>
+                                    Please provide right number of children along with their right age for best options and prices.
+                                </div>
+
+                                {/* Apply Button */}
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                                    <button 
+                                        type="button"
+                                        onClick={handleApplyGuests}
+                                        style={{
+                                            backgroundColor: '#186dec',
+                                            color: '#ffffff',
+                                            fontWeight: 800,
+                                            fontSize: '13px',
+                                            padding: '10px 24px',
+                                            borderRadius: '30px',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            boxShadow: '0 4px 12px rgba(24, 109, 236, 0.25)',
+                                            textTransform: 'uppercase',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        className="btn-apply-guests"
+                                    >
+                                        Apply
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
 
                     {/* Search Button block */}
                     <div className="search-action-block" style={{ paddingLeft: '8px', borderLeft: '1px solid rgba(0, 0, 0, 0.08)' }}>
-                        <Link 
-                          href={`/booking?roomType=${
-                            bookingData.roomType === 'Deluxe 3 – 3 Bedded Room' ? 'deluxe3' : 
-                            bookingData.roomType === 'Deluxe 4 – 4 Bedded Room' ? 'deluxe4' : 
-                            'deluxe2'
-                          }&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&guests=${encodeURIComponent(bookingData.guests)}`}
+                        <Link
+                          href={`/rooms-combo?checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&rooms=${bookingData.rooms}&adults=${bookingData.adults}&children=${bookingData.children}&guests=${encodeURIComponent(
+                            `${bookingData.adults} Adults${bookingData.children > 0 ? `, ${bookingData.children} Child` : ''}`
+                          )}`}
                           className="search-circle-button"
                           aria-label="Search Suites"
                         >
@@ -665,7 +767,7 @@ export default function Home() {
                 <div className="content-box">
                     <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"  /></svg>
                     <h2>Luxury Guestrooms & Divine Suites</h2><p>Experience a refined stay within the sacred atmosphere of Braj Nidhi. Thoughtfully designed rooms, elegant interiors, and peaceful surroundings come together to offer a truly elevated hospitality experience in the heart of Vrindavan.<br /><br />Whether you are visiting for darshan, weddings, spiritual retreats, or family gatherings, every stay is crafted with warmth, comfort, and timeless elegance.</p>
-                    <a href="/guesthouse" className="btn-outline">Explore Rooms <i className="fas fa-arrow-right"></i></a>
+                    <SectionLinkButton href="/guesthouse">Explore Rooms</SectionLinkButton>
                 </div>
                 <div className="image-grid">
                     <img src="/z.png" alt="Luxury Suite Room View 1" className="main-img" />
@@ -679,7 +781,7 @@ export default function Home() {
                 <div className="content-box">
                     <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"  /></svg>
                     <h2>Weddings & Grand Celebrations</h2><p>Celebrate your most special moments amidst the divine elegance of Braj Nidhi. From intimate wedding ceremonies to luxurious grand celebrations, our majestic venues, premium hospitality, and serene spiritual atmosphere create experiences that feel truly timeless.<br /><br />With beautifully designed spaces, exceptional accommodations, curated sattvic dining, and personalized event planning, every celebration at Braj Nidhi becomes a cherished memory for generations.</p>
-                    <a href="#" className="btn-outline">Plan Your Wedding <i className="fas fa-arrow-right"></i></a>
+                    <SectionLinkButton href="/weddings">Plan Your Wedding</SectionLinkButton>
                 </div>
                 <div className="image-grid">
                     <img src="DSC02591.webp" alt="Wedding Hall" className="main-img" />
@@ -693,7 +795,7 @@ export default function Home() {
                 <div className="content-box">
                     <svg className="animated-flute" viewBox="-10 -20 120 120"><use href="#krishna-flute-feather"  /></svg>
                     <h2>Corporate Retreats & Premium AV Hall</h2><p>Host conferences, meetings, leadership retreats, and corporate gatherings in one of Vrindavan’s finest AV venues. Equipped with advanced sound systems, professional setup, elegant interiors, and seamless event support, Braj Nidhi offers a premium experience designed for impactful events.<br /><br />Blending modern facilities with the peaceful atmosphere of Braj, it’s the perfect destination for productive meetings, meaningful retreats, and elevated corporate experiences.</p>
-                    <a href="/booking" className="btn-outline">Book Corporate Hall <i className="fas fa-arrow-right"></i></a>
+                    <SectionLinkButton href="/corporate">Book Corporate Hall</SectionLinkButton>
                 </div>
                 <div className="image-grid">
                     <img src="DSC09652.webp" alt="Premium AV Hall" className="main-img" />
@@ -753,7 +855,7 @@ export default function Home() {
                             <span><i className="fas fa-wifi"></i> Free WiFi</span>
                             <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                         </div>
-                        <Link href="/booking?roomType=deluxe2" className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></Link>
+                        <Link href={`/rooms-combo?roomType=deluxe2&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&rooms=1&adults=2&children=0&guests=${encodeURIComponent('2 Adults')}`} className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></Link>
                     </div>
                 </div>
 
@@ -768,7 +870,7 @@ export default function Home() {
                             <span><i className="fas fa-bath"></i> Deep Tub</span>
                             <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                         </div>
-                        <Link href="/booking?roomType=deluxe3" className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></Link>
+                        <Link href={`/rooms-combo?roomType=deluxe3&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&rooms=1&adults=3&children=0&guests=${encodeURIComponent('3 Adults')}`} className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></Link>
                     </div>
                 </div>
 
@@ -783,7 +885,7 @@ export default function Home() {
                             <span><i className="fas fa-bed"></i> Living Area</span>
                             <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                         </div>
-                        <Link href="/booking?roomType=deluxe4" className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></Link>
+                        <Link href={`/rooms-combo?roomType=deluxe4&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&rooms=1&adults=4&children=0&guests=${encodeURIComponent('4 Adults')}`} className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></Link>
                     </div>
                 </div>
             </div>

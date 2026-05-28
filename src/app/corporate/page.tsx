@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
+import BookNowButton from '@/components/BookNowButton';
 import Link from 'next/link';
 import LoginModal from '@/components/LoginModal';
+import LoginJoinButton from '@/components/LoginJoinButton';
 
 export default function Corporate() {
   const [heroImgIndex, setHeroImgIndex] = useState(0);
@@ -860,9 +862,9 @@ export default function Corporate() {
                     <button onClick={handleLogout} className="btn-login">Logout</button>
                 </>
             ) : (
-                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login">Login / Join</button>
+                <LoginJoinButton onClick={() => setIsLoginModalOpen(true)} />
             )}
-            <a href="/booking" className="btn-book">Book Now</a>
+            <BookNowButton href="/guesthouse#rooms-suites" />
         </div>
 
         {/* Hamburger Toggle Button */}
@@ -910,7 +912,7 @@ export default function Corporate() {
             ) : (
               <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
             )}
-            <a href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="btn-book" style={{ display: 'block', textAlign: 'center', marginTop: '4px' }}>Book Now</a>
+            <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
           </div>
         </div>
       </div>

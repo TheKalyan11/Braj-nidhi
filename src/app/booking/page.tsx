@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -13,19 +13,14 @@ import {
   MapPin, 
   Compass, 
   Car, 
-  QrCode, 
-  CreditCard, 
   CheckCircle2, 
   Sparkles, 
   Lock,
   ArrowRight,
   Info,
-  Clock,
   Menu,
   X,
   Settings,
-  Terminal,
-  Key,
   Star,
   Leaf,
   BedDouble,
@@ -36,6 +31,8 @@ import {
 } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
+import LoginJoinButton from '@/components/LoginJoinButton';
+import BookNowButton from '@/components/BookNowButton';
 
 // Types for booking details
 interface GuestDetails {
@@ -44,9 +41,6 @@ interface GuestDetails {
   lastName: string;
   email: string;
   phone: string;
-  gstEnabled: boolean;
-  gstNumber: string;
-  gstCompany: string;
 }
 
 export default function BookingPage() {
@@ -68,16 +62,11 @@ export default function BookingPage() {
   const [darshanGuide, setDarshanGuide] = useState<boolean>(false);
   const [airportCab, setAirportCab] = useState<boolean>(false);
   
-  // Promo codes
-  const [promoInput, setPromoInput] = useState<string>('');
-  const [appliedPromo, setAppliedPromo] = useState<string>('');
-  const [promoDiscount, setPromoDiscount] = useState<number>(0);
-  const [promoError, setPromoError] = useState<string>('');
-  const [promoSuccess, setPromoSuccess] = useState<string>('');
+
 
   // Login State
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [userName, setUserName] = useState<string>('Kalyan Sharma');
+  const [userName, setUserName] = useState<string>('Guest');
   const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
   const [loginModalInitialRegister, setLoginModalInitialRegister] = useState<boolean>(false);
   const [headerScrolled, setHeaderScrolled] = useState<boolean>(false);
@@ -89,18 +78,56 @@ export default function BookingPage() {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
-    gstEnabled: false,
-    gstNumber: '',
-    gstCompany: ''
+    phone: ''
   });
 
-  // Payment Sim State
-  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card' | 'qr'>('upi');
-  const [upiId, setUpiId] = useState<string>('');
-  const [cardNo, setCardNo] = useState<string>('');
-  const [cardExpiry, setCardExpiry] = useState<string>('');
-  const [cardCVV, setCardCVV] = useState<string>('');
+  const razorpayScriptRef = useRef<boolean>(false);
+  const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (currentStep !== 3) return;
+    const canvas = confettiCanvasRef.current;
+    if (!canvas) return;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const colors = ['#FF342B', '#FFD700', '#C89B3C', '#16a34a', '#3b82f6', '#FF6B6B', '#a855f7', '#f97316'];
+    const pieces = Array.from({ length: 180 }, () => ({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 100,
+      vx: (Math.random() - 0.5) * 5,
+      vy: Math.random() * 3 + 1.5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      w: Math.random() * 10 + 5,
+      h: Math.random() * 6 + 3,
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 0.15,
+    }));
+    const start = Date.now();
+    let frame: number;
+    const animate = () => {
+      const elapsed = Date.now() - start;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (elapsed > 4500) { ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+      const fade = elapsed > 3000 ? 1 - (elapsed - 3000) / 1500 : 1;
+      ctx.globalAlpha = fade;
+      pieces.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.angle += p.spin; p.vy += 0.04;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      frame = requestAnimationFrame(animate);
+    };
+    animate();
+    return () => { cancelAnimationFrame(frame); };
+  }, [currentStep]);
+
+  // Payment State
   const [paymentLoading, setPaymentLoading] = useState<boolean>(false);
   const [paymentStepText, setPaymentStepText] = useState<string>('');
   const [bookingRef, setBookingRef] = useState<string>('');
@@ -108,17 +135,8 @@ export default function BookingPage() {
   // ERP Live API Connection States
   const [reservationId, setReservationId] = useState<string>('');
   const [erpAmount, setErpAmount] = useState<number | null>(null);
-  const [apiConnectionStatus, setApiConnectionStatus] = useState<'sandbox' | 'live' | 'error'>('sandbox');
+  const [apiConnectionStatus, setApiConnectionStatus] = useState<'sandbox' | 'live' | 'error'>('live');
   const [apiErrorMsg, setApiErrorMsg] = useState<string>('');
-  const [credentialsOpen, setCredentialsOpen] = useState<boolean>(false);
-  const [sessionCredentials, setSessionCredentials] = useState({
-    apiKey: '',
-    apiSecret: '',
-    erpBase: 'https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api'
-  });
-  const [drawerApiKey, setDrawerApiKey] = useState<string>('');
-  const [drawerApiSecret, setDrawerApiSecret] = useState<string>('');
-  const [drawerErpBase, setDrawerErpBase] = useState<string>('https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api');
   const [availableRoomsList, setAvailableRoomsList] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [livePrices, setLivePrices] = useState<Record<string, number>>({
@@ -129,6 +147,15 @@ export default function BookingPage() {
 
   // Quick special request badges
   const [specialRequests, setSpecialRequests] = useState<string[]>([]);
+  const [showModify, setShowModify] = useState(false);
+  const [openCalendar, setOpenCalendar] = useState<'checkin' | 'checkout' | null>(null);
+  const [calViewDate, setCalViewDate] = useState(new Date());
+  const [showAddGuestModal, setShowAddGuestModal] = useState(false);
+  const [savedGuests, setSavedGuests] = useState<{title: string; firstName: string; lastName: string; isChild: boolean}[]>([]);
+  const [newGuestTitle, setNewGuestTitle] = useState('Mr');
+  const [newGuestFirstName, setNewGuestFirstName] = useState('');
+  const [newGuestLastName, setNewGuestLastName] = useState('');
+  const [newGuestIsChild, setNewGuestIsChild] = useState(false);
   const requestBadges = ["Late Check-out (2 hrs)", "Spiritual Literature in Room", "Quiet Room", "Extra Bedding", "Temple Prasadam Delivery"];
 
   const getRoomPrice = (type: string): number => {
@@ -185,13 +212,12 @@ export default function BookingPage() {
   // Member discount is 10% of Room cost if logged in
   const memberDiscount = isLoggedIn ? Math.round(roomCost * 0.10) : 0;
   const baseTotal = roomCost + darshanCost + cabCost;
-  const totalDiscount = memberDiscount + promoDiscount;
-  
+  const totalDiscount = memberDiscount;
+
   // Tax calculations
   const taxableAmount = Math.max(0, baseTotal - totalDiscount);
   const gstAmount = Math.round(taxableAmount * 0.12);
-  const serviceCharge = Math.round(taxableAmount * 0.05);
-  const finalTotal = taxableAmount + gstAmount + serviceCharge;
+  const finalTotal = taxableAmount + gstAmount;
   
   // Dynamic ERP total override
   const payableTotal = erpAmount !== null ? erpAmount : finalTotal;
@@ -279,36 +305,19 @@ export default function BookingPage() {
         }
       }
 
-      // Load ERP credentials from sessionStorage if available
-      const savedApiKey = sessionStorage.getItem("apiKey") || "";
-      const savedApiSecret = sessionStorage.getItem("apiSecret") || "";
-      const savedErpBase = sessionStorage.getItem("erpBase") || "https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api";
-      
-      setSessionCredentials({
-        apiKey: savedApiKey,
-        apiSecret: savedApiSecret,
-        erpBase: savedErpBase
-      });
-      
-      if (savedApiKey && savedApiSecret) {
-        setApiConnectionStatus('live');
-      } else {
-        setApiConnectionStatus('sandbox');
-      }
-
       // Load login state from localStorage
       const storedLogin = localStorage.getItem('isLoggedIn') === 'true';
       if (storedLogin) {
         setIsLoggedIn(true);
-        const storedName = localStorage.getItem('userName') || 'Kalyan Sharma';
-        setUserName(storedName);
+        const storedName = localStorage.getItem('userName') || '';
+        setUserName(storedName || 'Guest');
         const parts = storedName.split(' ');
         setGuestDetails(prev => ({
           ...prev,
-          firstName: parts[0] || 'Kalyan',
-          lastName: parts[1] || 'Sharma',
-          email: localStorage.getItem('userEmail') || 'kalyan@brajnidhi.com',
-          phone: localStorage.getItem('userPhone') || '+91 98765 43210'
+          firstName: parts[0] || '',
+          lastName: parts[1] || '',
+          email: localStorage.getItem('userEmail') || '',
+          phone: localStorage.getItem('userPhone') || ''
         }));
       }
     };
@@ -326,39 +335,15 @@ export default function BookingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Helper to get proxy request headers
-  const getProxyHeaders = () => {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
-    };
-    if (sessionCredentials.apiKey) {
-      headers['x-api-key'] = sessionCredentials.apiKey;
-    }
-    if (sessionCredentials.apiSecret) {
-      headers['x-api-secret'] = sessionCredentials.apiSecret;
-    }
-    if (sessionCredentials.erpBase) {
-      headers['x-erp-base'] = sessionCredentials.erpBase;
-    }
-    return headers;
-  };
-
   // Helper to fetch live rooms search from ERP
   const searchRoomsApi = async (currentCheckIn: string, currentCheckOut: string, guestCount: number) => {
     try {
       setIsSearching(true);
       setApiErrorMsg('');
-      const headers = getProxyHeaders();
-      
-      // If we don't have API keys set yet, we remain in sandbox
-      if (!sessionCredentials.apiKey || !sessionCredentials.apiSecret) {
-        setApiConnectionStatus('sandbox');
-        return;
-      }
 
       const response = await fetch('/api/booking/search_rooms', {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           property: "BRAJ-NIDHI-GUEST-HOUSE-VRN",
           check_in_date: currentCheckIn,
@@ -448,35 +433,7 @@ export default function BookingPage() {
   // Trigger API search rooms when inputs or credentials change
   useEffect(() => {
     searchRoomsApi(checkIn, checkOut, adults + children);
-  }, [checkIn, checkOut, adults, children, sessionCredentials.apiKey, sessionCredentials.apiSecret, sessionCredentials.erpBase]);
-
-  // Handle saving credentials from dev drawer
-  const handleSaveCredentials = (apiKey: string, apiSecret: string, erpBase: string) => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem("apiKey", apiKey);
-      sessionStorage.setItem("apiSecret", apiSecret);
-      sessionStorage.setItem("erpBase", erpBase);
-      
-      setSessionCredentials({
-        apiKey,
-        apiSecret,
-        erpBase
-      });
-      
-      if (apiKey && apiSecret) {
-        setApiConnectionStatus('live');
-      } else {
-        setApiConnectionStatus('sandbox');
-      }
-      setCredentialsOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    setDrawerApiKey(sessionCredentials.apiKey);
-    setDrawerApiSecret(sessionCredentials.apiSecret);
-    setDrawerErpBase(sessionCredentials.erpBase);
-  }, [sessionCredentials]);
+  }, [checkIn, checkOut, adults, children]);
 
   // Handle auto-fill if user logs in via shared LoginModal
   const handleLoginSuccess = (name: string) => {
@@ -508,41 +465,8 @@ export default function BookingPage() {
       firstName: '',
       lastName: '',
       email: '',
-      phone: '',
-      gstEnabled: false,
-      gstNumber: '',
-      gstCompany: ''
+      phone: ''
     });
-    setAppliedPromo('');
-    setPromoDiscount(0);
-  };
-
-  // Promo code trigger
-  const handleApplyPromo = (code: string) => {
-    const testCode = code.toUpperCase().trim();
-    if (testCode === 'VRINDAVAN10') {
-      const discount = Math.round(roomCost * 0.10);
-      setPromoDiscount(discount);
-      setAppliedPromo('VRINDAVAN10');
-      setPromoSuccess('Promo applied! 10% discount on Room Cost.');
-      setPromoError('');
-    } else if (testCode === 'WELCOME500') {
-      setPromoDiscount(500);
-      setAppliedPromo('WELCOME500');
-      setPromoSuccess('Promo applied! Flat ₹500 discount.');
-      setPromoError('');
-    } else {
-      setPromoError('Invalid coupon code. Try VRINDAVAN10 or WELCOME500.');
-      setPromoSuccess('');
-    }
-  };
-
-  const handleRemovePromo = () => {
-    setAppliedPromo('');
-    setPromoDiscount(0);
-    setPromoSuccess('');
-    setPromoError('');
-    setPromoInput('');
   };
 
   const handleRequestBadgeToggle = (badge: string) => {
@@ -553,227 +477,245 @@ export default function BookingPage() {
     }
   };
 
-  // Step Navigations
-  const proceedToPayment = async () => {
-    if (!isLoggedIn) {
-      alert('Please login or create an account to proceed to secure checkout.');
-      setLoginModalInitialRegister(false);
-      setLoginModalOpen(true);
-      return;
-    }
+  const CAL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+  const getCalDays = (year: number, month: number) => {
+    const firstDow = (new Date(year, month, 1).getDay() + 6) % 7; // Mon=0
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrev = new Date(year, month, 0).getDate();
+    const cells: { d: number; type: 'prev'|'cur'|'next' }[] = [];
+    for (let i = firstDow - 1; i >= 0; i--) cells.push({ d: daysInPrev - i, type: 'prev' });
+    for (let d = 1; d <= daysInMonth; d++) cells.push({ d, type: 'cur' });
+    while (cells.length < 42) cells.push({ d: cells.length - daysInMonth - firstDow + 1, type: 'next' });
+    return cells;
+  };
+
+  const handleCalSelect = (year: number, month: number, day: number) => {
+    const val = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    if (openCalendar === 'checkin') {
+      setCheckIn(val);
+      if (checkOut <= val) {
+        const nd = new Date(year, month, day + 1);
+        setCheckOut(`${nd.getFullYear()}-${String(nd.getMonth()+1).padStart(2,'0')}-${String(nd.getDate()).padStart(2,'0')}`);
+      }
+      setOpenCalendar('checkout');
+      setCalViewDate(new Date(year, month, day));
+    } else {
+      setCheckOut(val);
+      setOpenCalendar(null);
+    }
+  };
+
+  const handleAddGuest = () => {
+    if (!newGuestFirstName.trim() || !newGuestLastName.trim()) return;
+    setSavedGuests(prev => [...prev, { title: newGuestTitle, firstName: newGuestFirstName, lastName: newGuestLastName, isChild: newGuestIsChild }]);
+    setNewGuestFirstName('');
+    setNewGuestLastName('');
+    setNewGuestIsChild(false);
+    setNewGuestTitle('Mr');
+  };
+
+  const loadRazorpayScript = (): Promise<boolean> =>
+    new Promise((resolve) => {
+      if (razorpayScriptRef.current || (window as any).Razorpay) {
+        razorpayScriptRef.current = true;
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => { razorpayScriptRef.current = true; resolve(true); };
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+
+  // Single Pay Now handler — creates ERP reservation then opens Razorpay immediately
+  const proceedToPayment = async () => {
     if (!guestDetails.firstName || !guestDetails.lastName || !guestDetails.email || !guestDetails.phone) {
       alert('Please fill out all required guest information fields before proceeding.');
       return;
     }
 
-    // If sandbox mode (no API Key/Secret), bypass ERP API reservation creation
-    if (apiConnectionStatus === 'sandbox') {
-      setReservationId('MOCK-RES-' + Math.floor(100000 + Math.random() * 900000));
-      setErpAmount(null);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setCurrentStep(2);
-      return;
-    }
-
-    try {
-      setPaymentLoading(true);
-      setPaymentStepText('Holding your room in ERP Guesthouse System...');
-      setCurrentStep(2); // Show the payment layout so step loader works
-      
-      // Determine target room type based on selected type
-      let targetRoomType = 'Deluxe';
-      if (roomType === 'deluxe2') targetRoomType = 'Deluxe 2';
-      else if (roomType === 'deluxe3') targetRoomType = 'Deluxe 3';
-      else if (roomType === 'deluxe4') targetRoomType = 'Deluxe 4';
-
-      if (availableRoomsList.length > 0) {
-        const found = availableRoomsList.find((r: any) => {
-          const typeId = (r.roomTypeId || '').toLowerCase();
-          if (roomType === 'deluxe2' && (typeId.includes('deluxe2') || typeId.includes('twin') || typeId.includes('2'))) return true;
-          if (roomType === 'deluxe3' && (typeId.includes('deluxe3') || typeId.includes('triple') || typeId.includes('3'))) return true;
-          if (roomType === 'deluxe4' && (typeId.includes('deluxe4') || typeId.includes('quad') || typeId.includes('family') || typeId.includes('4'))) return true;
-          return false;
-        });
-        if (found) {
-          targetRoomType = found.roomTypeId;
-        }
-      }
-
-      const headers = getProxyHeaders();
-      const response = await fetch('/api/booking/create_reservation', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          property: "BRAJ-NIDHI-GUEST-HOUSE-VRN",
-          check_in_date: checkIn,
-          check_out_date: checkOut,
-          booking_type: "Walk-In",
-          hold_type: "BN-Website Hold-0001",
-          guest: {
-            name: `${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}`,
-            email: guestDetails.email,
-            phone: guestDetails.phone
-          },
-          rooms: [{
-            room_type: targetRoomType,
-            qty: 1,
-            adults: adults,
-            children: children
-          }]
-        })
-      });
-
-      const result = await response.json();
-      setPaymentLoading(false);
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to hold reservation in ERP');
-      }
-
-      if (result.reservationId) {
-        setReservationId(result.reservationId);
-      } else if (result.reservation_id) {
-        setReservationId(result.reservation_id);
-      } else {
-        setReservationId('ERP-RES-' + Math.floor(100000 + Math.random() * 900000));
-      }
-
-      if (result.amount) {
-        setErpAmount(Number(result.amount));
-      } else if (result.net_amount) {
-        setErpAmount(Number(result.net_amount));
-      }
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error: any) {
-      console.error('ERP createReservationApi error:', error);
-      setPaymentLoading(false);
-      alert(`ERP Reservation Error: ${error.message}. Falling back to sandbox simulator mode.`);
-      setApiConnectionStatus('error');
-      setReservationId('MOCK-RES-' + Math.floor(100000 + Math.random() * 900000));
-      setErpAmount(null);
-    }
-  };
-
-  // Payment Sim Flow
-  const triggerPaymentProcessing = async () => {
-    if (paymentMethod === 'upi' && !upiId) {
-      alert('Please enter a valid UPI ID');
-      return;
-    }
-    if (paymentMethod === 'card' && (!cardNo || !cardExpiry || !cardCVV)) {
-      alert('Please fill out all card details');
-      return;
-    }
-
     setPaymentLoading(true);
+    setPaymentStepText('Securing your room...');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // If sandbox mode, run the premium visual timer simulator
-    if (apiConnectionStatus === 'sandbox') {
-      const steps = [
-        "Contacting payment gateways...",
-        "Requesting authorization with your bank...",
-        "Securing token handshake...",
-        "Payment authorized! Finalizing booking..."
-      ];
+    let resId = 'MOCK-RES-' + Math.floor(100000 + Math.random() * 900000);
+    let amount = finalTotal;
 
-      let currentStepIdx = 0;
-      setPaymentStepText(steps[0]);
+    // Create ERP reservation if live
+    if (apiConnectionStatus !== 'sandbox') {
+      try {
+        setPaymentStepText('Holding your room in ERP...');
+        let targetRoomType = 'Deluxe';
+        if (roomType === 'deluxe2') targetRoomType = 'Deluxe 2';
+        else if (roomType === 'deluxe3') targetRoomType = 'Deluxe 3';
+        else if (roomType === 'deluxe4') targetRoomType = 'Deluxe 4';
 
-      const timer = setInterval(() => {
-        currentStepIdx++;
-        if (currentStepIdx < steps.length) {
-          setPaymentStepText(steps[currentStepIdx]);
-        } else {
-          clearInterval(timer);
-          const generatedRef = "BNG-MOCK-" + Math.floor(100000 + Math.random() * 900000);
-          setBookingRef(generatedRef);
+        if (availableRoomsList.length > 0) {
+          const found = availableRoomsList.find((r: any) => {
+            const typeId = (r.roomTypeId || '').toLowerCase();
+            if (roomType === 'deluxe2' && (typeId.includes('deluxe2') || typeId.includes('twin') || typeId.includes('2'))) return true;
+            if (roomType === 'deluxe3' && (typeId.includes('deluxe3') || typeId.includes('triple') || typeId.includes('3'))) return true;
+            if (roomType === 'deluxe4' && (typeId.includes('deluxe4') || typeId.includes('quad') || typeId.includes('family') || typeId.includes('4'))) return true;
+            return false;
+          });
+          if (found) targetRoomType = found.roomTypeId;
+        }
+
+        const response = await fetch('/api/booking/create_reservation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            property: "BRAJ-NIDHI-GUEST-HOUSE-VRN",
+            check_in_date: checkIn,
+            check_out_date: checkOut,
+            booking_type: "Walk-In",
+            hold_type: "BN-Website Hold-0001",
+            guest: {
+              name: `${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}`,
+              email: guestDetails.email,
+              phone: guestDetails.phone
+            },
+            rooms: [{ room_type: targetRoomType, qty: 1, adults, children }]
+          })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          resId = result.reservationId || result.reservation_id || resId;
+          if (result.amount) amount = Number(result.amount);
+          else if (result.net_amount) amount = Number(result.net_amount);
+          setErpAmount(amount);
+        }
+      } catch (err: any) {
+        console.error('ERP reservation error:', err);
+        setApiConnectionStatus('error');
+      }
+    }
+
+    setReservationId(resId);
+
+    // Load Razorpay and open checkout
+    try {
+      setPaymentStepText('Opening payment gateway...');
+      const loaded = await loadRazorpayScript();
+      if (!loaded) throw new Error('Could not load Razorpay. Check your internet connection.');
+
+      setPaymentStepText('Creating secure order...');
+      const orderRes = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, currency: 'INR', reservation_id: resId }),
+      });
+      const orderData = await orderRes.json();
+      if (!orderRes.ok) throw new Error(orderData.error || 'Failed to create payment order');
+
+      setPaymentLoading(false);
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Braj Nidhi Guesthouse',
+        description: `Booking ${resId}`,
+        image: '/logo.png',
+        order_id: orderData.order_id,
+        handler: async (response: any) => {
+          setPaymentLoading(true);
+          setPaymentStepText('Verifying payment...');
+
+          const verifyRes = await fetch('/api/payment/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+          const verifyData = await verifyRes.json();
+          if (!verifyRes.ok) throw new Error(verifyData.error || 'Payment verification failed');
+
+          setPaymentStepText('Confirming booking...');
+          try {
+            const confirmRes = await fetch('/api/booking/confirm_payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                reservation_id: resId,
+                amount,
+                mode_of_payment: 'Razorpay',
+                gateway_payment_id: response.razorpay_payment_id,
+              }),
+            });
+            const confirmData = await confirmRes.json();
+            const ref = confirmData.bookingReference || confirmData.bookingRef || confirmData.reservationId || resId;
+            setBookingRef(ref);
+          } catch {
+            setBookingRef(response.razorpay_payment_id);
+          }
+
           setPaymentLoading(false);
           setCurrentStep(3);
           window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      }, 1200);
-      return;
-    }
+        },
+        prefill: {
+          name: `${guestDetails.firstName} ${guestDetails.lastName}`.trim(),
+          email: guestDetails.email,
+          contact: guestDetails.phone,
+        },
+        theme: { color: '#C89B3C' },
+        modal: {
+          ondismiss: () => {
+            setPaymentLoading(false);
+            setPaymentStepText('');
+          },
+        },
+      };
 
-    // Live mode payment processing
-    try {
-      const headers = getProxyHeaders();
-      const currentAmount = erpAmount !== null ? erpAmount : finalTotal;
-
-      // 1. Create Payment Order
-      setPaymentStepText("Creating secure payment order in ERP...");
-      const orderRes = await fetch('/api/booking/create_payment_order', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          reservation_id: reservationId,
-          amount: currentAmount,
-          currency: "INR"
-        })
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', (response: any) => {
+        setPaymentLoading(false);
+        alert(`Payment failed: ${response.error.description}`);
       });
+      rzp.open();
 
-      const orderResult = await orderRes.json();
-      if (!orderRes.ok) {
-        throw new Error(orderResult.error || 'Failed to create payment order in ERP');
-      }
-
-      // 2. Confirm Payment
-      setPaymentStepText("Confirming payment receipt with ERP...");
-      const payConfirmRes = await fetch('/api/booking/confirm_payment', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          reservation_id: reservationId,
-          amount: currentAmount,
-          mode_of_payment: paymentMethod.toUpperCase(),
-          gateway_payment_id: "PAY-" + Math.floor(100000 + Math.random() * 900000)
-        })
-      });
-
-      const confirmResult = await payConfirmRes.json();
-      setPaymentLoading(false);
-
-      if (!payConfirmRes.ok) {
-        throw new Error(confirmResult.error || 'Failed to confirm payment in ERP');
-      }
-
-      // Save confirmed booking reference from ERP
-      const generatedRef = confirmResult.bookingReference || confirmResult.bookingRef || confirmResult.reservationId || reservationId;
-      setBookingRef(generatedRef);
-      setCurrentStep(3);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error: any) {
-      console.error('ERP payment flow error:', error);
+      console.error('Payment error:', error);
       setPaymentLoading(false);
-      alert(`ERP Payment Error: ${error.message}. Running payment simulation instead to complete checkout.`);
-      const generatedRef = "BNG-FAILOVER-" + Math.floor(100000 + Math.random() * 900000);
-      setBookingRef(generatedRef);
-      setCurrentStep(3);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      alert(`Payment Error: ${error.message}`);
     }
   };
+
 
   return (
     <div className="booking-page-mmt">
       {/* Dynamic Scoped CSS Stylesheet */}
       <style dangerouslySetInnerHTML={{ __html: `
         .booking-page-mmt {
-          background: linear-gradient(180deg, #f7f0e5 0%, #ffffff 62%);
+          background: #f5f0e8;
           color: #000000;
-          font-family: 'Inter', sans-serif;
+          font-family: 'Outfit', sans-serif;
           min-height: 100vh;
           padding-top: 120px;
-          padding-bottom: 80px;
+          padding-bottom: 0;
         }
 
+        .booking-page-mmt * {
+          font-family: 'Outfit', sans-serif;
+        }
         .booking-page-mmt h1,
         .booking-page-mmt h2,
         .booking-page-mmt h3,
         .booking-page-mmt h4,
         .booking-page-mmt h5,
-        .booking-page-mmt h6,
+        .booking-page-mmt h6 {
+          font-family: 'Bebas Neue', cursive !important;
+          font-weight: 400 !important;
+          color: #000000;
+          letter-spacing: 0.5px;
+        }
         .booking-page-mmt p,
         .booking-page-mmt span,
         .booking-page-mmt label,
@@ -784,46 +726,44 @@ export default function BookingPage() {
           color: #000000;
         }
 
-        /* Booking page override for reused home header on light background */
-        .booking-page-mmt #main-header {
-          background: rgba(255, 255, 255, 0.96);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        .booking-page-mmt header {
+          background: rgba(255, 255, 255, 0.92);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
         }
-        .booking-page-mmt #main-header nav ul li a,
-        .booking-page-mmt #main-header .nav-btns .btn-login {
-          color: #111111 !important;
+        .booking-page-mmt header nav ul li a {
+          font-family: 'Bebas Neue', cursive !important;
+          font-size: 1.25rem !important;
+          font-weight: 400 !important;
+          letter-spacing: 0.05em !important;
+          color: #000000 !important;
         }
-        .booking-page-mmt #main-header .nav-btns .btn-book {
-          color: #ffffff !important;
-          background: #111111;
-          border: 1px solid #111111;
+        .booking-page-mmt header .nav-btns .btn-book {
+          font-family: 'Bebas Neue', cursive !important;
+          font-size: 1.25rem !important;
+          font-weight: 400 !important;
+          letter-spacing: 0.05em !important;
         }
 
-        /* PREMIUM MMT LIGHT HEADER */
         .booking-header-bar {
           position: fixed;
           top: 0; left: 0; right: 0;
-          height: 90px;
-          background: rgba(255, 255, 255, 0.96);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+          height: 88px;
+          background: #ffffff;
+          border-bottom: 1px solid #e5e7eb;
           z-index: 1000;
           display: flex;
           flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
           gap: 16px;
-          padding: 0 6%;
+          padding: 0 5%;
           transition: all 0.3s ease;
         }
-        
+
         .booking-header-bar.scrolled {
-          background: rgba(255, 255, 255, 0.99);
-          border-bottom-color: rgba(212, 175, 55, 0.18);
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         }
 
         .booking-logo img {
@@ -835,7 +775,6 @@ export default function BookingPage() {
           transform: scale(1.04);
         }
 
-        /* STEPPER DESIGN */
         .stepper-container {
           display: flex;
           align-items: center;
@@ -846,15 +785,15 @@ export default function BookingPage() {
           display: flex;
           align-items: center;
           gap: 10px;
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 500;
-          color: rgba(44, 37, 32, 0.5);
+          color: rgba(107, 114, 128, 0.6);
           position: relative;
           transition: all 0.3s;
         }
 
         .stepper-item.active {
-          color: #8b0000;
+          color: #1d6de5;
           font-weight: 600;
         }
 
@@ -866,21 +805,21 @@ export default function BookingPage() {
           width: 24px;
           height: 24px;
           border-radius: 50%;
-          background: rgba(0, 0, 0, 0.05);
-          border: 1px solid rgba(0, 0, 0, 0.1);
+          background: rgba(0, 0, 0, 0.04);
+          border: 1px solid rgba(0, 0, 0, 0.08);
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 11px;
           transition: all 0.3s;
-          color: #2c2520;
+          color: #6B7280;
         }
 
         .stepper-item.active .stepper-circle {
-          background: #8b0000;
-          border-color: #8b0000;
+          background: #1d6de5;
+          border-color: #1d6de5;
           color: #ffffff;
-          box-shadow: 0 0 10px rgba(139, 0, 0, 0.25);
+          box-shadow: 0 0 16px rgba(29, 109, 229, 0.35);
         }
 
         .stepper-item.completed .stepper-circle {
@@ -890,47 +829,54 @@ export default function BookingPage() {
         }
 
         .stepper-arrow {
-          color: rgba(0, 0, 0, 0.15);
+          color: rgba(0, 0, 0, 0.12);
         }
 
-        /* LAYOUT DESIGN */
         .booking-grid-mmt {
-          max-width: 1240px;
+          max-width: 1380px;
           margin: 0 auto;
-          padding: 0 20px;
+          padding: 0 32px;
           display: grid;
           grid-template-columns: 8fr 4fr;
-          gap: 30px;
+          gap: 32px;
           align-items: start;
         }
 
         .hero-banner {
-          max-width: 1240px;
-          margin: 0 auto 32px;
-          padding: 32px;
-          background: linear-gradient(135deg, rgba(255, 247, 233, 0.96), rgba(243, 225, 196, 0.88));
-          border: 1px solid rgba(212, 175, 55, 0.22);
+          max-width: 1440px;
+          margin: 0 auto 40px;
+          padding: 44px;
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(212, 175, 55, 0.25);
           border-radius: 28px;
           box-shadow: 0 22px 50px rgba(0, 0, 0, 0.06);
           display: grid;
           grid-template-columns: 1.5fr 1fr;
           gap: 24px;
           align-items: center;
+          transition: all 0.4s ease;
+        }
+
+        .hero-banner:hover {
+          border-color: rgba(212, 175, 55, 0.4);
+          box-shadow: 0 25px 60px rgba(200, 155, 60, 0.1);
         }
 
         .hero-copy h1 {
-          font-size: 2.8rem;
+          font-size: 3.6rem;
           line-height: 1.02;
-          margin: 0 0 14px;
-          color: #7b3f0a;
+          margin: 0 0 16px;
+          color: #000000;
         }
 
         .hero-copy p {
-          font-size: 1rem;
-          color: #5f4c42;
+          font-size: 1.1rem;
+          color: #6B7280;
           line-height: 1.7;
-          margin: 0 0 24px;
-          max-width: 620px;
+          margin: 0 0 26px;
+          max-width: 680px;
         }
 
         .hero-stats {
@@ -943,49 +889,55 @@ export default function BookingPage() {
           flex: 1;
           min-width: 160px;
           padding: 18px 20px;
-          background: rgba(255, 255, 255, 0.94);
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
           border-radius: 18px;
           border: 1px solid rgba(212, 175, 55, 0.16);
-          color: #4c3e35;
+          color: #000000;
           box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04);
+          transition: all 0.3s ease;
+        }
+
+        .hero-stat:hover {
+          border-color: rgba(212, 175, 55, 0.35);
+          transform: translateY(-2px);
+          box-shadow: 0 16px 32px rgba(200, 155, 60, 0.12);
         }
 
         .hero-stat h3 {
           margin: 0 0 6px;
           font-size: 1.15rem;
           font-weight: 800;
-          color: #8b0000;
+          color: #C89B3C;
         }
 
         .hero-stat p {
           margin: 0;
           font-size: 0.92rem;
-          color: #6e5b4e;
+          color: #6B7280;
           line-height: 1.5;
         }
 
-        /* LEFT SIDE CARDS */
         .mmt-card {
           background: #ffffff;
-          border: 1px solid rgba(212, 175, 55, 0.14);
+          border: 1px solid rgba(0, 0, 0, 0.08);
           border-radius: 20px;
-          padding: 26px;
-          margin-bottom: 26px;
-          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.05);
-          transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+          padding: 32px;
+          margin-bottom: 24px;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+          transition: box-shadow 0.3s;
         }
 
         .mmt-card:hover {
-          transform: translateY(-2px);
-          border-color: rgba(212, 175, 55, 0.24);
-          box-shadow: 0 22px 45px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
         }
 
         .card-header-mmt {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.12);
           padding-bottom: 16px;
           margin-bottom: 20px;
         }
@@ -993,30 +945,26 @@ export default function BookingPage() {
         .card-header-title {
           font-size: 18px;
           font-weight: 700;
-          color: #1a1512;
+          color: #000000;
+          font-family: 'Outfit', sans-serif;
           display: flex;
           align-items: center;
           gap: 10px;
         }
 
         .card-header-title svg {
-          color: #8b0000;
+          color: #1d6de5;
         }
 
-        /* LOGIN INTEGRATION CARD */
-        @keyframes borderPulse {
-          0% {
-            border-color: rgba(212, 175, 55, 0.4);
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.05);
-          }
-          50% {
-            border-color: rgba(212, 175, 55, 0.95);
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.18);
-          }
-          100% {
-            border-color: rgba(212, 175, 55, 0.4);
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.05);
-          }
+        @keyframes goldBorderPulse {
+          0% { border-color: rgba(212, 175, 55, 0.3); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.05); }
+          50% { border-color: rgba(212, 175, 55, 0.8); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); }
+          100% { border-color: rgba(212, 175, 55, 0.3); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.05); }
+        }
+
+        @keyframes goldShimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
         }
 
         @keyframes sparkleRotate {
@@ -1025,24 +973,33 @@ export default function BookingPage() {
           100% { transform: scale(1) rotate(0deg); }
         }
 
+        @keyframes floatUp {
+          0% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+          100% { transform: translateY(0); }
+        }
+
+        @keyframes glassShimmer {
+          0% { opacity: 0; transform: translateX(-100%); }
+          50% { opacity: 0.5; }
+          100% { opacity: 0; transform: translateX(100%); }
+        }
+
         .login-banner-card {
-          background: #fcfbfa;
-          border: 2px dashed rgba(212, 175, 55, 0.5);
+          background: #fff8e7;
+          border: 1.5px solid rgba(245, 158, 11, 0.35);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 24px 28px;
-          border-radius: 20px;
-          margin-bottom: 28px;
-          animation: borderPulse 4s infinite ease-in-out;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          padding: 20px 24px;
+          border-radius: 12px;
+          margin-bottom: 20px;
+          transition: all 0.2s ease;
         }
 
         .login-banner-card:hover {
-          transform: translateY(-2px);
-          border-color: #d4af37;
-          background: #ffffff;
-          box-shadow: 0 15px 35px rgba(212, 175, 55, 0.25);
+          border-color: #f59e0b;
+          box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15);
         }
 
         .login-banner-info {
@@ -1055,8 +1012,8 @@ export default function BookingPage() {
           width: 52px;
           height: 52px;
           border-radius: 50%;
-          background: #f9f3e3;
-          border: 1.5px solid rgba(212, 175, 55, 0.25);
+          background: rgba(255, 255, 255, 0.9);
+          border: 1.5px solid rgba(212, 175, 55, 0.3);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1080,23 +1037,24 @@ export default function BookingPage() {
 
         .login-banner-text p {
           font-size: 14.5px;
-          color: #2c2520;
+          color: #6B7280;
           font-weight: 500;
           margin: 0;
           line-height: 1.4;
         }
 
         .btn-login-mmt {
-          height: 44px;
-          width: 150px;
-          background: #d4af37;
-          color: #000000;
-          font-weight: 800;
+          height: 40px;
+          width: 140px;
+          background: #1d6de5;
+          color: #ffffff;
+          font-weight: 700;
           font-size: 14px;
-          border-radius: 30px;
+          font-family: 'Outfit', sans-serif;
+          border-radius: 8px;
           border: none;
           cursor: pointer;
-          transition: all 0.3s;
+          transition: all 0.2s;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1106,19 +1064,18 @@ export default function BookingPage() {
         }
 
         .btn-login-mmt:hover {
-          background: #c39e2e;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(212, 175, 55, 0.35);
+          background: #1557c0;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px rgba(29, 109, 229, 0.3);
         }
 
-        /* ROOM DETAILS SPLIT CARD */
         .room-review-card {
           background: #ffffff;
-          border: 1px solid rgba(0,0,0,0.07);
-          border-radius: 20px;
+          border: 1px solid #e5e7eb;
+          border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 12px 36px rgba(0,0,0,0.07);
-          margin-bottom: 6px;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+          margin-bottom: 20px;
         }
 
         .room-review-body {
@@ -1144,8 +1101,8 @@ export default function BookingPage() {
           position: absolute;
           top: 0;
           left: 0;
-          background: linear-gradient(135deg, #8b0000 0%, #b71c1c 100%);
-          color: #fff;
+          background: linear-gradient(135deg, #C89B3C 0%, #D4AF37 100%);
+          color: #000000;
           font-size: 11px;
           font-weight: 800;
           padding: 8px 20px 8px 14px;
@@ -1157,16 +1114,20 @@ export default function BookingPage() {
           text-transform: uppercase;
         }
 
+        .room-best-choice-ribbon svg {
+          color: #000000;
+        }
+
         .room-garden-view-label {
           position: absolute;
           bottom: 14px;
           left: 14px;
-          background: rgba(255,255,255,0.92);
+          background: rgba(255,255,255,0.85);
           border-radius: 30px;
           padding: 6px 14px;
           font-size: 12px;
           font-weight: 600;
-          color: #1a1512;
+          color: #000000;
           display: flex;
           align-items: center;
           gap: 6px;
@@ -1182,9 +1143,9 @@ export default function BookingPage() {
         }
 
         .room-review-title {
-          font-size: 20px;
+          font-size: 26px;
           font-weight: 900;
-          color: #0f0f0f;
+          color: #000000;
           letter-spacing: 0.5px;
           text-transform: uppercase;
           margin: 0;
@@ -1204,20 +1165,20 @@ export default function BookingPage() {
           gap: 8px;
           padding: 9px 14px;
           border-radius: 10px;
-          border: 1px solid rgba(0,0,0,0.1);
-          background: #ffffff;
+          border: 1px solid rgba(200, 155, 60, 0.15);
+          background: rgba(255, 255, 255, 0.7);
           font-size: 13px;
           font-weight: 600;
-          color: #2c2520;
+          color: #000000;
         }
 
         .room-feature-badge.red {
-          border-color: rgba(139,0,0,0.2);
-          color: #8b0000;
+          border-color: rgba(200,155,60,0.25);
+          color: #C89B3C;
         }
 
         .room-feature-badge.red svg {
-          color: #8b0000;
+          color: #C89B3C;
         }
 
         .room-feature-badge.green {
@@ -1234,7 +1195,7 @@ export default function BookingPage() {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          border: 1px solid rgba(0,0,0,0.07);
+          border: 1px solid rgba(212, 175, 55, 0.12);
           border-radius: 14px;
           overflow: hidden;
         }
@@ -1244,7 +1205,7 @@ export default function BookingPage() {
           display: flex;
           flex-direction: column;
           gap: 4px;
-          background: #fff;
+          background: rgba(255,255,255,0.6);
         }
 
         .date-box-new-label {
@@ -1253,19 +1214,19 @@ export default function BookingPage() {
           gap: 6px;
           font-size: 10px;
           font-weight: 700;
-          color: rgba(44,37,32,0.5);
+          color: #6B7280;
           text-transform: uppercase;
           letter-spacing: 0.8px;
         }
 
         .date-box-new-label svg {
-          color: #8b0000;
+          color: #C89B3C;
         }
 
         .date-box-new-value {
           font-size: 16px;
           font-weight: 800;
-          color: #0f0f0f;
+          color: #000000;
           margin: 0;
         }
 
@@ -1276,19 +1237,19 @@ export default function BookingPage() {
           align-items: center;
           justify-content: center;
           gap: 4px;
-          background: rgba(139,0,0,0.04);
-          border-left: 1px solid rgba(0,0,0,0.07);
-          border-right: 1px solid rgba(0,0,0,0.07);
+          background: rgba(200, 155, 60, 0.06);
+          border-left: 1px solid rgba(212, 175, 55, 0.12);
+          border-right: 1px solid rgba(212, 175, 55, 0.12);
         }
 
         .date-nights-center .nights-count {
           font-size: 15px;
           font-weight: 800;
-          color: #8b0000;
+          color: #C89B3C;
         }
 
         .date-nights-center svg {
-          color: #8b0000;
+          color: #C89B3C;
         }
 
         .room-review-footer {
@@ -1296,8 +1257,8 @@ export default function BookingPage() {
           align-items: center;
           justify-content: space-between;
           padding: 16px 24px;
-          border-top: 1px solid rgba(0,0,0,0.06);
-          background: rgba(0,0,0,0.01);
+          border-top: 1px solid rgba(212, 175, 55, 0.1);
+          background: rgba(255, 255, 255, 0.4);
           position: relative;
           overflow: hidden;
         }
@@ -1312,24 +1273,24 @@ export default function BookingPage() {
           width: 38px;
           height: 38px;
           border-radius: 50%;
-          background: rgba(139,0,0,0.06);
+          background: rgba(200, 155, 60, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #8b0000;
+          color: #C89B3C;
           flex-shrink: 0;
         }
 
         .room-review-footer-text h5 {
           font-size: 13px;
           font-weight: 700;
-          color: #0f0f0f;
+          color: #000000;
           margin: 0 0 2px;
         }
 
         .room-review-footer-text p {
           font-size: 12px;
-          color: rgba(44,37,32,0.5);
+          color: #6B7280;
           margin: 0;
         }
 
@@ -1350,26 +1311,26 @@ export default function BookingPage() {
           width: 52px;
           height: 52px;
           border-radius: 50%;
-          background: rgba(139,0,0,0.08);
+          background: rgba(200, 155, 60, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #8b0000;
+          color: #C89B3C;
           flex-shrink: 0;
           margin-top: 2px;
         }
 
         .room-review-header-text h2 {
-          font-size: 22px;
+          font-size: 28px;
           font-weight: 800;
-          color: #0f0f0f;
-          margin: 0 0 4px;
+          color: #000000;
+          margin: 0 0 6px;
           line-height: 1.2;
         }
 
         .room-review-header-text p {
-          font-size: 14px;
-          color: rgba(44,37,32,0.55);
+          font-size: 15px;
+          color: #6B7280;
           margin: 0;
         }
 
@@ -1400,15 +1361,15 @@ export default function BookingPage() {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          background: rgba(0, 0, 0, 0.02);
-          border: 1px solid rgba(0, 0, 0, 0.05);
+          background: rgba(255, 255, 255, 0.5);
+          border: 1px solid rgba(212, 175, 55, 0.1);
           border-radius: 12px;
           padding: 14px 20px;
         }
 
         .stay-date-box h5 {
           font-size: 11px;
-          color: rgba(44, 37, 32, 0.5);
+          color: #6B7280;
           text-transform: uppercase;
           margin: 0 0 4px;
         }
@@ -1416,22 +1377,21 @@ export default function BookingPage() {
         .stay-date-box p {
           font-size: 15px;
           font-weight: 700;
-          color: #1a1512;
+          color: #000000;
           margin: 0;
         }
 
         .stay-duration-circle {
           padding: 6px 12px;
-          background: rgba(139, 0, 0, 0.08);
-          border: 1px solid rgba(139, 0, 0, 0.2);
+          background: rgba(200, 155, 60, 0.1);
+          border: 1px solid rgba(200, 155, 60, 0.25);
           border-radius: 20px;
           font-size: 12px;
           font-weight: 700;
-          color: #8b0000;
+          color: #C89B3C;
           text-align: center;
         }
 
-        /* SUITE SELECTION CARDS */
         .suite-selector-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1439,8 +1399,10 @@ export default function BookingPage() {
         }
 
         .suite-selector-card {
-          border: 1.5px solid rgba(0, 0, 0, 0.08);
-          background: #ffffff;
+          border: 1.5px solid rgba(212, 175, 55, 0.12);
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
           border-radius: 14px;
           padding: 18px;
           cursor: pointer;
@@ -1450,14 +1412,16 @@ export default function BookingPage() {
         }
 
         .suite-selector-card:hover {
-          border-color: rgba(139, 0, 0, 0.3);
-          background: rgba(0, 0, 0, 0.01);
+          border-color: rgba(200, 155, 60, 0.35);
+          background: rgba(255, 255, 255, 0.85);
+          transform: translateY(-2px);
+          box-shadow: 0 12px 30px rgba(200, 155, 60, 0.08);
         }
 
         .suite-selector-card.selected {
-          border-color: #8b0000;
-          background: rgba(139, 0, 0, 0.04);
-          box-shadow: 0 8px 25px rgba(139, 0, 0, 0.08);
+          border-color: #1d6de5;
+          background: rgba(29, 109, 229, 0.04);
+          box-shadow: 0 4px 16px rgba(29, 109, 229, 0.12);
         }
 
         .suite-selector-card.selected::after {
@@ -1467,7 +1431,7 @@ export default function BookingPage() {
           width: 0; height: 0;
           border-style: solid;
           border-width: 0 35px 35px 0;
-          border-color: transparent #8b0000 transparent transparent;
+          border-color: transparent #1d6de5 transparent transparent;
         }
 
         .suite-selector-card .selected-check {
@@ -1480,23 +1444,23 @@ export default function BookingPage() {
         .suite-selector-card h4 {
           font-size: 16px;
           font-weight: 700;
-          color: #1a1512;
+          color: #000000;
           margin: 0 0 6px;
         }
 
         .suite-selector-card p {
           font-size: 13px;
-          color: rgba(44, 37, 32, 0.6);
+          color: #6B7280;
           margin: 0 0 12px;
         }
 
         .suite-selector-card .price-tag {
           font-size: 18px;
           font-weight: 800;
-          color: #8b0000;
+          color: #1d6de5;
+          font-family: 'Outfit', sans-serif;
         }
 
-        /* FORM INPUT LABELS MMT */
         .form-grid-mmt {
           display: grid;
           grid-template-columns: 2fr 5fr 5fr;
@@ -1520,24 +1484,23 @@ export default function BookingPage() {
         .input-wrapper-mmt label {
           font-size: 12px;
           font-weight: 600;
-          color: #8b0000;
+          color: #6B7280;
           margin-bottom: 6px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
+          font-family: 'Outfit', sans-serif;
         }
 
-        .input-wrapper-mmt input, 
-        .input-wrapper-mmt select, 
+        .input-wrapper-mmt input,
+        .input-wrapper-mmt select,
         .input-wrapper-mmt textarea {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: #ffffff;
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.15);
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
           border-radius: 8px;
           padding: 12px 14px;
           font-size: 14px;
-          color: #1a1512;
+          font-family: 'Outfit', sans-serif;
+          color: #000000;
           outline: none;
           transition: all 0.2s ease;
           width: 100%;
@@ -1545,12 +1508,11 @@ export default function BookingPage() {
         .input-wrapper-mmt input:focus,
         .input-wrapper-mmt select:focus,
         .input-wrapper-mmt textarea:focus {
-          border-color: #8b0000;
+          border-color: #1d6de5;
           background: #ffffff;
-          box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+          box-shadow: 0 0 0 3px rgba(29, 109, 229, 0.12);
         }
 
-        /* 9. SPECIAL REQUESTS */
         .special-requests-badges {
           display: flex;
           flex-wrap: wrap;
@@ -1558,13 +1520,14 @@ export default function BookingPage() {
           margin-top: 10px;
         }
         .request-badge-item {
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.1);
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(212, 175, 55, 0.15);
           padding: 10px 16px;
           border-radius: 100px;
           font-size: 12px;
           font-weight: 600;
-          color: #2c2520;
+          color: #000000;
           cursor: pointer;
           transition: all 0.2s ease;
           display: flex;
@@ -1572,17 +1535,16 @@ export default function BookingPage() {
           gap: 6px;
         }
         .request-badge-item:hover {
-          border-color: rgba(139, 0, 0, 0.3);
-          background: rgba(0, 0, 0, 0.01);
+          border-color: rgba(200, 155, 60, 0.35);
+          background: rgba(255, 255, 255, 0.9);
         }
         .request-badge-item.active {
-          border-color: #8b0000;
-          background: rgba(139, 0, 0, 0.08);
-          color: #8b0000;
+          border-color: #C89B3C;
+          background: rgba(200, 155, 60, 0.1);
+          color: #C89B3C;
           font-weight: 700;
         }
 
-        /* 10. EXTRA VALUES & ADDONS */
         .addons-grid-mmt {
           display: flex;
           flex-direction: column;
@@ -1592,14 +1554,16 @@ export default function BookingPage() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.08);
+          background: rgba(255, 255, 255, 0.6);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(212, 175, 55, 0.12);
           border-radius: 12px;
           padding: 16px 20px;
           transition: all 0.2s ease;
         }
         .addon-item-row:hover {
-          background: rgba(0, 0, 0, 0.01);
+          background: rgba(255, 255, 255, 0.85);
+          border-color: rgba(212, 175, 55, 0.25);
         }
         .addon-text-group {
           display: flex;
@@ -1607,8 +1571,8 @@ export default function BookingPage() {
           gap: 15px;
         }
         .addon-icon-wrapper {
-          color: #8b0000;
-          background: rgba(139, 0, 0, 0.06);
+          color: #C89B3C;
+          background: rgba(200, 155, 60, 0.1);
           width: 40px;
           height: 40px;
           border-radius: 8px;
@@ -1619,12 +1583,12 @@ export default function BookingPage() {
         .addon-text h5 {
           font-size: 14px;
           font-weight: 800;
-          color: #1a1512;
+          color: #000000;
           margin: 0 0 3px;
         }
         .addon-text p {
           font-size: 11px;
-          color: rgba(44, 37, 32, 0.6);
+          color: #6B7280;
           margin: 0;
         }
         .addon-price-action {
@@ -1635,7 +1599,7 @@ export default function BookingPage() {
         .addon-price {
           font-size: 15px;
           font-weight: 800;
-          color: #8b0000;
+          color: #C89B3C;
         }
         .switch-toggle-mmt {
           position: relative;
@@ -1678,7 +1642,6 @@ export default function BookingPage() {
           transform: translateX(22px);
         }
 
-        /* 11. SIDEBAR & RECEIPT STYLES */
         .mmt-sidebar {
           position: sticky;
           top: 130px;
@@ -1692,19 +1655,23 @@ export default function BookingPage() {
         }
 
         .summary-card-header h3 {
-          font-size: 20px;
+          font-size: 18px;
           font-weight: 700;
-          color: #8b0000;
+          color: #000000;
+          font-family: 'Outfit', sans-serif;
           display: flex;
           align-items: center;
           gap: 8px;
+        }
+        .summary-card-header h3 svg {
+          color: #1d6de5;
         }
 
         .summary-row-mmt {
           display: flex;
           justify-content: space-between;
           font-size: 14px;
-          color: rgba(44, 37, 32, 0.65);
+          color: #6B7280;
           margin-bottom: 12px;
         }
 
@@ -1717,31 +1684,20 @@ export default function BookingPage() {
           border-top: 1.5px solid rgba(0, 0, 0, 0.08);
           margin-top: 16px;
           padding-top: 16px;
-          font-size: 20px;
-          font-weight: 900;
-          color: #8b0000;
+          font-size: 18px;
+          font-weight: 800;
+          color: #000000;
+          font-family: 'Outfit', sans-serif;
         }
-
-        /* PROMO BOX DESIGN */
-        .promo-container-mmt {
-          margin-top: 20px;
-          padding: 16px;
-          background: #faf9f5;
-          border: 1px solid rgba(0, 0, 0, 0.06);
-          border-radius: 12px;
-        }
-
-        .promo-input-group {
-          display: flex;
-          gap: 10px;
-          margin-top: 8px;
+        .summary-row-mmt.total span:last-child {
+          color: #1d6de5;
         }
 
         .promo-input-group input {
           flex: 1;
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.15);
-          color: #1a1512;
+          background: rgba(255, 255, 255, 0.8);
+          border: 1px solid rgba(212, 175, 55, 0.2);
+          color: #000000;
           padding: 10px 14px;
           border-radius: 8px;
           font-size: 13px;
@@ -1752,9 +1708,9 @@ export default function BookingPage() {
 
         .btn-apply-promo {
           padding: 10px 18px;
-          background: rgba(139, 0, 0, 0.06);
-          color: #8b0000;
-          border: 1px solid rgba(139, 0, 0, 0.2);
+          background: rgba(200, 155, 60, 0.1);
+          color: #C89B3C;
+          border: 1px solid rgba(200, 155, 60, 0.25);
           border-radius: 8px;
           font-weight: 700;
           font-size: 13px;
@@ -1763,91 +1719,53 @@ export default function BookingPage() {
         }
 
         .btn-apply-promo:hover {
-          background: #8b0000;
-          color: #ffffff;
+          background: #C89B3C;
+          color: #000000;
         }
 
-        .promo-badges-quick {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          margin-top: 14px;
-          border-top: 1px solid rgba(0, 0, 0, 0.06);
-          padding-top: 14px;
-        }
 
-        .quick-promo-pill {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 8px 12px;
-          border-radius: 8px;
-          background: rgba(139, 0, 0, 0.03);
-          border: 1px dashed rgba(139, 0, 0, 0.2);
-          cursor: pointer;
-          transition: all 0.3s;
-        }
-
-        .quick-promo-pill:hover {
-          background: rgba(139, 0, 0, 0.06);
-          border-color: #8b0000;
-        }
-
-        .quick-promo-code {
-          font-size: 12px;
-          font-weight: 700;
-          color: #8b0000;
-          background: rgba(139, 0, 0, 0.08);
-          padding: 2px 6px;
-          border-radius: 4px;
-        }
-
-        .quick-promo-desc {
-          font-size: 11px;
-          color: rgba(44, 37, 32, 0.6);
-        }
-
-        /* PRIMARY ACTION GRADIENT BUTTON WITH GLOW */
         .btn-primary-mmt {
           width: 100%;
           padding: 16px;
-          background: linear-gradient(135deg, #d4af37 0%, #8b0000 100%);
+          background: linear-gradient(135deg, #1d6de5, #1557c0);
           color: #ffffff;
           border: none;
-          border-radius: 14px;
-          font-weight: 800;
+          border-radius: 10px;
+          font-weight: 700;
           font-size: 16px;
+          font-family: 'Outfit', sans-serif;
           cursor: pointer;
-          margin-top: 24px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 14px 30px rgba(212, 175, 55, 0.24);
+          margin-top: 20px;
+          transition: all 0.25s ease;
+          box-shadow: 0 8px 24px rgba(29, 109, 229, 0.3);
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 10px;
+          letter-spacing: 0.3px;
         }
 
         .btn-primary-mmt:hover {
           transform: translateY(-2px);
-          box-shadow: 0 15px 35px rgba(139, 0, 0, 0.35);
+          box-shadow: 0 12px 32px rgba(29, 109, 229, 0.4);
         }
 
         .btn-primary-mmt svg {
-          transition: transform 0.3s;
+          transition: transform 0.25s;
         }
 
         .btn-primary-mmt:hover svg {
           transform: translateX(4px);
         }
 
-        /* COMPLETED SUCCESS STATE */
         .success-checkmark-card {
           max-width: 650px;
           margin: 40px auto;
           text-align: center;
           padding: 50px 40px;
-          background: #ffffff;
-          border: 1.5px solid rgba(139, 0, 0, 0.2);
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(20px);
+          border: 1.5px solid rgba(200, 155, 60, 0.2);
           border-radius: 24px;
           box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08);
         }
@@ -1866,11 +1784,10 @@ export default function BookingPage() {
           box-shadow: 0 0 30px rgba(22, 163, 74, 0.15);
         }
 
-        /* MODAL POPUPS */
         .mmt-modal-overlay {
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.6);
+          background: rgba(0, 0, 0, 0.5);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           z-index: 2000;
@@ -1881,8 +1798,9 @@ export default function BookingPage() {
         }
 
         .mmt-modal-content {
-          background: #ffffff;
-          border: 1.5px solid rgba(139, 0, 0, 0.3);
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(24px);
+          border: 1.5px solid rgba(200, 155, 60, 0.3);
           border-radius: 20px;
           max-width: 440px;
           width: 100%;
@@ -1903,10 +1821,9 @@ export default function BookingPage() {
         }
 
         .mmt-modal-close:hover {
-          color: #8b0000;
+          color: #C89B3C;
         }
 
-        /* PAYMENT TAB SELECTORS MMT STYLE */
         .payment-container-split {
           display: flex;
           gap: 24px;
@@ -1924,9 +1841,10 @@ export default function BookingPage() {
         .payment-tab-btn {
           width: 100%;
           padding: 16px;
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          color: rgba(44, 37, 32, 0.7);
+          background: rgba(255, 255, 255, 0.6);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(212, 175, 55, 0.12);
+          color: #6B7280;
           font-weight: 700;
           font-size: 14px;
           border-radius: 12px;
@@ -1940,21 +1858,22 @@ export default function BookingPage() {
         }
 
         .payment-tab-btn:hover {
-          background: rgba(0, 0, 0, 0.02);
-          border-color: rgba(0, 0, 0, 0.15);
+          background: rgba(255, 255, 255, 0.8);
+          border-color: rgba(200, 155, 60, 0.3);
         }
 
         .payment-tab-btn.active {
-          background: rgba(139, 0, 0, 0.04);
-          border: 1.5px solid #8b0000;
-          color: #8b0000;
-          box-shadow: 0 4px 15px rgba(139, 0, 0, 0.08);
+          background: rgba(200, 155, 60, 0.08);
+          border: 1.5px solid #C89B3C;
+          color: #C89B3C;
+          box-shadow: 0 4px 15px rgba(200, 155, 60, 0.12);
         }
 
         .payment-content-pane {
           flex: 1;
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.08);
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(212, 175, 55, 0.12);
           border-radius: 16px;
           padding: 24px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.03);
@@ -1966,9 +1885,9 @@ export default function BookingPage() {
           justify-content: center;
           gap: 8px;
           font-size: 12px;
-          color: rgba(44, 37, 32, 0.5);
+          color: #6B7280;
           margin-top: 16px;
-          border-top: 1px solid rgba(0, 0, 0, 0.06);
+          border-top: 1px solid rgba(212, 175, 55, 0.1);
           padding-top: 16px;
         }
 
@@ -1976,7 +1895,6 @@ export default function BookingPage() {
           color: #16a34a;
         }
 
-        /* SPINNING LOADER FOR SIMULATED TRANSACTION */
         .payment-loading-overlay {
           text-align: center;
           padding: 40px 20px;
@@ -1985,8 +1903,8 @@ export default function BookingPage() {
         .spinner-payment {
           width: 56px;
           height: 56px;
-          border: 4px solid rgba(139, 0, 0, 0.15);
-          border-top: 4px solid #8b0000;
+          border: 4px solid rgba(200, 155, 60, 0.15);
+          border-top: 4px solid #C89B3C;
           border-radius: 50%;
           margin: 0 auto 20px;
           animation: spin 1s linear infinite;
@@ -1997,170 +1915,91 @@ export default function BookingPage() {
           100% { transform: rotate(360deg); }
         }
 
-        /* RESPONSIVE DESIGN */
         @media (max-width: 1024px) {
-          .booking-page-mmt {
-            padding-top: 100px;
-          }
-          .hero-banner {
-            padding: 30px;
-            gap: 25px;
-          }
+          .booking-page-mmt { padding-top: 100px; }
+          .hero-banner { padding: 30px; gap: 25px; }
         }
 
         @media (max-width: 900px) {
-          .booking-grid-mmt {
-            grid-template-columns: 1fr;
-          }
-          .mmt-sidebar {
-            position: static;
-          }
-          .suite-selector-grid {
-            grid-template-columns: 1fr;
-          }
+          .booking-grid-mmt { grid-template-columns: 1fr; }
+          .mmt-sidebar { position: static; }
+          .suite-selector-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
-          .booking-page-mmt {
-            padding-top: 90px;
-            padding-bottom: 40px;
-          }
-          .booking-page-mmt #main-header {
-            padding: 10px 4% !important;
-          }
-          .booking-page-mmt #main-header nav {
-            display: none !important;
-          }
-          .booking-page-mmt #main-header .nav-btns {
-            display: none !important;
-          }
-          .booking-page-mmt #main-header .mobile-menu-btn {
-            display: flex !important;
-          }
-          .hero-banner {
-            grid-template-columns: 1fr;
-            text-align: center;
-            padding: 24px 20px;
-            border-radius: 16px;
-          }
-          .hero-banner div:last-child {
-            text-align: center !important;
-            margin-top: 20px;
-          }
-          .hero-banner div:last-child img {
-            max-width: 100% !important;
-          }
-          .hero-stats {
-            flex-direction: column;
-            gap: 16px;
-            text-align: left;
-            margin-top: 24px;
-          }
-          .hero-stat {
-            min-width: 100%;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-          }
-          .hero-stat:last-child {
-            border-bottom: none;
-          }
-          .room-review-split {
-            grid-template-columns: 1fr;
-            gap: 16px;
-          }
-          .room-review-image {
-            height: 200px;
-          }
-          .form-grid-mmt {
-            grid-template-columns: 1fr;
-            gap: 12px;
-          }
+          .booking-page-mmt { padding-top: 90px; padding-bottom: 40px; }
+          .booking-page-mmt #main-header { padding: 10px 4% !important; }
+          .booking-page-mmt #main-header nav { display: none !important; }
+          .booking-page-mmt #main-header .nav-btns { display: none !important; }
+          .booking-page-mmt #main-header .mobile-menu-btn { display: flex !important; }
+          .hero-banner { grid-template-columns: 1fr; text-align: center; padding: 24px 20px; border-radius: 16px; }
+          .hero-banner div:last-child { text-align: center !important; margin-top: 20px; }
+          .hero-banner div:last-child img { max-width: 100% !important; }
+          .hero-stats { flex-direction: column; gap: 16px; text-align: left; margin-top: 24px; }
+          .hero-stat { min-width: 100%; padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+          .hero-stat:last-child { border-bottom: none; }
+          .room-review-split { grid-template-columns: 1fr; gap: 16px; }
+          .room-review-image { height: 200px; }
+          .form-grid-mmt { grid-template-columns: 1fr; gap: 12px; }
         }
 
         @media (max-width: 600px) {
-          .stepper-container {
-            gap: 8px;
-            justify-content: space-between;
-            width: 100%;
-          }
-          .stepper-item span:last-child {
-            display: none;
-          }
-          .stepper-item.active span:last-child {
-            display: inline-block;
-            font-size: 11px;
-          }
-          .stepper-circle {
-            width: 26px !important;
-            height: 26px !important;
-            font-size: 11px !important;
-          }
-          .form-grid-dual-mmt {
-            grid-template-columns: 1fr;
-            gap: 12px;
-          }
-          .stay-dates-strip {
-            grid-template-columns: 1fr;
-            gap: 12px;
-            text-align: center;
-          }
-          .stay-date-box {
-            text-align: center !important;
-          }
-          .stay-duration-circle {
-            margin: 0 auto;
-            width: fit-content;
-          }
-          .mmt-card {
-            padding: 20px 16px;
-          }
-          .special-requests-badges {
-            gap: 8px;
-          }
-          .request-badge-item {
-            padding: 8px 12px;
-            font-size: 11px;
-          }
+          .stepper-container { gap: 8px; justify-content: space-between; width: 100%; }
+          .stepper-item span:last-child { display: none; }
+          .stepper-item.active span:last-child { display: inline-block; font-size: 11px; }
+          .stepper-circle { width: 26px !important; height: 26px !important; font-size: 11px !important; }
+          .form-grid-dual-mmt { grid-template-columns: 1fr; gap: 12px; }
+          .stay-dates-strip { grid-template-columns: 1fr; gap: 12px; text-align: center; }
+          .stay-date-box { text-align: center !important; }
+          .stay-duration-circle { margin: 0 auto; width: fit-content; }
+          .mmt-card { padding: 20px 16px; }
+          .special-requests-badges { gap: 8px; }
+          .request-badge-item { padding: 8px 12px; font-size: 11px; }
         }
 
         @media (max-width: 500px) {
-          .addon-item-row {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-          }
-          .addon-price-action {
-            width: 100%;
-            justify-content: space-between;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            padding-top: 8px;
-          }
+          .addon-item-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+          .addon-price-action { width: 100%; justify-content: space-between; border-top: 1px solid rgba(0, 0, 0, 0.05); padding-top: 8px; }
         }
 
         @media (max-width: 480px) {
-          .payment-tabs {
-            flex-direction: column;
-            gap: 6px;
-            background: transparent;
-            border: none;
-            padding: 0;
-          }
-          .payment-tab-btn {
-            background: rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 8px;
-            width: 100%;
-          }
+          .payment-tabs { flex-direction: column; gap: 6px; background: transparent; border: none; padding: 0; }
+          .payment-tab-btn { background: rgba(0, 0, 0, 0.03); border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 8px; width: 100%; }
         }
 
-        /* MOBILE MENU DRAWER STYLES */
+        /* Dates row — stack to 2×2 grid on very small screens */
+        .bk-dates-row {
+          display: grid;
+          grid-template-columns: 1fr auto 1fr 1fr;
+          gap: 0;
+          align-items: stretch;
+        }
+        @media (max-width: 400px) {
+          .bk-dates-row {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 12px 8px !important;
+          }
+          .bk-dates-row > div {
+            padding: 0 !important;
+            border-right: none !important;
+            border-bottom: 1px solid #e5e7eb;
+          }
+          .bk-dates-row > div:nth-child(1),
+          .bk-dates-row > div:nth-child(2) {
+            border-bottom: 1px solid #e5e7eb;
+          }
+          .bk-dates-row > div:nth-child(3),
+          .bk-dates-row > div:nth-child(4) {
+            border-bottom: none;
+          }
+          /* Hide the nights circle on tiny screens — shown inline in Check-in col */
+          .bk-nights-bubble { display: none !important; }
+        }
+
         .mobile-menu-overlay {
           position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: rgba(26, 21, 18, 0.4);
+          top: 0; left: 0; width: 100vw; height: 100vh;
+          background: rgba(0, 0, 0, 0.4);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           z-index: 2000;
@@ -2173,7 +2012,8 @@ export default function BookingPage() {
           width: 80%;
           max-width: 320px;
           height: 100%;
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(20px);
           box-shadow: -10px 0 40px rgba(0, 0, 0, 0.12);
           padding: 30px 24px;
           display: flex;
@@ -2187,14 +2027,14 @@ export default function BookingPage() {
           align-items: center;
           justify-content: space-between;
           margin-bottom: 40px;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.1);
           padding-bottom: 20px;
         }
 
         .mobile-menu-close {
           background: none;
           border: none;
-          color: #1a1512;
+          color: #000000;
           cursor: pointer;
           padding: 6px;
           display: flex;
@@ -2214,18 +2054,18 @@ export default function BookingPage() {
         .mobile-nav-links ul li a {
           font-size: 18px;
           font-weight: 600;
-          color: #1a1512 !important;
+          color: #000000 !important;
           text-decoration: none !important;
           transition: color 0.3s;
           display: block;
         }
 
         .mobile-nav-links ul li a:hover {
-          color: #8b0000 !important;
+          color: #C89B3C !important;
         }
 
         .mobile-menu-footer {
-          border-top: 1px solid rgba(0, 0, 0, 0.06);
+          border-top: 1px solid rgba(212, 175, 55, 0.1);
           padding-top: 24px;
           margin-top: auto;
           display: flex;
@@ -2250,246 +2090,186 @@ export default function BookingPage() {
           to { transform: translateX(0); }
         }
 
-        /* Collapsible Developer Credentials Drawer */
-        .dev-credentials-toggle {
-          position: fixed;
-          bottom: 24px;
-          right: 24px;
-          z-index: 999;
-          background: linear-gradient(135deg, #111111 0%, #222222 100%);
-          color: #ffffff;
-          border: 1.5px solid rgba(212, 175, 55, 0.3);
-          border-radius: 50px;
-          padding: 12px 24px;
-          font-size: 13px;
-          font-weight: 700;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .dev-credentials-toggle:hover {
-          transform: translateY(-2px) scale(1.03);
-          box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2);
-          border-color: #d4af37;
-        }
-
-        .dev-drawer-backdrop {
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.4);
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          z-index: 2000;
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.3s ease;
-        }
-
-        .dev-drawer-backdrop.open {
-          opacity: 1;
-          pointer-events: auto;
-        }
-
-        .dev-credentials-drawer {
-          position: fixed;
-          top: 0;
-          right: 0;
-          width: 100%;
-          max-width: 400px;
-          height: 100vh;
-          background: linear-gradient(180deg, #16120e 0%, #0d0a08 100%);
-          border-left: 1px solid rgba(212, 175, 55, 0.2);
-          box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
-          z-index: 2001;
-          transform: translateX(100%);
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-          padding: 30px 24px;
-          display: flex;
-          flex-direction: column;
-          color: #ffffff;
-        }
-
-        .dev-credentials-drawer.open {
-          transform: translateX(0);
-        }
-
-        .dev-drawer-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          padding-bottom: 20px;
-          margin-bottom: 24px;
-        }
-
-        .dev-drawer-header h3 {
-          margin: 0;
-          font-size: 18px;
-          font-weight: 800;
-          color: #d4af37;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .dev-drawer-close {
-          background: none;
-          border: none;
-          color: rgba(255, 255, 255, 0.5);
-          cursor: pointer;
-          padding: 6px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s;
-        }
-
-        .dev-drawer-close:hover {
-          background: rgba(255, 255, 255, 0.06);
-          color: #ffffff;
-        }
-
-        .dev-drawer-section {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 12px;
-          padding: 16px;
-          margin-bottom: 24px;
-        }
-
-        .dev-status-indicator {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-top: 8px;
-        }
-
-        .status-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          display: inline-block;
-        }
-
-        .status-dot.live {
-          background-color: #22c55e;
-          box-shadow: 0 0 10px #22c55e;
-        }
-
-        .status-dot.sandbox {
-          background-color: #eab308;
-          box-shadow: 0 0 10px #eab308;
-        }
-
-        .status-dot.error {
-          background-color: #ef4444;
-          box-shadow: 0 0 10px #ef4444;
-        }
-
-        .dev-input-wrapper {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          margin-bottom: 16px;
-        }
-
-        .dev-input-wrapper label {
-          font-size: 11px;
-          font-weight: 700;
-          color: rgba(255, 255, 255, 0.6);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .dev-input-wrapper input {
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          color: #ffffff;
-          border-radius: 8px;
-          padding: 10px 12px;
-          font-size: 13px;
-          outline: none;
-          transition: all 0.2s;
-        }
-
-        .dev-input-wrapper input:focus {
-          border-color: #d4af37;
-          background: rgba(255, 255, 255, 0.06);
-        }
-
-        .dev-save-btn {
-          width: 100%;
-          padding: 12px;
-          background: linear-gradient(135deg, #d4af37 0%, #8b0000 100%);
-          color: #ffffff;
-          border: none;
-          border-radius: 8px;
-          font-weight: 700;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          margin-top: 20px;
-        }
-
-        .dev-save-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 20px rgba(139, 0, 0, 0.3);
-        }
-
-        /* STEP 3 CONFIRMATION SCREEN */
-        .confirmation-mmt-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 0 60px; }
-        .conf-status-header { display: flex; flex-direction: column; gap: 6px; padding-bottom: 24px; border-bottom: 1px solid rgba(0,0,0,0.08); margin-bottom: 22px; }
-        .conf-check-circle { width: 46px; height: 46px; border-radius: 50%; background: rgba(22,163,74,0.08); border: 2px solid rgba(22,163,74,0.2); display: flex; align-items: center; justify-content: center; color: #16a34a; margin-bottom: 6px; }
-        .conf-status-label { font-size: 13px; color: rgba(44,37,32,0.6); font-weight: 500; }
-        .conf-status-title { font-size: 32px; font-weight: 800; color: #1a1512; line-height: 1.1; margin: 0; }
-        .conf-action-pills { display: flex; gap: 10px; margin-top: 8px; }
-        .conf-action-pill { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #8b0000; font-weight: 600; cursor: pointer; background: transparent; border: none; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
-        .confirmation-split { display: grid; grid-template-columns: 300px 1fr; gap: 28px; align-items: start; }
-        .conf-left-card { background: #fff; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); position: sticky; top: 100px; }
-        .conf-left-image { width: 100%; height: 160px; object-fit: cover; display: block; }
-        .conf-left-body { padding: 18px; }
-        .conf-room-title-line { display: flex; flex-direction: column; gap: 4px; padding-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,0.07); margin-bottom: 14px; }
-        .conf-room-title-line h3 { font-size: 15px; font-weight: 800; color: #1a1512; margin: 0; }
-        .conf-room-title-line span { font-size: 12px; color: rgba(44,37,32,0.55); font-weight: 500; }
-        .conf-price-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,0.07); margin-bottom: 14px; }
-        .conf-price-tag { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1512; }
-        .conf-ref-badge { font-size: 11px; background: rgba(139,0,0,0.06); border: 1px solid rgba(139,0,0,0.15); color: #8b0000; border-radius: 6px; padding: 4px 10px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+        .confirmation-mmt-wrapper { max-width: 1280px; margin: 0 auto; padding: 0 0 60px; }
+        .conf-status-header { display: flex; flex-direction: column; gap: 8px; padding-bottom: 30px; border-bottom: 1px solid rgba(212, 175, 55, 0.15); margin-bottom: 30px; }
+        .conf-check-circle { width: 56px; height: 56px; border-radius: 50%; background: rgba(22,163,74,0.08); border: 2px solid rgba(22,163,74,0.2); display: flex; align-items: center; justify-content: center; color: #16a34a; margin-bottom: 8px; }
+        .conf-status-label { font-size: 15px; color: #6B7280; font-weight: 500; }
+        .conf-status-title { font-size: 42px; font-weight: 800; color: #000000; line-height: 1.1; margin: 0; }
+        .conf-action-pills { display: flex; gap: 12px; margin-top: 10px; }
+        /* ── Add to Calendar button ── */
+        .atc-btn { display: flex; justify-content: center; align-items: center; padding: 9px 12px; gap: 8px; height: 40px; width: 201px; border: none; background: #FF342B; border-radius: 20px; cursor: pointer; }
+        .atc-btn .atc-label { line-height: 22px; font-size: 17px; color: #fff; font-family: 'Outfit', sans-serif; letter-spacing: 1px; }
+        .atc-btn:hover { background: #e52e26; }
+        .atc-btn:hover .atc-icon { animation: atc-slope 1s linear infinite; }
+        @keyframes atc-slope { 50% { transform: rotate(10deg); } }
+        .confirmation-split { display: grid; grid-template-columns: 360px 1fr; gap: 32px; align-items: start; }
+        .conf-left-card { background: rgba(255,255,255,0.9); backdrop-filter: blur(16px); border-radius: 18px; border: 1px solid rgba(212,175,55,0.18); overflow: hidden; box-shadow: 0 6px 28px rgba(0,0,0,0.08); position: sticky; top: 100px; }
+        .conf-left-image { width: 100%; height: 200px; object-fit: cover; display: block; }
+        .conf-left-body { padding: 22px; }
+        .conf-room-title-line { display: flex; flex-direction: column; gap: 5px; padding-bottom: 16px; border-bottom: 1px solid rgba(212,175,55,0.1); margin-bottom: 16px; }
+        .conf-room-title-line h3 { font-size: 18px; font-weight: 800; color: #000000; margin: 0; font-family: 'Bebas Neue', cursive; letter-spacing: 0.5px; }
+        .conf-room-title-line span { font-size: 13px; color: #6B7280; font-weight: 500; }
+        .conf-price-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 1px solid rgba(212,175,55,0.1); margin-bottom: 16px; }
+        .conf-price-tag { display: flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 700; color: #000000; }
+        .conf-ref-badge { font-size: 12px; background: rgba(200,155,60,0.08); border: 1px solid rgba(200,155,60,0.2); color: #C89B3C; border-radius: 6px; padding: 5px 12px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
         .conf-property-box { display: flex; align-items: center; gap: 12px; padding-top: 4px; }
-        .conf-property-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(139,0,0,0.15); }
-        .conf-property-details h4 { font-size: 13px; font-weight: 800; color: #1a1512; margin: 0 0 2px; }
-        .conf-property-details span { font-size: 11px; color: rgba(44,37,32,0.55); }
-        .conf-right-side { display: flex; flex-direction: column; gap: 18px; }
-        .conf-accordion { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-        .conf-accordion-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid rgba(0,0,0,0.07); font-size: 14px; font-weight: 700; color: #1a1512; }
-        .conf-detail-row { display: flex; align-items: center; padding: 16px 22px; border-bottom: 1px solid rgba(0,0,0,0.05); gap: 16px; }
+        .conf-property-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(200,155,60,0.25); }
+        .conf-property-details h4 { font-size: 15px; font-weight: 800; color: #000000; margin: 0 0 2px; }
+        .conf-property-details span { font-size: 12px; color: #6B7280; }
+        .conf-right-side { display: flex; flex-direction: column; gap: 20px; }
+        .conf-accordion { background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(212,175,55,0.14); border-radius: 16px; overflow: hidden; box-shadow: 0 3px 16px rgba(0,0,0,0.05); }
+        .conf-accordion-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 26px; border-bottom: 1px solid rgba(212,175,55,0.1); font-size: 17px; font-weight: 700; color: #000000; }
+        .conf-detail-row { display: flex; align-items: center; padding: 18px 26px; border-bottom: 1px solid rgba(212,175,55,0.08); gap: 18px; }
         .conf-detail-row:last-child { border-bottom: none; }
-        .conf-detail-icon { width: 36px; display: flex; align-items: center; justify-content: center; color: rgba(44,37,32,0.35); flex-shrink: 0; }
-        .conf-detail-label { width: 130px; font-size: 13px; color: rgba(44,37,32,0.55); flex-shrink: 0; }
-        .conf-detail-value { flex: 1; font-size: 14px; font-weight: 600; color: #1a1512; }
+        .conf-detail-icon { width: 38px; display: flex; align-items: center; justify-content: center; color: #C89B3C; flex-shrink: 0; }
+        .conf-detail-label { width: 140px; font-size: 15px; color: #6B7280; flex-shrink: 0; }
+        .conf-detail-value { flex: 1; font-size: 16px; font-weight: 600; color: #000000; }
         .conf-detail-actions { display: flex; gap: 8px; margin-left: auto; }
-        .conf-action-btn { display: flex; align-items: center; gap: 5px; padding: 7px 14px; border: 1px solid rgba(0,0,0,0.12); border-radius: 8px; font-size: 12px; font-weight: 600; color: rgba(44,37,32,0.7); background: transparent; cursor: pointer; transition: all 0.2s; }
-        .conf-action-btn:hover { border-color: #8b0000; color: #8b0000; }
-        .conf-guest-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 18px 22px; }
-        .conf-guest-card { background: rgba(139,0,0,0.04); border: 1px solid rgba(139,0,0,0.1); border-radius: 12px; padding: 16px; display: flex; align-items: flex-start; gap: 12px; }
-        .conf-guest-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #8b0000, #d4af37); color: white; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .conf-guest-info h5 { font-size: 13px; font-weight: 700; color: #1a1512; margin: 0 0 3px; }
-        .conf-guest-info span { font-size: 11px; color: rgba(44,37,32,0.55); }
-        .conf-paid-tag { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #16a34a; font-weight: 600; margin-top: 6px; }
-        .conf-bottom-actions { display: flex; gap: 12px; margin-top: 8px; }
-        @media (max-width: 768px) {
+        .conf-action-btn { display: flex; align-items: center; gap: 5px; padding: 8px 16px; border: 1px solid rgba(200,155,60,0.2); border-radius: 8px; font-size: 13px; font-weight: 600; color: #6B7280; background: transparent; cursor: pointer; transition: all 0.2s; }
+        .conf-action-btn:hover { border-color: #C89B3C; color: #C89B3C; }
+        .conf-guest-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 22px 26px; }
+        .conf-guest-card { background: rgba(200,155,60,0.06); border: 1px solid rgba(200,155,60,0.14); border-radius: 14px; padding: 18px; display: flex; align-items: flex-start; gap: 14px; }
+        .conf-guest-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #C89B3C, #D4AF37); color: #000000; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .conf-guest-info h5 { font-size: 15px; font-weight: 700; color: #000000; margin: 0 0 4px; }
+        .conf-guest-info span { font-size: 13px; color: #6B7280; }
+        .conf-paid-tag { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #16a34a; font-weight: 600; margin-top: 8px; }
+        .conf-bottom-actions { display: flex; align-items: center; gap: 20px; margin-top: 24px; flex-wrap: wrap; }
+        /* ── Return to Home button ── */
+        .rth-btn { position: relative; overflow: hidden; border: 1px solid #18181a; color: #18181a; display: inline-block; font-size: 15px; line-height: 15px; padding: 18px 28px 17px; cursor: pointer; background: #fff; user-select: none; font-family: 'Outfit', sans-serif; font-weight: 600; text-decoration: none; }
+        .rth-btn span:first-child { position: relative; transition: color 600ms cubic-bezier(0.48, 0, 0.12, 1); z-index: 10; }
+        .rth-btn span:last-child { color: white; display: block; position: absolute; bottom: 0; transition: all 500ms cubic-bezier(0.48, 0, 0.12, 1); z-index: 100; opacity: 0; top: 50%; left: 50%; transform: translateY(225%) translateX(-50%); height: 14px; line-height: 13px; white-space: nowrap; }
+        .rth-btn::after { content: ""; position: absolute; bottom: -50%; left: 0; width: 100%; height: 100%; background-color: black; transform-origin: bottom center; transition: transform 600ms cubic-bezier(0.48, 0, 0.12, 1); transform: skewY(9.3deg) scaleY(0); z-index: 50; }
+        .rth-btn:hover::after { transform: skewY(9.3deg) scaleY(2); }
+        .rth-btn:hover span:last-child { transform: translateX(-50%) translateY(-50%); opacity: 1; transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1); }
+        /* ── Print Receipt Button (Valorant style) ── */
+        .pr-btn-wrap { display: none; }
+        .vb-borders { position: relative; width: fit-content; height: fit-content; }
+        .vb-borders::before { content: ""; position: absolute; width: calc(100% + 0.5em); height: 50%; left: -0.3em; top: -0.3em; border: 1px solid #0E1822; border-bottom: 0; }
+        .vb-borders::after { content: ""; position: absolute; width: calc(100% + 0.5em); height: 50%; left: -0.3em; bottom: -0.3em; border: 1px solid #0E1822; border-top: 0; z-index: 0; }
+        .vb-btn { font-family: 'Outfit', sans-serif; color: white; cursor: pointer; font-size: 13px; font-weight: 700; letter-spacing: 0.05rem; border: 1px solid #0E1822; padding: 0.8rem 2.1rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 531.28 200'%3E%3Cpolygon fill='%23FF4655' points='415.81 200 0 200 115.47 0 531.28 0 415.81 200'/%3E%3C/svg%3E"); background-color: #0E1822; background-size: 200%; background-position: 200%; background-repeat: no-repeat; transition: background-position 0.3s ease-in-out, border 0.3s ease-in-out, color 0.3s ease-in-out; position: relative; z-index: 1; }
+        .vb-btn:hover { border: 1px solid #FF4655; color: white; background-position: 40%; }
+        .vb-btn::before { content: ""; position: absolute; background-color: #0E1822; width: 0.2rem; height: 0.2rem; top: -1px; left: -1px; transition: background-color 0.15s ease-in-out; }
+        .vb-btn::after { content: ""; position: absolute; background-color: #FF4655; width: 0.3rem; height: 0.3rem; bottom: -1px; right: -1px; transition: background-color 0.15s ease-in-out; }
+        .vb-btn:hover::before { background-color: white; }
+        .vb-btn:hover::after { background-color: white; }
+        /* Hidden receipt — only visible when printing */
+        .pr-receipt-print { display: none; }
+        @page { size: A5 portrait; margin: 10mm; }
+        @media print {
+          * { visibility: hidden !important; }
+          .pr-receipt-print { visibility: visible !important; display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; width: 260px !important; padding: 0 !important; margin: 0 !important; font-family: "Courier New", Courier, monospace !important; font-size: 11px !important; line-height: 1.7 !important; color: #000 !important; background: #fff !important; page-break-inside: avoid !important; }
+          .pr-receipt-print * { visibility: visible !important; }
+        }
+
+        /* ── Footer reset: fully restore global site-footer styles ── */
+        .booking-page-mmt .site-footer {
+          background: #ffffff !important;
+          color: #111111 !important;
+          padding: 80px 8% 0 !important;
+          display: flex !important;
+          flex-direction: column !important;
+          position: relative !important;
+          z-index: auto !important;
+        }
+        .booking-page-mmt .footer-top-links {
+          display: grid !important;
+          grid-template-columns: repeat(5, 1fr) !important;
+          gap: 30px !important;
+          margin: 0 auto 80px auto !important;
+          max-width: 1400px !important;
+          width: 100% !important;
+        }
+        .booking-page-mmt .footer-col h3 {
+          font-family: 'Outfit', sans-serif !important;
+          font-size: 1.1rem !important;
+          font-weight: 700 !important;
+          color: #111 !important;
+          margin-bottom: 25px !important;
+          letter-spacing: normal !important;
+        }
+        .booking-page-mmt .site-footer .footer-col a {
+          display: block !important;
+          font-family: 'Outfit', sans-serif !important;
+          color: #666 !important;
+          text-decoration: none !important;
+          margin-bottom: 15px !important;
+          font-size: 0.95rem !important;
+          transition: color 0.3s ease !important;
+        }
+        .booking-page-mmt .site-footer .footer-col a:hover {
+          color: #2563eb !important;
+        }
+        .booking-page-mmt .footer-middle-bar {
+          display: flex !important;
+          justify-content: space-between !important;
+          align-items: center !important;
+          padding: 30px 0 !important;
+          border-top: 1px solid #eaeaea !important;
+          border-bottom: 1px solid #eaeaea !important;
+          max-width: 1400px !important;
+          margin: 0 auto !important;
+          width: 100% !important;
+          font-family: 'Outfit', sans-serif !important;
+          font-size: 0.9rem !important;
+          color: #666 !important;
+          font-weight: 500 !important;
+        }
+        .booking-page-mmt .site-footer .footer-middle-bar a,
+        .booking-page-mmt .site-footer .footer-middle-bar span {
+          font-family: 'Outfit', sans-serif !important;
+          color: #666 !important;
+        }
+        .booking-page-mmt .site-footer .footer-middle-bar a:hover {
+          color: #2563eb !important;
+        }
+        .booking-page-mmt .footer-massive-text {
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+          font-size: 14.5vw !important;
+          font-weight: 900 !important;
+          line-height: 0.75 !important;
+          text-transform: uppercase !important;
+          text-align: center !important;
+          background: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1920') center 60% / cover !important;
+          -webkit-background-clip: text !important;
+          background-clip: text !important;
+          -webkit-text-fill-color: transparent !important;
+          color: transparent !important;
+          padding-top: 40px !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          letter-spacing: -0.06em !important;
+          width: 100% !important;
+          user-select: none !important;
+        }
+        @media (max-width: 992px) {
+          .booking-page-mmt .footer-top-links {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 40px !important;
+          }
+          .booking-page-mmt .footer-massive-text {
+            font-size: 15vw !important;
+            padding-top: 30px !important;
+            letter-spacing: -0.05em !important;
+          }
+        }
+        @media (max-width: 600px) {
+          .booking-page-mmt .footer-top-links {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .booking-page-mmt .footer-middle-bar {
+            flex-direction: column !important;
+            gap: 10px !important;
+            text-align: center !important;
+          }
+        }
+
+        @media (max-width: 900px) {
           .confirmation-split { grid-template-columns: 1fr; }
           .conf-left-card { position: static; }
-          .conf-status-title { font-size: 24px; }
+          .conf-status-title { font-size: 28px; }
           .conf-guest-cards { grid-template-columns: 1fr; }
+          .conf-detail-label { width: 110px; font-size: 13px; }
+          .conf-detail-value { font-size: 14px; }
         }
       ` }} />
 
@@ -2519,12 +2299,12 @@ export default function BookingPage() {
                   <span className="user-name">{userName}</span>
                 </div>
               </div>
-              <button onClick={handleLogout} className="btn-login">Logout</button>
+              <LoginJoinButton onClick={handleLogout} label="Logout" />
             </>
           ) : (
-            <button onClick={() => setLoginModalOpen(true)} className="btn-login">Login / Join</button>
+            <LoginJoinButton onClick={() => setLoginModalOpen(true)} />
           )}
-          <a href="/booking" className="btn-book">Book Now</a>
+          <BookNowButton href="/guesthouse#rooms-suites" />
         </div>
 
         {/* Mobile Header Actions Wrapper */}
@@ -2563,20 +2343,20 @@ export default function BookingPage() {
               {isLoggedIn ? (
                 <div className="mobile-user-profile">
                   <span className="user-label">Braj Club Member</span>
-                  <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
+                  <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#C89B3C' }}>{userName}</span>
                   <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}>Logout</button>
                 </div>
               ) : (
                 <button onClick={() => { setLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
               )}
-              <a href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="btn-book" style={{ display: 'block', textAlign: 'center', marginTop: '4px' }}>Book Now</a>
+              <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
             </div>
           </div>
         </div>
       )}
 
       {/* 2. BODY CONTENT SECTION */}
-      <main style={{ marginTop: '20px' }}>
+      <main style={{ marginTop: '20px', paddingBottom: '80px' }}>
         
         {currentStep === 1 && (
           <>
@@ -2585,166 +2365,211 @@ export default function BookingPage() {
             {/* LEFT SIDE CONTENT - GUEST & ROOM SELECTIONS */}
             <div>
               
-              {/* Login Banner Promo */}
-              {!isLoggedIn && (
-                <div className="login-banner-card">
-                  <div className="login-banner-info">
-                    <div className="login-banner-icon">
-                      <Sparkles size={20} />
-                    </div>
-                    <div className="login-banner-text">
-                      <h4>Log in or Create an Account for an Extra 10% Member Discount!</h4>
-                      <p>Unlock exclusive heritage member pricing and instant guest details autofill.</p>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <button 
-                      onClick={() => {
-                        setLoginModalInitialRegister(false);
-                        setLoginModalOpen(true);
-                      }} 
-                      className="btn-login-mmt"
-                      style={{ background: 'transparent', border: '1.5px solid #d4af37', color: '#000000', padding: 0 }}
-                    >
-                      <span>Login</span>
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setLoginModalInitialRegister(true);
-                        setLoginModalOpen(true);
-                      }} 
-                      className="btn-login-mmt"
-                      style={{ background: '#d4af37', border: '1.5px solid #d4af37', color: '#000000', padding: 0 }}
-                    >
-                      <Sparkles size={14} style={{ color: '#000000' }} />
-                      <span>Create Account</span>
-                    </button>
-                  </div>
-                </div>
-              )}
+              {/* MMT-style review heading */}
+              <h2 style={{ fontSize: '36px', fontFamily: 'Bebas Neue, cursive', fontWeight: 400, letterSpacing: '0.5px', color: '#000', marginBottom: '20px', marginTop: '0' }}>Review your Booking</h2>
 
-              {/* Card 1: Review Room Details */}
-              {/* OUTER HEADER - outside the card */}
-              <div className="room-review-header-outer">
-                <div className="room-review-header-left">
-                  <div className="room-review-header-icon">
-                    <Compass size={22} />
+              {/* Hotel + Stay Summary Card */}
+              <div className="mmt-card" style={{ marginBottom: '16px', padding: '20px 24px' }}>
+
+                {/* Hotel top: name + stars + address + room thumb */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                  <div>
+                    <h3 style={{ fontSize: '20px', marginBottom: '5px', color: '#111' }}>Braj Nidhi Guesthouse</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '5px' }}>
+                      {[1,2,3,4].map(i => <Star key={i} size={13} fill="#f59e0b" stroke="none"/>)}
+                      <Star size={13} stroke="#f59e0b" fill="none"/>
+                      <span style={{ background: '#e8f5e9', color: '#2e7d32', fontSize: '11px', fontWeight: '700', padding: '2px 9px', borderRadius: '12px', marginLeft: '8px' }}>Spiritual Heritage</span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <MapPin size={11} style={{ color: '#C89B3C' }}/>
+                      Chattikara Road, Vrindavan, Uttar Pradesh
+                    </div>
                   </div>
-                  <div className="room-review-header-text">
-                    <h2>Review Your Spiritual Stay Details</h2>
-                    <p>Please review your booking details before confirming your stay.</p>
+                  <img src={getRoomImage(roomType)} alt="Room" style={{ width: '84px', height: '62px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0, border: '1px solid #e5e7eb' }}/>
+                </div>
+
+                <div style={{ borderTop: '1px solid #f0f0f0', margin: '14px 0' }}/>
+
+                {/* Dates / Nights / Guests display row */}
+                <div className="bk-dates-row">
+                  <div style={{ paddingRight: '16px', borderRight: '1px solid #e5e7eb' }}>
+                    <div style={{ fontSize: '10px', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '4px' }}>CHECK IN</div>
+                    <div style={{ fontSize: '14px', fontWeight: '800', color: '#111', lineHeight: 1.3 }}>
+                      {new Date(checkIn).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>2:00 PM</div>
+                  </div>
+
+                  <div className="bk-nights-bubble" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px' }}>
+                    <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '20px', padding: '6px 14px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '16px', fontWeight: '900', color: '#1d4ed8', lineHeight: 1 }}>{nights}</div>
+                      <div style={{ fontSize: '9px', color: '#3b82f6', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Nights</div>
+                    </div>
+                  </div>
+
+                  <div style={{ padding: '0 16px', borderRight: '1px solid #e5e7eb' }}>
+                    <div style={{ fontSize: '10px', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '4px' }}>CHECK OUT</div>
+                    <div style={{ fontSize: '14px', fontWeight: '800', color: '#111', lineHeight: 1.3 }}>
+                      {new Date(checkOut).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>11:00 AM</div>
+                  </div>
+
+                  <div style={{ paddingLeft: '16px' }}>
+                    <div style={{ fontSize: '10px', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '4px' }}>GUESTS & ROOMS</div>
+                    <div style={{ fontSize: '14px', fontWeight: '800', color: '#111', lineHeight: 1.3 }}>
+                      {nights} Nights · {adults + children} Guest{adults + children > 1 ? 's' : ''} · 1 Room
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>
+                      {adults} Adult{adults > 1 ? 's' : ''}{children > 0 ? `, ${children} Child${children > 1 ? 'ren' : ''}` : ''}
+                    </div>
                   </div>
                 </div>
-                <div className="instant-confirm-badge">
-                  <CheckCircle2 size={16} />
-                  <span>Instant Confirmation</span>
+
+                {/* Modify toggle */}
+                <button
+                  onClick={() => setShowModify(!showModify)}
+                  style={{ marginTop: '14px', background: 'none', border: '1px solid #e5e7eb', borderRadius: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: '600', color: '#1d6de5', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                >
+                  <Calendar size={13}/>
+                  {showModify ? 'Close Modify Panel' : 'Modify Dates / Guests'}
+                </button>
+
+                {/* Inline edit panel */}
+                {showModify && (
+                  <div style={{ background: '#f9fafb', borderRadius: '10px', padding: '16px', border: '1px solid #e5e7eb', marginTop: '12px' }}>
+
+                    {/* Check-in / Check-out buttons */}
+                    <div style={{ display: 'flex', gap: '1px', background: '#e5e7eb', borderRadius: '10px', overflow: 'hidden', marginBottom: '12px' }}>
+                      {(['checkin','checkout'] as const).map(type => {
+                        const val = type === 'checkin' ? checkIn : checkOut;
+                        const label = type === 'checkin' ? 'Check-in' : 'Check-out';
+                        const isOpen = openCalendar === type;
+                        const formatted = val ? new Date(val + 'T00:00:00').toLocaleDateString('en-GB').replace(/\//g,'/') : 'Select';
+                        return (
+                          <button key={type} onClick={() => { setOpenCalendar(isOpen ? null : type); setCalViewDate(new Date((val || new Date().toISOString().split('T')[0]) + 'T00:00:00')); }} style={{ flex:1, padding:'12px 14px', background: isOpen ? '#fff' : '#f9fafb', border: isOpen ? '2px solid #1d6de5' : '2px solid transparent', borderRadius:'10px', cursor:'pointer', textAlign:'left', transition:'all 0.15s' }}>
+                            <div style={{ fontSize:'10px', color:'#6B7280', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'3px' }}>{label}</div>
+                            <div style={{ fontSize:'15px', fontWeight:'700', color:'#111' }}>{formatted}</div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Calendar popup */}
+                    {openCalendar && (() => {
+                      const yr = calViewDate.getFullYear();
+                      const mo = calViewDate.getMonth();
+                      const todayStr = new Date().toISOString().split('T')[0];
+                      const selStr = openCalendar === 'checkin' ? checkIn : checkOut;
+                      return (
+                        <div style={{ background:'#fff', borderRadius:'10px', border:'1px solid #e5e7eb', boxShadow:'0 6px 20px rgba(0,0,0,0.1)', padding:'10px 12px', marginBottom:'10px', maxWidth:'280px' }}>
+                          {/* Month nav */}
+                          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'8px' }}>
+                            <button onClick={() => setCalViewDate(new Date(yr, mo - 1, 1))} style={{ background:'none', border:'none', cursor:'pointer', color:'#374151', fontSize:'13px', padding:'3px 7px', borderRadius:'5px' }}>◄</button>
+                            <div style={{ fontSize:'12px', fontWeight:'600', color:'#111', background:'#f3f4f6', padding:'4px 12px', borderRadius:'16px', display:'flex', alignItems:'center', gap:'4px' }}>
+                              {CAL_MONTHS[mo]} {yr} <span style={{ fontSize:'9px', color:'#6B7280' }}>▼</span>
+                            </div>
+                            <button onClick={() => setCalViewDate(new Date(yr, mo + 1, 1))} style={{ background:'none', border:'none', cursor:'pointer', color:'#374151', fontSize:'13px', padding:'3px 7px', borderRadius:'5px' }}>►</button>
+                          </div>
+                          {/* Weekday headers */}
+                          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:'2px' }}>
+                            {['Mo','Tu','We','Th','Fr','Sa','Su'].map(d => (
+                              <div key={d} style={{ textAlign:'center', fontSize:'9px', fontWeight:'700', color: d==='Sa'||d==='Su' ? '#ef4444' : '#9CA3AF', padding:'2px 0' }}>{d}</div>
+                            ))}
+                          </div>
+                          {/* Date cells */}
+                          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'1px' }}>
+                            {getCalDays(yr, mo).map((cell, idx) => {
+                              const ds = cell.type === 'cur' ? `${yr}-${String(mo+1).padStart(2,'0')}-${String(cell.d).padStart(2,'0')}` : '';
+                              const isSel = ds === selStr;
+                              const isToday = ds === todayStr;
+                              const isPast = ds && ds < todayStr;
+                              const disabled = cell.type !== 'cur' || !!isPast;
+                              return (
+                                <button key={idx} disabled={disabled} onClick={() => !disabled && handleCalSelect(yr, mo, cell.d)}
+                                  style={{ border: isToday && !isSel ? '1.5px solid #1d6de5' : 'none', borderRadius:'50%', background: isSel ? '#1d6de5' : 'transparent', color: isSel ? '#fff' : cell.type !== 'cur' || isPast ? '#d1d5db' : '#111', fontSize:'11px', fontWeight: isSel ? '700' : '400', cursor: disabled ? 'default' : 'pointer', aspectRatio:'1', display:'flex', alignItems:'center', justifyContent:'center', padding:'3px', opacity: cell.type !== 'cur' ? 0.3 : 1, transition:'background 0.15s' }}
+                                >
+                                  {cell.d}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Guests +/- counters */}
+                    <div style={{ display:'flex', flexDirection:'column', gap:'10px', marginTop:'4px' }}>
+                      {[
+                        { label:'Adults', sub:'', val: adults, min:1, max:6, set: setAdults },
+                        { label:'Children', sub:'0 – 17 Years Old', val: children, min:0, max:6, set: setChildren }
+                      ].map(({ label, sub, val, min, max, set }) => (
+                        <div key={label} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px', background:'#fff', borderRadius:'8px', border:'1px solid #e5e7eb' }}>
+                          <div>
+                            <div style={{ fontSize:'14px', fontWeight:'700', color:'#111' }}>{label}</div>
+                            {sub && <div style={{ fontSize:'11px', color:'#9CA3AF', marginTop:'1px' }}>{sub}</div>}
+                          </div>
+                          <div style={{ display:'flex', alignItems:'center', gap:'0', border:'1px solid #e5e7eb', borderRadius:'8px', overflow:'hidden', background:'#fff' }}>
+                            <button onClick={() => set(Math.max(min, val - 1))} style={{ width:'34px', height:'34px', background:'none', border:'none', fontSize:'18px', fontWeight:'300', color: val <= min ? '#d1d5db' : '#374151', cursor: val <= min ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>−</button>
+                            <span style={{ width:'32px', textAlign:'center', fontSize:'15px', fontWeight:'700', color:'#111' }}>{val}</span>
+                            <button onClick={() => set(Math.min(max, val + 1))} style={{ width:'34px', height:'34px', background:'none', border:'none', fontSize:'18px', fontWeight:'300', color: val >= max ? '#d1d5db' : '#374151', cursor: val >= max ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>+</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ borderTop: '1px solid #f0f0f0', margin: '16px 0' }}/>
+
+                {/* Room type row */}
+                <div style={{ background: '#f9fafb', borderRadius: '10px', padding: '14px 16px' }}>
+                  <div style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '8px' }}>
+                    {adults + children} x {getRoomTitle(roomType)}
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginBottom: '10px' }}>
+                    <span style={{ fontSize: '12px', color: '#374151' }}>• Room Only</span>
+                    <span style={{ fontSize: '12px', color: '#374151' }}>• Sattvic Vegetarian Meals Access</span>
+                    <span style={{ fontSize: '12px', color: '#374151' }}>• Free High-Speed Wi-Fi</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', background: '#f0fdf4', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
+                    <ShieldCheck size={13} style={{ color: '#16a34a' }}/>
+                    <span style={{ fontSize: '12px', color: '#16a34a', fontWeight: '600' }}>Free cancellation up to 48 hours before check-in</span>
+                  </div>
                 </div>
               </div>
 
-              {/* MAIN WHITE CARD */}
-              <div className="room-review-card">
-                {/* Body: Photo + Info */}
-                <div className="room-review-body">
-                  {/* Left: photo */}
-                  <div className="room-review-photo-wrap">
-                    <Image
-                      src={getRoomImage(roomType)}
-                      alt="Selected suite room"
-                      fill
-                      style={{ objectFit: 'cover' }}
-                    />
-                    <div className="room-best-choice-ribbon">
-                      <Star size={11} strokeWidth={2.5} />
-                      Best Choice
-                    </div>
-                    <div className="room-garden-view-label">
-                      <Leaf size={13} style={{ color: '#16a34a' }} />
-                      Spiritual Garden View
-                    </div>
+              {/* Important Information */}
+              <div className="mmt-card" style={{ marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '18px', fontFamily: 'Outfit, sans-serif', fontWeight: '700', color: '#111', marginBottom: '16px' }}>Important Information</h3>
+                <div style={{ border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: '#f0fdf4', borderBottom: '1px solid #e5e7eb' }}>
+                    <span style={{ fontSize: '16px' }}>🕉️</span>
+                    <span style={{ fontSize: '13px', fontWeight: '700', color: '#166534' }}>Spiritual Property Rules</span>
                   </div>
-
-                  {/* Right: Info */}
-                  <div className="room-review-info">
-                    <h3 className="room-review-title">{getRoomTitle(roomType)}</h3>
-
-                    {/* Feature badges 2x2 grid */}
-                    <div className="room-feature-grid">
-                      <div className="room-feature-badge red">
-                        <Leaf size={15} />
-                        <span>Spiritual Garden View</span>
-                      </div>
-                      <div className="room-feature-badge">
-                        <BedDouble size={15} style={{ color: '#555' }} />
-                        <span>King-size Bed</span>
-                      </div>
-                      <div className="room-feature-badge green">
-                        <Coffee size={15} />
-                        <span>Breakfast Included</span>
-                      </div>
-                      <div className="room-feature-badge">
-                        <Wifi size={15} style={{ color: '#555' }} />
-                        <span>Free high-speed WiFi</span>
-                      </div>
-                    </div>
-
-                    {/* Date strip with calendar icons */}
-                    <div className="date-strip-new">
-                      <div className="date-box-new">
-                        <div className="date-box-new-label">
-                          <CalendarDays size={12} />
-                          Check-In Date
-                        </div>
-                        <p className="date-box-new-value">
-                          {new Date(checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </p>
-                      </div>
-                      <div className="date-nights-center">
-                        <Moon size={16} />
-                        <span className="nights-count">{nights} {nights === 1 ? 'Night' : 'Nights'}</span>
-                      </div>
-                      <div className="date-box-new">
-                        <div className="date-box-new-label">
-                          <CalendarDays size={12} />
-                          Check-Out Date
-                        </div>
-                        <p className="date-box-new-value">
-                          {new Date(checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </p>
-                      </div>
-                    </div>
+                  <div style={{ padding: '12px 16px' }}>
+                    <p style={{ fontSize: '13px', color: '#374151', margin: '0 0 10px' }}>
+                      Braj Nidhi is a strictly sattvic heritage property dedicated to devotional living.
+                    </p>
+                    <ul style={{ listStyle: 'disc', paddingLeft: '18px', margin: 0, display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                      <li style={{ fontSize: '13px', color: '#374151' }}>Primary Guest must be at least 18 years of age.</li>
+                      <li style={{ fontSize: '13px', color: '#16a34a', fontWeight: '500' }}>No meat, alcohol, or tobacco permitted anywhere on the property.</li>
+                      <li style={{ fontSize: '13px', color: '#16a34a', fontWeight: '500' }}>Smoking strictly prohibited inside rooms and all common areas.</li>
+                      <li style={{ fontSize: '13px', color: '#374151' }}>Male-only groups and family groups are welcome.</li>
+                      <li style={{ fontSize: '13px', color: '#374151' }}>Valid ID proof required at check-in: Aadhaar, Passport, Driving Licence, or Voter ID.</li>
+                      <li style={{ fontSize: '13px', color: '#374151' }}>Check-in: 2:00 PM &nbsp;·&nbsp; Check-out: 11:00 AM</li>
+                      <li style={{ fontSize: '13px', color: '#374151' }}>Free cancellation up to 48 hours before check-in. No refund thereafter.</li>
+                    </ul>
                   </div>
-                </div>
-
-                {/* Footer: Secure booking strip */}
-                <div className="room-review-footer">
-                  <div className="room-review-footer-left">
-                    <div className="room-review-footer-icon">
-                      <ShieldCheck size={18} />
-                    </div>
-                    <div className="room-review-footer-text">
-                      <h5>Secure &amp; Hassle-Free Booking</h5>
-                      <p>Your information is safe with us.</p>
-                    </div>
-                  </div>
-                  {/* Temple watermark illustration */}
-                  <svg width="140" height="60" viewBox="0 0 200 80" fill="none" style={{ opacity: 0.13, flexShrink: 0 }}>
-                    <path d="M100 70 L100 40 L90 40 L90 20 L95 20 L95 10 L100 5 L105 10 L105 20 L110 20 L110 40 L100 40" stroke="#8b4513" strokeWidth="2" fill="none"/>
-                    <path d="M75 70 L75 45 L68 45 L68 30 L72 30 L72 22 L75 18 L78 22 L78 30 L82 30 L82 45 L75 45" stroke="#8b4513" strokeWidth="2" fill="none"/>
-                    <path d="M125 70 L125 45 L118 45 L118 30 L122 30 L122 22 L125 18 L128 22 L128 30 L132 30 L132 45 L125 45" stroke="#8b4513" strokeWidth="2" fill="none"/>
-                    <path d="M55 70 L55 52 L50 52 L50 42 L52 42 L52 36 L55 32 L58 36 L58 42 L60 42 L60 52 L55 52" stroke="#8b4513" strokeWidth="2" fill="none"/>
-                    <path d="M145 70 L145 52 L140 52 L140 42 L142 42 L142 36 L145 32 L148 36 L148 42 L150 42 L150 52 L145 52" stroke="#8b4513" strokeWidth="2" fill="none"/>
-                    <line x1="40" y1="70" x2="160" y2="70" stroke="#8b4513" strokeWidth="1.5"/>
-                    <path d="M85 40 Q100 30 115 40" stroke="#8b4513" strokeWidth="1.5" fill="none"/>
-                  </svg>
                 </div>
               </div>
 
-              {/* Card 2: Interactive Room & Guest Selections */}
-              <div className="mmt-card">
+              {/* Card 2 removed — dates/guests now editable in hotel summary card above */}
+              {false && <div className="mmt-card">
                 <div className="card-header-mmt">
                   <div className="card-header-title">
                     <Calendar size={18} />
-                    <span>Customize Room & Calendar Selections</span>
+                    <span>Customize Room &amp; Calendar Selections</span>
                   </div>
                 </div>
 
@@ -2763,11 +2588,11 @@ export default function BookingPage() {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     {isSearching ? (
-                      <div className="spinner-payment" style={{ width: '16px', height: '16px', borderWidth: '2px', animation: 'spin 1s linear infinite', borderTopColor: '#8b0000', margin: 0 }}></div>
+                      <div className="spinner-payment" style={{ width: '16px', height: '16px', borderWidth: '2px', animation: 'spin 1s linear infinite', borderTopColor: '#C89B3C', margin: 0 }}></div>
                     ) : (
                       <span className={`status-dot ${apiConnectionStatus}`} />
                     )}
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#1a1512' }}>
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#000000' }}>
                       {isSearching ? 'Syncing live inventory from ERP...' : 
                        apiConnectionStatus === 'live' ? 'Live ERP Connected' : 
                        apiConnectionStatus === 'error' ? 'ERP Sync Interrupted (Sandbox active)' : 
@@ -2782,13 +2607,6 @@ export default function BookingPage() {
                       style={{ padding: '6px 12px', fontSize: '12px', margin: 0 }}
                     >
                       Search / Sync Rooms
-                    </button>
-                    <button 
-                      onClick={() => setCredentialsOpen(true)}
-                      className="btn-apply-promo"
-                      style={{ padding: '6px 12px', fontSize: '12px', margin: 0, background: '#111111', color: '#ffffff', borderColor: '#111111' }}
-                    >
-                      Setup Dev API Hub
                     </button>
                   </div>
                 </div>
@@ -2817,7 +2635,7 @@ export default function BookingPage() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
                           <span className="price-tag">₹{livePrices.deluxe2.toLocaleString()}<span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(44, 37, 32, 0.5)' }}> / night</span></span>
                           {!available && (
-                            <span className="badge-pill-mmt accent" style={{ background: 'rgba(139, 0, 0, 0.08)', borderColor: 'rgba(139, 0, 0, 0.25)', color: '#8b0000', fontSize: '10px', fontWeight: '800' }}>Sold Out on ERP</span>
+                            <span className="badge-pill-mmt accent" style={{ background: 'rgba(200, 155, 60, 0.08)', borderColor: 'rgba(200, 155, 60, 0.25)', color: '#C89B3C', fontSize: '10px', fontWeight: '800' }}>Sold Out on ERP</span>
                           )}
                         </div>
                       </div>
@@ -2843,7 +2661,7 @@ export default function BookingPage() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
                           <span className="price-tag">₹{livePrices.deluxe3.toLocaleString()}<span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(44, 37, 32, 0.5)' }}> / night</span></span>
                           {!available && (
-                            <span className="badge-pill-mmt accent" style={{ background: 'rgba(139, 0, 0, 0.08)', borderColor: 'rgba(139, 0, 0, 0.25)', color: '#8b0000', fontSize: '10px', fontWeight: '800' }}>Sold Out on ERP</span>
+                            <span className="badge-pill-mmt accent" style={{ background: 'rgba(200, 155, 60, 0.08)', borderColor: 'rgba(200, 155, 60, 0.25)', color: '#C89B3C', fontSize: '10px', fontWeight: '800' }}>Sold Out on ERP</span>
                           )}
                         </div>
                       </div>
@@ -2869,7 +2687,7 @@ export default function BookingPage() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
                           <span className="price-tag">₹{livePrices.deluxe4.toLocaleString()}<span style={{ fontSize: '12px', fontWeight: 'normal', color: 'rgba(44, 37, 32, 0.5)' }}> / night</span></span>
                           {!available && (
-                            <span className="badge-pill-mmt accent" style={{ background: 'rgba(139, 0, 0, 0.08)', borderColor: 'rgba(139, 0, 0, 0.25)', color: '#8b0000', fontSize: '10px', fontWeight: '800' }}>Sold Out on ERP</span>
+                            <span className="badge-pill-mmt accent" style={{ background: 'rgba(200, 155, 60, 0.08)', borderColor: 'rgba(200, 155, 60, 0.25)', color: '#C89B3C', fontSize: '10px', fontWeight: '800' }}>Sold Out on ERP</span>
                           )}
                         </div>
                       </div>
@@ -2918,7 +2736,7 @@ export default function BookingPage() {
                     </select>
                   </div>
                 </div>
-              </div>
+              </div>}
 
               {/* Card 3: Guest Contact Details */}
               <div className="mmt-card">
@@ -2927,8 +2745,33 @@ export default function BookingPage() {
                     <Users size={18} />
                     <span>Primary Guest Details</span>
                   </div>
-                  <span style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.5)' }}>* Required fields</span>
+                  <button
+                    onClick={() => setShowAddGuestModal(true)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', color: '#1d6de5', fontSize: '13px', fontWeight: '700', cursor: 'pointer', padding: '4px 0', fontFamily: 'Outfit, sans-serif' }}
+                  >
+                    + Add Guest
+                  </button>
                 </div>
+
+                {/* Saved Guests List */}
+                {savedGuests.length > 0 && (
+                  <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {savedGuests.map((g, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#f9fafb', borderRadius: '10px', border: '1px solid #e5e7eb' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '700', color: '#1d6de5', flexShrink: 0 }}>
+                            {g.firstName[0]?.toUpperCase()}
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '14px', fontWeight: '600', color: '#111' }}>{g.title}. {g.firstName} {g.lastName}</div>
+                            {g.isChild && <div style={{ fontSize: '11px', color: '#9CA3AF' }}>Below 12 years</div>}
+                          </div>
+                        </div>
+                        <button onClick={() => setSavedGuests(prev => prev.filter((_, idx) => idx !== i))} style={{ background: 'none', border: 'none', color: '#9CA3AF', cursor: 'pointer', fontSize: '20px', lineHeight: 1, padding: '0 4px' }}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="form-grid-mmt">
                   <div className="input-wrapper-mmt">
@@ -2946,7 +2789,7 @@ export default function BookingPage() {
                     <label>First Name *</label>
                     <input 
                       type="text" 
-                      placeholder="e.g. Kalyan" 
+                      placeholder="First name"
                       value={guestDetails.firstName}
                       onChange={(e) => setGuestDetails(prev => ({ ...prev, firstName: e.target.value }))}
                     />
@@ -2955,7 +2798,7 @@ export default function BookingPage() {
                     <label>Last Name *</label>
                     <input 
                       type="text" 
-                      placeholder="e.g. Sharma" 
+                      placeholder="Last name"
                       value={guestDetails.lastName}
                       onChange={(e) => setGuestDetails(prev => ({ ...prev, lastName: e.target.value }))}
                     />
@@ -2981,7 +2824,7 @@ export default function BookingPage() {
                     <div style={{ position: 'relative' }}>
                       <input 
                         type="tel" 
-                        placeholder="e.g. +91 98765 43210" 
+                        placeholder="+91 XXXXX XXXXX"
                         style={{ paddingLeft: '40px', width: '100%' }}
                         value={guestDetails.phone}
                         onChange={(e) => setGuestDetails(prev => ({ ...prev, phone: e.target.value }))}
@@ -2990,124 +2833,44 @@ export default function BookingPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Special Request tags */}
-                <div style={{ marginTop: '24px' }}>
-                  <h4 style={{ fontSize: '13px', fontWeight: '700', color: 'rgba(44, 37, 32, 0.9)', marginBottom: '4px' }}>
-                    Special Requests (Optional)
-                  </h4>
-                  <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.6)', margin: '0 0 12px' }}>
-                    Select pre-curated options to configure in your premium stay suite.
-                  </p>
-                  <div className="requests-container">
-                    {requestBadges.map((badge, idx) => (
-                      <div 
-                        key={idx}
-                        onClick={() => handleRequestBadgeToggle(badge)}
-                        className={`request-badge-item ${specialRequests.includes(badge) ? 'active' : ''}`}
-                      >
-                        {badge}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* GST Invoice Details */}
-                <div style={{ marginTop: '24px', borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: '20px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', userSelect: 'none' }}>
-                    <input 
-                      type="checkbox" 
-                      style={{ accentColor: '#d4af37', width: '16px', height: '16px' }}
-                      checked={guestDetails.gstEnabled}
-                      onChange={(e) => setGuestDetails(prev => ({ ...prev, gstEnabled: e.target.checked }))}
-                    />
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(44, 37, 32, 0.9)' }}>
-                      Enter GST Details (Optional - For corporate invoice claims)
-                    </span>
-                  </label>
-
-                  {guestDetails.gstEnabled && (
-                    <div className="form-grid-dual-mmt" style={{ marginTop: '16px' }}>
-                      <div className="input-wrapper-mmt">
-                        <label>GST Number</label>
-                        <input 
-                          type="text" 
-                          placeholder="e.g. 07AAAAA1111A1Z1" 
-                          value={guestDetails.gstNumber}
-                          onChange={(e) => setGuestDetails(prev => ({ ...prev, gstNumber: e.target.value }))}
-                        />
-                      </div>
-                      <div className="input-wrapper-mmt">
-                        <label>Registered Company Name</label>
-                        <input 
-                          type="text" 
-                          placeholder="e.g. Braj Heritage Private Ltd." 
-                          value={guestDetails.gstCompany}
-                          onChange={(e) => setGuestDetails(prev => ({ ...prev, gstCompany: e.target.value }))}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
 
-              {/* Card 4: Premium Spiritual Add-ons */}
-              <div className="mmt-card">
-                <div className="card-header-mmt">
-                  <div className="card-header-title">
-                    <Sparkles size={18} />
-                    <span>Enhance Your Spiritual Journey (Add-ons)</span>
-                  </div>
-                </div>
-
-                {/* Addon 1 */}
-                <div className="addon-item-row">
-                  <div className="addon-left-info">
-                    <div className="addon-icon-box">
-                      <Compass size={20} />
-                    </div>
-                    <div className="addon-text">
-                      <h5>Private Vrindavan Temple Darshan Guide</h5>
-                      <p>Includes express temple entries, private guide escort, and sacred Prasadam offerings.</p>
-                    </div>
-                  </div>
-                  <div className="addon-right-action">
-                    <span className="addon-price">₹1,500</span>
-                    <label className="switch-toggle-mmt">
-                      <input 
-                        type="checkbox" 
-                        checked={darshanGuide}
-                        onChange={(e) => setDarshanGuide(e.target.checked)}
-                      />
-                      <span className="switch-slider-mmt"></span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Addon 2 */}
-                <div className="addon-item-row">
-                  <div className="addon-left-info">
-                    <div className="addon-icon-box">
-                      <Car size={20} />
-                    </div>
-                    <div className="addon-text">
-                      <h5>Chauffeur-Driven Airport Pickup & Drop</h5>
-                      <p>Luxury private transfers between New Delhi Airport (DEL) and Braj Nidhi Guesthouse.</p>
-                    </div>
-                  </div>
-                  <div className="addon-right-action">
-                    <span className="addon-price">₹2,500</span>
-                    <label className="switch-toggle-mmt">
-                      <input 
-                        type="checkbox" 
-                        checked={airportCab}
-                        onChange={(e) => setAirportCab(e.target.checked)}
-                      />
-                      <span className="switch-slider-mmt"></span>
-                    </label>
-                  </div>
-                </div>
+              {/* Terms + PAY NOW */}
+              <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px 24px', marginBottom: '16px' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '16px' }}>
+                  <input type="checkbox" defaultChecked style={{ marginTop: '2px', accentColor: '#1d6de5', width: '15px', height: '15px', flexShrink: 0, cursor: 'pointer' }}/>
+                  <span style={{ fontSize: '13px', color: '#374151', lineHeight: '1.5' }}>
+                    By proceeding, I agree to Braj Nidhi's{' '}
+                    <a href="/terms" style={{ color: '#1d6de5', textDecoration: 'none', fontWeight: '600' }}>Terms of Service</a>,{' '}
+                    <a href="/privacy" style={{ color: '#1d6de5', textDecoration: 'none', fontWeight: '600' }}>Privacy Policy</a> and{' '}
+                    <a href="/cancellation-policy" style={{ color: '#1d6de5', textDecoration: 'none', fontWeight: '600' }}>Cancellation &amp; Property Booking Policies</a>.
+                  </span>
+                </label>
+                <button
+                  onClick={proceedToPayment}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    background: 'linear-gradient(135deg, #1565C0, #1976D2, #1E88E5)',
+                    color: '#fff',
+                    fontSize: '16px',
+                    fontWeight: '800',
+                    fontFamily: 'Outfit, sans-serif',
+                    letterSpacing: '1.5px',
+                    border: 'none',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase',
+                    boxShadow: '0 6px 20px rgba(21, 101, 192, 0.4)',
+                    transition: 'all 0.25s'
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 10px 30px rgba(21, 101, 192, 0.55)')}
+                  onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(21, 101, 192, 0.4)')}
+                >
+                  PAY NOW
+                </button>
               </div>
+
             </div>
 
             {/* RIGHT STICKY SIDEBAR - BOOKING PRICE SUMMARY & PROMO ENGINE */}
@@ -3120,7 +2883,7 @@ export default function BookingPage() {
                     {apiConnectionStatus === 'live' ? (
                       <span className="badge-pill-mmt success" style={{ fontSize: '10px', marginLeft: 'auto', background: 'rgba(22, 163, 74, 0.08)', borderColor: 'rgba(22, 163, 74, 0.2)', color: '#16a34a' }}>Live ERP</span>
                     ) : apiConnectionStatus === 'error' ? (
-                      <span className="badge-pill-mmt accent" style={{ fontSize: '10px', marginLeft: 'auto', background: 'rgba(139, 0, 0, 0.06)', borderColor: 'rgba(139, 0, 0, 0.2)', color: '#8b0000' }}>ERP Offline</span>
+                      <span className="badge-pill-mmt accent" style={{ fontSize: '10px', marginLeft: 'auto', background: 'rgba(200, 155, 60, 0.06)', borderColor: 'rgba(200, 155, 60, 0.2)', color: '#C89B3C' }}>ERP Offline</span>
                     ) : (
                       <span className="badge-pill-mmt" style={{ fontSize: '10px', marginLeft: 'auto' }}>Sandbox</span>
                     )}
@@ -3155,357 +2918,52 @@ export default function BookingPage() {
                     </div>
                   )}
 
-                  {appliedPromo && (
-                    <div className="summary-row-mmt discount">
-                      <span>Coupon Discount ({appliedPromo})</span>
-                      <span>-₹{promoDiscount.toLocaleString()}</span>
-                    </div>
-                  )}
-
                   <div className="summary-row-mmt" style={{ borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: '10px' }}>
-                    <span>GST (12% Standard Tax)</span>
+                    <span>Taxes & Fees (12% GST)</span>
                     <span>₹{gstAmount.toLocaleString()}</span>
-                  </div>
-                  <div className="summary-row-mmt">
-                    <span>Spiritual Trust Levy & Service Fee (5%)</span>
-                    <span>₹{serviceCharge.toLocaleString()}</span>
                   </div>
                   <div className="summary-row-mmt total">
                     <span>Total Payable</span>
                     <span>₹{payableTotal.toLocaleString()}</span>
                   </div>
+                  <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px' }}>Inclusive of all taxes and fees</div>
                 </div>
 
-                {/* Promo Code Engine */}
-                <div className="promo-container-mmt">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '700', color: '#d4af37' }}>
-                    <Percent size={14} />
-                    <span>Apply Promotional Code</span>
+                {/* Coupon Code */}
+                <div style={{ marginTop: '16px', borderTop: '1px solid #e5e7eb', paddingTop: '16px' }}>
+                  <div style={{ fontSize: '15px', fontWeight: '700', color: '#111', marginBottom: '10px' }}>Coupon Codes</div>
+                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', background: '#fafafa' }}>
+                    <input
+                      type="text"
+                      placeholder="Have A Coupon Code?"
+                      style={{ flex: 1, padding: '12px 14px', border: 'none', background: 'transparent', fontSize: '13px', color: '#374151', outline: 'none', fontFamily: 'Outfit, sans-serif' }}
+                    />
+                    <button style={{ padding: '12px 16px', background: 'none', border: 'none', fontSize: '13px', fontWeight: '700', color: '#9CA3AF', cursor: 'pointer', letterSpacing: '0.5px', fontFamily: 'Outfit, sans-serif' }}>
+                      APPLY
+                    </button>
                   </div>
-
-                  {appliedPromo ? (
-                    <div style={{ marginTop: '12px', background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34,197,94,0.3)', padding: '10px 14px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div>
-                        <p style={{ margin: 0, fontSize: '11px', color: '#15803d', fontWeight: '700' }}>COUPON APPLIED!</p>
-                        <p style={{ margin: 0, fontSize: '13px', color: '#1a1512', fontWeight: 'bold' }}>{appliedPromo}</p>
-                      </div>
-                      <button 
-                        onClick={handleRemovePromo}
-                        style={{ background: 'transparent', border: 'none', color: 'rgba(0,0,0,0.45)', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', textDecoration: 'underline' }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="promo-input-group">
-                        <input 
-                          type="text" 
-                          placeholder="ENTER PROMO CODE" 
-                          value={promoInput}
-                          onChange={(e) => setPromoInput(e.target.value)}
-                        />
-                        <button 
-                          onClick={() => handleApplyPromo(promoInput)}
-                          className="btn-apply-promo"
-                        >
-                          Apply
-                        </button>
-                      </div>
-                      {promoError && <p style={{ color: '#f87171', fontSize: '11px', margin: '6px 0 0', fontWeight: '500' }}>{promoError}</p>}
-                      {promoSuccess && <p style={{ color: '#4ade80', fontSize: '11px', margin: '6px 0 0', fontWeight: '500' }}>{promoSuccess}</p>}
-
-                      <div className="promo-badges-quick">
-                        <div onClick={() => handleApplyPromo('VRINDAVAN10')} className="quick-promo-pill">
-                          <span className="quick-promo-code">VRINDAVAN10</span>
-                          <span className="quick-promo-desc">10% Off Room Suites</span>
-                        </div>
-                        <div onClick={() => handleApplyPromo('WELCOME500')} className="quick-promo-pill">
-                          <span className="quick-promo-code">WELCOME500</span>
-                          <span className="quick-promo-desc">Save flat ₹500 instantly</span>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <button 
-                  onClick={proceedToPayment}
-                  className="btn-primary-mmt"
-                >
-                  <span>Confirm Book this Now</span>
-                  <ArrowRight size={18} />
-                </button>
-
-                <div className="secure-lock-bar">
-                  <Lock size={13} />
-                  <span>256-bit Secure TLS Booking Shield</span>
                 </div>
               </div>
             </div>
 
           </div>
 
-          <div className="hero-banner" style={{ marginTop: '30px', marginBottom: '20px' }}>
-            <div className="hero-copy">
-              <h1>Reserve Your Heritage Stay with Comfort & Devotion</h1>
-              <p>Complete your premium booking with curated guest services, secure payment, and exclusive member rewards crafted for the perfect Vrindavan retreat.</p>
-              <div className="hero-stats">
-                <div className="hero-stat">
-                  <h3>{getRoomTitle(roomType)}</h3>
-                  <p>Luxury suite tailored for your selected group size with heritage-inspired décor.</p>
-                </div>
-                <div className="hero-stat">
-                  <h3>{nights} Nights</h3>
-                  <p>Flexible stay dates with welcome breakfast and spiritual amenities.</p>
-                </div>
-                <div className="hero-stat">
-                  <h3>{adults} Adults / {children} Children</h3>
-                  <p>Choose your ideal family or friends configuration for a seamless check-in.</p>
-                </div>
-              </div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <Image src="/DSC05963-HDR.webp" alt="Premium suite preview" width={420} height={300} style={{ width: '100%', height: 'auto', borderRadius: '20px', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }} />
-            </div>
-          </div>
           </>
         )}
 
-        {/* 3. STEP 2: SECURE MAKE-MY-TRIP PAYMENT SYSTEM SCREEN */}
-        {currentStep === 2 && (
-          <div className="booking-grid-mmt" style={{ maxWidth: '1000px' }}>
-            
-            {/* LEFT SIDE - INTERACTIVE PAYMENT PORTALS */}
-            <div>
-              <div className="mmt-card">
-                
-                {paymentLoading ? (
-                  /* SIMULATED GATEWAY LOADER */
-                  <div className="payment-loading-overlay">
-                    <div className="spinner-payment"></div>
-                    <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '8px', color: '#1a1512' }}>
-                      {paymentStepText}
-                    </h3>
-                    <p style={{ color: 'rgba(44, 37, 32, 0.65)', fontSize: '13px' }}>
-                      Please do not close this tab or refresh the page. Your payment is securing.
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <div className="card-header-mmt">
-                      <div className="card-header-title">
-                        <Lock size={18} />
-                        <span>Select Secure Payment Method</span>
-                      </div>
-                      <span className="badge-pill-mmt success">Secured by Razorpay</span>
-                    </div>
-
-                    <div className="payment-container-split">
-                      {/* Left Side: Payment Tabs */}
-                      <div className="payment-tabs">
-                      <button 
-                        onClick={() => setPaymentMethod('upi')}
-                        className={`payment-tab-btn ${paymentMethod === 'upi' ? 'active' : ''}`}
-                      >
-                        <Compass size={16} />
-                        <span>UPI Instants</span>
-                      </button>
-                      <button 
-                        onClick={() => setPaymentMethod('qr')}
-                        className={`payment-tab-btn ${paymentMethod === 'qr' ? 'active' : ''}`}
-                      >
-                        <QrCode size={16} />
-                        <span>BHIM QR Scan</span>
-                      </button>
-                      <button 
-                        onClick={() => setPaymentMethod('card')}
-                        className={`payment-tab-btn ${paymentMethod === 'card' ? 'active' : ''}`}
-                      >
-                        <CreditCard size={16} />
-                        <span>Debit / Credit Card</span>
-                      </button>
-                      </div>
-
-                      {/* Right Side: Payment Form Pane */}
-                      <div className="payment-content-pane">
-                        {/* Method 1: UPI */}
-                        {paymentMethod === 'upi' && (
-                          <div style={{ animation: 'fadeIn 0.4s ease' }}>
-                            <h4 style={{ fontSize: '15px', color: '#1a1512', margin: '0 0 10px' }}>Pay via Instant UPI ID</h4>
-                            <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', marginBottom: '18px' }}>
-                              Submit your registered Virtual Payment Address (e.g. username@okhdfcbank or phone@paytm).
-                            </p>
-                            
-                            <div className="input-wrapper-mmt" style={{ maxWidth: '380px' }}>
-                              <label>Enter Virtual Payment Address (VPA)</label>
-                              <input 
-                                type="text" 
-                                placeholder="e.g. kalyan@ybl" 
-                                value={upiId}
-                                onChange={(e) => setUpiId(e.target.value)}
-                              />
-                            </div>
-                            
-                            <div style={{ marginTop: '20px', background: 'rgba(0, 0, 0, 0.03)', padding: '12px 16px', borderRadius: '10px', fontSize: '12px', color: 'rgba(44, 37, 32, 0.7)', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                              <Info size={16} style={{ color: '#8b0000' }} />
-                              <span>We will send a secure transaction request directly to your UPI smartphone application.</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Method 2: Scan QR */}
-                        {paymentMethod === 'qr' && (
-                          <div style={{ textAlign: 'center', padding: '15px 0', animation: 'fadeIn 0.4s ease' }}>
-                            <h4 style={{ fontSize: '16px', color: '#1a1512', margin: '0 0 6px' }}>Scan Unified BHIM Trust QR Code</h4>
-                            <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', margin: '0 0 20px' }}>
-                              Scan this official encrypted dynamic booking receipt QR using any UPI app (GPay, PhonePe, Paytm).
-                            </p>
-
-                            <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', display: 'inline-block', border: '3px solid #d4af37', boxShadow: '0 0 25px rgba(212,175,55,0.2)' }}>
-                              {/* Rich glowing simulator QR */}
-                              <QrCode size={180} style={{ color: '#0b0908' }} />
-                            </div>
-                            
-                            <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', color: '#a3e635', fontWeight: '700' }}>
-                              <Clock size={14} />
-                              <span>QR Code expires in 4 mins 52 secs</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Method 3: Cards */}
-                        {paymentMethod === 'card' && (
-                          <div style={{ animation: 'fadeIn 0.4s ease' }}>
-                            <h4 style={{ fontSize: '15px', color: '#1a1512', margin: '0 0 10px' }}>Pay via Secure Credit or Debit Card</h4>
-                            <p style={{ fontSize: '12px', color: 'rgba(44, 37, 32, 0.65)', marginBottom: '18px' }}>
-                              Enter card details. We encrypt this data directly via end-to-end PCI-DSS compliant secure vaults.
-                            </p>
-
-                            <div className="input-wrapper-mmt" style={{ marginBottom: '16px' }}>
-                              <label>Cardholder Full Name</label>
-                              <input 
-                                type="text" 
-                                placeholder="e.g. Kalyan Sharma" 
-                              />
-                            </div>
-
-                            <div className="input-wrapper-mmt" style={{ marginBottom: '16px' }}>
-                              <label>Debit / Credit Card Number</label>
-                              <input 
-                                type="text" 
-                                placeholder="4111 2222 3333 4444" 
-                                maxLength={19}
-                                value={cardNo}
-                                onChange={(e) => setCardNo(e.target.value)}
-                              />
-                            </div>
-
-                            <div className="form-grid-dual-mmt">
-                              <div className="input-wrapper-mmt">
-                                <label>Expiry Date (MM/YY)</label>
-                                <input 
-                                  type="text" 
-                                  placeholder="09/29" 
-                                  maxLength={5}
-                                  value={cardExpiry}
-                                  onChange={(e) => setCardExpiry(e.target.value)}
-                                />
-                              </div>
-                              <div className="input-wrapper-mmt">
-                                <label>CVV Shield (3-Digit)</label>
-                                <input 
-                                  type="password" 
-                                  placeholder="***" 
-                                  maxLength={3}
-                                  value={cardCVV}
-                                  onChange={(e) => setCardCVV(e.target.value)}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '16px', marginTop: '30px' }}>
-                      <button 
-                        onClick={() => setCurrentStep(1)}
-                        style={{ flex: 1, padding: '14px', background: 'transparent', border: '1px solid rgba(0,0,0,0.15)', color: 'rgba(44,37,32,0.7)', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.3s' }}
-                      >
-                        Back to Details
-                      </button>
-                      <button 
-                        onClick={triggerPaymentProcessing}
-                        className="btn-primary-mmt"
-                        style={{ flex: 2, margin: 0 }}
-                      >
-                        <ShieldCheck size={18} />
-                        <span>Pay Securely ₹{payableTotal.toLocaleString()}</span>
-                      </button>
-                    </div>
-                  </>
-                )}
-
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN - PRICE BREAKDOWN STICKY CARD */}
-            <div>
-              <div className="mmt-card" style={{ borderColor: 'rgba(212, 175, 55, 0.25)' }}>
-                <div className="summary-card-header">
-                  <h3>
-                    <Compass size={18} />
-                    <span>Booking Outline</span>
-                  </h3>
-                </div>
-
-                <div style={{ fontSize: '13px', color: 'rgba(44, 37, 32, 0.7)' }}>
-                  <p style={{ margin: '0 0 10px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Suite:</span>
-                    <strong style={{ color: '#1a1512' }}>{getRoomTitle(roomType)}</strong>
-                  </p>
-                  <p style={{ margin: '0 0 10px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Nights Count:</span>
-                    <strong style={{ color: '#1a1512' }}>{nights} {nights === 1 ? 'Night' : 'Nights'}</strong>
-                  </p>
-                  <p style={{ margin: '0 0 10px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Guests Configuration:</span>
-                    <strong style={{ color: '#1a1512' }}>{adults} Adults, {children} Children</strong>
-                  </p>
-                  <p style={{ margin: '0 0 10px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Primary Guest:</span>
-                    <strong style={{ color: '#1a1512' }}>{guestDetails.firstName} {guestDetails.lastName}</strong>
-                  </p>
-                </div>
-
-                <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: '15px', marginTop: '15px' }}>
-                  <div className="summary-row-mmt" style={{ fontSize: '13px' }}>
-                    <span>Room Net cost:</span>
-                    <span>₹{roomCost.toLocaleString()}</span>
-                  </div>
-                  {totalDiscount > 0 && (
-                    <div className="summary-row-mmt discount" style={{ fontSize: '13px' }}>
-                      <span>Combined Discounts:</span>
-                      <span>-₹{totalDiscount.toLocaleString()}</span>
-                    </div>
-                  )}
-                  <div className="summary-row-mmt total" style={{ fontSize: '16px', margin: '10px 0 0', paddingTop: '10px' }}>
-                    <span>Final Amount:</span>
-                    <span>₹{payableTotal.toLocaleString()}</span>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
+        {/* Step 2 — loading overlay while creating ERP reservation */}
+        {currentStep === 2 && paymentLoading && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '40vh', gap: '20px' }}>
+            <div className="spinner-payment" style={{ width: '48px', height: '48px', borderWidth: '4px' }}></div>
+            <p style={{ fontSize: '16px', fontWeight: '700', color: '#000', textAlign: 'center' }}>{paymentStepText}</p>
+            <p style={{ fontSize: '13px', color: 'rgba(44,37,32,0.6)', textAlign: 'center' }}>Please do not close or refresh this page.</p>
           </div>
         )}
 
         {/* 4. STEP 3: TRANSACTION SUCCESS CONFIRMATION RECEIPT SCREEN */}
         {currentStep === 3 && (
           <div className="confirmation-mmt-wrapper">
-            
+            <canvas ref={confettiCanvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 9999 }} />
 
             {/* STATUS HEADER */}
             <div className="conf-status-header">
@@ -3518,8 +2976,16 @@ export default function BookingPage() {
                 {new Date(checkIn).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })} is confirmed!
               </h2>
               <div className="conf-action-pills">
-                <button className="conf-action-pill"><Mail size={13} /><span>Leave a note</span></button>
-                <button className="conf-action-pill"><Calendar size={13} /><span>Add to calendar</span></button>
+                <button className="atc-btn" onClick={() => {
+                  const fmt = (d: string) => d.replace(/-/g, '');
+                  const title = encodeURIComponent(`Braj Nidhi Stay — ${getRoomTitle(roomType)}`);
+                  const details = encodeURIComponent(`Booking Ref: ${bookingRef}\nGuest: ${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}\nTotal Paid: Rs.${payableTotal.toLocaleString()}`);
+                  const location = encodeURIComponent('Braj Nidhi Guesthouse, Raman Reti Road, Vrindavan, UP');
+                  window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(checkIn)}/${fmt(checkOut)}&details=${details}&location=${location}`, '_blank');
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width={24} viewBox="0 0 24 24" height={24} fill="none" className="atc-icon"><g strokeWidth={2} strokeLinecap="round" stroke="#fff"><rect y={5} x={4} width={16} rx={2} height={16} /><path d="m8 3v4" /><path d="m16 3v4" /><path d="m4 11h16" /></g></svg>
+                  <span className="atc-label">Add to Calendar</span>
+                </button>
               </div>
             </div>
 
@@ -3536,7 +3002,7 @@ export default function BookingPage() {
                   </div>
                   <div className="conf-price-row">
                     <div className="conf-price-tag">
-                      <MapPin size={13} style={{ color: '#8b0000' }} />
+                      <MapPin size={13} style={{ color: '#C89B3C' }} />
                       ₹{pricePerNight.toLocaleString()} / night
                     </div>
                     <div className="conf-ref-badge"><Check size={10} />{bookingRef}</div>
@@ -3545,7 +3011,7 @@ export default function BookingPage() {
                     <img src="/Braj_nidhi_.png" alt="Braj Nidhi" className="conf-property-avatar" />
                     <div className="conf-property-details">
                       <h4>Braj Nidhi Guesthouse</h4>
-                      <span>Tel: +91 99359 50632</span>
+                      <span>Raman Reti Road, Vrindavan</span>
                     </div>
                   </div>
                 </div>
@@ -3563,12 +3029,12 @@ export default function BookingPage() {
                   <div className="conf-detail-row">
                     <div className="conf-detail-icon"><Phone size={16} /></div>
                     <span className="conf-detail-label">Phone</span>
-                    <span className="conf-detail-value">+91 99359 50632</span>
+                    <span className="conf-detail-value">{guestDetails.phone || '—'}</span>
                   </div>
                   <div className="conf-detail-row">
                     <div className="conf-detail-icon"><Mail size={16} /></div>
                     <span className="conf-detail-label">Email</span>
-                    <span className="conf-detail-value">info@brajnidhi.com</span>
+                    <span className="conf-detail-value">{guestDetails.email || '—'}</span>
                   </div>
                   <div className="conf-detail-row">
                     <div className="conf-detail-icon"><Calendar size={16} /></div>
@@ -3587,17 +3053,9 @@ export default function BookingPage() {
                   <div className="conf-detail-row">
                     <div className="conf-detail-icon"><Users size={16} /></div>
                     <span className="conf-detail-label">Your Contact</span>
-                    <span className="conf-detail-value" style={{ color: '#8b0000', fontWeight: 700 }}>
+                    <span className="conf-detail-value" style={{ color: '#C89B3C', fontWeight: 700 }}>
                       {guestDetails.title}. {guestDetails.firstName} {guestDetails.lastName}
                     </span>
-                    <div className="conf-detail-actions">
-                      <button className="conf-action-btn" onClick={() => window.location.href = `mailto:${guestDetails.email}`}>
-                        <Mail size={12} /> Write
-                      </button>
-                      <button className="conf-action-btn" onClick={() => window.location.href = `tel:${guestDetails.phone}`}>
-                        <Phone size={12} /> Call
-                      </button>
-                    </div>
                   </div>
                 </div>
 
@@ -3628,13 +3086,74 @@ export default function BookingPage() {
                   </div>
                 </div>
 
+
+                {/* Hidden receipt — only rendered when printing */}
+                <div className="pr-receipt-print">
+                  <div style={{ textAlign: 'center', fontWeight: 700, fontSize: '13px' }}>Braj Nidhi Guesthouse</div>
+                  <div style={{ textAlign: 'center' }}>Raman Reti Road, Vrindavan, UP</div>
+                  <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
+                  <div>Ref: {bookingRef}</div>
+                  <div>Date: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
+                  <div>Guest: {guestDetails.title}. {guestDetails.firstName} {guestDetails.lastName}</div>
+                  {guestDetails.phone && <div>Phone: {guestDetails.phone}</div>}
+                  <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ fontWeight: 700 }}>Item</td>
+                        <td style={{ fontWeight: 700, textAlign: 'center', width: '40px' }}>Qty</td>
+                        <td style={{ fontWeight: 700, textAlign: 'right' }}>Price</td>
+                      </tr>
+                      <tr>
+                        <td>{getRoomTitle(roomType)}</td>
+                        <td style={{ textAlign: 'center' }}>{nights}N</td>
+                        <td style={{ textAlign: 'right' }}>Rs.{roomCost.toLocaleString()}</td>
+                      </tr>
+                      <tr>
+                        <td>Guests</td>
+                        <td style={{ textAlign: 'center' }}>{adults}A{children > 0 ? `+${children}C` : ''}</td>
+                        <td style={{ textAlign: 'right' }}>Incl.</td>
+                      </tr>
+                      {totalDiscount > 0 && (
+                        <tr>
+                          <td>Discount</td>
+                          <td></td>
+                          <td style={{ textAlign: 'right' }}>-Rs.{totalDiscount.toLocaleString()}</td>
+                        </tr>
+                      )}
+                      <tr>
+                        <td>Check-In</td>
+                        <td></td>
+                        <td style={{ textAlign: 'right' }}>{new Date(checkIn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                      </tr>
+                      <tr>
+                        <td>Check-Out</td>
+                        <td></td>
+                        <td style={{ textAlign: 'right' }}>{new Date(checkOut).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontWeight: 700 }}>
+                    <tbody>
+                      <tr>
+                        <td>Total Paid</td>
+                        <td style={{ textAlign: 'right' }}>Rs.{payableTotal.toLocaleString()}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
+                  <div style={{ textAlign: 'center', marginTop: '4px' }}>Radhe Radhe! Thank you for choosing Braj Nidhi.</div>
+                </div>
+
                 <div className="conf-bottom-actions">
-                  <Link href="/" style={{ padding: '13px 24px', background: 'transparent', border: '1px solid rgba(0,0,0,0.14)', color: 'rgba(44,37,32,0.75)', borderRadius: '10px', fontSize: '14px', fontWeight: '700', textDecoration: 'none' }}>
-                    Return to Home
+                  <Link href="/" className="rth-btn">
+                    <span className="text">Return to Home</span>
+                    <span>Go Home ↩</span>
                   </Link>
-                  <button onClick={() => window.print()} className="btn-primary-mmt" style={{ flex: 'none', width: 'auto', margin: 0, padding: '13px 28px' }}>
-                    <ShieldCheck size={16} /><span>Print Receipt</span>
-                  </button>
+                  <div className="vb-borders">
+                    <button className="vb-btn" onClick={() => window.print()}>PRINT RECEIPT</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -3644,12 +3163,91 @@ export default function BookingPage() {
       </main>
 
       {/* 5. UNIFIED PREMIUM SHARED LOGIN MODAL */}
-      <LoginModal 
-        isOpen={loginModalOpen} 
-        onClose={() => setLoginModalOpen(false)} 
+      <LoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
         initialIsRegistering={loginModalInitialRegister}
       />
+
+
+      {/* Add Guest Modal */}
+      {showAddGuestModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowAddGuestModal(false)}>
+          <div style={{ background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '460px', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }} onClick={e => e.stopPropagation()}>
+
+            {/* Close */}
+            <button onClick={() => setShowAddGuestModal(false)} style={{ position: 'absolute', top: '14px', right: '14px', width: '32px', height: '32px', borderRadius: '50%', background: '#111', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', zIndex: 1 }}>×</button>
+
+            {/* Title */}
+            <div style={{ padding: '22px 24px 14px' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: '700', color: '#111', fontFamily: 'Outfit, sans-serif', margin: 0 }}>Saved Guests</h2>
+            </div>
+
+            {/* Saved guests */}
+            {savedGuests.length > 0 && (
+              <div style={{ padding: '0 24px 12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {savedGuests.map((g, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#f9fafb', borderRadius: '10px', border: '1px solid #e5e7eb' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '700', color: '#1d6de5', flexShrink: 0 }}>
+                        {g.firstName[0]?.toUpperCase()}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#111' }}>{g.title}. {g.firstName} {g.lastName}</div>
+                        {g.isChild && <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '1px' }}>Below 12 years</div>}
+                      </div>
+                    </div>
+                    <button onClick={() => setSavedGuests(prev => prev.filter((_, idx) => idx !== i))} style={{ background: 'none', border: 'none', color: '#9CA3AF', cursor: 'pointer', fontSize: '22px', lineHeight: 1, padding: '0 4px' }}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add Guests form */}
+            <div style={{ margin: '0 24px 16px', background: '#EEF5FB', borderRadius: '12px', padding: '18px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#111', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>Add Guests</h3>
+              <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '16px', lineHeight: '1.5' }}>
+                Name should be as per official govt. ID &amp; travelers below 18 years of age cannot travel alone
+              </p>
+
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px', marginBottom: '12px' }}>
+                <div style={{ minWidth: '95px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>TITLE</div>
+                  <select value={newGuestTitle} onChange={e => setNewGuestTitle(e.target.value)} style={{ width: '100%', padding: '10px 8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', background: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer' }}>
+                    <option value="Mr">Mr</option>
+                    <option value="Mrs">Mrs</option>
+                    <option value="Ms">Ms</option>
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>FULL NAME</div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input type="text" placeholder="First name" value={newGuestFirstName} onChange={e => setNewGuestFirstName(e.target.value)} style={{ flex: 1, padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', background: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', minWidth: 0 }}/>
+                    <input type="text" placeholder="Last name" value={newGuestLastName} onChange={e => setNewGuestLastName(e.target.value)} style={{ flex: 1, padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', background: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', minWidth: 0 }}/>
+                  </div>
+                </div>
+              </div>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '16px' }}>
+                <input type="checkbox" checked={newGuestIsChild} onChange={e => setNewGuestIsChild(e.target.checked)} style={{ width: '15px', height: '15px', accentColor: '#1d6de5', cursor: 'pointer' }}/>
+                <span style={{ fontSize: '13px', color: '#374151' }}>Below 12 years of age</span>
+              </label>
+
+              <button onClick={handleAddGuest} style={{ padding: '10px 24px', background: 'transparent', border: '2px solid #1d6de5', borderRadius: '24px', fontSize: '13px', fontWeight: '700', color: '#1d6de5', cursor: 'pointer', letterSpacing: '0.5px', fontFamily: 'Outfit, sans-serif', textTransform: 'uppercase', transition: 'all 0.2s' }}>
+                ADD TO SAVED GUESTS
+              </button>
+            </div>
+
+            {/* Done */}
+            <div style={{ borderTop: '1px solid #e5e7eb', padding: '16px 24px' }}>
+              <button onClick={() => setShowAddGuestModal(false)} style={{ width: '100%', padding: '14px', background: '#e5e7eb', color: '#6B7280', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', letterSpacing: '1.5px', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
+                DONE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer className="site-footer">
         <div className="footer-top-links">
@@ -3668,98 +3266,6 @@ export default function BookingPage() {
       </footer>
 
       <FloatingWidgets />
-
-      {/* Retractable Developer Credentials Drawer Toggle Button */}
-      <button 
-        className="dev-credentials-toggle"
-        onClick={() => setCredentialsOpen(true)}
-      >
-        <Terminal size={16} style={{ color: '#d4af37' }} />
-        <span>Dev API Hub</span>
-      </button>
-
-      {/* Dev Drawer Backdrop */}
-      <div 
-        className={`dev-drawer-backdrop ${credentialsOpen ? 'open' : ''}`}
-        onClick={() => setCredentialsOpen(false)}
-      />
-
-      {/* Collapsible Developer Credentials Drawer */}
-      <div className={`dev-credentials-drawer ${credentialsOpen ? 'open' : ''}`}>
-        <div className="dev-drawer-header">
-          <h3>
-            <Terminal size={20} />
-            <span>Developer Credentials Hub</span>
-          </h3>
-          <button 
-            className="dev-drawer-close"
-            onClick={() => setCredentialsOpen(false)}
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="dev-drawer-section">
-          <label style={{ fontSize: '11px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }}>
-            System Sync Status
-          </label>
-          <div className="dev-status-indicator">
-            <span className={`status-dot ${apiConnectionStatus}`} />
-            <span style={{ fontSize: '14px', fontWeight: '700', color: apiConnectionStatus === 'live' ? '#22c55e' : apiConnectionStatus === 'error' ? '#ef4444' : '#eab308' }}>
-              {apiConnectionStatus === 'live' ? 'Live ERP Active' : apiConnectionStatus === 'error' ? 'Connection Error' : 'Sandbox Simulator Active'}
-            </span>
-          </div>
-          {apiErrorMsg && (
-            <p style={{ fontSize: '11px', color: '#ef4444', marginTop: '10px', background: 'rgba(239, 68, 68, 0.08)', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.15)', whiteSpace: 'pre-wrap' }}>
-              {apiErrorMsg}
-            </p>
-          )}
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className="dev-input-wrapper">
-            <label>ERP API Base URL</label>
-            <input 
-              type="text" 
-              placeholder="e.g. https://pankaj.vcmerp.in/api/method/..."
-              value={drawerErpBase}
-              onChange={(e) => setDrawerErpBase(e.target.value)}
-            />
-          </div>
-
-          <div className="dev-input-wrapper">
-            <label>ERP API Key</label>
-            <input 
-              type="password" 
-              placeholder="Enter api_key"
-              value={drawerApiKey}
-              onChange={(e) => setDrawerApiKey(e.target.value)}
-            />
-          </div>
-
-          <div className="dev-input-wrapper">
-            <label>ERP API Secret</label>
-            <input 
-              type="password" 
-              placeholder="Enter api_secret"
-              value={drawerApiSecret}
-              onChange={(e) => setDrawerApiSecret(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '20px', lineHeight: '1.5' }}>
-          💡 These developer credentials are saved securely in your browser's local <code style={{ color: '#d4af37' }}>sessionStorage</code>. They will be sent safely through the Next.js API proxy route and are cleared instantly when you close your browser tab.
-        </p>
-
-        <button 
-          className="dev-save-btn"
-          onClick={() => handleSaveCredentials(drawerApiKey, drawerApiSecret, drawerErpBase)}
-        >
-          <Key size={16} />
-          <span>Save & Initialize Connection</span>
-        </button>
-      </div>
     </div>
   );
 }

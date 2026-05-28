@@ -1,36 +1,32 @@
 import { NextRequest } from 'next/server';
 
+const ERP_API_KEY = process.env.ERP_API_KEY;
+const ERP_API_SECRET = process.env.ERP_API_SECRET;
+const ERP_BASE_URL = process.env.ERP_BASE_URL || 'https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api';
+
 export async function POST(
   request: NextRequest,
   context: { params: Promise<{ method: string }> }
 ) {
   try {
-    const { method } = await context.params;
-    const body = await request.json();
-
-    // Check if custom credentials are provided in headers or body for private testing
-    // Otherwise fall back to server-side environment variables
-    const apiKey = request.headers.get('x-api-key') || process.env.ERP_API_KEY;
-    const apiSecret = request.headers.get('x-api-secret') || process.env.ERP_API_SECRET;
-    const customBase = request.headers.get('x-erp-base') || 'https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api';
-
-    if (!apiKey || !apiSecret) {
+    if (!ERP_API_KEY || !ERP_API_SECRET) {
       return Response.json(
-        { error: 'ERP connection credentials are not configured. Please add ERP_API_KEY and ERP_API_SECRET to your environment variables.' },
-        { status: 400 }
+        { error: 'ERP credentials are not configured on the server.' },
+        { status: 500 }
       );
     }
 
-    const targetUrl = `${customBase.replace(/\/$/, '')}.${method}`;
+    const { method } = await context.params;
+    const body = await request.json();
 
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      'Authorization': `token ${apiKey}:${apiSecret}`,
-    };
+    const targetUrl = `${ERP_BASE_URL.replace(/\/$/, '')}.${method}`;
 
     const erpResponse = await fetch(targetUrl, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `token ${ERP_API_KEY}:${ERP_API_SECRET}`,
+      },
       body: JSON.stringify(body),
     });
 

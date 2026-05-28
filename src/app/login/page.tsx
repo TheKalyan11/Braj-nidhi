@@ -529,24 +529,9 @@ export default function LoginPage() {
         <div className="mmt-right-pane">
           <div>
             {/* Selector Tabs Capsule */}
-            <div className="mmt-pill-tabs">
-              <div
-                className={`mmt-pill-tab ${activeAccountType === 'personal' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveAccountType('personal');
-                  setIsRegistering(false);
-                }}
-              >
+            <div className="mmt-pill-tabs single">
+              <div className="mmt-pill-tab active">
                 Personal Account
-              </div>
-              <div
-                className={`mmt-pill-tab ${activeAccountType === 'mybiz' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveAccountType('mybiz');
-                  setIsRegistering(false);
-                }}
-              >
-                Corporate Account
               </div>
             </div>
 

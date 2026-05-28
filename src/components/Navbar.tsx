@@ -86,7 +86,7 @@ const Navbar = () => {
             <span>Support</span>
           </Link>
           <Link
-            href="/booking"
+            href="/guesthouse#rooms-suites"
             className="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-semibold uppercase tracking-wider hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20 flex items-center gap-2"
           >
             <Calendar size={16} />
@@ -139,7 +139,7 @@ const Navbar = () => {
                   Create Account
                 </Link>
                 <Link
-                  href="/booking"
+                  href="/guesthouse#rooms-suites"
                   className="bg-primary text-white text-center py-3 rounded-xl font-bold uppercase"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

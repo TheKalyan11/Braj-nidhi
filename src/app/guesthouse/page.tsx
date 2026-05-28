@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
+import BookNowButton from '@/components/BookNowButton';
+import LoginJoinButton from '@/components/LoginJoinButton';
 
 // Self-contained Room Card Slideshow to isolate slide re-renders
 const RoomCardSlideshow = ({ images, alt, interval = 4000 }: { images: string[]; alt: string; interval?: number }) => {
@@ -1522,9 +1524,9 @@ export default function Guesthouse() {
                     <button onClick={handleLogout} className="btn-login">Logout</button>
                 </>
             ) : (
-                <button onClick={() => setIsLoginModalOpen(true)} className="btn-login">Login / Join</button>
+                <LoginJoinButton onClick={() => setIsLoginModalOpen(true)} />
             )}
-            <a href="/booking" className="btn-book">Book Now</a>
+            <BookNowButton href="#rooms-suites" />
         </div>
 
         {/* Mobile Header Actions Flex Wrapper */}
@@ -1576,7 +1578,7 @@ export default function Guesthouse() {
             ) : (
               <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
             )}
-            <a href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="btn-book" style={{ display: 'block', textAlign: 'center', marginTop: '4px' }}>Book Now</a>
+            <BookNowButton href="#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
           </div>
         </div>
       </div>
@@ -1683,7 +1685,7 @@ export default function Guesthouse() {
             </div>
         </section>
 
-        <section className="featured-rooms-section">
+        <section id="rooms-suites" className="featured-rooms-section">
             <div className="featured-rooms-inner">
                 <div className="featured-rooms-header">
                     <h2>ROOMS AND SUITES</h2>
