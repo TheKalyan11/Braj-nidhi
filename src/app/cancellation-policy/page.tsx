@@ -435,10 +435,10 @@ export default function CancellationPolicyPage() {
                 <div className="mobile-user-profile">
                   <span className="user-label">Braj Club Member</span>
                   <span className="user-name" style={{ fontSize: "15px", fontWeight: "800", color: "#8b0000" }}>{userName}</span>
-                  <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: "8px", width: "100%", justifyContent: "center" }}>Logout</button>
+                  <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
                 </div>
               ) : (
-                <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: "100%", justifyContent: "center" }}>Login / Create Account</button>
+                <LoginJoinButton onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
               )}
               <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: "block", textAlign: "center", marginTop: "4px" }} />
             </div>

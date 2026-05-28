@@ -200,20 +200,22 @@ export default function PremiumDoubleCalendar({
             to   { opacity: 1; transform: translateY(0); }
           }
 
-          /* Mobile: centered fixed overlay */
+          /* Mobile: drop upwards relative to search block */
           @media (max-width: 768px) {
             .sky-cal-panel {
-              position: fixed;
-              bottom: auto;
-              top: 50%; left: 50%;
-              transform: translate(-50%, -50%);
+              position: absolute;
+              top: auto;
+              bottom: calc(100% + 15px);
+              left: 50%;
+              transform: translateX(-50%);
               width: calc(100vw - 20px);
+              max-height: 75vh;
               border-radius: 16px;
               animation: skyFadeMobile 0.18s ease forwards;
             }
             @keyframes skyFadeMobile {
-              from { opacity: 0; transform: translate(-50%, -47%); }
-              to   { opacity: 1; transform: translate(-50%, -50%); }
+              from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+              to   { opacity: 1; transform: translateX(-50%) translateY(0); }
             }
           }
 
@@ -307,6 +309,13 @@ export default function PremiumDoubleCalendar({
             box-shadow: 0 8px 28px rgba(0,0,0,0.13);
             z-index: 10; max-height: 220px; overflow-y: auto;
             min-width: 180px; padding: 4px 0;
+          }
+          @media (max-width: 768px) {
+            .sky-month-picker {
+              top: auto;
+              bottom: calc(100% + 4px);
+              box-shadow: 0 -8px 28px rgba(0,0,0,0.13);
+            }
           }
           .sky-month-option {
             padding: 9px 18px; font-size: 14px;

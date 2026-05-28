@@ -1,0 +1,15 @@
+[Unit]
+Description=Braj Nidhi Next.js App
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/var/www/brajnidhi
+ExecStart=/usr/bin/node /var/www/brajnidhi/node_modules/.bin/next start -p 3000
+Restart=always
+RestartSec=5
+EnvironmentFile=/etc/brajnidhi.env
+
+[Install]
+WantedBy=multi-user.target

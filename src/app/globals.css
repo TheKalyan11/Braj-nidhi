@@ -365,8 +365,9 @@ header.scrolled nav ul li a:hover {
 .luxury-search-container {
     position: absolute;
     bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
     width: 90%;
     max-width: 1200px;
     z-index: 10;
@@ -3192,7 +3193,7 @@ header.scrolled nav ul li a:hover {
 }
 
 .mobile-menu-footer {
-    padding: 20px 22px 30px;
+    padding: 20px 22px 100px; /* Increased bottom padding to avoid overlap with floating widgets */
     border-top: 1px solid rgba(0, 0, 0, 0.07);
     display: flex;
     flex-direction: column;
@@ -3567,17 +3568,17 @@ html, body {
 
 /* === Floating Widgets — Mobile Positioning === */
 @media (max-width: 768px) {
-    /* Match desktop style: vertically centered, left margin, circular icons */
+    /* Match desktop style: bottom-anchored, left margin, circular icons */
     .float-social-stack {
         display: flex !important;
         flex-direction: column;
         position: fixed;
-        top: 50%;
-        transform: translateY(-50%);
-        bottom: auto;
+        top: auto;
+        transform: none;
+        bottom: 60px;
         left: 12px;
         right: auto;
-        gap: 2px;
+        gap: 0;
         opacity: 1 !important;
         pointer-events: auto !important;
     }
@@ -4564,3 +4565,10 @@ header.scrolled .mobile-logout-btn {
     }
 }
 
+
+.mobile-ljb {
+    width: 100% !important;
+    margin-top: 8px;
+    justify-content: center;
+    text-align: center;
+}

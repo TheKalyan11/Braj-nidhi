@@ -1554,7 +1554,9 @@ export default function Guesthouse() {
       <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
         <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
           <div className="mobile-menu-header">
-            <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto" }} />
+            <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
+            </Link>
             <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
               <X size={24} />
             </button>
@@ -1573,10 +1575,10 @@ export default function Guesthouse() {
               <div className="mobile-user-profile">
                 <span className="user-label">Braj Club Member</span>
                 <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
-                <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}>Logout</button>
+                <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
               </div>
             ) : (
-              <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
+              <LoginJoinButton onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
             )}
             <BookNowButton href="#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
           </div>
