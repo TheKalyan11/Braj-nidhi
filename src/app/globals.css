@@ -3573,12 +3573,12 @@ html, body {
         display: flex !important;
         flex-direction: column;
         position: fixed;
-        bottom: 70px;   /* sits above the music player (48px height + gap) */
+        top: 50%;
+        transform: translateY(-50%);
+        bottom: auto;
         left: 0;
         right: auto;
-        top: auto;
-        transform: none;
-        gap: 2px;
+        gap: 3px;
         opacity: 1 !important;
         pointer-events: auto !important;
     }
