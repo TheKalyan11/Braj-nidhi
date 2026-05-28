@@ -206,6 +206,8 @@ export default function PremiumDoubleCalendar({
   };
 
   return (
+    <>
+    <div className="mmt-cal-backdrop" onClick={onClose} />
     <div
       ref={containerRef}
       className="mmt-calendar-overlay animate-fadeIn"
@@ -385,6 +387,13 @@ export default function PremiumDoubleCalendar({
         .mmt-cal-arrow.right {
           right: -2px;
         }
+        .mmt-cal-backdrop {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.45);
+          z-index: 99998;
+        }
         
         /* Days layout */
         .mmt-cal-weekdays {
@@ -477,13 +486,27 @@ export default function PremiumDoubleCalendar({
         }
         
         @media (max-width: 767px) {
+          .mmt-cal-backdrop {
+            display: block !important;
+          }
           .mmt-calendar-overlay {
-            width: 95vw !important;
-            max-width: 380px;
+            position: fixed !important;
+            top: 50% !important;
+            bottom: auto !important;
             left: 50% !important;
             right: auto !important;
-            transform: translateX(-50%) !important;
+            transform: translate(-50%, -50%) !important;
+            width: 92vw !important;
+            max-width: 380px;
+            max-height: 88vh;
+            overflow-y: auto;
+            z-index: 99999 !important;
             padding: 16px;
+            animation: fadeInCenter 0.22s cubic-bezier(0.16,1,0.3,1) forwards;
+          }
+          @keyframes fadeInCenter {
+            from { opacity: 0; transform: translate(-50%, -48%); }
+            to   { opacity: 1; transform: translate(-50%, -50%); }
           }
           .mmt-cal-header-tabs {
             gap: 12px;
@@ -508,13 +531,13 @@ export default function PremiumDoubleCalendar({
           }
           .mmt-cal-day-cell {
             font-size: 16px;
-            height: 34px;
+            height: 38px;
           }
           .mmt-cal-month-col:first-of-type .mmt-cal-arrow.right {
             display: flex;
           }
           .mmt-cal-month-col:last-of-type {
-            display: none; /* Hide second month on mobile */
+            display: none;
           }
         }
         `
@@ -667,5 +690,6 @@ export default function PremiumDoubleCalendar({
       </div>
 
     </div>
+    </>
   );
 }

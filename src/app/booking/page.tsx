@@ -1921,8 +1921,8 @@ export default function BookingPage() {
         }
 
         @media (max-width: 900px) {
-          .booking-grid-mmt { grid-template-columns: 1fr; }
-          .mmt-sidebar { position: static; }
+          .booking-grid-mmt { grid-template-columns: 1fr; padding: 0 16px; gap: 16px; }
+          .mmt-sidebar { position: static; order: -1; }
           .suite-selector-grid { grid-template-columns: 1fr; }
         }
 
@@ -2344,10 +2344,10 @@ export default function BookingPage() {
                 <div className="mobile-user-profile">
                   <span className="user-label">Braj Club Member</span>
                   <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#C89B3C' }}>{userName}</span>
-                  <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}>Logout</button>
+                  <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
                 </div>
               ) : (
-                <button onClick={() => { setLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
+                <LoginJoinButton onClick={() => { setLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
               )}
               <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
             </div>
