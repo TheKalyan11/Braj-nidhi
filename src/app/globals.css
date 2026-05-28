@@ -3567,8 +3567,7 @@ html, body {
 
 /* === Floating Widgets — Mobile Positioning === */
 @media (max-width: 768px) {
-    /* Left side, just above the music player. Icons are 28 px so they only
-       occupy x:0-28 — minimal overlap with content that starts at ~20 px. */
+    /* Match desktop style: vertically centered, left margin, circular icons */
     .float-social-stack {
         display: flex !important;
         flex-direction: column;
@@ -3576,15 +3575,15 @@ html, body {
         top: 50%;
         transform: translateY(-50%);
         bottom: auto;
-        left: 0;
+        left: 12px;
         right: auto;
-        gap: 3px;
+        gap: 2px;
         opacity: 1 !important;
         pointer-events: auto !important;
     }
 
     .float-social-stack .socialcontainer {
-        height: 34px;
+        height: 40px;
         overflow: hidden;
         display: block;
     }
@@ -3598,27 +3597,27 @@ html, body {
     .float-social-stack .social-icon-3-3,
     .float-social-stack .social-icon-4,
     .float-social-stack .social-icon-4-4 {
-        width: 34px;
-        height: 34px;
+        width: 40px;
+        height: 40px;
         margin: 0;
-        border-radius: 0 8px 8px 0;
+        border-radius: 50px;
     }
 
     .float-social-stack svg {
-        width: 18px;
+        width: 22px;
     }
 
     .float-social-stack .socialcontainer:hover .social-icon-1,
     .float-social-stack .socialcontainer:hover .social-icon-2,
     .float-social-stack .socialcontainer:hover .social-icon-3,
     .float-social-stack .socialcontainer:hover .social-icon-4 {
-        transform: translateY(-34px);
+        transform: translateY(-40px);
     }
 
-    /* Music player — bottom-left, clear of LiveChat button */
+    /* Music player — bottom-left */
     .premium-music-player {
         bottom: 16px;
-        left: 8px;
+        left: 12px;
         opacity: 1 !important;
         pointer-events: auto !important;
     }
