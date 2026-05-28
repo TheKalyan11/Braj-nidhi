@@ -295,6 +295,27 @@ function RoomsComboContent() {
           .rcp-room-body-grid{grid-template-columns:1fr;}
           .rcp-room-img{height:220px;}
           .rcp-search-strip{gap:14px;}
+          /* Room card header — compact on mobile */
+          .rcp-room-header{padding:12px 14px;gap:8px;}
+          .rcp-room-header-left{gap:10px;}
+          .rcp-room-thumb{width:70px;height:54px;}
+          .rcp-room-name h3{font-size:15px;margin-bottom:4px;}
+          .rcp-room-header-right{gap:8px;}
+          .rcp-price-mrp{font-size:12px;}
+          .rcp-price-main{font-size:20px;}
+          .rcp-price-label{font-size:11px;}
+          .rcp-discount{font-size:11px;}
+          /* Action buttons */
+          .rcp-room-actions{flex-direction:column;gap:8px;}
+          .btn-select-room,.btn-view-details{width:100%;justify-content:center;padding:12px 16px;font-size:14px;}
+          /* Amenities + body padding */
+          .rcp-room-body{padding:14px;}
+          .rcp-amenity-item{font-size:13px;}
+        }
+        @media(max-width:400px){
+          .rcp-room-name h3{font-size:13px;}
+          .rcp-price-main{font-size:18px;}
+          .rcp-room-thumb{width:58px;height:46px;}
         }
       `}} />
 
@@ -322,7 +343,7 @@ function RoomsComboContent() {
                 </div>
                 <div className="user-profile-badge">{getUserInitials(userName)}</div>
               </div>
-              <button onClick={handleLogout} className="btn-login">Logout</button>
+              <LoginJoinButton onClick={handleLogout} label="Logout" />
             </>
           ) : (
             <LoginJoinButton onClick={() => setIsLoginModalOpen(true)} />
@@ -365,10 +386,10 @@ function RoomsComboContent() {
                 <div className="mobile-user-profile">
                   <span className="user-label">Braj Club Member</span>
                   <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
-                  <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="btn-login" style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}>Logout</button>
+                  <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
                 </div>
               ) : (
-                <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="btn-login" style={{ width: '100%', justifyContent: 'center' }}>Login / Create Account</button>
+                <LoginJoinButton onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
               )}
               <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
             </div>
