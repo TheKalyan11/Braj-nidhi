@@ -1,21 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar as CalendarIcon } from 'lucide-react';
 
 interface PremiumDoubleCalendarProps {
-  checkIn: string; // Format: 'YYYY-MM-DD'
-  checkOut: string; // Format: 'YYYY-MM-DD'
+  checkIn: string;
+  checkOut: string;
   onChange: (checkIn: string, checkOut: string) => void;
   isOpen: boolean;
   onClose?: () => void;
   initialSelection?: 'in' | 'out';
-}
-
-interface FestivalEvent {
-  date: string; // Format: 'YYYY-MM-DD'
-  label: string; // Short label like 'Akshaya', 'Braj'
-  fullName: string;
 }
 
 export default function PremiumDoubleCalendar({
@@ -26,659 +19,510 @@ export default function PremiumDoubleCalendar({
   onClose,
   initialSelection = 'in'
 }: PremiumDoubleCalendarProps) {
-  // Convert standard date string to Date objects
   const parseDateStr = (str: string) => {
     if (!str) return new Date();
     const [y, m, d] = str.split('-').map(Number);
     return new Date(y, m - 1, d);
   };
 
+  const fmtStr = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
   const checkInDate = parseDateStr(checkIn);
   const checkOutDate = parseDateStr(checkOut);
 
-  // Active sub-selection state: 'in' or 'out'
   const [activeSelection, setActiveSelection] = useState<'in' | 'out'>(initialSelection);
-
-  // Reset to initialSelection each time the calendar opens
-  useEffect(() => {
-    if (isOpen) setActiveSelection(initialSelection);
-  }, [isOpen, initialSelection]);
-  
-  // Left-most visible month and year in side-by-side view (Defaults to checkInDate's month)
-  const [currentMonth, setCurrentMonth] = useState(checkInDate.getMonth());
-  const [currentYear, setCurrentYear] = useState(checkInDate.getFullYear());
-
-  // Keep calendar view in sync when checkIn changes externally
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      const d = parseDateStr(checkIn);
-      setCurrentMonth(d.getMonth());
-      setCurrentYear(d.getFullYear());
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [checkIn]);
+  const [leftMonth, setLeftMonth] = useState(checkInDate.getMonth());
+  const [leftYear, setLeftYear] = useState(checkInDate.getFullYear());
+  const [hoverDate, setHoverDate] = useState<Date | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen) {
+      setActiveSelection(initialSelection);
+      const d = parseDateStr(checkIn);
+      setLeftMonth(d.getMonth());
+      setLeftYear(d.getFullYear());
+    }
+  }, [isOpen, initialSelection]);
 
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        const trigger = containerRef.current.closest('.mmt-date-trigger') || document.querySelector('.block-trigger-wrapper');
-        if (trigger && trigger.contains(event.target as Node)) {
-          return;
-        }
-        if (onClose) {
-          onClose();
-        }
+  // Close on outside click
+  useEffect(() => {
+    if (!isOpen) return;
+    const handle = (e: MouseEvent | TouchEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        const t = e.target as Element;
+        if (t.closest('.mmt-date-trigger') || t.closest('.search-block')) return;
+        if (onClose) onClose();
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside, true);
-    document.addEventListener('touchstart', handleClickOutside, true);
+    document.addEventListener('mousedown', handle, true);
+    document.addEventListener('touchstart', handle, true);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside, true);
-      document.removeEventListener('touchstart', handleClickOutside, true);
+      document.removeEventListener('mousedown', handle, true);
+      document.removeEventListener('touchstart', handle, true);
     };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  // Custom Vrindavan & Spiritual Holy Festivals (Removed per user request to clear underlines/highlights)
-  const festivals: FestivalEvent[] = [];
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const WEEKDAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
-  // Helper date parsing and formatting
-  const formatDateParts = (d: Date) => {
-    const day = d.getDate();
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const yrStr = d.getFullYear().toString().slice(-2);
-    return {
-      day,
-      month: months[d.getMonth()],
-      year: yrStr
-    };
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Right month is always left+1
+  const rightMonth = (leftMonth + 1) % 12;
+  const rightYear = leftMonth === 11 ? leftYear + 1 : leftYear;
+
+  const prevMonth = () => {
+    if (leftMonth === 0) { setLeftMonth(11); setLeftYear(leftYear - 1); }
+    else setLeftMonth(leftMonth - 1);
+  };
+  const nextMonth = () => {
+    if (leftMonth === 11) { setLeftMonth(0); setLeftYear(leftYear + 1); }
+    else setLeftMonth(leftMonth + 1);
   };
 
-  const getDaysInMonth = (month: number, year: number) => {
-    return new Date(year, month + 1, 0).getDate();
+  const buildGrid = (month: number, year: number) => {
+    const firstDow = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells: (Date | null)[] = [];
+    for (let i = 0; i < firstDow; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+    return cells;
   };
 
-  const getFirstDayOfMonth = (month: number, year: number) => {
-    return new Date(year, month, 1).getDay();
-  };
+  const sameDay = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
-  const isSameDay = (d1: Date, d2: Date) => {
-    return d1.getFullYear() === d2.getFullYear() &&
-           d1.getMonth() === d2.getMonth() &&
-           d1.getDate() === d2.getDate();
-  };
-
-  const isBetweenDays = (dayDate: Date, start: Date, end: Date) => {
-    const dayTime = dayDate.getTime();
-    const startTime = new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime();
-    const endTime = new Date(end.getFullYear(), end.getMonth(), end.getDate()).getTime();
-    return dayTime > startTime && dayTime < endTime;
-  };
-
-  // Build dates for specific month
-  const generateMonthGrid = (monthIndex: number, year: number) => {
-    const daysInMonth = getDaysInMonth(monthIndex, year);
-    const firstDay = getFirstDayOfMonth(monthIndex, year);
-    const gridDays = [];
-
-    // Push empty placeholders for preceding days
-    for (let i = 0; i < firstDay; i++) {
-      gridDays.push(null);
-    }
-
-    // Push actual day numbers
-    for (let d = 1; d <= daysInMonth; d++) {
-      gridDays.push(new Date(year, monthIndex, d));
-    }
-
-    return gridDays;
-  };
-
-  // Navigate side-by-side months
-  const handlePrevMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else {
-      setCurrentMonth(currentMonth - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else {
-      setCurrentMonth(currentMonth + 1);
-    }
-  };
-
-  // Click on date cell logic
-  const handleDateClick = (dayDate: Date) => {
-    const y = dayDate.getFullYear();
-    const m = String(dayDate.getMonth() + 1).padStart(2, '0');
-    const d = String(dayDate.getDate()).padStart(2, '0');
-    const formattedStr = `${y}-${m}-${d}`;
-
+  const handleDayClick = (day: Date) => {
+    if (day < today) return;
+    const val = fmtStr(day);
     if (activeSelection === 'in') {
-      // Set Check-in date. If check-out is before this date, reset check-out to check-in + 1 day
-      const newCheckOut = dayDate.getTime() >= checkOutDate.getTime() 
-        ? new Date(dayDate.getTime() + 86400000) 
-        : checkOutDate;
-      
-      const outY = newCheckOut.getFullYear();
-      const outM = String(newCheckOut.getMonth() + 1).padStart(2, '0');
-      const outD = String(newCheckOut.getDate()).padStart(2, '0');
-      
-      onChange(formattedStr, `${outY}-${outM}-${outD}`);
-      setActiveSelection('out'); // Switch selection underline to Check-out
+      const newOut = day >= checkOutDate ? fmtStr(new Date(day.getTime() + 86400000)) : checkOut;
+      onChange(val, newOut);
+      setActiveSelection('out');
     } else {
-      // Set Check-out date
-      if (dayDate.getTime() <= checkInDate.getTime()) {
-        // If clicked date is before check-in, set it as check-in instead and select checkout
-        onChange(formattedStr, checkOut);
+      if (day <= checkInDate) {
+        onChange(val, checkOut);
         setActiveSelection('out');
       } else {
-        onChange(checkIn, formattedStr);
-        if (onClose) onClose(); // Close on complete selection
+        onChange(checkIn, val);
+        setHoverDate(null);
       }
     }
   };
 
-  const leftMonth = currentMonth;
-  const leftYear = currentYear;
-  const rightMonth = (currentMonth + 1) % 12;
-  const rightYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+  const fmtDisplay = (dateStr: string) => {
+    const d = parseDateStr(dateStr);
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    return {
+      day: d.getDate(),
+      month: MONTHS[d.getMonth()].slice(0, 3),
+      year: d.getFullYear(),
+      dow: days[d.getDay()]
+    };
+  };
 
-  const monthsList = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  const ci = fmtDisplay(checkIn);
+  const co = fmtDisplay(checkOut);
 
-  const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  const getDayState = (day: Date | null) => {
+    if (!day) return {};
+    const isPast = day < today;
+    const isStart = sameDay(day, checkInDate);
+    const isEnd = sameDay(day, checkOutDate);
+    const effectiveEnd = (activeSelection === 'out' && hoverDate && hoverDate > checkInDate) ? hoverDate : checkOutDate;
+    const inRange = day > checkInDate && day < effectiveEnd && !isStart && !isEnd;
+    const isToday = sameDay(day, today);
+    return { isPast, isStart, isEnd, inRange, isToday };
+  };
 
-  // Check if a cell has a festival event
-  const getFestivalForDate = (date: Date) => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    const dateStr = `${y}-${m}-${d}`;
-    return festivals.find(f => f.date === dateStr);
+  const renderGrid = (month: number, year: number, isMobileHidden = false) => {
+    const cells = buildGrid(month, year);
+    return (
+      <div className={`sky-month-col${isMobileHidden ? ' sky-mobile-hide' : ''}`}>
+        <div className="sky-month-nav">
+          {!isMobileHidden && (
+            <button className="sky-nav-btn" onClick={prevMonth} aria-label="Previous month">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+          )}
+          <span className="sky-month-label">{MONTHS[month]} {year}</span>
+          {isMobileHidden ? null : (
+            <button className="sky-nav-btn sky-nav-right" onClick={nextMonth} aria-label="Next month">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          )}
+          {isMobileHidden && (
+            <button className="sky-nav-btn sky-nav-right" onClick={nextMonth} aria-label="Next month">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          )}
+        </div>
+        <div className="sky-weekdays">
+          {WEEKDAYS.map(w => <div key={w} className="sky-wd">{w}</div>)}
+        </div>
+        <div className="sky-days-grid">
+          {cells.map((day, idx) => {
+            if (!day) return <div key={`e-${idx}`} className="sky-day-cell sky-empty" />;
+            const { isPast, isStart, isEnd, inRange, isToday } = getDayState(day);
+            const isRangeStart = isStart && !sameDay(checkInDate, checkOutDate);
+            const isRangeEnd = isEnd && !sameDay(checkInDate, checkOutDate);
+            return (
+              <div
+                key={`d-${day.getDate()}`}
+                className={[
+                  'sky-day-cell',
+                  isPast ? 'sky-past' : '',
+                  isStart ? 'sky-start' : '',
+                  isEnd ? 'sky-end' : '',
+                  inRange ? 'sky-in-range' : '',
+                  isToday && !isStart && !isEnd ? 'sky-today' : '',
+                  isRangeStart ? 'sky-range-start' : '',
+                  isRangeEnd ? 'sky-range-end' : '',
+                ].filter(Boolean).join(' ')}
+                onClick={() => !isPast && handleDayClick(day)}
+                onMouseEnter={() => !isPast && activeSelection === 'out' && setHoverDate(day)}
+                onMouseLeave={() => setHoverDate(null)}
+              >
+                <div className="sky-day-bg" />
+                <span className="sky-day-num">{day.getDate()}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   return (
     <>
-    <div className="mmt-cal-backdrop" onClick={onClose} />
-    <div
-      ref={containerRef}
-      className="mmt-calendar-overlay animate-fadeIn"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translate(-50%, -48%); }
-          to { opacity: 1; transform: translate(-50%, -50%); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .mmt-calendar-overlay {
-          background: #ffffff !important;
-          border-radius: 20px;
-          border: 1px solid rgba(0, 0, 0, 0.08) !important;
-          box-shadow: 0 18px 60px rgba(0, 0, 0, 0.14) !important;
-          box-sizing: border-box;
-          width: min(650px, calc(100vw - 32px));
-          max-width: none;
-          padding: 18px 22px 20px;
-          color: #1f2937 !important;
-          font-family: 'Outfit', sans-serif;
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          z-index: 99999;
-          user-select: none;
-          max-height: 90vh;
-          overflow-y: auto;
-        }
-        .mmt-calendar-overlay::before {
-          display: none;
-        }
-        .mmt-cal-backdrop {
-          display: block;
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.45);
-          z-index: 99998;
-        }
-        
-        /* Premium date tabs at top matching MMT image */
-        .mmt-cal-header-tabs {
-          display: flex;
-          align-items: center;
-          border-bottom: 1.5px solid rgba(0, 0, 0, 0.06) !important;
-          justify-content: space-between;
-          padding-bottom: 14px;
-          margin-bottom: 14px;
-          gap: 18px;
-        }
-        .mmt-cal-tab {
-          display: flex;
-          align-items: center;
-          cursor: pointer;
-          padding: 4px 0;
-          position: relative;
-          transition: all 0.25s ease;
-          min-width: 72px;
-        }
-        .mmt-cal-tab-icon {
-          color: rgba(0, 0, 0, 0.3) !important;
-          margin-right: 10px;
-          transition: all 0.25s ease;
-        }
-        .mmt-cal-tab:last-of-type {
-          justify-content: flex-end;
-        }
-        .mmt-cal-tab:last-of-type .mmt-cal-tab-icon {
-          order: 2;
-          margin-left: 10px;
-          margin-right: 0;
-        }
-        .mmt-cal-tab.active .mmt-cal-tab-icon {
-          color: #eab308 !important;
-        }
-        .mmt-cal-tab-text {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          line-height: 1.02;
-        }
-        .mmt-cal-tab:last-of-type .mmt-cal-tab-text {
-          align-items: flex-end;
-        }
-        .mmt-cal-tab-date-top {
-          font-size: 16px;
-          font-weight: 800;
-          color: #111827 !important;
-          transition: all 0.25s ease;
-        }
-        .mmt-cal-tab-date-bottom {
-          font-size: 16px;
-          font-weight: 800;
-          color: rgba(17, 24, 39, 0.62) !important;
-          transition: all 0.25s ease;
-        }
-        .mmt-cal-tab.active .mmt-cal-tab-date-top {
-          color: #1f2937 !important;
-          font-weight: 800;
-        }
-        .mmt-cal-tab.active .mmt-cal-tab-date-bottom {
-          color: rgba(0, 0, 0, 0.6) !important;
-          font-weight: 700;
-        }
-        .mmt-cal-tab.active::after {
-          content: '';
-          position: absolute;
-          bottom: -15.5px;
-          left: 0;
-          right: 0;
-          height: 3px;
-          background: #eab308 !important;
-          border-radius: 2px 2px 0 0;
-        }
-        .mmt-cal-tab-dash {
-          font-size: 16px;
-          color: rgba(0, 0, 0, 0.2) !important;
-          font-weight: 400;
-          margin: 0 auto;
-        }
+      {/* Backdrop */}
+      <div className="sky-backdrop" onClick={onClose} />
 
-        /* Two Columns side-by-side */
-        .mmt-cal-dual-months {
-          display: flex;
-          gap: 24px;
-          justify-content: space-between;
-        }
-        .mmt-cal-month-col {
-          width: calc(50% - 12px);
-        }
-        
-        /* Month Title paginator styling */
-        .mmt-cal-month-title-row {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 32px;
-          position: relative;
-          margin-bottom: 14px;
-        }
-        .mmt-cal-month-name {
-          font-size: 16px;
-          font-weight: 800;
-          color: #1f2937 !important;
-          letter-spacing: 0;
-        }
-        .mmt-cal-month-name span {
-          display: block;
-          font-weight: 400;
-          margin-left: 0;
-          margin-top: 3px;
-          color: rgba(0, 0, 0, 0.4) !important;
-          font-size: 13px;
-          text-align: center;
-        }
-        .mmt-cal-arrow {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          color: #b45309 !important;
-          border: 1px solid rgba(180, 83, 9, 0.15) !important;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .mmt-cal-arrow:hover {
-          background: rgba(180, 83, 9, 0.08) !important;
-          border-color: #b45309 !important;
-          color: #b45309 !important;
-        }
-        .mmt-cal-arrow.left {
-          left: -2px;
-        }
-        .mmt-cal-arrow.right {
-          right: -2px;
-        }
-        /* Days layout */
-        .mmt-cal-weekdays {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          text-align: center;
-          margin-bottom: 10px;
-        }
-        .mmt-cal-weekday {
-          font-size: 11px;
-          font-weight: 600;
-          color: rgba(0, 0, 0, 0.4) !important;
-          height: 20px;
-        }
-        
-        .mmt-cal-days-grid {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          row-gap: 5px;
-        }
-        
-        .mmt-cal-day-cell {
-          height: 34px;
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          font-size: 15px;
-          font-weight: 500;
-          color: #1f2937 !important;
-          border-radius: 4px;
-          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .mmt-cal-day-cell:hover:not(.empty):not(.past) {
-          background: rgba(234, 179, 8, 0.12) !important;
-          color: #b45309 !important;
-        }
-        
-        /* Selected Range styles */
-        .mmt-cal-day-cell.selected-start {
-          background: #eab308 !important;
-          color: #111827 !important;
-          border-radius: 4px 0 0 4px !important;
-          font-weight: 500;
-        }
-        
-        .mmt-cal-day-cell.selected-end {
-          background: #eab308 !important;
-          color: #111827 !important;
-          border-radius: 0 4px 4px 0 !important;
-          font-weight: 500;
-        }
-        
-        .mmt-cal-day-cell.selected-start.selected-end {
-          border-radius: 4px !important;
-        }
-        
-        .mmt-cal-day-cell.in-range {
-          background: rgba(234, 179, 8, 0.12) !important;
-          color: #b45309 !important;
-          border-radius: 0 !important;
-        }
-        
-        .mmt-cal-day-cell.empty {
-          cursor: default;
-          pointer-events: none;
-        }
-        
-        .mmt-cal-day-cell.past {
-          color: rgba(0, 0, 0, 0.2) !important;
-          cursor: default;
-          pointer-events: none;
-        }
-        
-        .mmt-day-num {
-          z-index: 10;
-          font-weight: inherit;
-          margin-top: 0;
-        }
-        
-        /* Hide arrows on opposite cols to make it look exactly like image */
-        .mmt-cal-month-col:first-of-type .mmt-cal-arrow.right {
-          display: none;
-        }
-        .mmt-cal-month-col:last-of-type .mmt-cal-arrow.left {
-          display: none;
-        }
-        
-        @media (max-width: 767px) {
-          .mmt-calendar-overlay {
-            width: 92vw !important;
-            max-width: 380px !important;
-            padding: 16px !important;
+      {/* Calendar panel */}
+      <div ref={containerRef} className="sky-cal-panel" onClick={e => e.stopPropagation()}>
+        <style dangerouslySetInnerHTML={{ __html: `
+          /* ── Skyscanner-style calendar ── */
+          .sky-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 99998;
           }
-          .mmt-cal-header-tabs {
-            gap: 12px;
-            margin-bottom: 16px;
-            padding-bottom: 14px;
-          }
-          .mmt-cal-tab-date-top {
-            font-size: 15px;
-          }
-          .mmt-cal-tab-date-bottom {
-            font-size: 15px;
-          }
-          .mmt-cal-tab.active::after {
-            bottom: -15.5px;
-          }
-          .mmt-cal-dual-months {
-            flex-direction: column;
-            gap: 16px;
-          }
-          .mmt-cal-month-col {
-            width: 100% !important;
-          }
-          .mmt-cal-day-cell {
-            font-size: 16px;
-            height: 38px;
-          }
-          .mmt-cal-month-col:first-of-type .mmt-cal-arrow.right {
+          .sky-cal-panel {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 99999;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+            width: min(740px, calc(100vw - 24px));
+            max-height: 90vh;
+            overflow-y: auto;
+            font-family: 'Outfit', sans-serif;
+            animation: skyFadeIn 0.2s ease forwards;
             display: flex;
+            flex-direction: column;
           }
-          .mmt-cal-month-col:last-of-type {
-            display: none;
+          @keyframes skyFadeIn {
+            from { opacity: 0; transform: translate(-50%, -47%); }
+            to   { opacity: 1; transform: translate(-50%, -50%); }
           }
-        }
-        `
-      }} />
 
-      {/* 1. Header Date Tabs Panel */}
-      <div className="mmt-cal-header-tabs">
-        <div 
-          className={`mmt-cal-tab ${activeSelection === 'in' ? 'active' : ''}`}
-          onClick={() => setActiveSelection('in')}
-        >
-          <CalendarIcon size={16} className="mmt-cal-tab-icon" />
-          <div className="mmt-cal-tab-text">
-            <span className="mmt-cal-tab-date-top">{formatDateParts(checkInDate).day}</span>
-            <span className="mmt-cal-tab-date-top">{formatDateParts(checkInDate).month}</span>
-            <span className="mmt-cal-tab-date-bottom">{formatDateParts(checkInDate).year}</span>
+          /* ── Header tabs ── */
+          .sky-header {
+            display: flex;
+            border-bottom: 1px solid #e8e8e8;
+            position: relative;
+          }
+          .sky-tab {
+            flex: 1;
+            padding: 18px 24px 14px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.15s;
+          }
+          .sky-tab:first-child { border-right: 1px solid #e8e8e8; }
+          .sky-tab:hover { background: #f7f7f7; }
+          .sky-tab-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 4px;
+          }
+          .sky-tab-date {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111;
+            line-height: 1.1;
+          }
+          .sky-tab-sub {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 2px;
+          }
+          .sky-tab.sky-tab-active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0; right: 0;
+            height: 3px;
+            background: #C89B3C;
+            border-radius: 2px 2px 0 0;
+          }
+          .sky-tab.sky-tab-active .sky-tab-label { color: #C89B3C; }
+          .sky-tab.sky-tab-active .sky-tab-date { color: #111; }
+          .sky-close-btn {
+            position: absolute;
+            top: 14px; right: 14px;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f3f4f6;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #6b7280;
+            transition: background 0.15s;
+          }
+          .sky-close-btn:hover { background: #e5e7eb; color: #111; }
+
+          /* ── Month columns ── */
+          .sky-months-wrap {
+            display: flex;
+            gap: 0;
+            padding: 20px 24px 10px;
+            flex: 1;
+          }
+          .sky-month-col {
+            flex: 1;
+            min-width: 0;
+          }
+          .sky-month-col + .sky-month-col {
+            padding-left: 24px;
+            border-left: 1px solid #f0f0f0;
+            margin-left: 24px;
+          }
+          .sky-month-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+          }
+          .sky-month-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111;
+            text-align: center;
+            flex: 1;
+          }
+          .sky-nav-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #6b7280;
+            transition: all 0.15s;
+            flex-shrink: 0;
+          }
+          .sky-nav-btn:hover { border-color: #C89B3C; color: #C89B3C; background: #fdf8ef; }
+
+          /* ── Weekdays ── */
+          .sky-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            margin-bottom: 6px;
+          }
+          .sky-wd {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            padding: 4px 0;
+          }
+
+          /* ── Day cells ── */
+          .sky-days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            row-gap: 2px;
+          }
+          .sky-day-cell {
+            position: relative;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+          }
+          .sky-day-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+          }
+          .sky-day-num {
+            position: relative;
+            z-index: 2;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 500;
+            color: #111;
+            transition: background 0.15s, color 0.15s;
+          }
+          .sky-day-cell:hover:not(.sky-past):not(.sky-start):not(.sky-end) .sky-day-num {
+            background: #f5edda;
+            color: #C89B3C;
+          }
+          /* Past */
+          .sky-past { cursor: default; }
+          .sky-past .sky-day-num { color: #d1d5db; }
+          /* Today */
+          .sky-today .sky-day-num { font-weight: 700; text-decoration: underline; text-decoration-color: #C89B3C; }
+          /* In-range background (full width strip) */
+          .sky-in-range .sky-day-bg { background: #fdf3dc; }
+          /* Range-start: right half strip */
+          .sky-range-start .sky-day-bg { background: linear-gradient(to right, transparent 50%, #fdf3dc 50%); }
+          /* Range-end: left half strip */
+          .sky-range-end .sky-day-bg { background: linear-gradient(to left, transparent 50%, #fdf3dc 50%); }
+          /* Start/end circles */
+          .sky-start .sky-day-num, .sky-end .sky-day-num {
+            background: #C89B3C;
+            color: #fff;
+            font-weight: 700;
+          }
+
+          /* ── Footer ── */
+          .sky-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 14px 24px 18px;
+            border-top: 1px solid #f0f0f0;
+            gap: 12px;
+          }
+          .sky-nights-badge {
+            font-size: 13px;
+            color: #6b7280;
+            margin-right: auto;
+          }
+          .sky-nights-badge strong { color: #111; }
+          .sky-clear-btn {
+            padding: 10px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Outfit', sans-serif;
+          }
+          .sky-clear-btn:hover { border-color: #C89B3C; color: #C89B3C; }
+          .sky-done-btn {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 8px;
+            background: #C89B3C;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Outfit', sans-serif;
+          }
+          .sky-done-btn:hover { background: #b08a32; }
+
+          /* ── Mobile ── */
+          @media (max-width: 640px) {
+            .sky-cal-panel {
+              width: 95vw;
+              max-height: 92vh;
+              border-radius: 14px;
+            }
+            .sky-tab { padding: 14px 16px 12px; }
+            .sky-tab-date { font-size: 17px; }
+            .sky-months-wrap { padding: 16px 16px 8px; }
+            .sky-mobile-hide { display: none; }
+            .sky-month-col + .sky-month-col { display: none; }
+            .sky-footer { padding: 12px 16px 16px; }
+            .sky-day-cell { height: 44px; }
+            .sky-day-num { width: 40px; height: 40px; font-size: 15px; }
+          }
+        `}} />
+
+        {/* Header */}
+        <div className="sky-header">
+          <div
+            className={`sky-tab${activeSelection === 'in' ? ' sky-tab-active' : ''}`}
+            onClick={() => setActiveSelection('in')}
+          >
+            <div className="sky-tab-label">Check-in</div>
+            <div className="sky-tab-date">{ci.day} {ci.month} {ci.year}</div>
+            <div className="sky-tab-sub">{ci.dow}</div>
           </div>
+          <div
+            className={`sky-tab${activeSelection === 'out' ? ' sky-tab-active' : ''}`}
+            onClick={() => setActiveSelection('out')}
+          >
+            <div className="sky-tab-label">Check-out</div>
+            <div className="sky-tab-date">{co.day} {co.month} {co.year}</div>
+            <div className="sky-tab-sub">{co.dow}</div>
+          </div>
+          <button className="sky-close-btn" onClick={onClose} aria-label="Close calendar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
-        
-        <span className="mmt-cal-tab-dash">-</span>
-        
-        <div 
-          className={`mmt-cal-tab ${activeSelection === 'out' ? 'active' : ''}`}
-          onClick={() => setActiveSelection('out')}
-        >
-          <CalendarIcon size={16} className="mmt-cal-tab-icon" />
-          <div className="mmt-cal-tab-text">
-            <span className="mmt-cal-tab-date-top">{formatDateParts(checkOutDate).day}</span>
-            <span className="mmt-cal-tab-date-top">{formatDateParts(checkOutDate).month}</span>
-            <span className="mmt-cal-tab-date-bottom">{formatDateParts(checkOutDate).year}</span>
-          </div>
+
+        {/* Months */}
+        <div className="sky-months-wrap">
+          {renderGrid(leftMonth, leftYear, false)}
+          {renderGrid(rightMonth, rightYear, true)}
+        </div>
+
+        {/* Footer */}
+        <div className="sky-footer">
+          {(() => {
+            const ci2 = parseDateStr(checkIn);
+            const co2 = parseDateStr(checkOut);
+            const nights = Math.round((co2.getTime() - ci2.getTime()) / 86400000);
+            return nights > 0 ? (
+              <span className="sky-nights-badge"><strong>{nights} night{nights > 1 ? 's' : ''}</strong> selected</span>
+            ) : null;
+          })()}
+          <button className="sky-clear-btn" onClick={() => {
+            const t = fmtStr(today);
+            const t2 = fmtStr(new Date(today.getTime() + 86400000));
+            onChange(t, t2);
+            setActiveSelection('in');
+          }}>Clear</button>
+          <button className="sky-done-btn" onClick={onClose}>Done</button>
         </div>
       </div>
-
-      {/* 2. Side-by-Side Dual-Month Calendar Grids */}
-      <div className="mmt-cal-dual-months">
-        
-        {/* Left Column - Month A */}
-        <div className="mmt-cal-month-col">
-          <div className="mmt-cal-month-title-row">
-            <div className="mmt-cal-arrow left" onClick={handlePrevMonth} title="Previous Month">
-              {/* Premium sleek arrow matching image */}
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15m0 0l6.75-6.75M4.5 12l6.75 6.75" />
-              </svg>
-            </div>
-            <h3 className="mmt-cal-month-name">
-              {monthsList[leftMonth]} <span>{leftYear.toString().slice(-2)}</span>
-            </h3>
-          </div>
-          
-          <div className="mmt-cal-weekdays">
-            {weekdays.map(w => <div key={w} className="mmt-cal-weekday">{w}</div>)}
-          </div>
-          
-          <div className="mmt-cal-days-grid">
-            {generateMonthGrid(leftMonth, leftYear).map((day, idx) => {
-              if (day === null) return <div key={`empty-left-${idx}`} className="mmt-cal-day-cell empty" />;
-              
-              const isStart = isSameDay(day, checkInDate);
-              const isEnd = isSameDay(day, checkOutDate);
-              const inRange = isBetweenDays(day, checkInDate, checkOutDate);
-              const festival = getFestivalForDate(day);
-              
-              // Check for past days compared to actual current date
-              const baseToday = new Date();
-              baseToday.setHours(0, 0, 0, 0);
-              const isPast = day.getTime() < baseToday.getTime();
-              
-              return (
-                <div
-                  key={`day-left-${day.getDate()}`}
-                  onClick={() => !isPast && handleDateClick(day)}
-                  className={`mmt-cal-day-cell 
-                    ${isStart ? 'selected-start' : ''} 
-                    ${isEnd ? 'selected-end' : ''} 
-                    ${inRange ? 'in-range' : ''}
-                    ${festival ? 'has-festival' : ''}
-                    ${isPast ? 'past' : ''}
-                  `}
-                  title={festival ? festival.fullName : undefined}
-                >
-                  {festival && festival.label && (
-                    <span className="mmt-festival-label">{festival.label}</span>
-                  )}
-                  <span className="mmt-day-num">{day.getDate()}</span>
-                  {festival && <span className="mmt-day-line" />}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right Column - Month B */}
-        <div className="mmt-cal-month-col">
-          <div className="mmt-cal-month-title-row">
-            <h3 className="mmt-cal-month-name">
-              {monthsList[rightMonth]} <span>{rightYear.toString().slice(-2)}</span>
-            </h3>
-            <div className="mmt-cal-arrow right" onClick={handleNextMonth} title="Next Month">
-              {/* Premium sleek arrow matching image */}
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-              </svg>
-            </div>
-          </div>
-          
-          <div className="mmt-cal-weekdays">
-            {weekdays.map(w => <div key={w} className="mmt-cal-weekday">{w}</div>)}
-          </div>
-          
-          <div className="mmt-cal-days-grid">
-            {generateMonthGrid(rightMonth, rightYear).map((day, idx) => {
-              if (day === null) return <div key={`empty-right-${idx}`} className="mmt-cal-day-cell empty" />;
-              
-              const isStart = isSameDay(day, checkInDate);
-              const isEnd = isSameDay(day, checkOutDate);
-              const inRange = isBetweenDays(day, checkInDate, checkOutDate);
-              const festival = getFestivalForDate(day);
-              
-              // Check for past days compared to actual current date
-              const baseToday = new Date();
-              baseToday.setHours(0, 0, 0, 0);
-              const isPast = day.getTime() < baseToday.getTime();
-              
-              return (
-                <div
-                  key={`day-right-${day.getDate()}`}
-                  onClick={() => !isPast && handleDateClick(day)}
-                  className={`mmt-cal-day-cell 
-                    ${isStart ? 'selected-start' : ''} 
-                    ${isEnd ? 'selected-end' : ''} 
-                    ${inRange ? 'in-range' : ''}
-                    ${festival ? 'has-festival' : ''}
-                    ${isPast ? 'past' : ''}
-                  `}
-                  title={festival ? festival.fullName : undefined}
-                >
-                  {festival && festival.label && (
-                    <span className="mmt-festival-label">{festival.label}</span>
-                  )}
-                  <span className="mmt-day-num">{day.getDate()}</span>
-                  {festival && <span className="mmt-day-line" />}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-      </div>
-
-    </div>
     </>
   );
 }
