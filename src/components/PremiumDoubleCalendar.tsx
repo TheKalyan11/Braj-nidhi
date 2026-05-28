@@ -11,43 +11,47 @@ interface PremiumDoubleCalendarProps {
   initialSelection?: 'in' | 'out';
 }
 
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+// Mon-first week
+const WEEKDAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function parseDateStr(str: string) {
+  if (!str) return new Date();
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function fmtStr(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function sameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
+}
+
 export default function PremiumDoubleCalendar({
-  checkIn,
-  checkOut,
-  onChange,
-  isOpen,
-  onClose,
-  initialSelection = 'in'
+  checkIn, checkOut, onChange, isOpen, onClose, initialSelection = 'in'
 }: PremiumDoubleCalendarProps) {
-  const parseDateStr = (str: string) => {
-    if (!str) return new Date();
-    const [y, m, d] = str.split('-').map(Number);
-    return new Date(y, m - 1, d);
-  };
-
-  const fmtStr = (d: Date) => {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  };
-
   const checkInDate = parseDateStr(checkIn);
   const checkOutDate = parseDateStr(checkOut);
 
   const [activeSelection, setActiveSelection] = useState<'in' | 'out'>(initialSelection);
-  const [leftMonth, setLeftMonth] = useState(checkInDate.getMonth());
-  const [leftYear, setLeftYear] = useState(checkInDate.getFullYear());
-  const [hoverDate, setHoverDate] = useState<Date | null>(null);
-
+  const [viewMonth, setViewMonth] = useState(checkInDate.getMonth());
+  const [viewYear, setViewYear] = useState(checkInDate.getFullYear());
+  const [showMonthPicker, setShowMonthPicker] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       setActiveSelection(initialSelection);
-      const d = parseDateStr(checkIn);
-      setLeftMonth(d.getMonth());
-      setLeftYear(d.getFullYear());
+      const d = parseDateStr(initialSelection === 'out' ? checkOut : checkIn);
+      setViewMonth(d.getMonth());
+      setViewYear(d.getFullYear());
     }
   }, [isOpen, initialSelection]);
 
@@ -71,155 +75,102 @@ export default function PremiumDoubleCalendar({
 
   if (!isOpen) return null;
 
-  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const WEEKDAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-
-  const today = new Date(); today.setHours(0,0,0,0);
-
-  // Right month is always left+1
-  const rightMonth = (leftMonth + 1) % 12;
-  const rightYear = leftMonth === 11 ? leftYear + 1 : leftYear;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
 
   const prevMonth = () => {
-    if (leftMonth === 0) { setLeftMonth(11); setLeftYear(leftYear - 1); }
-    else setLeftMonth(leftMonth - 1);
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
+    else setViewMonth(viewMonth - 1);
+    setShowMonthPicker(false);
   };
+
   const nextMonth = () => {
-    if (leftMonth === 11) { setLeftMonth(0); setLeftYear(leftYear + 1); }
-    else setLeftMonth(leftMonth + 1);
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
+    else setViewMonth(viewMonth + 1);
+    setShowMonthPicker(false);
   };
 
-  const buildGrid = (month: number, year: number) => {
-    const firstDow = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const cells: (Date | null)[] = [];
-    for (let i = 0; i < firstDow; i++) cells.push(null);
-    for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
-    return cells;
-  };
-
-  const sameDay = (a: Date, b: Date) =>
-    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-
-  const handleDayClick = (day: Date) => {
+  const handleDayClick = (day: Date, isOverflow: boolean) => {
+    if (day < today && !isOverflow) return;
     if (day < today) return;
     const val = fmtStr(day);
     if (activeSelection === 'in') {
       const newOut = day >= checkOutDate ? fmtStr(new Date(day.getTime() + 86400000)) : checkOut;
       onChange(val, newOut);
       setActiveSelection('out');
+      // Navigate to check-out month if needed
+      if (day.getMonth() !== viewMonth || day.getFullYear() !== viewYear) {
+        setViewMonth(day.getMonth());
+        setViewYear(day.getFullYear());
+      }
     } else {
       if (day <= checkInDate) {
         onChange(val, checkOut);
         setActiveSelection('out');
       } else {
         onChange(checkIn, val);
-        setHoverDate(null);
+        if (onClose) onClose(); // auto-close after check-out selected
       }
     }
   };
 
+  // Build grid: Mon-first, show prev/next month overflow days
+  const buildGrid = () => {
+    const firstDay = new Date(viewYear, viewMonth, 1);
+    // Mon=0 … Sun=6; JS: Sun=0 Mon=1 … Sat=6
+    const firstDow = (firstDay.getDay() + 6) % 7; // Mon-first offset
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
+
+    const cells: { date: Date; overflow: boolean }[] = [];
+
+    // Prev month overflow
+    for (let i = firstDow - 1; i >= 0; i--) {
+      const m = viewMonth === 0 ? 11 : viewMonth - 1;
+      const y = viewMonth === 0 ? viewYear - 1 : viewYear;
+      cells.push({ date: new Date(y, m, prevMonthDays - i), overflow: true });
+    }
+
+    // Current month
+    for (let d = 1; d <= daysInMonth; d++) {
+      cells.push({ date: new Date(viewYear, viewMonth, d), overflow: false });
+    }
+
+    // Next month overflow — fill to complete rows (multiple of 7)
+    let next = 1;
+    while (cells.length % 7 !== 0) {
+      const m = viewMonth === 11 ? 0 : viewMonth + 1;
+      const y = viewMonth === 11 ? viewYear + 1 : viewYear;
+      cells.push({ date: new Date(y, m, next++), overflow: true });
+    }
+
+    return cells;
+  };
+
+  const cells = buildGrid();
+  const nights = Math.round((checkOutDate.getTime() - checkInDate.getTime()) / 86400000);
+
   const fmtDisplay = (dateStr: string) => {
     const d = parseDateStr(dateStr);
-    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    return {
-      day: d.getDate(),
-      month: MONTHS[d.getMonth()].slice(0, 3),
-      year: d.getFullYear(),
-      dow: days[d.getDay()]
-    };
+    const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} ${d.getFullYear()} · ${dows[d.getDay()]}`;
   };
 
-  const ci = fmtDisplay(checkIn);
-  const co = fmtDisplay(checkOut);
-
-  const getDayState = (day: Date | null) => {
-    if (!day) return {};
-    const isPast = day < today;
-    const isStart = sameDay(day, checkInDate);
-    const isEnd = sameDay(day, checkOutDate);
-    const effectiveEnd = (activeSelection === 'out' && hoverDate && hoverDate > checkInDate) ? hoverDate : checkOutDate;
-    const inRange = day > checkInDate && day < effectiveEnd && !isStart && !isEnd;
-    const isToday = sameDay(day, today);
-    return { isPast, isStart, isEnd, inRange, isToday };
-  };
-
-  const renderGrid = (month: number, year: number, isMobileHidden = false) => {
-    const cells = buildGrid(month, year);
-    return (
-      <div className={`sky-month-col${isMobileHidden ? ' sky-mobile-hide' : ''}`}>
-        <div className="sky-month-nav">
-          {!isMobileHidden && (
-            <button className="sky-nav-btn" onClick={prevMonth} aria-label="Previous month">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
-              </svg>
-            </button>
-          )}
-          <span className="sky-month-label">{MONTHS[month]} {year}</span>
-          {isMobileHidden ? null : (
-            <button className="sky-nav-btn sky-nav-right" onClick={nextMonth} aria-label="Next month">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
-              </svg>
-            </button>
-          )}
-          {isMobileHidden && (
-            <button className="sky-nav-btn sky-nav-right" onClick={nextMonth} aria-label="Next month">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
-              </svg>
-            </button>
-          )}
-        </div>
-        <div className="sky-weekdays">
-          {WEEKDAYS.map(w => <div key={w} className="sky-wd">{w}</div>)}
-        </div>
-        <div className="sky-days-grid">
-          {cells.map((day, idx) => {
-            if (!day) return <div key={`e-${idx}`} className="sky-day-cell sky-empty" />;
-            const { isPast, isStart, isEnd, inRange, isToday } = getDayState(day);
-            const isRangeStart = isStart && !sameDay(checkInDate, checkOutDate);
-            const isRangeEnd = isEnd && !sameDay(checkInDate, checkOutDate);
-            return (
-              <div
-                key={`d-${day.getDate()}`}
-                className={[
-                  'sky-day-cell',
-                  isPast ? 'sky-past' : '',
-                  isStart ? 'sky-start' : '',
-                  isEnd ? 'sky-end' : '',
-                  inRange ? 'sky-in-range' : '',
-                  isToday && !isStart && !isEnd ? 'sky-today' : '',
-                  isRangeStart ? 'sky-range-start' : '',
-                  isRangeEnd ? 'sky-range-end' : '',
-                ].filter(Boolean).join(' ')}
-                onClick={() => !isPast && handleDayClick(day)}
-                onMouseEnter={() => !isPast && activeSelection === 'out' && setHoverDate(day)}
-                onMouseLeave={() => setHoverDate(null)}
-              >
-                <div className="sky-day-bg" />
-                <span className="sky-day-num">{day.getDate()}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
+  // Dropdown month list: current month + 24 future months
+  const monthOptions: { label: string; month: number; year: number }[] = [];
+  for (let i = 0; i < 25; i++) {
+    const m = (today.getMonth() + i) % 12;
+    const y = today.getFullYear() + Math.floor((today.getMonth() + i) / 12);
+    monthOptions.push({ label: `${MONTHS[m]} ${y}`, month: m, year: y });
+  }
 
   return (
     <>
-      {/* Backdrop */}
       <div className="sky-backdrop" onClick={onClose} />
-
-      {/* Calendar panel */}
       <div ref={containerRef} className="sky-cal-panel" onClick={e => e.stopPropagation()}>
         <style dangerouslySetInnerHTML={{ __html: `
-          /* ── Skyscanner-style calendar ── */
           .sky-backdrop {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45);
+            background: rgba(0,0,0,0.4);
             z-index: 99998;
           }
           .sky-cal-panel {
@@ -228,56 +179,52 @@ export default function PremiumDoubleCalendar({
             transform: translate(-50%, -50%);
             z-index: 99999;
             background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.18);
-            width: min(740px, calc(100vw - 24px));
-            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+            width: min(460px, calc(100vw - 24px));
+            max-height: 92vh;
             overflow-y: auto;
             font-family: 'Outfit', sans-serif;
-            animation: skyFadeIn 0.2s ease forwards;
-            display: flex;
-            flex-direction: column;
+            animation: skyFade 0.18s ease forwards;
           }
-          @keyframes skyFadeIn {
-            from { opacity: 0; transform: translate(-50%, -47%); }
-            to   { opacity: 1; transform: translate(-50%, -50%); }
+          @keyframes skyFade {
+            from { opacity: 0; transform: translate(-50%,-48%); }
+            to   { opacity: 1; transform: translate(-50%,-50%); }
           }
 
-          /* ── Header tabs ── */
-          .sky-header {
+          /* Header tabs */
+          .sky-tabs {
             display: flex;
             border-bottom: 1px solid #e8e8e8;
-            position: relative;
           }
           .sky-tab {
             flex: 1;
-            padding: 18px 24px 14px;
+            padding: 16px 20px 12px;
             cursor: pointer;
             position: relative;
             transition: background 0.15s;
           }
           .sky-tab:first-child { border-right: 1px solid #e8e8e8; }
-          .sky-tab:hover { background: #f7f7f7; }
+          .sky-tab:hover { background: #f9f9f9; }
           .sky-tab-label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            color: #6b7280;
+            color: #9ca3af;
             margin-bottom: 4px;
           }
-          .sky-tab-date {
-            font-size: 20px;
-            font-weight: 700;
-            color: #111;
-            line-height: 1.1;
+          .sky-tab-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
-          .sky-tab-sub {
-            font-size: 12px;
-            color: #9ca3af;
-            margin-top: 2px;
-          }
-          .sky-tab.sky-tab-active::after {
+          .sky-tab.active .sky-tab-label { color: #C89B3C; }
+          .sky-tab.active .sky-tab-value { color: #111; font-weight: 700; }
+          .sky-tab.active::after {
             content: '';
             position: absolute;
             bottom: -1px; left: 0; right: 0;
@@ -285,87 +232,93 @@ export default function PremiumDoubleCalendar({
             background: #C89B3C;
             border-radius: 2px 2px 0 0;
           }
-          .sky-tab.sky-tab-active .sky-tab-label { color: #C89B3C; }
-          .sky-tab.sky-tab-active .sky-tab-date { color: #111; }
-          .sky-close-btn {
-            position: absolute;
-            top: 14px; right: 14px;
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            border: none;
-            background: #f3f4f6;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            color: #6b7280;
-            transition: background 0.15s;
-          }
-          .sky-close-btn:hover { background: #e5e7eb; color: #111; }
 
-          /* ── Month columns ── */
-          .sky-months-wrap {
-            display: flex;
-            gap: 0;
-            padding: 20px 24px 10px;
-            flex: 1;
-          }
-          .sky-month-col {
-            flex: 1;
-            min-width: 0;
-          }
-          .sky-month-col + .sky-month-col {
-            padding-left: 24px;
-            border-left: 1px solid #f0f0f0;
-            margin-left: 24px;
-          }
+          /* Month nav */
           .sky-month-nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 14px;
+            padding: 14px 16px 10px;
+            position: relative;
           }
-          .sky-month-label {
-            font-size: 15px;
-            font-weight: 700;
-            color: #111;
-            text-align: center;
-            flex: 1;
-          }
-          .sky-nav-btn {
+          .sky-nav-arrow {
             width: 32px; height: 32px;
             border-radius: 50%;
             border: 1px solid #e5e7eb;
             background: #fff;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            color: #6b7280;
+            color: #374151;
             transition: all 0.15s;
             flex-shrink: 0;
           }
-          .sky-nav-btn:hover { border-color: #C89B3C; color: #C89B3C; background: #fdf8ef; }
+          .sky-nav-arrow:hover { border-color: #C89B3C; color: #C89B3C; }
+          .sky-month-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            font-size: 15px;
+            font-weight: 700;
+            color: #111;
+            user-select: none;
+            transition: border-color 0.15s;
+          }
+          .sky-month-title:hover { border-color: #C89B3C; }
+          .sky-month-title svg { color: #9ca3af; }
+          .sky-month-picker {
+            position: absolute;
+            top: calc(100% - 4px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 10;
+            max-height: 220px;
+            overflow-y: auto;
+            min-width: 180px;
+            padding: 4px 0;
+          }
+          .sky-month-option {
+            padding: 9px 18px;
+            font-size: 14px;
+            cursor: pointer;
+            color: #374151;
+            transition: background 0.1s;
+          }
+          .sky-month-option:hover { background: #fdf8ef; color: #C89B3C; }
+          .sky-month-option.current { font-weight: 700; color: #C89B3C; }
 
-          /* ── Weekdays ── */
+          /* Weekday headers */
           .sky-weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            margin-bottom: 6px;
+            padding: 0 12px;
+            margin-bottom: 4px;
           }
           .sky-wd {
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
             color: #9ca3af;
             padding: 4px 0;
           }
 
-          /* ── Day cells ── */
+          /* Day grid */
           .sky-days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
+            padding: 0 12px;
             row-gap: 2px;
           }
-          .sky-day-cell {
+          .sky-day {
             position: relative;
-            height: 40px;
+            height: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -380,147 +333,175 @@ export default function PremiumDoubleCalendar({
           .sky-day-num {
             position: relative;
             z-index: 2;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center;
             border-radius: 50%;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
             color: #111;
-            transition: background 0.15s, color 0.15s;
+            transition: background 0.12s, color 0.12s;
           }
-          .sky-day-cell:hover:not(.sky-past):not(.sky-start):not(.sky-end) .sky-day-num {
-            background: #f5edda;
+          /* Overflow (prev/next month) */
+          .sky-day.overflow .sky-day-num { color: #c8c8c8; }
+          .sky-day.overflow { cursor: default; }
+          /* Past */
+          .sky-day.past { cursor: default; }
+          .sky-day.past:not(.overflow) .sky-day-num { color: #c8c8c8; }
+          /* Hover */
+          .sky-day:not(.past):not(.overflow):not(.sel-start):not(.sel-end):hover .sky-day-num {
+            background: #f0e8d4;
             color: #C89B3C;
           }
-          /* Past */
-          .sky-past { cursor: default; }
-          .sky-past .sky-day-num { color: #d1d5db; }
-          /* Today */
-          .sky-today .sky-day-num { font-weight: 700; text-decoration: underline; text-decoration-color: #C89B3C; }
-          /* In-range background (full width strip) */
-          .sky-in-range .sky-day-bg { background: #fdf3dc; }
-          /* Range-start: right half strip */
-          .sky-range-start .sky-day-bg { background: linear-gradient(to right, transparent 50%, #fdf3dc 50%); }
-          /* Range-end: left half strip */
-          .sky-range-end .sky-day-bg { background: linear-gradient(to left, transparent 50%, #fdf3dc 50%); }
-          /* Start/end circles */
-          .sky-start .sky-day-num, .sky-end .sky-day-num {
-            background: #C89B3C;
-            color: #fff;
+          /* In-range strip */
+          .sky-day.in-range .sky-day-bg { background: #fdf0d8; }
+          .sky-day.range-left .sky-day-bg { background: linear-gradient(to right, transparent 50%, #fdf0d8 50%); }
+          .sky-day.range-right .sky-day-bg { background: linear-gradient(to left, transparent 50%, #fdf0d8 50%); }
+          /* Selected start/end */
+          .sky-day.sel-start .sky-day-num,
+          .sky-day.sel-end .sky-day-num {
+            background: #1a56db;
+            color: #fff !important;
+            font-weight: 700;
+          }
+          /* Today underline */
+          .sky-day.is-today:not(.sel-start):not(.sel-end) .sky-day-num {
+            text-decoration: underline;
+            text-decoration-color: #C89B3C;
             font-weight: 700;
           }
 
-          /* ── Footer ── */
+          /* Footer */
           .sky-footer {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            padding: 14px 24px 18px;
+            justify-content: space-between;
+            padding: 12px 20px 16px;
             border-top: 1px solid #f0f0f0;
-            gap: 12px;
+            margin-top: 8px;
           }
-          .sky-nights-badge {
+          .sky-nights {
             font-size: 13px;
             color: #6b7280;
-            margin-right: auto;
           }
-          .sky-nights-badge strong { color: #111; }
-          .sky-clear-btn {
-            padding: 10px 20px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            background: #fff;
+          .sky-nights strong { color: #111; }
+          .sky-close-link {
             font-size: 14px;
             font-weight: 600;
-            color: #6b7280;
+            color: #374151;
             cursor: pointer;
-            transition: all 0.15s;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            background: none; border: none;
             font-family: 'Outfit', sans-serif;
+            padding: 0;
+            transition: color 0.15s;
           }
-          .sky-clear-btn:hover { border-color: #C89B3C; color: #C89B3C; }
-          .sky-done-btn {
-            padding: 10px 28px;
-            border: none;
-            border-radius: 8px;
-            background: #C89B3C;
-            font-size: 14px;
-            font-weight: 700;
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: 'Outfit', sans-serif;
-          }
-          .sky-done-btn:hover { background: #b08a32; }
+          .sky-close-link:hover { color: #C89B3C; }
 
-          /* ── Mobile ── */
-          @media (max-width: 640px) {
-            .sky-cal-panel {
-              width: 95vw;
-              max-height: 92vh;
-              border-radius: 14px;
-            }
-            .sky-tab { padding: 14px 16px 12px; }
-            .sky-tab-date { font-size: 17px; }
-            .sky-months-wrap { padding: 16px 16px 8px; }
-            .sky-mobile-hide { display: none; }
-            .sky-month-col + .sky-month-col { display: none; }
-            .sky-footer { padding: 12px 16px 16px; }
-            .sky-day-cell { height: 44px; }
+          /* Mobile */
+          @media (max-width: 480px) {
+            .sky-cal-panel { width: 96vw; border-radius: 10px; }
+            .sky-tab { padding: 12px 14px 10px; }
+            .sky-tab-value { font-size: 13px; }
+            .sky-day { height: 46px; }
             .sky-day-num { width: 40px; height: 40px; font-size: 15px; }
+            .sky-weekdays, .sky-days-grid { padding: 0 8px; }
           }
         `}} />
 
-        {/* Header */}
-        <div className="sky-header">
-          <div
-            className={`sky-tab${activeSelection === 'in' ? ' sky-tab-active' : ''}`}
-            onClick={() => setActiveSelection('in')}
-          >
+        {/* Tabs */}
+        <div className="sky-tabs">
+          <div className={`sky-tab${activeSelection === 'in' ? ' active' : ''}`} onClick={() => setActiveSelection('in')}>
             <div className="sky-tab-label">Check-in</div>
-            <div className="sky-tab-date">{ci.day} {ci.month} {ci.year}</div>
-            <div className="sky-tab-sub">{ci.dow}</div>
+            <div className="sky-tab-value">{fmtDisplay(checkIn)}</div>
           </div>
-          <div
-            className={`sky-tab${activeSelection === 'out' ? ' sky-tab-active' : ''}`}
-            onClick={() => setActiveSelection('out')}
-          >
+          <div className={`sky-tab${activeSelection === 'out' ? ' active' : ''}`} onClick={() => setActiveSelection('out')}>
             <div className="sky-tab-label">Check-out</div>
-            <div className="sky-tab-date">{co.day} {co.month} {co.year}</div>
-            <div className="sky-tab-sub">{co.dow}</div>
+            <div className="sky-tab-value">{fmtDisplay(checkOut)}</div>
           </div>
-          <button className="sky-close-btn" onClick={onClose} aria-label="Close calendar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
         </div>
 
-        {/* Months */}
-        <div className="sky-months-wrap">
-          {renderGrid(leftMonth, leftYear, false)}
-          {renderGrid(rightMonth, rightYear, true)}
+        {/* Month navigation */}
+        <div className="sky-month-nav">
+          <button className="sky-nav-arrow" onClick={prevMonth} aria-label="Previous month">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <div className="sky-month-title" onClick={() => setShowMonthPicker(!showMonthPicker)}>
+            <span>{MONTHS[viewMonth]} {viewYear}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+          <button className="sky-nav-arrow" onClick={nextMonth} aria-label="Next month">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+
+          {showMonthPicker && (
+            <div className="sky-month-picker">
+              {monthOptions.map((opt, i) => (
+                <div
+                  key={i}
+                  className={`sky-month-option${opt.month === viewMonth && opt.year === viewYear ? ' current' : ''}`}
+                  onClick={() => { setViewMonth(opt.month); setViewYear(opt.year); setShowMonthPicker(false); }}
+                >
+                  {opt.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Weekday headers */}
+        <div className="sky-weekdays">
+          {WEEKDAYS.map(w => <div key={w} className="sky-wd">{w}</div>)}
+        </div>
+
+        {/* Day grid */}
+        <div className="sky-days-grid">
+          {cells.map(({ date, overflow }, idx) => {
+            const isPast = date < today;
+            const isStart = !overflow && sameDay(date, checkInDate);
+            const isEnd = !overflow && sameDay(date, checkOutDate);
+            const isToday = !overflow && sameDay(date, today);
+            const inRange = !overflow && date > checkInDate && date < checkOutDate;
+            const rangeLeft = isStart && !sameDay(checkInDate, checkOutDate);
+            const rangeRight = isEnd && !sameDay(checkInDate, checkOutDate);
+
+            const cls = [
+              'sky-day',
+              overflow ? 'overflow' : '',
+              !overflow && isPast ? 'past' : '',
+              isStart ? 'sel-start' : '',
+              isEnd ? 'sel-end' : '',
+              inRange ? 'in-range' : '',
+              rangeLeft ? 'range-left' : '',
+              rangeRight ? 'range-right' : '',
+              isToday ? 'is-today' : '',
+            ].filter(Boolean).join(' ');
+
+            return (
+              <div
+                key={idx}
+                className={cls}
+                onClick={() => !overflow && !isPast && handleDayClick(date, overflow)}
+              >
+                <div className="sky-day-bg" />
+                <span className="sky-day-num">{date.getDate()}</span>
+              </div>
+            );
+          })}
         </div>
 
         {/* Footer */}
         <div className="sky-footer">
-          {(() => {
-            const ci2 = parseDateStr(checkIn);
-            const co2 = parseDateStr(checkOut);
-            const nights = Math.round((co2.getTime() - ci2.getTime()) / 86400000);
-            return nights > 0 ? (
-              <span className="sky-nights-badge"><strong>{nights} night{nights > 1 ? 's' : ''}</strong> selected</span>
-            ) : null;
-          })()}
-          <button className="sky-clear-btn" onClick={() => {
-            const t = fmtStr(today);
-            const t2 = fmtStr(new Date(today.getTime() + 86400000));
-            onChange(t, t2);
-            setActiveSelection('in');
-          }}>Clear</button>
-          <button className="sky-done-btn" onClick={onClose}>Done</button>
+          <span className="sky-nights">
+            {nights > 0 ? <><strong>{nights} night{nights !== 1 ? 's' : ''}</strong> selected</> : <span style={{color:'#9ca3af'}}>Select dates</span>}
+          </span>
+          <button className="sky-close-link" onClick={onClose}>Close</button>
         </div>
       </div>
     </>
