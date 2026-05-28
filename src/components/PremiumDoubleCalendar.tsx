@@ -9,6 +9,7 @@ interface PremiumDoubleCalendarProps {
   onChange: (checkIn: string, checkOut: string) => void;
   isOpen: boolean;
   onClose?: () => void;
+  initialSelection?: 'in' | 'out';
 }
 
 interface FestivalEvent {
@@ -22,7 +23,8 @@ export default function PremiumDoubleCalendar({
   checkOut,
   onChange,
   isOpen,
-  onClose
+  onClose,
+  initialSelection = 'in'
 }: PremiumDoubleCalendarProps) {
   // Convert standard date string to Date objects
   const parseDateStr = (str: string) => {
@@ -35,7 +37,12 @@ export default function PremiumDoubleCalendar({
   const checkOutDate = parseDateStr(checkOut);
 
   // Active sub-selection state: 'in' or 'out'
-  const [activeSelection, setActiveSelection] = useState<'in' | 'out'>('in');
+  const [activeSelection, setActiveSelection] = useState<'in' | 'out'>(initialSelection);
+
+  // Reset to initialSelection each time the calendar opens
+  useEffect(() => {
+    if (isOpen) setActiveSelection(initialSelection);
+  }, [isOpen, initialSelection]);
   
   // Left-most visible month and year in side-by-side view (Defaults to checkInDate's month)
   const [currentMonth, setCurrentMonth] = useState(checkInDate.getMonth());
@@ -216,11 +223,11 @@ export default function PremiumDoubleCalendar({
       <style dangerouslySetInnerHTML={{
         __html: `
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateX(-50%) translateY(8px); }
-          to { opacity: 1; transform: translateX(-50%) translateY(0); }
+          from { opacity: 0; transform: translate(-50%, -48%); }
+          to { opacity: 1; transform: translate(-50%, -50%); }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .mmt-calendar-overlay {
           background: #ffffff !important;
@@ -233,17 +240,24 @@ export default function PremiumDoubleCalendar({
           padding: 18px 22px 20px;
           color: #1f2937 !important;
           font-family: 'Outfit', sans-serif;
-          position: absolute;
-          top: auto;
-          bottom: calc(100% + 18px);
+          position: fixed;
+          top: 50%;
           left: 50%;
-          right: auto;
-          transform: translateX(-50%);
-          z-index: 9999;
+          transform: translate(-50%, -50%);
+          z-index: 99999;
           user-select: none;
+          max-height: 90vh;
+          overflow-y: auto;
         }
         .mmt-calendar-overlay::before {
           display: none;
+        }
+        .mmt-cal-backdrop {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.45);
+          z-index: 99998;
         }
         
         /* Premium date tabs at top matching MMT image */
@@ -387,14 +401,6 @@ export default function PremiumDoubleCalendar({
         .mmt-cal-arrow.right {
           right: -2px;
         }
-        .mmt-cal-backdrop {
-          display: none;
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.45);
-          z-index: 99998;
-        }
-        
         /* Days layout */
         .mmt-cal-weekdays {
           display: grid;
@@ -486,27 +492,10 @@ export default function PremiumDoubleCalendar({
         }
         
         @media (max-width: 767px) {
-          .mmt-cal-backdrop {
-            display: block !important;
-          }
           .mmt-calendar-overlay {
-            position: fixed !important;
-            top: 50% !important;
-            bottom: auto !important;
-            left: 50% !important;
-            right: auto !important;
-            transform: translate(-50%, -50%) !important;
             width: 92vw !important;
-            max-width: 380px;
-            max-height: 88vh;
-            overflow-y: auto;
-            z-index: 99999 !important;
-            padding: 16px;
-            animation: fadeInCenter 0.22s cubic-bezier(0.16,1,0.3,1) forwards;
-          }
-          @keyframes fadeInCenter {
-            from { opacity: 0; transform: translate(-50%, -48%); }
-            to   { opacity: 1; transform: translate(-50%, -50%); }
+            max-width: 380px !important;
+            padding: 16px !important;
           }
           .mmt-cal-header-tabs {
             gap: 12px;

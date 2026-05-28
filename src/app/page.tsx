@@ -86,6 +86,7 @@ export default function Home() {
   
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [calendarInitialSelection, setCalendarInitialSelection] = useState<'in' | 'out'>('in');
 
   const formatDateFriendly = (dateStr: string) => {
     if (!dateStr) return '';
@@ -553,30 +554,36 @@ export default function Home() {
                 <div className="search-label-above" style={{ margin: '0 0 15px 0', textAlign: 'center' }}>Find now your luxury suites</div>
                 <div className="luxury-search-bar" style={{ maxWidth: '720px', margin: '0 auto' }}>
 
-                    {/* Dates block */}
+                    {/* Check-In block */}
                     <div className="search-block mmt-date-trigger" style={{ position: 'relative' }}>
-                          <div 
-                            className="block-trigger-wrapper" 
-                            style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '12px' }}
+                        <div
+                            className={`block-trigger-wrapper${isCalendarOpen && calendarInitialSelection === 'in' ? ' cal-active' : ''}`}
+                            style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '10px' }}
                             onClick={() => {
                               setOpenDropdown(null);
-                              setIsCalendarOpen(!isCalendarOpen);
+                              if (isCalendarOpen && calendarInitialSelection === 'in') {
+                                setIsCalendarOpen(false);
+                              } else {
+                                setCalendarInitialSelection('in');
+                                setIsCalendarOpen(true);
+                              }
                             }}
-                          >
+                        >
                             <div className="block-icon gold-icon">
                                 <i className="far fa-calendar-alt"></i>
                             </div>
                             <div className="block-info">
-                                <span className="block-label">Dates</span>
-                                <span className="block-value">{formatDateFriendly(bookingData.checkIn)} - {formatDateFriendly(bookingData.checkOut)}</span>
+                                <span className="block-label">Check-In</span>
+                                <span className="block-value" style={{ fontWeight: 700 }}>{formatDateFriendly(bookingData.checkIn)}</span>
                             </div>
                             <i className="fas fa-chevron-down block-chevron"></i>
                         </div>
 
-                        <PremiumDoubleCalendar 
-                          checkIn={bookingData.checkIn} 
-                          checkOut={bookingData.checkOut} 
-                          isOpen={isCalendarOpen} 
+                        <PremiumDoubleCalendar
+                          checkIn={bookingData.checkIn}
+                          checkOut={bookingData.checkOut}
+                          isOpen={isCalendarOpen}
+                          initialSelection={calendarInitialSelection}
                           onChange={(start, end) => {
                             setBookingData(prev => ({ ...prev, checkIn: start, checkOut: end }));
                           }}
@@ -584,10 +591,37 @@ export default function Home() {
                         />
                     </div>
 
+                    {/* Check-Out block */}
+                    <div
+                        className="search-block"
+                        style={{ position: 'relative' }}
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          if (isCalendarOpen && calendarInitialSelection === 'out') {
+                            setIsCalendarOpen(false);
+                          } else {
+                            setCalendarInitialSelection('out');
+                            setIsCalendarOpen(true);
+                          }
+                        }}
+                    >
+                        <div className={`block-trigger-wrapper${isCalendarOpen && calendarInitialSelection === 'out' ? ' cal-active' : ''}`}
+                            style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '10px' }}>
+                            <div className="block-icon gold-icon">
+                                <i className="far fa-calendar-alt"></i>
+                            </div>
+                            <div className="block-info">
+                                <span className="block-label">Check-Out</span>
+                                <span className="block-value" style={{ fontWeight: 700 }}>{formatDateFriendly(bookingData.checkOut)}</span>
+                            </div>
+                            <i className="fas fa-chevron-down block-chevron"></i>
+                        </div>
+                    </div>
+
                     {/* Guests block */}
-                    <div 
+                    <div
                       className="search-block"
-                      onClick={() => setOpenDropdown(openDropdown === 'guests' ? null : 'guests')}
+                      onClick={() => { setIsCalendarOpen(false); setOpenDropdown(openDropdown === 'guests' ? null : 'guests'); }}
                     >
                         <div className="block-icon gold-icon">
                             <i className="fas fa-user-friends"></i>

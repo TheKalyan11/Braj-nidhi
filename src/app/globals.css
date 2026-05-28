@@ -420,6 +420,12 @@ header.scrolled nav ul li a:hover {
     border-right: none;
 }
 
+/* Highlight the active date block when calendar is open */
+.cal-active {
+    background: rgba(212, 175, 55, 0.06);
+    border-radius: 50px;
+}
+
 /* Active Dark (Room Type Block on Left) */
 .search-block.active-dark {
     background: #0a0e14; /* Dark luxury navy/black background */
