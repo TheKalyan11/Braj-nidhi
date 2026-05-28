@@ -12,7 +12,6 @@ interface PremiumDoubleCalendarProps {
 }
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-// Mon-first week
 const WEEKDAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 function parseDateStr(str: string) {
@@ -28,10 +27,21 @@ function fmtStr(d: Date) {
   return `${y}-${m}-${day}`;
 }
 
+function addDays(d: Date, n: number) {
+  return new Date(d.getTime() + n * 86400000);
+}
+
 function sameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&
     a.getDate() === b.getDate();
+}
+
+function fmtDisplay(dateStr: string) {
+  if (!dateStr) return '—';
+  const d = parseDateStr(dateStr);
+  const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} ${d.getFullYear()} · ${dows[d.getDay()]}`;
 }
 
 export default function PremiumDoubleCalendar({
@@ -49,9 +59,11 @@ export default function PremiumDoubleCalendar({
   useEffect(() => {
     if (isOpen) {
       setActiveSelection(initialSelection);
-      const d = parseDateStr(initialSelection === 'out' ? checkOut : checkIn);
+      const anchor = initialSelection === 'out' ? checkOut : checkIn;
+      const d = parseDateStr(anchor);
       setViewMonth(d.getMonth());
       setViewYear(d.getFullYear());
+      setShowMonthPicker(false);
     }
   }, [isOpen, initialSelection]);
 
@@ -78,90 +90,88 @@ export default function PremiumDoubleCalendar({
   const today = new Date(); today.setHours(0, 0, 0, 0);
 
   const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
-    else setViewMonth(viewMonth - 1);
     setShowMonthPicker(false);
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+    else setViewMonth(m => m - 1);
   };
 
   const nextMonth = () => {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
-    else setViewMonth(viewMonth + 1);
     setShowMonthPicker(false);
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+    else setViewMonth(m => m + 1);
   };
 
-  const handleDayClick = (day: Date, isOverflow: boolean) => {
-    if (day < today && !isOverflow) return;
+  const handleDayClick = (day: Date, overflow: boolean) => {
+    if (overflow) return; // never trigger on overflow cells
     if (day < today) return;
-    const val = fmtStr(day);
+
     if (activeSelection === 'in') {
-      const newOut = day >= checkOutDate ? fmtStr(new Date(day.getTime() + 86400000)) : checkOut;
-      onChange(val, newOut);
+      // Set check-in; push checkout to next day if check-in >= checkout
+      const minOut = addDays(day, 1);
+      const newOutDate = day >= checkOutDate ? minOut : checkOutDate;
+      const newOut = fmtStr(newOutDate);
+      onChange(fmtStr(day), newOut);
       setActiveSelection('out');
-      // Navigate to check-out month if needed
-      if (day.getMonth() !== viewMonth || day.getFullYear() !== viewYear) {
-        setViewMonth(day.getMonth());
-        setViewYear(day.getFullYear());
-      }
+      // Always navigate view to show the checkout month
+      setViewMonth(newOutDate.getMonth());
+      setViewYear(newOutDate.getFullYear());
     } else {
+      // Check-out mode: must be at least 1 day after check-in
       if (day <= checkInDate) {
-        onChange(val, checkOut);
+        // Re-select as new check-in, push checkout out
+        const minOut = addDays(day, 1);
+        onChange(fmtStr(day), fmtStr(minOut));
         setActiveSelection('out');
+        setViewMonth(minOut.getMonth());
+        setViewYear(minOut.getFullYear());
       } else {
-        onChange(checkIn, val);
-        if (onClose) onClose(); // auto-close after check-out selected
+        onChange(checkIn, fmtStr(day));
+        if (onClose) onClose();
       }
     }
   };
 
-  // Build grid: Mon-first, show prev/next month overflow days
+  // Build Mon-first grid with overflow days from prev/next month
   const buildGrid = () => {
     const firstDay = new Date(viewYear, viewMonth, 1);
-    // Mon=0 … Sun=6; JS: Sun=0 Mon=1 … Sat=6
-    const firstDow = (firstDay.getDay() + 6) % 7; // Mon-first offset
+    const firstDow = (firstDay.getDay() + 6) % 7; // Mon=0 … Sun=6
     const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-    const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
+    const prevMonthTotal = new Date(viewYear, viewMonth, 0).getDate();
 
     const cells: { date: Date; overflow: boolean }[] = [];
 
-    // Prev month overflow
     for (let i = firstDow - 1; i >= 0; i--) {
-      const m = viewMonth === 0 ? 11 : viewMonth - 1;
-      const y = viewMonth === 0 ? viewYear - 1 : viewYear;
-      cells.push({ date: new Date(y, m, prevMonthDays - i), overflow: true });
+      const pm = viewMonth === 0 ? 11 : viewMonth - 1;
+      const py = viewMonth === 0 ? viewYear - 1 : viewYear;
+      cells.push({ date: new Date(py, pm, prevMonthTotal - i), overflow: true });
     }
-
-    // Current month
     for (let d = 1; d <= daysInMonth; d++) {
       cells.push({ date: new Date(viewYear, viewMonth, d), overflow: false });
     }
-
-    // Next month overflow — fill to complete rows (multiple of 7)
     let next = 1;
     while (cells.length % 7 !== 0) {
-      const m = viewMonth === 11 ? 0 : viewMonth + 1;
-      const y = viewMonth === 11 ? viewYear + 1 : viewYear;
-      cells.push({ date: new Date(y, m, next++), overflow: true });
+      const nm = viewMonth === 11 ? 0 : viewMonth + 1;
+      const ny = viewMonth === 11 ? viewYear + 1 : viewYear;
+      cells.push({ date: new Date(ny, nm, next++), overflow: true });
     }
-
     return cells;
   };
 
   const cells = buildGrid();
   const nights = Math.round((checkOutDate.getTime() - checkInDate.getTime()) / 86400000);
 
-  const fmtDisplay = (dateStr: string) => {
-    const d = parseDateStr(dateStr);
-    const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)} ${d.getFullYear()} · ${dows[d.getDay()]}`;
-  };
-
-  // Dropdown month list: current month + 24 future months
+  // Dropdown: current month + next 24 months
   const monthOptions: { label: string; month: number; year: number }[] = [];
   for (let i = 0; i < 25; i++) {
-    const m = (today.getMonth() + i) % 12;
-    const y = today.getFullYear() + Math.floor((today.getMonth() + i) / 12);
+    const idx = today.getMonth() + i;
+    const m = idx % 12;
+    const y = today.getFullYear() + Math.floor(idx / 12);
     monthOptions.push({ label: `${MONTHS[m]} ${y}`, month: m, year: y });
   }
+
+  // Can go back only if we're past current month
+  const isAtOrBeforeToday = viewYear < today.getFullYear() ||
+    (viewYear === today.getFullYear() && viewMonth <= today.getMonth());
 
   return (
     <>
@@ -170,7 +180,7 @@ export default function PremiumDoubleCalendar({
         <style dangerouslySetInnerHTML={{ __html: `
           .sky-backdrop {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.45);
             z-index: 99998;
           }
           .sky-cal-panel {
@@ -179,243 +189,197 @@ export default function PremiumDoubleCalendar({
             transform: translate(-50%, -50%);
             z-index: 99999;
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.18);
-            width: min(460px, calc(100vw - 24px));
-            max-height: 92vh;
+            border-radius: 16px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.22);
+            width: min(460px, calc(100vw - 20px));
+            max-height: 95vh;
             overflow-y: auto;
             font-family: 'Outfit', sans-serif;
             animation: skyFade 0.18s ease forwards;
           }
           @keyframes skyFade {
-            from { opacity: 0; transform: translate(-50%,-48%); }
-            to   { opacity: 1; transform: translate(-50%,-50%); }
+            from { opacity: 0; transform: translate(-50%, -46%); }
+            to   { opacity: 1; transform: translate(-50%, -50%); }
           }
 
-          /* Header tabs */
-          .sky-tabs {
-            display: flex;
-            border-bottom: 1px solid #e8e8e8;
-          }
+          /* Tabs */
+          .sky-tabs { display: flex; border-bottom: 1px solid #e8e8e8; }
           .sky-tab {
-            flex: 1;
-            padding: 16px 20px 12px;
-            cursor: pointer;
-            position: relative;
+            flex: 1; padding: 14px 18px 12px;
+            cursor: pointer; position: relative;
             transition: background 0.15s;
           }
           .sky-tab:first-child { border-right: 1px solid #e8e8e8; }
-          .sky-tab:hover { background: #f9f9f9; }
+          .sky-tab:hover { background: #fafafa; }
           .sky-tab-label {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            color: #9ca3af;
-            margin-bottom: 4px;
+            font-size: 10px; font-weight: 700; letter-spacing: 1.3px;
+            text-transform: uppercase; color: #9ca3af; margin-bottom: 3px;
           }
           .sky-tab-value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 13px; font-weight: 600; color: #374151;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
           }
           .sky-tab.active .sky-tab-label { color: #C89B3C; }
           .sky-tab.active .sky-tab-value { color: #111; font-weight: 700; }
           .sky-tab.active::after {
-            content: '';
-            position: absolute;
+            content: ''; position: absolute;
             bottom: -1px; left: 0; right: 0;
-            height: 3px;
-            background: #C89B3C;
+            height: 3px; background: #C89B3C;
             border-radius: 2px 2px 0 0;
           }
 
           /* Month nav */
           .sky-month-nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 16px 10px;
-            position: relative;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px 10px; position: relative;
           }
           .sky-nav-arrow {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            border: 1px solid #e5e7eb;
-            background: #fff;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            color: #374151;
-            transition: all 0.15s;
-            flex-shrink: 0;
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1.5px solid #e5e7eb; background: #fff;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            color: #374151; transition: all 0.15s; flex-shrink: 0;
           }
-          .sky-nav-arrow:hover { border-color: #C89B3C; color: #C89B3C; }
+          .sky-nav-arrow:hover:not(:disabled) { border-color: #C89B3C; color: #C89B3C; }
+          .sky-nav-arrow:disabled { opacity: 0.3; cursor: default; }
           .sky-month-title {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            font-size: 15px;
-            font-weight: 700;
-            color: #111;
-            user-select: none;
-            transition: border-color 0.15s;
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer; padding: 6px 14px; border-radius: 8px;
+            border: 1.5px solid #e5e7eb; font-size: 15px; font-weight: 700;
+            color: #111; user-select: none; transition: border-color 0.15s;
           }
           .sky-month-title:hover { border-color: #C89B3C; }
-          .sky-month-title svg { color: #9ca3af; }
           .sky-month-picker {
-            position: absolute;
-            top: calc(100% - 4px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            z-index: 10;
-            max-height: 220px;
-            overflow-y: auto;
-            min-width: 180px;
-            padding: 4px 0;
+            position: absolute; top: calc(100% - 4px); left: 50%;
+            transform: translateX(-50%); background: #fff;
+            border: 1px solid #e5e7eb; border-radius: 10px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.13);
+            z-index: 10; max-height: 220px; overflow-y: auto;
+            min-width: 180px; padding: 4px 0;
           }
           .sky-month-option {
-            padding: 9px 18px;
-            font-size: 14px;
-            cursor: pointer;
-            color: #374151;
-            transition: background 0.1s;
+            padding: 9px 18px; font-size: 14px;
+            cursor: pointer; color: #374151; transition: background 0.1s;
           }
           .sky-month-option:hover { background: #fdf8ef; color: #C89B3C; }
-          .sky-month-option.current { font-weight: 700; color: #C89B3C; }
+          .sky-month-option.cur { font-weight: 700; color: #C89B3C; background: #fdf8ef; }
 
           /* Weekday headers */
           .sky-weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            padding: 0 12px;
-            margin-bottom: 4px;
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            padding: 0 12px; margin-bottom: 2px;
           }
           .sky-wd {
-            text-align: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: #9ca3af;
-            padding: 4px 0;
+            text-align: center; font-size: 11px; font-weight: 700;
+            color: #9ca3af; padding: 4px 0; letter-spacing: 0.5px;
           }
 
           /* Day grid */
           .sky-days-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            padding: 0 12px;
-            row-gap: 2px;
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            padding: 0 12px; row-gap: 1px;
           }
           .sky-day {
-            position: relative;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            user-select: none;
+            position: relative; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; user-select: none;
           }
-          .sky-day-bg {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-          }
+          .sky-day-bg { position: absolute; inset: 0; z-index: 0; }
           .sky-day-num {
-            position: relative;
-            z-index: 2;
+            position: relative; z-index: 2;
             width: 38px; height: 38px;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-            font-size: 15px;
-            font-weight: 500;
-            color: #111;
+            border-radius: 50%; font-size: 14px; font-weight: 500; color: #111;
             transition: background 0.12s, color 0.12s;
           }
-          /* Overflow (prev/next month) */
-          .sky-day.overflow .sky-day-num { color: #c8c8c8; }
-          .sky-day.overflow { cursor: default; }
-          /* Past */
-          .sky-day.past { cursor: default; }
-          .sky-day.past:not(.overflow) .sky-day-num { color: #c8c8c8; }
-          /* Hover */
-          .sky-day:not(.past):not(.overflow):not(.sel-start):not(.sel-end):hover .sky-day-num {
-            background: #f0e8d4;
-            color: #C89B3C;
+
+          /* Overflow (prev/next month) — not clickable */
+          .sky-day.overflow { cursor: default; pointer-events: none; }
+          .sky-day.overflow .sky-day-num { color: #d1d5db; }
+
+          /* Past dates — not clickable */
+          .sky-day.past { cursor: default; pointer-events: none; }
+          .sky-day.past .sky-day-num { color: #d1d5db; }
+
+          /* Checkout-disabled (before or on check-in) */
+          .sky-day.out-disabled { cursor: not-allowed; }
+          .sky-day.out-disabled .sky-day-num { color: #d1d5db; }
+
+          /* Hover — only valid days */
+          .sky-day:not(.past):not(.overflow):not(.out-disabled):not(.sel-start):not(.sel-end):hover .sky-day-num {
+            background: #e8f0fe;
+            color: #1a56db;
           }
-          /* In-range strip */
-          .sky-day.in-range .sky-day-bg { background: #fdf0d8; }
-          .sky-day.range-left .sky-day-bg { background: linear-gradient(to right, transparent 50%, #fdf0d8 50%); }
-          .sky-day.range-right .sky-day-bg { background: linear-gradient(to left, transparent 50%, #fdf0d8 50%); }
-          /* Selected start/end */
+
+          /* Range fill */
+          .sky-day.in-range .sky-day-bg { background: #e8f0fe; }
+          .sky-day.range-left .sky-day-bg { background: linear-gradient(to right, transparent 50%, #e8f0fe 50%); }
+          .sky-day.range-right .sky-day-bg { background: linear-gradient(to left, transparent 50%, #e8f0fe 50%); }
+
+          /* Selected start / end */
           .sky-day.sel-start .sky-day-num,
           .sky-day.sel-end .sky-day-num {
-            background: #1a56db;
+            background: #1a56db !important;
             color: #fff !important;
             font-weight: 700;
+            box-shadow: 0 2px 8px rgba(26,86,219,0.35);
           }
-          /* Today underline */
+
+          /* Today marker */
           .sky-day.is-today:not(.sel-start):not(.sel-end) .sky-day-num {
-            text-decoration: underline;
-            text-decoration-color: #C89B3C;
+            border: 2px solid #C89B3C;
             font-weight: 700;
           }
 
           /* Footer */
           .sky-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 20px 16px;
-            border-top: 1px solid #f0f0f0;
-            margin-top: 8px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 18px 14px; border-top: 1px solid #f0f0f0; margin-top: 6px;
           }
-          .sky-nights {
-            font-size: 13px;
-            color: #6b7280;
-          }
-          .sky-nights strong { color: #111; }
+          .sky-nights { font-size: 13px; color: #6b7280; }
+          .sky-nights strong { color: #111; font-weight: 700; }
+          .sky-nights .hint { font-size: 12px; color: #9ca3af; }
           .sky-close-link {
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-            cursor: pointer;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            background: none; border: none;
-            font-family: 'Outfit', sans-serif;
-            padding: 0;
-            transition: color 0.15s;
+            font-size: 14px; font-weight: 600; color: #374151;
+            cursor: pointer; text-decoration: underline;
+            text-underline-offset: 3px; background: none; border: none;
+            font-family: inherit; padding: 4px 0; transition: color 0.15s;
           }
           .sky-close-link:hover { color: #C89B3C; }
 
-          /* Mobile */
           @media (max-width: 480px) {
-            .sky-cal-panel { width: 96vw; border-radius: 10px; }
+            .sky-cal-panel { width: 97vw; border-radius: 12px; }
             .sky-tab { padding: 12px 14px 10px; }
-            .sky-tab-value { font-size: 13px; }
+            .sky-tab-value { font-size: 12px; }
             .sky-day { height: 46px; }
             .sky-day-num { width: 40px; height: 40px; font-size: 15px; }
-            .sky-weekdays, .sky-days-grid { padding: 0 8px; }
+            .sky-weekdays, .sky-days-grid { padding: 0 6px; }
+            .sky-month-nav { padding: 12px 10px 8px; }
           }
         `}} />
 
         {/* Tabs */}
         <div className="sky-tabs">
-          <div className={`sky-tab${activeSelection === 'in' ? ' active' : ''}`} onClick={() => setActiveSelection('in')}>
+          <div
+            className={`sky-tab${activeSelection === 'in' ? ' active' : ''}`}
+            onClick={() => {
+              setActiveSelection('in');
+              const d = parseDateStr(checkIn);
+              setViewMonth(d.getMonth());
+              setViewYear(d.getFullYear());
+            }}
+          >
             <div className="sky-tab-label">Check-in</div>
             <div className="sky-tab-value">{fmtDisplay(checkIn)}</div>
           </div>
-          <div className={`sky-tab${activeSelection === 'out' ? ' active' : ''}`} onClick={() => setActiveSelection('out')}>
+          <div
+            className={`sky-tab${activeSelection === 'out' ? ' active' : ''}`}
+            onClick={() => {
+              setActiveSelection('out');
+              const d = parseDateStr(checkOut);
+              setViewMonth(d.getMonth());
+              setViewYear(d.getFullYear());
+            }}
+          >
             <div className="sky-tab-label">Check-out</div>
             <div className="sky-tab-value">{fmtDisplay(checkOut)}</div>
           </div>
@@ -423,17 +387,24 @@ export default function PremiumDoubleCalendar({
 
         {/* Month navigation */}
         <div className="sky-month-nav">
-          <button className="sky-nav-arrow" onClick={prevMonth} aria-label="Previous month">
+          <button
+            className="sky-nav-arrow"
+            onClick={prevMonth}
+            disabled={isAtOrBeforeToday}
+            aria-label="Previous month"
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
             </svg>
           </button>
-          <div className="sky-month-title" onClick={() => setShowMonthPicker(!showMonthPicker)}>
+
+          <div className="sky-month-title" onClick={() => setShowMonthPicker(p => !p)}>
             <span>{MONTHS[viewMonth]} {viewYear}</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
             </svg>
           </div>
+
           <button className="sky-nav-arrow" onClick={nextMonth} aria-label="Next month">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
@@ -445,8 +416,12 @@ export default function PremiumDoubleCalendar({
               {monthOptions.map((opt, i) => (
                 <div
                   key={i}
-                  className={`sky-month-option${opt.month === viewMonth && opt.year === viewYear ? ' current' : ''}`}
-                  onClick={() => { setViewMonth(opt.month); setViewYear(opt.year); setShowMonthPicker(false); }}
+                  className={`sky-month-option${opt.month === viewMonth && opt.year === viewYear ? ' cur' : ''}`}
+                  onClick={() => {
+                    setViewMonth(opt.month);
+                    setViewYear(opt.year);
+                    setShowMonthPicker(false);
+                  }}
                 >
                   {opt.label}
                 </div>
@@ -455,7 +430,7 @@ export default function PremiumDoubleCalendar({
           )}
         </div>
 
-        {/* Weekday headers */}
+        {/* Weekday row */}
         <div className="sky-weekdays">
           {WEEKDAYS.map(w => <div key={w} className="sky-wd">{w}</div>)}
         </div>
@@ -463,7 +438,9 @@ export default function PremiumDoubleCalendar({
         {/* Day grid */}
         <div className="sky-days-grid">
           {cells.map(({ date, overflow }, idx) => {
-            const isPast = date < today;
+            const isPast = !overflow && date < today;
+            // In checkout mode, dates on or before check-in are disabled
+            const isOutDisabled = !overflow && activeSelection === 'out' && date <= checkInDate;
             const isStart = !overflow && sameDay(date, checkInDate);
             const isEnd = !overflow && sameDay(date, checkOutDate);
             const isToday = !overflow && sameDay(date, today);
@@ -473,21 +450,24 @@ export default function PremiumDoubleCalendar({
 
             const cls = [
               'sky-day',
-              overflow ? 'overflow' : '',
-              !overflow && isPast ? 'past' : '',
-              isStart ? 'sel-start' : '',
-              isEnd ? 'sel-end' : '',
-              inRange ? 'in-range' : '',
-              rangeLeft ? 'range-left' : '',
-              rangeRight ? 'range-right' : '',
-              isToday ? 'is-today' : '',
+              overflow        ? 'overflow'     : '',
+              isPast          ? 'past'         : '',
+              isOutDisabled   ? 'out-disabled' : '',
+              isStart         ? 'sel-start'    : '',
+              isEnd           ? 'sel-end'      : '',
+              inRange         ? 'in-range'     : '',
+              rangeLeft       ? 'range-left'   : '',
+              rangeRight      ? 'range-right'  : '',
+              isToday         ? 'is-today'     : '',
             ].filter(Boolean).join(' ');
+
+            const clickable = !overflow && !isPast && !isOutDisabled;
 
             return (
               <div
                 key={idx}
                 className={cls}
-                onClick={() => !overflow && !isPast && handleDayClick(date, overflow)}
+                onClick={() => clickable && handleDayClick(date, overflow)}
               >
                 <div className="sky-day-bg" />
                 <span className="sky-day-num">{date.getDate()}</span>
@@ -499,9 +479,14 @@ export default function PremiumDoubleCalendar({
         {/* Footer */}
         <div className="sky-footer">
           <span className="sky-nights">
-            {nights > 0 ? <><strong>{nights} night{nights !== 1 ? 's' : ''}</strong> selected</> : <span style={{color:'#9ca3af'}}>Select dates</span>}
+            {nights > 0
+              ? <><strong>{nights} night{nights !== 1 ? 's' : ''}</strong> · {MONTHS[checkInDate.getMonth()].slice(0,3)} {checkInDate.getDate()} → {MONTHS[checkOutDate.getMonth()].slice(0,3)} {checkOutDate.getDate()}</>
+              : <span className="hint">
+                  {activeSelection === 'in' ? 'Select check-in date' : 'Select check-out date'}
+                </span>
+            }
           </span>
-          <button className="sky-close-link" onClick={onClose}>Close</button>
+          <button className="sky-close-link" onClick={onClose}>Done</button>
         </div>
       </div>
     </>
