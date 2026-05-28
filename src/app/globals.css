@@ -2259,7 +2259,7 @@ header.scrolled nav ul li a:hover {
 /* --- Premium Black Liquid Glass Music Player --- */
 .premium-music-player {
     position: fixed;
-    bottom: 30px;
+    bottom: 16px;
     left: 30px;
     z-index: 10000;
     pointer-events: auto;
@@ -2438,7 +2438,7 @@ header.scrolled nav ul li a:hover {
 /* === Left Floating Social Stack (Instagram top, WhatsApp middle, Music bottom) === */
 .float-social-stack {
     position: fixed;
-    bottom: 90px;
+    bottom: 60px;
     left: 30px;
     z-index: 9999;
     display: flex;
@@ -2449,10 +2449,11 @@ header.scrolled nav ul li a:hover {
     transition: opacity 0.3s ease, pointer-events 0s;
 }
 
+/* Widgets stay visible always — no footer hiding */
 .float-social-stack.footer-hidden,
 .premium-music-player.footer-hidden {
-    opacity: 0;
-    pointer-events: none;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .float-social-stack svg {
@@ -3571,16 +3572,19 @@ html, body {
     .float-social-stack {
         display: flex !important;
         flex-direction: column;
-        bottom: 62px;   /* sits above the music player (~42 px) */
+        position: fixed;
+        bottom: 70px;   /* sits above the music player (48px height + gap) */
         left: 0;
         right: auto;
         top: auto;
         transform: none;
-        gap: 1px;
+        gap: 2px;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
 
     .float-social-stack .socialcontainer {
-        height: 28px;
+        height: 34px;
         overflow: hidden;
         display: block;
     }
@@ -3594,27 +3598,29 @@ html, body {
     .float-social-stack .social-icon-3-3,
     .float-social-stack .social-icon-4,
     .float-social-stack .social-icon-4-4 {
-        width: 28px;
-        height: 28px;
+        width: 34px;
+        height: 34px;
         margin: 0;
-        border-radius: 0 5px 5px 0;
+        border-radius: 0 8px 8px 0;
     }
 
     .float-social-stack svg {
-        width: 22px;
+        width: 18px;
     }
 
     .float-social-stack .socialcontainer:hover .social-icon-1,
     .float-social-stack .socialcontainer:hover .social-icon-2,
     .float-social-stack .socialcontainer:hover .social-icon-3,
     .float-social-stack .socialcontainer:hover .social-icon-4 {
-        transform: translateY(-28px);
+        transform: translateY(-34px);
     }
 
-    /* Music player — tighter to bottom-left */
+    /* Music player — bottom-left, clear of LiveChat button */
     .premium-music-player {
         bottom: 16px;
-        left: 16px;
+        left: 8px;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
 
     .premium-music-player .toggle-cont {
