@@ -186,10 +186,10 @@ export default function PremiumDoubleCalendar({
             left: 0;
             z-index: 99999;
             background: #fff;
-            border-radius: 24px;
+            border-radius: 18px;
             border: 1px solid rgba(0,0,0,0.08);
             box-shadow: 0 15px 45px rgba(0,0,0,0.12);
-            width: 420px;
+            width: 320px;
             max-height: 92vh;
             overflow-y: auto;
             font-family: 'Outfit', sans-serif;
@@ -224,7 +224,7 @@ export default function PremiumDoubleCalendar({
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 22px;
+            padding: 10px 16px;
             cursor: pointer;
             transition: background 0.15s;
             position: relative;
@@ -243,17 +243,17 @@ export default function PremiumDoubleCalendar({
           }
 
           .sky-row-label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 1.4px;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
             color: #9ca3af;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
           }
           .sky-date-row.active .sky-row-label { color: #C89B3C; }
 
           .sky-row-value {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 700;
             color: #111;
           }
@@ -283,10 +283,10 @@ export default function PremiumDoubleCalendar({
           /* Month nav */
           .sky-month-nav {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 16px 8px; position: relative;
+            padding: 10px 12px 6px; position: relative;
           }
           .sky-nav-arrow {
-            width: 34px; height: 34px; border-radius: 50%;
+            width: 28px; height: 28px; border-radius: 50%;
             border: 1.5px solid #e5e7eb; background: #fff;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             color: #374151; transition: all 0.15s; flex-shrink: 0;
@@ -294,9 +294,9 @@ export default function PremiumDoubleCalendar({
           .sky-nav-arrow:hover:not(:disabled) { border-color: #C89B3C; color: #C89B3C; }
           .sky-nav-arrow:disabled { opacity: 0.3; cursor: default; }
           .sky-month-title {
-            display: flex; align-items: center; gap: 6px;
-            cursor: pointer; padding: 6px 14px; border-radius: 8px;
-            border: 1.5px solid #e5e7eb; font-size: 15px; font-weight: 700;
+            display: flex; align-items: center; gap: 5px;
+            cursor: pointer; padding: 4px 10px; border-radius: 8px;
+            border: 1.5px solid #e5e7eb; font-size: 13px; font-weight: 700;
             color: #111; user-select: none; transition: border-color 0.15s;
           }
           .sky-month-title:hover { border-color: #C89B3C; }
@@ -318,29 +318,29 @@ export default function PremiumDoubleCalendar({
           /* Weekday headers */
           .sky-weekdays {
             display: grid; grid-template-columns: repeat(7, 1fr);
-            padding: 0 12px; margin-bottom: 2px;
+            padding: 0 8px; margin-bottom: 1px;
           }
           .sky-wd {
-            text-align: center; font-size: 11px; font-weight: 700;
-            color: #9ca3af; padding: 4px 0; letter-spacing: 0.5px;
+            text-align: center; font-size: 10px; font-weight: 700;
+            color: #9ca3af; padding: 3px 0; letter-spacing: 0.3px;
           }
 
           /* Day grid */
           .sky-days-grid {
             display: grid; grid-template-columns: repeat(7, 1fr);
-            padding: 0 12px; row-gap: 1px;
+            padding: 0 8px; row-gap: 0px;
           }
           .sky-day {
-            position: relative; height: 44px;
+            position: relative; height: 36px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; user-select: none;
           }
           .sky-day-bg { position: absolute; inset: 0; z-index: 0; }
           .sky-day-num {
             position: relative; z-index: 2;
-            width: 38px; height: 38px;
+            width: 30px; height: 30px;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; font-size: 14px; font-weight: 500; color: #111;
+            border-radius: 50%; font-size: 12px; font-weight: 500; color: #111;
             transition: background 0.12s, color 0.12s;
           }
           .sky-day.overflow { cursor: default; pointer-events: none; }
@@ -369,17 +369,17 @@ export default function PremiumDoubleCalendar({
           /* Footer */
           .sky-footer {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 20px 16px; border-top: 1px solid #f0f0f0; margin-top: 6px;
+            padding: 8px 14px 12px; border-top: 1px solid #f0f0f0; margin-top: 4px;
           }
-          .sky-nights { font-size: 13px; color: #6b7280; }
+          .sky-nights { font-size: 11px; color: #6b7280; }
           .sky-nights strong { color: #111; font-weight: 700; }
           .sky-apply-btn {
             background: #1a56db;
             color: #fff;
             border: none;
             border-radius: 50px;
-            padding: 8px 24px;
-            font-size: 14px;
+            padding: 6px 18px;
+            font-size: 12px;
             font-weight: 700;
             font-family: inherit;
             cursor: pointer;
