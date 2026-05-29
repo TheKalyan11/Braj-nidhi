@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 import LoadingTransition from "@/components/LoadingTransition";
 import { MusicProvider } from "@/lib/MusicContext";
+import SPDivineBar from "@/components/SPDivineBar";
 
 export default function RootLayout({
   children,
@@ -29,6 +30,7 @@ export default function RootLayout({
       </head>
       <body className="index-page antialiased">
         <MusicProvider>
+          <SPDivineBar />
           <LoadingTransition />
           {children}
         </MusicProvider>
