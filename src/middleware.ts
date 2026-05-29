@@ -59,7 +59,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
     "img-src 'self' data: blob: https:; " +
     "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://api.openai.com https://graph.facebook.com https://api.callmebot.com https://pankaj.vcmerp.in; " +
-    "frame-src https://api.razorpay.com https://checkout.razorpay.com; " +
+    "frame-src https://api.razorpay.com https://checkout.razorpay.com https://www.google.com https://maps.google.com https://maps.googleapis.com; " +
     "object-src 'none'; " +
     "base-uri 'self';",
 };

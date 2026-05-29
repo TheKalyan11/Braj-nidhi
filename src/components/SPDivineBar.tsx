@@ -42,12 +42,12 @@ export default function SPDivineBar() {
         src="/sp logo.png"
         alt="His Divine Grace Srila Prabhupada"
         style={{
-          height: "96px",        // taller than bar so it peeks below into header
+          height: "72px",
           width: "auto",
           objectFit: "contain",
           display: "block",
-          filter: "drop-shadow(0 3px 12px rgba(0,0,0,0.30))",
-          marginTop: "16px",     // push portrait downward so it overlaps header edge
+          filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.25))",
+          marginTop: "4px",
         }}
       />
     </div>
