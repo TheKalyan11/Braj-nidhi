@@ -1,13 +1,8 @@
 "use client";
 
-/**
- * Srila Prabhupada top bar — sits ABOVE the main header.
- * On scroll: slides up and disappears. Header then floats up as normal.
- */
-
 import { useState, useEffect } from "react";
 
-const BAR_HEIGHT = 80; // px — keep in sync with globals.css header top value
+const BAR_HEIGHT = 68; // px — keep in sync with globals.css header { top: 68px }
 
 export default function SPDivineBar() {
   const [scrolled, setScrolled] = useState(false);
@@ -31,23 +26,20 @@ export default function SPDivineBar() {
         alignItems: "center",
         zIndex: 1050,
         pointerEvents: "none",
-        /* Slide the whole bar upward on scroll */
         transform: scrolled ? `translateY(-${BAR_HEIGHT}px)` : "translateY(0)",
         transition: "transform 0.38s cubic-bezier(0.4,0,0.2,1)",
-        /* Subtle warm gradient so logo has a readable background on all pages */
-        background: "linear-gradient(180deg, rgba(20,10,5,0.55) 0%, rgba(20,10,5,0.0) 100%)",
+        background: "transparent", // no gradient — no visual gap
       }}
     >
       <img
         src="/sp logo.png"
         alt="His Divine Grace Srila Prabhupada"
         style={{
-          height: "72px",
+          height: "68px",    // fills the bar exactly — no extra space
           width: "auto",
           objectFit: "contain",
           display: "block",
-          filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.25))",
-          marginTop: "4px",
+          filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.22))",
         }}
       />
     </div>
