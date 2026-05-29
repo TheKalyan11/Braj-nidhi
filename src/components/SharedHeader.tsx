@@ -45,7 +45,46 @@ export default function SharedHeader({ onLoginOpen }: SharedHeaderProps) {
 
   return (
     <>
-      <header id="main-header" className={scrolled ? 'scrolled' : ''}>
+      {/* ── Srila Prabhupada Divine Bar ─────────────────────────────────────── */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1002,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          height: '88px',
+          pointerEvents: 'none',
+          opacity: scrolled ? 0 : 1,
+          transform: scrolled ? 'translateY(-18px) scale(0.95)' : 'translateY(0) scale(1)',
+          transition: 'opacity 0.35s ease, transform 0.35s ease',
+          background: scrolled
+            ? 'transparent'
+            : 'linear-gradient(180deg, rgba(255,252,245,0.92) 60%, transparent 100%)',
+        }}
+      >
+        <img
+          src="/sp logo.png"
+          alt="His Divine Grace Srila Prabhupada"
+          style={{
+            height: '108px',
+            width: 'auto',
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 4px 14px rgba(139,0,0,0.18))',
+            marginTop: '-4px',
+          }}
+        />
+      </div>
+
+      {/* ── Main Header — pushed below SP bar when visible ───────────────────── */}
+      <header
+        id="main-header"
+        className={scrolled ? 'scrolled' : ''}
+        style={{ top: scrolled ? undefined : '82px' }}
+      >
         <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
           <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '60px', width: 'auto' }} />
         </Link>
