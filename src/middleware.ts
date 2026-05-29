@@ -10,16 +10,38 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 
 // ─── Allowed origins ──────────────────────────────────────────────────────────
-// Add your production domain here once deployed.
-const ALLOWED_ORIGINS = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  // 'https://www.brajnidhiguesthouse.com',   ← uncomment when live
+// Explicit extra origins (add your custom domain here when ready)
+const EXTRA_ALLOWED_ORIGINS: string[] = [
+  // 'https://www.brajnidhiguesthouse.com',
 ];
 
-function isAllowedOrigin(origin: string | null): boolean {
-  if (!origin) return true; // server-to-server / Postman — allow
-  return ALLOWED_ORIGINS.some(o => origin.startsWith(o));
+/**
+ * Allow an origin when:
+ *  1. No origin header (server-to-server call, curl, Postman)
+ *  2. Origin is localhost (local dev)
+ *  3. Origin is any *.vercel.app subdomain (all Vercel preview/production deployments)
+ *  4. Origin matches the request's own host (same-site fetch — the most common case)
+ *  5. Origin is in the explicit EXTRA_ALLOWED_ORIGINS list
+ */
+function isAllowedOrigin(origin: string | null, host: string | null): boolean {
+  if (!origin) return true;
+
+  // localhost dev
+  if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) return true;
+
+  // any Vercel deployment (*.vercel.app)
+  try {
+    const { hostname } = new URL(origin);
+    if (hostname.endsWith('.vercel.app')) return true;
+
+    // same host as the incoming request (production custom domain)
+    if (host && hostname === host) return true;
+  } catch {
+    return false;
+  }
+
+  // explicit whitelist
+  return EXTRA_ALLOWED_ORIGINS.some(o => origin.startsWith(o));
 }
 
 // ─── Security headers applied to every response ───────────────────────────────
@@ -48,9 +70,10 @@ export function middleware(request: NextRequest) {
 
   // ── CORS pre-flight ──────────────────────────────────────────────────────────
   const origin = request.headers.get('origin');
+  const host   = request.headers.get('host');
 
   if (isApiRoute && request.method === 'OPTIONS') {
-    if (!isAllowedOrigin(origin)) {
+    if (!isAllowedOrigin(origin, host)) {
       return new NextResponse(null, { status: 403 });
     }
     return new NextResponse(null, {
@@ -65,7 +88,7 @@ export function middleware(request: NextRequest) {
   }
 
   // ── Block disallowed origins on API routes ────────────────────────────────────
-  if (isApiRoute && origin && !isAllowedOrigin(origin)) {
+  if (isApiRoute && origin && !isAllowedOrigin(origin, host)) {
     return NextResponse.json(
       { error: 'Forbidden: cross-origin request not allowed' },
       { status: 403 },
@@ -88,7 +111,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Also echo CORS header for allowed API requests
-  if (isApiRoute && isAllowedOrigin(origin)) {
+  if (isApiRoute && isAllowedOrigin(origin, host)) {
     response.headers.set('Access-Control-Allow-Origin', origin ?? '*');
     response.headers.set('Vary', 'Origin');
   }
