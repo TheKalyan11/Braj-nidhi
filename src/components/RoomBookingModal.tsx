@@ -244,6 +244,7 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
               initialSelection={calendarInitialSelection}
               onChange={(cin, cout) => { setCheckIn(cin); setCheckOut(cout); }}
               onClose={() => setIsCalendarOpen(false)}
+              forceFixed
             />
           </div>
         </div>

@@ -9,6 +9,8 @@ interface PremiumDoubleCalendarProps {
   isOpen: boolean;
   onClose?: () => void;
   initialSelection?: 'in' | 'out';
+  /** Force fixed centered positioning (use inside modals) */
+  forceFixed?: boolean;
 }
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -45,7 +47,7 @@ function fmtDisplay(dateStr: string) {
 }
 
 export default function PremiumDoubleCalendar({
-  checkIn, checkOut, onChange, isOpen, onClose, initialSelection = 'in'
+  checkIn, checkOut, onChange, isOpen, onClose, initialSelection = 'in', forceFixed = false
 }: PremiumDoubleCalendarProps) {
   const checkInDate = parseDateStr(checkIn);
   const checkOutDate = parseDateStr(checkOut);
@@ -166,8 +168,8 @@ export default function PremiumDoubleCalendar({
 
   return (
     <>
-      <div className="sky-backdrop" onClick={onClose} />
-      <div ref={containerRef} className="sky-cal-panel" onClick={e => e.stopPropagation()}>
+      <div className="sky-backdrop" onClick={onClose} style={forceFixed ? { zIndex: 299998 } : undefined} />
+      <div ref={containerRef} className={`sky-cal-panel${forceFixed ? ' sky-cal-fixed' : ''}`} onClick={e => e.stopPropagation()}>
         <style dangerouslySetInnerHTML={{ __html: `
           /* Backdrop: transparent on desktop (click-outside only), dark on mobile */
           .sky-backdrop {
@@ -200,9 +202,25 @@ export default function PremiumDoubleCalendar({
             to   { opacity: 1; transform: translateY(0); }
           }
 
+          /* Force fixed centered — used inside modals */
+          .sky-cal-panel.sky-cal-fixed {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            bottom: auto !important;
+            transform: translate(-50%, -50%) !important;
+            width: min(420px, calc(100vw - 20px)) !important;
+            z-index: 299999 !important;
+            animation: skyFadeFixed 0.18s ease forwards;
+          }
+          @keyframes skyFadeFixed {
+            from { opacity: 0; transform: translate(-50%, -47%); }
+            to   { opacity: 1; transform: translate(-50%, -50%); }
+          }
+
           /* Mobile: drop upwards relative to search block */
           @media (max-width: 768px) {
-            .sky-cal-panel {
+            .sky-cal-panel:not(.sky-cal-fixed) {
               position: absolute;
               top: auto;
               bottom: calc(100% + 15px);
