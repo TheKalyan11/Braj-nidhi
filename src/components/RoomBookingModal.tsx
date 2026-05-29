@@ -113,8 +113,9 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
         background: '#fff',
         borderRadius: '20px',
         boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
-        width: 'min(480px, calc(100vw - 24px))',
-        maxHeight: '90vh',
+        width: 'min(520px, calc(100vw - 24px))',
+        maxHeight: '96vh',
+        minHeight: 'min(640px, 90vh)',
         overflowY: 'auto',
         fontFamily: "'Outfit', sans-serif",
         animation: 'rbmFade 0.2s ease forwards',
@@ -126,17 +127,17 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
           }
           .rbm-row {
             display:flex; align-items:center; justify-content:space-between;
-            padding:13px 22px; cursor:pointer; transition:background 0.15s;
+            padding:18px 26px; cursor:pointer; transition:background 0.15s;
             position:relative;
           }
           .rbm-row:hover { background:#fafafa; }
           .rbm-row + .rbm-row { border-top:1px solid #f0f0f0; }
           .rbm-row-label {
-            font-size:10px; font-weight:700; letter-spacing:1.3px;
-            text-transform:uppercase; color:#9ca3af; margin-bottom:3px;
+            font-size:11px; font-weight:700; letter-spacing:1.3px;
+            text-transform:uppercase; color:#9ca3af; margin-bottom:5px;
           }
           .rbm-row-value {
-            font-size:15px; font-weight:700; color:#111;
+            font-size:17px; font-weight:700; color:#111;
           }
           .rbm-badge {
             font-size:11px; font-weight:600; color:#fff;
@@ -144,36 +145,36 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
           }
           .rbm-counter-row {
             display:flex; align-items:center; justify-content:space-between;
-            padding:0 0 12px;
+            padding:0 0 16px;
           }
-          .rbm-counter-label { font-size:14px; font-weight:600; color:#2c2520; }
-          .rbm-counter-sub { font-size:11px; color:#9ca3af; }
+          .rbm-counter-label { font-size:15px; font-weight:600; color:#2c2520; }
+          .rbm-counter-sub { font-size:12px; color:#9ca3af; margin-top:2px; }
           .rbm-counter-ctrl {
             display:flex; align-items:center;
-            border:1px solid #efe8df; border-radius:10px;
-            padding:5px 10px; gap:16px; width:110px; justify-content:space-between;
+            border:1px solid #efe8df; border-radius:12px;
+            padding:7px 14px; gap:20px; width:120px; justify-content:space-between;
           }
           .rbm-counter-btn {
-            background:none; border:none; font-size:18px; cursor:pointer;
+            background:none; border:none; font-size:20px; cursor:pointer;
             color:#2c2520; font-weight:500; padding:0; line-height:1;
           }
           .rbm-counter-btn:disabled { color:#ccc; cursor:default; }
-          .rbm-counter-num { font-size:16px; font-weight:700; color:#2c2520; min-width:16px; text-align:center; }
+          .rbm-counter-num { font-size:17px; font-weight:700; color:#2c2520; min-width:18px; text-align:center; }
         `}</style>
 
         {/* Header */}
         <div style={{
-          padding: '20px 22px 16px',
+          padding: '26px 26px 20px',
           borderBottom: '1px solid #f0f0f0',
           display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
         }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 4 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '1.4px', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 6 }}>
               Book Room
             </div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: '#111', lineHeight: 1.2 }}>{roomName}</div>
-            <div style={{ fontSize: 14, color: accentColor, fontWeight: 700, marginTop: 4 }}>
-              ₹{price.toLocaleString()} <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 400 }}>per night</span>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#111', lineHeight: 1.2 }}>{roomName}</div>
+            <div style={{ fontSize: 16, color: accentColor, fontWeight: 700, marginTop: 6 }}>
+              ₹{price.toLocaleString()} <span style={{ fontSize: 13, color: '#9ca3af', fontWeight: 400 }}>per night</span>
             </div>
           </div>
           <button
@@ -266,7 +267,7 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
           </div>
 
           {showGuests && (
-            <div style={{ padding: '16px 22px', borderTop: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ padding: '20px 26px', borderTop: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Rooms */}
               <div className="rbm-counter-row">
                 <div><div className="rbm-counter-label">Rooms</div></div>
@@ -310,7 +311,7 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
         </div>
 
         {/* Summary + CTA */}
-        <div style={{ padding: '16px 22px 22px' }}>
+        <div style={{ padding: '20px 26px 28px' }}>
           {nights > 0 && (
             <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 14 }}>
               <strong style={{ color: '#111' }}>{nights} night{nights!==1?'s':''}</strong>
@@ -325,8 +326,8 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
               color: '#fff',
               border: 'none',
               borderRadius: '50px',
-              padding: '14px 24px',
-              fontSize: 15,
+              padding: '16px 28px',
+              fontSize: 17,
               fontWeight: 800,
               cursor: 'pointer',
               fontFamily: 'inherit',
