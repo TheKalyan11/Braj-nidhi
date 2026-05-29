@@ -39,7 +39,7 @@ h1, h2, h3, h4, h5, h6 {
 /* --- Header --- */
 header {
     position: fixed;
-    top: 68px;          /* directly below SP Divine Bar (68px tall) — no gap */
+    top: 48px;          /* SP bar (68px) minus header padding-top (20px) = content flush at 68px */
     left: 0;
     width: 100%;
     padding: 20px 8%;
