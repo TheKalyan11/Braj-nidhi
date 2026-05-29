@@ -38,24 +38,26 @@ export interface BookingRecord {
   guestPhone?: string;
   bookedAt: string;  // ISO timestamp
   status: 'confirmed' | 'cancelled';
-  erpReservationId?: string;   // set when ERP sync succeeds
+  erpReservationId?: string;
   erpSyncStatus?: 'synced' | 'pending' | 'failed';
 }
 
-// ─── Local file store ─────────────────────────────────────────────────────────
+// ─── Storage Abstraction ──────────────────────────────────────────────────────
+// • Vercel (production) → Upstash Redis  (UPSTASH_REDIS_REST_URL + _TOKEN set)
+// • Local dev           → src/data/bookings.json  (file on disk)
+
+const KV_KEY = 'bn:bookings';
+
+// ── Local file helpers (dev only) ─────────────────────────────────────────────
 
 const DATA_PATH = path.join(process.cwd(), 'src', 'data', 'bookings.json');
 
-function ensureDataFile() {
-  const dir = path.dirname(DATA_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(DATA_PATH))
-    fs.writeFileSync(DATA_PATH, JSON.stringify({ bookings: [] }, null, 2));
-}
-
-export function readBookings(): BookingRecord[] {
-  ensureDataFile();
+function fileReadBookings(): BookingRecord[] {
   try {
+    const dir = path.dirname(DATA_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    if (!fs.existsSync(DATA_PATH))
+      fs.writeFileSync(DATA_PATH, JSON.stringify({ bookings: [] }, null, 2));
     const raw = fs.readFileSync(DATA_PATH, 'utf-8');
     return (JSON.parse(raw).bookings ?? []) as BookingRecord[];
   } catch {
@@ -63,9 +65,59 @@ export function readBookings(): BookingRecord[] {
   }
 }
 
-export function writeBookings(bookings: BookingRecord[]) {
-  ensureDataFile();
-  fs.writeFileSync(DATA_PATH, JSON.stringify({ bookings }, null, 2));
+function fileWriteBookings(bookings: BookingRecord[]) {
+  try {
+    const dir = path.dirname(DATA_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(DATA_PATH, JSON.stringify({ bookings }, null, 2));
+  } catch (e) {
+    console.error('[storage] file write error:', e);
+  }
+}
+
+// ── Redis helpers (production) ────────────────────────────────────────────────
+
+function getRedis() {
+  const { Redis } = require('@upstash/redis');
+  return new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL!,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  });
+}
+
+function isRedisConfigured() {
+  return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+}
+
+// ── Public read / write ───────────────────────────────────────────────────────
+
+export async function readBookings(): Promise<BookingRecord[]> {
+  if (isRedisConfigured()) {
+    try {
+      const redis = getRedis();
+      const data = await redis.get(KV_KEY);
+      if (!data) return [];
+      // Upstash auto-parses JSON
+      return Array.isArray(data) ? data as BookingRecord[] : [];
+    } catch (e) {
+      console.error('[storage] Redis read error, falling back to []:', e);
+      return [];
+    }
+  }
+  return fileReadBookings();
+}
+
+export async function writeBookings(bookings: BookingRecord[]): Promise<void> {
+  if (isRedisConfigured()) {
+    try {
+      const redis = getRedis();
+      await redis.set(KV_KEY, bookings);
+    } catch (e) {
+      console.error('[storage] Redis write error:', e);
+    }
+  } else {
+    fileWriteBookings(bookings);
+  }
 }
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
@@ -82,15 +134,16 @@ export function dateRange(from: string, to: string): string[] {
   return dates;
 }
 
-// ─── Availability queries ──────────────────────────────────────────────────────
+// ─── Availability queries (all async now) ──────────────────────────────────────
 
 /** How many rooms are booked on each date in [from, to) */
-export function getBookedCountsForRange(
+export async function getBookedCountsForRange(
   roomType: RoomType,
   from: string,
   to: string,
-): Record<string, number> {
-  const bookings = readBookings().filter(
+): Promise<Record<string, number>> {
+  const allBookings = await readBookings();
+  const bookings = allBookings.filter(
     b => b.roomType === roomType && b.status === 'confirmed',
   );
   const dates = dateRange(from, to);
@@ -108,12 +161,12 @@ export function getBookedCountsForRange(
 }
 
 /** Available rooms per date in [from, to) */
-export function getAvailabilityForRange(
+export async function getAvailabilityForRange(
   roomType: RoomType,
   from: string,
   to: string,
-): Record<string, number> {
-  const booked = getBookedCountsForRange(roomType, from, to);
+): Promise<Record<string, number>> {
+  const booked = await getBookedCountsForRange(roomType, from, to);
   const total = TOTAL_ROOMS[roomType];
   const out: Record<string, number> = {};
   for (const [date, count] of Object.entries(booked)) {
@@ -123,29 +176,29 @@ export function getAvailabilityForRange(
 }
 
 /** Dates where availability < rooms needed */
-export function getUnavailableDates(
+export async function getUnavailableDates(
   roomType: RoomType,
   from: string,
   to: string,
   rooms = 1,
-): string[] {
-  const avail = getAvailabilityForRange(roomType, from, to);
+): Promise<string[]> {
+  const avail = await getAvailabilityForRange(roomType, from, to);
   return Object.entries(avail)
     .filter(([, a]) => a < rooms)
     .map(([d]) => d);
 }
 
 /** Next upgradeable room type with enough availability */
-export function suggestUpgrade(
+export async function suggestUpgrade(
   roomType: RoomType,
   checkIn: string,
   checkOut: string,
   rooms = 1,
-): { roomType: RoomType; name: string; price: number; available: number } | null {
+): Promise<{ roomType: RoomType; name: string; price: number; available: number } | null> {
   const idx = UPGRADE_ORDER.indexOf(roomType);
   for (let i = idx + 1; i < UPGRADE_ORDER.length; i++) {
     const candidate = UPGRADE_ORDER[i];
-    const avail = getAvailabilityForRange(candidate, checkIn, checkOut);
+    const avail = await getAvailabilityForRange(candidate, checkIn, checkOut);
     const values = Object.values(avail);
     const minAvail = values.length ? Math.min(...values) : TOTAL_ROOMS[candidate];
     if (minAvail >= rooms) {
@@ -174,7 +227,6 @@ const ERP_ROOM_TYPE_MAP: Record<RoomType, string | undefined> = {
   deluxe4: process.env.ERP_ROOM_TYPE_DELUXE4 || undefined,
 };
 
-/** Call ERP and push booking as reservation */
 export async function syncToERP(booking: BookingRecord): Promise<{
   erpReservationId?: string;
   status: 'synced' | 'failed';
@@ -188,7 +240,7 @@ export async function syncToERP(booking: BookingRecord): Promise<{
   if (!erpRoomTypeId) {
     return {
       status: 'failed',
-      error: `ERP room type ID for ${booking.roomType} not configured. Set ERP_ROOM_TYPE_${booking.roomType.toUpperCase()} in .env.local`,
+      error: `ERP room type ID for ${booking.roomType} not configured. Set ERP_ROOM_TYPE_${booking.roomType.toUpperCase()}`,
     };
   }
 
@@ -229,53 +281,16 @@ export async function syncToERP(booking: BookingRecord): Promise<{
     }
 
     const result = data.message ?? data;
-    const erpReservationId: string | undefined = result.reservationId ?? result.reservation_id ?? result.name;
+    const erpReservationId: string | undefined =
+      result.reservationId ?? result.reservation_id ?? result.name;
     return { status: 'synced', erpReservationId };
   } catch (e: any) {
     return { status: 'failed', error: e.message ?? 'Network error' };
   }
 }
 
-// ─── Search ERP for room availability (when room types are configured) ─────────
-
-export async function searchERPRooms(params: {
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  rooms: number;
-}): Promise<{ available: boolean; erpData?: any; error?: string }> {
-  if (!ERP_BASE || !process.env.ERP_API_KEY) {
-    return { available: false, error: 'ERP not configured' };
-  }
-  try {
-    const res = await fetch(`${ERP_BASE}.search_rooms`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: ERP_AUTH },
-      body: JSON.stringify({
-        property: ERP_PROPERTY,
-        check_in_date: params.checkIn,
-        check_out_date: params.checkOut,
-        guests: params.guests,
-        rooms: params.rooms,
-        booking_type: ERP_BOOKING_TYPE,
-        hold_type: ERP_HOLD_TYPE,
-      }),
-      signal: AbortSignal.timeout(8_000),
-    });
-    const data = await res.json();
-    const result = data.message ?? data;
-    return {
-      available: (result.availableRooms?.length ?? 0) > 0,
-      erpData: result,
-    };
-  } catch (e: any) {
-    return { available: false, error: e.message };
-  }
-}
-
 // ─── Booking management ───────────────────────────────────────────────────────
 
-/** Create a booking locally and attempt ERP sync */
 export async function createBooking(params: {
   roomType: RoomType;
   checkIn: string;
@@ -287,8 +302,8 @@ export async function createBooking(params: {
   guestEmail?: string;
   guestPhone?: string;
 }): Promise<{ success: boolean; booking?: BookingRecord; error?: string; erpError?: string }> {
-  // Check local availability first
-  const avail = getAvailabilityForRange(params.roomType, params.checkIn, params.checkOut);
+  // Check availability
+  const avail = await getAvailabilityForRange(params.roomType, params.checkIn, params.checkOut);
   const values = Object.values(avail);
   if (values.length === 0) return { success: false, error: 'Invalid date range' };
   const minAvail = Math.min(...values);
@@ -300,8 +315,8 @@ export async function createBooking(params: {
     };
   }
 
-  // Create local record
-  const bookings = readBookings();
+  // Build and save booking
+  const bookings = await readBookings();
   const booking: BookingRecord = {
     id: `BK${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
     roomType: params.roomType,
@@ -319,18 +334,18 @@ export async function createBooking(params: {
   };
 
   bookings.push(booking);
-  writeBookings(bookings);
+  await writeBookings(bookings);
 
-  // Try ERP sync (non-blocking — don't fail if ERP is down)
+  // ERP sync (non-blocking)
   let erpError: string | undefined;
   try {
     const erpResult = await syncToERP(booking);
-    const all = readBookings();
+    const all = await readBookings();
     const idx = all.findIndex(b => b.id === booking.id);
     if (idx !== -1) {
       all[idx].erpSyncStatus = erpResult.status;
       if (erpResult.erpReservationId) all[idx].erpReservationId = erpResult.erpReservationId;
-      writeBookings(all);
+      await writeBookings(all);
       booking.erpSyncStatus = erpResult.status;
       booking.erpReservationId = erpResult.erpReservationId;
     }
@@ -342,35 +357,32 @@ export async function createBooking(params: {
   return { success: true, booking, erpError };
 }
 
-/** Cancel a booking */
-export function cancelBooking(id: string): boolean {
-  const bookings = readBookings();
+export async function cancelBooking(id: string): Promise<boolean> {
+  const bookings = await readBookings();
   const idx = bookings.findIndex(b => b.id === id);
   if (idx === -1) return false;
   bookings[idx].status = 'cancelled';
-  writeBookings(bookings);
+  await writeBookings(bookings);
   return true;
 }
 
-/** Restore a cancelled booking */
-export function restoreBooking(id: string): boolean {
-  const bookings = readBookings();
+export async function restoreBooking(id: string): Promise<boolean> {
+  const bookings = await readBookings();
   const idx = bookings.findIndex(b => b.id === id);
   if (idx === -1) return false;
   bookings[idx].status = 'confirmed';
-  writeBookings(bookings);
+  await writeBookings(bookings);
   return true;
 }
 
-/** Retry ERP sync for a failed booking */
 export async function retryERPSync(id: string): Promise<{ success: boolean; error?: string }> {
-  const bookings = readBookings();
+  const bookings = await readBookings();
   const booking = bookings.find(b => b.id === id);
   if (!booking) return { success: false, error: 'Booking not found' };
   const result = await syncToERP(booking);
   const idx = bookings.findIndex(b => b.id === id);
   bookings[idx].erpSyncStatus = result.status;
   if (result.erpReservationId) bookings[idx].erpReservationId = result.erpReservationId;
-  writeBookings(bookings);
+  await writeBookings(bookings);
   return { success: result.status === 'synced', error: result.error };
 }

@@ -12,18 +12,15 @@ import type { RoomType } from '@/lib/roomAvailability';
 import { isAdminAuthorized, unauthorizedResponse } from '@/lib/apiAuth';
 import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
-/** GET /api/availability/admin — list all bookings + 90-day availability snapshot */
 export async function GET(req: NextRequest) {
-  // ── Auth ────────────────────────────────────────────────────────────────────
   if (!isAdminAuthorized(req)) return unauthorizedResponse();
 
-  // ── Rate limit: 60 req/min per IP ───────────────────────────────────────────
   const ip = getClientIp(req);
   const rl = checkRateLimit(`admin:${ip}`, { limit: 60, windowMs: 60_000 });
   if (!rl.allowed) return rateLimitResponse(rl.resetAt);
 
   try {
-    const bookings = readBookings();
+    const bookings = await readBookings();
 
     const today = new Date();
     const from = today.toISOString().split('T')[0];
@@ -33,7 +30,7 @@ export async function GET(req: NextRequest) {
 
     const snapshot: Record<string, Record<string, number>> = {};
     for (const rt of UPGRADE_ORDER as RoomType[]) {
-      snapshot[rt] = getAvailabilityForRange(rt, from, to);
+      snapshot[rt] = await getAvailabilityForRange(rt, from, to);
     }
 
     const erpConfig = {
@@ -52,26 +49,21 @@ export async function GET(req: NextRequest) {
   }
 }
 
-/** PATCH /api/availability/admin?id=BKxxx&action=cancel|restore|retry-erp */
 export async function PATCH(req: NextRequest) {
-  // ── Auth ────────────────────────────────────────────────────────────────────
   if (!isAdminAuthorized(req)) return unauthorizedResponse();
 
-  // ── Rate limit: 30 req/min per IP ───────────────────────────────────────────
   const ip = getClientIp(req);
   const rl = checkRateLimit(`admin-patch:${ip}`, { limit: 30, windowMs: 60_000 });
   if (!rl.allowed) return rateLimitResponse(rl.resetAt);
 
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id');
+  const id     = searchParams.get('id');
   const action = searchParams.get('action');
 
   if (!id || !action) {
     return Response.json({ error: 'Missing id or action' }, { status: 400 });
   }
-
-  // Validate id format to prevent injection
-  if (!/^BK[A-Z0-9]+$/.test(id)) {
+  if (!/^BK[A-Za-z0-9_-]+$/.test(id)) {
     return Response.json({ error: 'Invalid booking id format' }, { status: 400 });
   }
 
@@ -80,8 +72,8 @@ export async function PATCH(req: NextRequest) {
     return Response.json({ error: 'Unknown action' }, { status: 400 });
   }
 
-  if (action === 'cancel') return Response.json({ success: cancelBooking(id) });
-  if (action === 'restore') return Response.json({ success: restoreBooking(id) });
+  if (action === 'cancel')    return Response.json({ success: await cancelBooking(id) });
+  if (action === 'restore')   return Response.json({ success: await restoreBooking(id) });
   if (action === 'retry-erp') return Response.json(await retryERPSync(id));
 
   return Response.json({ error: 'Unknown action' }, { status: 400 });
