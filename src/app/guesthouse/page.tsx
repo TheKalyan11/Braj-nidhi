@@ -9,6 +9,7 @@ import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
 import BookNowButton from '@/components/BookNowButton';
 import LoginJoinButton from '@/components/LoginJoinButton';
+import RoomBookingModal from '@/components/RoomBookingModal';
 
 // Self-contained Room Card Slideshow to isolate slide re-renders
 const RoomCardSlideshow = ({ images, alt, interval = 4000 }: { images: string[]; alt: string; interval?: number }) => {
@@ -47,6 +48,14 @@ export default function Guesthouse() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // Room booking modal
+  const [roomModal, setRoomModal] = useState<{ open: boolean; roomType: 'deluxe2'|'deluxe3'|'deluxe4'; roomName: string; price: number }>({
+    open: false, roomType: 'deluxe2', roomName: '', price: 0
+  });
+  const openRoomModal = (roomType: 'deluxe2'|'deluxe3'|'deluxe4', roomName: string, price: number) => {
+    setRoomModal({ open: true, roomType, roomName, price });
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -1776,7 +1785,7 @@ export default function Guesthouse() {
                                     <span><i className="fas fa-wifi"></i> Free WiFi</span>
                                     <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                                 </div>
-                                <a href="/booking?roomType=deluxe2" className="btn-availability">Book for ₹3,500 <i className="fas fa-chevron-right"></i></a>
+                                <button className="btn-availability" style={{ border: "none", cursor: "pointer", width: "100%" }} onClick={() => openRoomModal('deluxe2', 'Deluxe 2 – Twin Bedded Room', 3500)}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></button>
                             </div>
                         </div>
 
@@ -1792,7 +1801,7 @@ export default function Guesthouse() {
                                     <span><i className="fas fa-bath"></i> Deep Tub</span>
                                     <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                                 </div>
-                                <a href="/booking?roomType=deluxe3" className="btn-availability">Book for ₹4,500 <i className="fas fa-chevron-right"></i></a>
+                                <button className="btn-availability" style={{ border: "none", cursor: "pointer", width: "100%" }} onClick={() => openRoomModal('deluxe3', 'Deluxe 3 – 3 Bedded Room', 4500)}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></button>
                             </div>
                         </div>
 
@@ -1808,7 +1817,7 @@ export default function Guesthouse() {
                                     <span><i className="fas fa-bed"></i> Living Area</span>
                                     <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                                 </div>
-                                <a href="/booking?roomType=deluxe4" className="btn-availability">Book for ₹4,999 <i className="fas fa-chevron-right"></i></a>
+                                <button className="btn-availability" style={{ border: "none", cursor: "pointer", width: "100%" }} onClick={() => openRoomModal('deluxe4', 'Deluxe 4 – 4 Bedded Room', 4999)}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></button>
                             </div>
                         </div>
                     </div>
@@ -2028,6 +2037,13 @@ export default function Guesthouse() {
             <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
         )}
     </AnimatePresence>
+    <RoomBookingModal
+      isOpen={roomModal.open}
+      onClose={() => setRoomModal(m => ({ ...m, open: false }))}
+      roomType={roomModal.roomType}
+      roomName={roomModal.roomName}
+      price={roomModal.price}
+    />
 
     
 

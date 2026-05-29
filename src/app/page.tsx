@@ -9,6 +9,7 @@ import LoginJoinButton from '@/components/LoginJoinButton';
 import BookNowButton from '@/components/BookNowButton';
 import SectionLinkButton from '@/components/SectionLinkButton';
 import PremiumDoubleCalendar from '@/components/PremiumDoubleCalendar';
+import RoomBookingModal from '@/components/RoomBookingModal';
 
 // Self-contained Hero Slideshow Component to prevent top-level page re-renders
 const HeroSlideshow = ({ images }: { images: string[] }) => {
@@ -87,6 +88,14 @@ export default function Home() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [calendarInitialSelection, setCalendarInitialSelection] = useState<'in' | 'out'>('in');
+
+  // Room booking modal
+  const [roomModal, setRoomModal] = useState<{ open: boolean; roomType: 'deluxe2'|'deluxe3'|'deluxe4'; roomName: string; price: number }>({
+    open: false, roomType: 'deluxe2', roomName: '', price: 0
+  });
+  const openRoomModal = (roomType: 'deluxe2'|'deluxe3'|'deluxe4', roomName: string, price: number) => {
+    setRoomModal({ open: true, roomType, roomName, price });
+  };
 
   const formatDateFriendly = (dateStr: string) => {
     if (!dateStr) return '';
@@ -891,7 +900,7 @@ export default function Home() {
                             <span><i className="fas fa-wifi"></i> Free WiFi</span>
                             <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
                         </div>
-                        <Link href={`/rooms-combo?roomType=deluxe2&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&rooms=1&adults=2&children=0&guests=${encodeURIComponent('2 Adults')}`} className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></Link>
+                        <button className="btn-availability" style={{ display: "block", width: "100%", textAlign: "center", border: "none", cursor: "pointer" }} onClick={() => openRoomModal('deluxe2', 'Deluxe 2 – Twin Bedded Room', 3500)}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
 
@@ -906,7 +915,7 @@ export default function Home() {
                             <span><i className="fas fa-bath"></i> Deep Tub</span>
                             <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                         </div>
-                        <Link href={`/rooms-combo?roomType=deluxe3&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&rooms=1&adults=3&children=0&guests=${encodeURIComponent('3 Adults')}`} className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></Link>
+                        <button className="btn-availability" style={{ display: "block", width: "100%", textAlign: "center", border: "none", cursor: "pointer" }} onClick={() => openRoomModal('deluxe3', 'Deluxe 3 – 3 Bedded Room', 4500)}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
 
@@ -921,7 +930,7 @@ export default function Home() {
                             <span><i className="fas fa-bed"></i> Living Area</span>
                             <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
                         </div>
-                        <Link href={`/rooms-combo?roomType=deluxe4&checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&rooms=1&adults=4&children=0&guests=${encodeURIComponent('4 Adults')}`} className="btn-availability" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></Link>
+                        <button className="btn-availability" style={{ display: "block", width: "100%", textAlign: "center", border: "none", cursor: "pointer" }} onClick={() => openRoomModal('deluxe4', 'Deluxe 4 – 4 Bedded Room', 4999)}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
             </div>
@@ -1584,6 +1593,13 @@ export default function Home() {
     <FloatingWidgets />
 
     <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+    <RoomBookingModal
+      isOpen={roomModal.open}
+      onClose={() => setRoomModal(m => ({ ...m, open: false }))}
+      roomType={roomModal.roomType}
+      roomName={roomModal.roomName}
+      price={roomModal.price}
+    />
 
     </div>
   );
