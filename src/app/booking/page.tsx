@@ -54,6 +54,9 @@ export default function BookingPage() {
   const [checkIn, setCheckIn] = useState<string>('2026-05-18');
   const [checkOut, setCheckOut] = useState<string>('2026-05-20');
   
+  // Rooms count (passed from RoomBookingModal)
+  const [rooms, setRooms] = useState<number>(1);
+
   // Guests
   const [adults, setAdults] = useState<number>(2);
   const [children, setChildren] = useState<number>(0);
@@ -202,7 +205,7 @@ export default function BookingPage() {
 
   // Price calculations
   const pricePerNight = livePrices[roomType] || getRoomPrice(roomType);
-  const roomCost = pricePerNight * nights;
+  const roomCost = pricePerNight * nights * rooms;
   
   // Add-ons Cost
   const darshanCost = darshanGuide ? 1500 : 0;
@@ -272,7 +275,13 @@ export default function BookingPage() {
       setCheckIn(parsedCheckIn || formatDate(today));
       setCheckOut(parsedCheckOut || formatDate(tomorrow));
 
-      // 3. Guests
+      // 3. Rooms
+      const paramRooms = params.get('rooms');
+      if (paramRooms && !isNaN(Number(paramRooms))) {
+        setRooms(Math.max(1, Number(paramRooms)));
+      }
+
+      // 4. Guests
       const paramAdults = params.get('adults');
       if (paramAdults && !isNaN(Number(paramAdults))) {
         setAdults(Math.max(1, Number(paramAdults)));
@@ -632,6 +641,23 @@ export default function BookingPage() {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
+              // Pass booking details for notifications
+              bookingDetails: {
+                guestName: `${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}`.trim(),
+                guestEmail: guestDetails.email,
+                guestPhone: guestDetails.phone,
+                roomType,
+                roomName: getRoomTitle(roomType),
+                checkIn,
+                checkOut,
+                nights,
+                rooms,
+                adults,
+                children,
+                total: payableTotal,
+                bookingRef: resId,
+                paymentId: response.razorpay_payment_id,
+              },
             }),
           });
           const verifyData = await verifyRes.json();
@@ -2891,42 +2917,159 @@ export default function BookingPage() {
                 </div>
 
                 <div>
-                  <div className="summary-row-mmt">
-                    <span>Base Room Fare ({nights} nights)</span>
-                    <span>₹{roomCost.toLocaleString()}</span>
+
+                  {/* ── Booking snapshot widget ── */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1px 1fr 1px 1fr',
+                    marginBottom: 18,
+                    background: '#fff',
+                    borderRadius: 14,
+                    border: '1px solid #e9ecef',
+                    overflow: 'hidden',
+                    boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
+                  }}>
+                    {/* Rooms */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 6px 14px', gap: 6 }}>
+                      <div style={{ color: '#1a56db', marginBottom: 2 }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M3 7v13"/><path d="M21 7v13"/><path d="M3 16h18"/><rect x="3" y="7" width="18" height="9" rx="2"/><path d="M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4"/>
+                        </svg>
+                      </div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: '#111', lineHeight: 1 }}>{rooms}</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.9px' }}>
+                        Room{rooms > 1 ? 's' : ''}
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#f0f0f0', width: 1 }} />
+
+                    {/* Nights */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 6px 14px', gap: 6 }}>
+                      <div style={{ color: '#C89B3C', marginBottom: 2 }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                      </div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: '#C89B3C', lineHeight: 1 }}>{nights}</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.9px' }}>
+                        Night{nights !== 1 ? 's' : ''}
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#f0f0f0', width: 1 }} />
+
+                    {/* Guests */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 6px 14px', gap: 6 }}>
+                      <div style={{ color: '#16a34a', marginBottom: 2 }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                      </div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: '#111', lineHeight: 1 }}>{adults + children}</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.9px' }}>
+                        Guest{adults + children !== 1 ? 's' : ''}
+                      </div>
+                    </div>
+
+                    {/* Bottom date strip */}
+                    <div style={{
+                      gridColumn: '1 / -1',
+                      borderTop: '1px solid #f0f0f0',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      gap: 10, padding: '8px 14px',
+                      background: '#fafafa',
+                    }}>
+                      <span style={{ fontSize: 12, color: '#374151', fontWeight: 700 }}>
+                        {new Date(checkIn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#d1d5db' }}>
+                        <span style={{ height: 1, width: 20, background: '#d1d5db', display: 'inline-block' }} />
+                        <span style={{ fontSize: 10, fontWeight: 700, color: '#C89B3C', whiteSpace: 'nowrap' }}>{nights}N</span>
+                        <span style={{ height: 1, width: 20, background: '#d1d5db', display: 'inline-block' }} />
+                      </span>
+                      <span style={{ fontSize: 12, color: '#374151', fontWeight: 700 }}>
+                        {new Date(checkOut).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                      </span>
+                    </div>
                   </div>
-                  
-                  {darshanGuide && (
-                    <div className="summary-row-mmt">
-                      <span>Darshan VIP Guide Option</span>
-                      <span>₹1,500</span>
+
+                  {/* ── Room cost breakdown ── */}
+                  <div style={{
+                    background: '#f9fafb', borderRadius: 10, padding: '12px 14px',
+                    marginBottom: 10, border: '1px solid #f0f0f0',
+                  }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>
+                      Room Charges
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151', marginBottom: 4 }}>
+                      <span>{getRoomTitle(roomType)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#6b7280', marginBottom: 4 }}>
+                      <span>₹{pricePerNight.toLocaleString()} × {nights} night{nights !== 1 ? 's' : ''} × {rooms} room{rooms > 1 ? 's' : ''}</span>
+                      <span style={{ fontWeight: 700, color: '#111' }}>₹{roomCost.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  {/* ── Add-ons ── */}
+                  {(darshanGuide || airportCab) && (
+                    <div style={{
+                      background: '#f9fafb', borderRadius: 10, padding: '12px 14px',
+                      marginBottom: 10, border: '1px solid #f0f0f0',
+                    }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>
+                        Add-ons
+                      </div>
+                      {darshanGuide && (
+                        <div className="summary-row-mmt" style={{ padding: '2px 0', margin: 0 }}>
+                          <span>🛕 Darshan VIP Guide</span>
+                          <span>₹1,500</span>
+                        </div>
+                      )}
+                      {airportCab && (
+                        <div className="summary-row-mmt" style={{ padding: '2px 0', margin: 0 }}>
+                          <span>🚗 Airport Luxury Pickup</span>
+                          <span>₹2,500</span>
+                        </div>
+                      )}
                     </div>
                   )}
 
-                  {airportCab && (
-                    <div className="summary-row-mmt">
-                      <span>Airport Luxury Car Pickup</span>
-                      <span>₹2,500</span>
-                    </div>
-                  )}
-
-                  {/* Discounts display */}
+                  {/* ── Discounts ── */}
                   {isLoggedIn && (
                     <div className="summary-row-mmt discount">
-                      <span>10% Club Member Discount</span>
-                      <span>-₹{memberDiscount.toLocaleString()}</span>
+                      <span>✨ 10% Club Member Discount</span>
+                      <span>−₹{memberDiscount.toLocaleString()}</span>
                     </div>
                   )}
 
-                  <div className="summary-row-mmt" style={{ borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: '10px' }}>
-                    <span>Taxes & Fees (12% GST)</span>
-                    <span>₹{gstAmount.toLocaleString()}</span>
+                  {/* ── Taxes ── */}
+                  <div style={{ borderTop: '1px dashed rgba(0,0,0,0.1)', margin: '10px 0', paddingTop: 10 }}>
+                    <div className="summary-row-mmt" style={{ color: '#6b7280', fontSize: 13 }}>
+                      <span>Subtotal (before tax)</span>
+                      <span>₹{(baseTotal - totalDiscount).toLocaleString()}</span>
+                    </div>
+                    <div className="summary-row-mmt" style={{ color: '#6b7280', fontSize: 13 }}>
+                      <span>GST 12%</span>
+                      <span>₹{gstAmount.toLocaleString()}</span>
+                    </div>
                   </div>
-                  <div className="summary-row-mmt total">
-                    <span>Total Payable</span>
-                    <span>₹{payableTotal.toLocaleString()}</span>
+
+                  {/* ── Grand Total ── */}
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    background: 'linear-gradient(135deg, #1a56db 0%, #1e40af 100%)',
+                    borderRadius: 12, padding: '14px 16px', marginTop: 8,
+                  }}>
+                    <div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', fontWeight: 600, marginBottom: 2 }}>TOTAL PAYABLE</div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>Incl. all taxes &amp; fees</div>
+                    </div>
+                    <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'Outfit, sans-serif' }}>
+                      ₹{payableTotal.toLocaleString()}
+                    </div>
                   </div>
-                  <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px' }}>Inclusive of all taxes and fees</div>
+
                 </div>
 
                 {/* Coupon Code */}

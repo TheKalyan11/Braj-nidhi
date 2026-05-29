@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import Razorpay from 'razorpay';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
-// Lazy-initialize so the module can be imported at build time without env vars
 function getRazorpay() {
   const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -9,25 +9,57 @@ function getRazorpay() {
   return new Razorpay({ key_id: keyId, key_secret: keySecret });
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const { amount, currency = 'INR', reservation_id } = await request.json();
+// Min ₹100, Max ₹5,00,000 per order
+const MIN_AMOUNT = 100;
+const MAX_AMOUNT = 500_000;
 
-    if (!amount || amount <= 0) {
-      return Response.json({ error: 'Invalid amount' }, { status: 400 });
+export async function POST(request: NextRequest) {
+  // ── Rate limit: 5 orders/min per IP ─────────────────────────────────────────
+  const ip = getClientIp(request);
+  const rl = checkRateLimit(`create-order:${ip}`, { limit: 5, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt);
+
+  try {
+    const body = await request.json();
+    const { amount, currency = 'INR', reservation_id } = body;
+
+    // ── Input validation ────────────────────────────────────────────────────────
+    const parsedAmount = Number(amount);
+    if (!amount || isNaN(parsedAmount) || parsedAmount < MIN_AMOUNT || parsedAmount > MAX_AMOUNT) {
+      return Response.json(
+        { error: `Invalid amount. Must be between ₹${MIN_AMOUNT} and ₹${MAX_AMOUNT}` },
+        { status: 400 },
+      );
     }
+
+    if (currency !== 'INR') {
+      return Response.json({ error: 'Only INR is supported' }, { status: 400 });
+    }
+
+    // Sanitize reservation_id
+    const cleanReservationId =
+      typeof reservation_id === 'string'
+        ? reservation_id.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 50)
+        : '';
 
     const razorpay = getRazorpay();
     const order = await razorpay.orders.create({
-      amount: Math.round(amount * 100), // Razorpay expects paise
+      amount: Math.round(parsedAmount * 100), // paise
       currency,
-      receipt: reservation_id || `rcpt_${Date.now()}`,
-      notes: { reservation_id: reservation_id || '' },
+      receipt: cleanReservationId || `rcpt_${Date.now()}`,
+      notes: { reservation_id: cleanReservationId },
     });
 
-    return Response.json({ order_id: order.id, amount: order.amount, currency: order.currency });
+    return Response.json({
+      order_id: order.id,
+      amount: order.amount,
+      currency: order.currency,
+    });
   } catch (error: any) {
     console.error('Razorpay create-order error:', error);
-    return Response.json({ error: error.message || 'Failed to create order' }, { status: 500 });
+    return Response.json(
+      { error: error.message || 'Failed to create order' },
+      { status: 500 },
+    );
   }
 }

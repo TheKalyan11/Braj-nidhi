@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { useMusic } from "@/lib/MusicContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play,
@@ -160,11 +161,10 @@ interface QualState {
 }
 
 export default function FloatingWidgets() {
+  const { isPlaying, togglePlay } = useMusic();
   const [mounted, setMounted] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"home" | "chat" | "explore" | "profile">("home");
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const getFormattedTime = () => {
     const date = new Date();
@@ -204,17 +204,6 @@ export default function FloatingWidgets() {
     phone: "",
   });
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play().catch(() => setIsPlaying(false));
-      setIsPlaying(true);
-    }
-  };
-
   useEffect(() => {
     setMounted(true);
     return () => {
@@ -233,36 +222,26 @@ export default function FloatingWidgets() {
 
   const fetchAIResponse = async (userMessage: string): Promise<string> => {
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      // Calls our secure /api/chat proxy — OpenAI key stays on the server
+      const response = await fetch("/api/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [
-            {
-              role: "system",
-              content: `You are the AI concierge/guide for Braj Nidhi, a luxury spiritual guesthouse in Vrindavan.
+          messages: [{ role: "user", content: userMessage }],
+          systemPrompt: `You are the AI concierge/guide for Braj Nidhi, a luxury spiritual guesthouse in Vrindavan.
               Answer the user based on the following verified knowledge base:
               ${JSON.stringify(BRAJ_NIDHI_KNOWLEDGE, null, 2)}
-              
+
               Guidelines:
               1. Keep responses concise, warm, and elegant. Start with a blessed greeting like "Radhe Radhe! 🙏".
               2. Always present details matching the provided knowledge base (e.g. pricing, timings, rules).
               3. Do not invent any facts not present in the knowledge base.
               4. If asked about booking a room, guide them to click the custom Spark AI button or start the Reservation flow.`,
-            },
-            { role: "user", content: userMessage },
-          ],
-          max_tokens: 250,
-          temperature: 0.7,
         }),
       });
       if (!response.ok) throw new Error("API error");
       const data = await response.json();
-      return data.choices[0]?.message?.content || "Blessed seeker, please try again.";
+      return data.reply || "Blessed seeker, please try again.";
     } catch {
       return "Radhe Radhe! 🙏 For direct room reservations or support, please speak directly to our concierge team at +91 98765 43210.";
     }
@@ -529,8 +508,6 @@ export default function FloatingWidgets() {
           </div>
         </div>
       </motion.button>
-
-      <audio ref={audioRef} src="/hare-krishna-original.mp3" loop preload="auto" />
 
       {/* --- Chat Window Shell (Revamped with Ultra-Premium Soft Purple Mockup Styling) --- */}
       <AnimatePresence>

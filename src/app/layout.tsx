@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 };
 
 import LoadingTransition from "@/components/LoadingTransition";
+import { MusicProvider } from "@/lib/MusicContext";
 
 export default function RootLayout({
   children,
@@ -27,8 +28,10 @@ export default function RootLayout({
         <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js" async></script>
       </head>
       <body className="index-page antialiased">
-        <LoadingTransition />
-        {children}
+        <MusicProvider>
+          <LoadingTransition />
+          {children}
+        </MusicProvider>
       </body>
     </html>
   );

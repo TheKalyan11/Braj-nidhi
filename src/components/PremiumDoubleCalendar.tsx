@@ -11,6 +11,10 @@ interface PremiumDoubleCalendarProps {
   initialSelection?: 'in' | 'out';
   /** Force fixed centered positioning (use inside modals) */
   forceFixed?: boolean;
+  /** Dates with zero availability — shown red + struck-through */
+  unavailableDates?: string[];
+  /** Dates with limited availability — value = rooms left, shown with orange dot */
+  lowAvailDates?: Record<string, number>;
 }
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -47,7 +51,8 @@ function fmtDisplay(dateStr: string) {
 }
 
 export default function PremiumDoubleCalendar({
-  checkIn, checkOut, onChange, isOpen, onClose, initialSelection = 'in', forceFixed = false
+  checkIn, checkOut, onChange, isOpen, onClose, initialSelection = 'in', forceFixed = false,
+  unavailableDates = [], lowAvailDates = {},
 }: PremiumDoubleCalendarProps) {
   const checkInDate = parseDateStr(checkIn);
   const checkOutDate = parseDateStr(checkOut);
@@ -393,6 +398,32 @@ export default function PremiumDoubleCalendar({
             border: 2px solid #C89B3C; font-weight: 700;
           }
 
+          /* Unavailable (fully booked) */
+          .sky-day.unavailable {
+            cursor: not-allowed !important;
+            pointer-events: none;
+          }
+          .sky-day.unavailable .sky-day-num {
+            color: #ef4444 !important;
+            text-decoration: line-through;
+            opacity: 0.7;
+          }
+
+          /* Low availability — orange dot below number */
+          .sky-day.low-avail .sky-day-num::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: #f97316;
+          }
+          .sky-day.low-avail:not(.sel-start):not(.sel-end):not(.unavailable) .sky-day-num {
+            position: relative;
+          }
+
           /* Footer */
           .sky-footer {
             display: flex; align-items: center; justify-content: space-between;
@@ -520,6 +551,7 @@ export default function PremiumDoubleCalendar({
         {/* Day grid */}
         <div className="sky-days-grid">
           {cells.map(({ date, overflow }, idx) => {
+            const dateStr = fmtStr(date);
             const isPast = !overflow && date < today;
             const isOutDisabled = !overflow && activeSelection === 'out' && date <= checkInDate;
             const isStart = !overflow && sameDay(date, checkInDate);
@@ -528,25 +560,31 @@ export default function PremiumDoubleCalendar({
             const inRange = !overflow && date > checkInDate && date < checkOutDate;
             const rangeLeft = isStart && !sameDay(checkInDate, checkOutDate);
             const rangeRight = isEnd && !sameDay(checkInDate, checkOutDate);
+            const isUnavailable = !overflow && !isPast && unavailableDates.includes(dateStr);
+            const isLowAvail = !overflow && !isPast && !isUnavailable && dateStr in lowAvailDates;
+            const lowCount = isLowAvail ? lowAvailDates[dateStr] : 0;
 
             const cls = [
               'sky-day',
-              overflow      ? 'overflow'     : '',
-              isPast        ? 'past'         : '',
-              isOutDisabled ? 'out-disabled' : '',
-              isStart       ? 'sel-start'    : '',
-              isEnd         ? 'sel-end'      : '',
-              inRange       ? 'in-range'     : '',
-              rangeLeft     ? 'range-left'   : '',
-              rangeRight    ? 'range-right'  : '',
-              isToday       ? 'is-today'     : '',
+              overflow       ? 'overflow'     : '',
+              isPast         ? 'past'         : '',
+              isOutDisabled  ? 'out-disabled' : '',
+              isUnavailable  ? 'unavailable'  : '',
+              isStart        ? 'sel-start'    : '',
+              isEnd          ? 'sel-end'      : '',
+              inRange        ? 'in-range'     : '',
+              rangeLeft      ? 'range-left'   : '',
+              rangeRight     ? 'range-right'  : '',
+              isToday        ? 'is-today'     : '',
+              isLowAvail     ? 'low-avail'    : '',
             ].filter(Boolean).join(' ');
 
             return (
               <div
                 key={idx}
                 className={cls}
-                onClick={() => !overflow && !isPast && !isOutDisabled && handleDayClick(date, overflow)}
+                title={isUnavailable ? 'Sold out' : isLowAvail ? `Only ${lowCount} room${lowCount === 1 ? '' : 's'} left` : undefined}
+                onClick={() => !overflow && !isPast && !isOutDisabled && !isUnavailable && handleDayClick(date, overflow)}
               >
                 <div className="sky-day-bg" />
                 <span className="sky-day-num">{date.getDate()}</span>

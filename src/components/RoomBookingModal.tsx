@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import PremiumDoubleCalendar from './PremiumDoubleCalendar';
 
@@ -26,11 +26,36 @@ function fmtDisplay(dateStr: string) {
   return `${d} ${MONTHS[m-1].slice(0,3)} '${String(y).slice(2)} · ${dows[date.getDay()]}`;
 }
 
+function addDays(d: Date, n: number): Date {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+interface AvailabilityState {
+  unavailableDates: string[];
+  lowAvailDates: Record<string, number>;
+  upgradeRoom: {
+    roomType: 'deluxe2' | 'deluxe3' | 'deluxe4';
+    name: string;
+    price: number;
+    available: number;
+  } | null;
+  rangeBlocked: boolean;   // true if any night in selected range is unavailable
+  loading: boolean;
+}
+
+const ROOM_NAMES: Record<string, string> = {
+  deluxe2: 'Deluxe 2 – Twin Bedded Room',
+  deluxe3: 'Deluxe 3 – Triple Room',
+  deluxe4: 'Deluxe 4 – Family Room',
+};
+
 export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, price }: RoomBookingModalProps) {
   const router = useRouter();
 
   const todayDate = new Date(); todayDate.setHours(0,0,0,0);
-  const tomorrowDate = new Date(todayDate); tomorrowDate.setDate(todayDate.getDate() + 1);
+  const tomorrowDate = addDays(todayDate, 1);
 
   const [checkIn, setCheckIn] = useState(fmt(todayDate));
   const [checkOut, setCheckOut] = useState(fmt(tomorrowDate));
@@ -42,15 +67,29 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
   const [children, setChildren] = useState(0);
   const [showGuests, setShowGuests] = useState(false);
 
+  // ERP availability state
+  const [avail, setAvail] = useState<AvailabilityState>({
+    unavailableDates: [],
+    lowAvailDates: {},
+    upgradeRoom: null,
+    rangeBlocked: false,
+    loading: false,
+  });
+
+  // Track booking in progress
+  const [booking, setBooking] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [bookingError, setBookingError] = useState('');
+
   // Reset on open
   useEffect(() => {
     if (isOpen) {
       const t = new Date(); t.setHours(0,0,0,0);
-      const tm = new Date(t); tm.setDate(t.getDate() + 1);
+      const tm = addDays(t, 1);
       setCheckIn(fmt(t));
       setCheckOut(fmt(tm));
       setRooms(1); setAdults(2); setChildren(0);
       setIsCalendarOpen(false); setShowGuests(false);
+      setBooking('idle'); setBookingError('');
     }
   }, [isOpen]);
 
@@ -62,17 +101,123 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
     return () => document.removeEventListener('keydown', handle);
   }, [isOpen, onClose]);
 
+  // Fetch availability when modal opens or dates/rooms change
+  const fetchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const fetchAvailability = useCallback(async (
+    rt: string, cin: string, cout: string, rm: number,
+  ) => {
+    if (!cin || !cout || cin >= cout) return;
+
+    // Window: 3 months from today for the calendar
+    const today = new Date(); today.setHours(0,0,0,0);
+    const windowFrom = fmt(today);
+    const windowTo = fmt(addDays(today, 92));
+
+    setAvail(a => ({ ...a, loading: true }));
+    try {
+      const res = await fetch(
+        `/api/availability?roomType=${rt}&from=${windowFrom}&to=${windowTo}&rooms=${rm}`,
+      );
+      if (!res.ok) throw new Error('fetch failed');
+      const data = await res.json();
+
+      const availability: Record<string, number> = data.availability ?? {};
+
+      // Separate unavailable (0) from low (1-2 for a 3-room type)
+      const unavailableDates: string[] = [];
+      const lowAvailDates: Record<string, number> = {};
+      for (const [date, count] of Object.entries(availability)) {
+        const c = count as number;
+        if (c < rm) unavailableDates.push(date);
+        else if (c <= 1) lowAvailDates[date] = c;
+      }
+
+      // Check if selected range is blocked
+      const rangeBlocked = checkRangeBlocked(cin, cout, unavailableDates);
+
+      setAvail({
+        unavailableDates,
+        lowAvailDates,
+        upgradeRoom: data.upgrade ?? null,
+        rangeBlocked,
+        loading: false,
+      });
+    } catch {
+      setAvail(a => ({ ...a, loading: false }));
+    }
+  }, []);
+
+  function checkRangeBlocked(cin: string, cout: string, unavail: string[]): boolean {
+    if (!cin || !cout || cin >= cout) return false;
+    const cur = new Date(cin);
+    const end = new Date(cout);
+    const unavailSet = new Set(unavail);
+    while (cur < end) {
+      if (unavailSet.has(fmt(cur))) return true;
+      cur.setDate(cur.getDate() + 1);
+    }
+    return false;
+  }
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (fetchDebounce.current) clearTimeout(fetchDebounce.current);
+    fetchDebounce.current = setTimeout(() => {
+      fetchAvailability(roomType, checkIn, checkOut, rooms);
+    }, 300);
+    return () => { if (fetchDebounce.current) clearTimeout(fetchDebounce.current); };
+  }, [isOpen, roomType, checkIn, checkOut, rooms, fetchAvailability]);
+
   if (!isOpen) return null;
 
   const nights = Math.round(
-    (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000
+    (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000,
   );
   const totalGuests = adults + children;
   const guestsLabel = `${rooms} Room${rooms>1?'s':''}, ${totalGuests} Guest${totalGuests>1?'s':''}`;
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
+    if (avail.rangeBlocked) return;
+    setBooking('loading');
+    try {
+      const res = await fetch('/api/availability/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomType, checkIn, checkOut, rooms, adults, children,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setBooking('error');
+        setBookingError(data.error || 'Booking failed');
+        return;
+      }
+      setBooking('success');
+      const params = new URLSearchParams({
+        roomType,
+        checkin: checkIn,
+        checkout: checkOut,
+        rooms: String(rooms),
+        adults: String(adults),
+        children: String(children),
+        guests: guestsLabel,
+        bookingId: data.booking?.id ?? '',
+      });
+      onClose();
+      router.push(`/booking?${params.toString()}`);
+    } catch {
+      setBooking('error');
+      setBookingError('Network error. Please try again.');
+    }
+  };
+
+  const handleUpgradeClick = (upgradeRoomType: string) => {
+    onClose();
+    // Re-open with upgraded room type is handled by parent, but we can just navigate to booking
     const params = new URLSearchParams({
-      roomType,
+      roomType: upgradeRoomType,
       checkin: checkIn,
       checkout: checkOut,
       rooms: String(rooms),
@@ -80,7 +225,6 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
       children: String(children),
       guests: guestsLabel,
     });
-    onClose();
     router.push(`/booking?${params.toString()}`);
   };
 
@@ -99,6 +243,8 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
   };
   const maxAdults = (maxOccupancy[roomType]?.adults ?? 9) * rooms;
   const maxChildren = (maxOccupancy[roomType]?.children ?? 9) * rooms;
+
+  const isBlocked = avail.rangeBlocked;
 
   return (
     <>
@@ -168,6 +314,34 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
           }
           .rbm-counter-btn:disabled { color:#ccc; cursor:default; }
           .rbm-counter-num { font-size:17px; font-weight:700; color:#2c2520; min-width:18px; text-align:center; }
+
+          /* Availability banner */
+          .rbm-avail-banner {
+            margin: 0 20px 0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+          }
+          .rbm-avail-banner.sold-out {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #b91c1c;
+          }
+          .rbm-avail-banner.low-avail {
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            color: #c2410c;
+          }
+          .rbm-upgrade-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 8px; padding: 7px 16px; border-radius: 50px;
+            font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+            font-family: inherit; transition: opacity 0.15s;
+          }
+          .rbm-upgrade-btn:hover { opacity: 0.85; }
         `}</style>
 
         {/* Header */}
@@ -244,7 +418,7 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
             </span>
           </div>
 
-          {/* Calendar — sits here, positions absolute above */}
+          {/* Calendar — forceFixed so it renders above the modal */}
           <div style={{ position: 'relative' }}>
             <PremiumDoubleCalendar
               checkIn={checkIn}
@@ -254,9 +428,45 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
               onChange={(cin, cout) => { setCheckIn(cin); setCheckOut(cout); }}
               onClose={() => setIsCalendarOpen(false)}
               forceFixed
+              unavailableDates={avail.unavailableDates}
+              lowAvailDates={avail.lowAvailDates}
             />
           </div>
         </div>
+
+        {/* Availability Banner */}
+        {!avail.loading && isBlocked && (
+          <div style={{ padding: '14px 20px 0' }}>
+            <div className="rbm-avail-banner sold-out">
+              <span style={{ fontSize: 20, flexShrink: 0 }}>🚫</span>
+              <div>
+                <div style={{ fontWeight: 700, marginBottom: 4 }}>
+                  {roomName} is sold out for selected dates
+                </div>
+                <div style={{ opacity: 0.85 }}>
+                  Please choose different dates or consider an upgrade.
+                </div>
+                {avail.upgradeRoom && (
+                  <button
+                    className="rbm-upgrade-btn"
+                    style={{ background: roomColors[avail.upgradeRoom.roomType] || '#374151', color: '#fff', marginTop: 10 }}
+                    onClick={() => handleUpgradeClick(avail.upgradeRoom!.roomType)}
+                  >
+                    ⬆️ Upgrade to {ROOM_NAMES[avail.upgradeRoom.roomType]}
+                    <span style={{ fontWeight: 400, opacity: 0.9 }}>
+                      · ₹{avail.upgradeRoom.price.toLocaleString()}/night
+                    </span>
+                  </button>
+                )}
+                {!avail.upgradeRoom && (
+                  <div style={{ marginTop: 6, fontWeight: 600 }}>
+                    No rooms available for these dates. Try different dates.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Rooms & Guests row */}
         <div style={{ borderBottom: '1px solid #f0f0f0' }}>
@@ -321,7 +531,7 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
                 </div>
               </div>
 
-              {/* Live price preview inside guest section */}
+              {/* Live price preview */}
               {nights > 0 && (
                 <div style={{
                   background: '#f8f9fa', borderRadius: 10, padding: '12px 16px',
@@ -348,6 +558,13 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
           )}
         </div>
 
+        {/* Booking error */}
+        {booking === 'error' && (
+          <div style={{ margin: '14px 20px 0', padding: '12px 16px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, fontSize: 13, color: '#b91c1c', fontWeight: 600 }}>
+            ⚠️ {bookingError}
+          </div>
+        )}
+
         {/* Summary + CTA */}
         <div style={{ padding: '20px 26px 28px' }}>
           {nights > 0 && (
@@ -362,16 +579,17 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
           )}
           <button
             onClick={handleProceed}
+            disabled={isBlocked || booking === 'loading'}
             style={{
               width: '100%',
-              background: accentColor,
-              color: '#fff',
+              background: isBlocked ? '#d1d5db' : accentColor,
+              color: isBlocked ? '#9ca3af' : '#fff',
               border: 'none',
               borderRadius: '50px',
               padding: '16px 28px',
               fontSize: 17,
               fontWeight: 800,
-              cursor: 'pointer',
+              cursor: isBlocked ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit',
               letterSpacing: '0.5px',
               transition: 'opacity 0.15s',
@@ -380,14 +598,38 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
               justifyContent: 'center',
               gap: 8,
             }}
-            onMouseOver={e => (e.currentTarget.style.opacity='0.9')}
-            onMouseOut={e => (e.currentTarget.style.opacity='1')}
+            onMouseOver={e => { if (!isBlocked) e.currentTarget.style.opacity='0.9'; }}
+            onMouseOut={e => { e.currentTarget.style.opacity='1'; }}
           >
-            Proceed to Book
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
-            </svg>
+            {booking === 'loading' ? (
+              'Confirming...'
+            ) : isBlocked ? (
+              'Dates Unavailable'
+            ) : (
+              <>
+                Proceed to Book
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+              </>
+            )}
           </button>
+
+          {/* Legend */}
+          {(avail.unavailableDates.length > 0 || Object.keys(avail.lowAvailDates).length > 0) && !isBlocked && (
+            <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 11, color: '#9ca3af' }}>
+              {avail.unavailableDates.length > 0 && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ color: '#ef4444', fontWeight: 700, textDecoration: 'line-through' }}>15</span> Sold out
+                </span>
+              )}
+              {Object.keys(avail.lowAvailDates).length > 0 && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#f97316' }} /> Low availability
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </>
