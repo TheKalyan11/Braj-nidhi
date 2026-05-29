@@ -39,7 +39,7 @@ h1, h2, h3, h4, h5, h6 {
 /* --- Header --- */
 header {
     position: fixed;
-    top: 0;
+    top: 80px;          /* below SP Divine Bar (80px tall) */
     left: 0;
     width: 100%;
     padding: 20px 8%;
@@ -47,7 +47,13 @@ header {
     justify-content: space-between;
     align-items: center;
     z-index: 1000;
-    transition: var(--transition);
+    transition: top 0.38s cubic-bezier(0.4,0,0.2,1),
+                width 0.38s cubic-bezier(0.4,0,0.2,1),
+                left 0.38s cubic-bezier(0.4,0,0.2,1),
+                padding 0.38s cubic-bezier(0.4,0,0.2,1),
+                background 0.38s ease,
+                border-radius 0.38s ease,
+                box-shadow 0.38s ease;
 }
 
 header.scrolled {
