@@ -91,6 +91,15 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
   };
   const accentColor = roomColors[roomType] || '#C89B3C';
 
+  // Occupancy limits per room type
+  const maxOccupancy: Record<string, { adults: number; children: number }> = {
+    deluxe2: { adults: 2, children: 2 },
+    deluxe3: { adults: 3, children: 3 },
+    deluxe4: { adults: 4, children: 4 },
+  };
+  const maxAdults = (maxOccupancy[roomType]?.adults ?? 9) * rooms;
+  const maxChildren = (maxOccupancy[roomType]?.children ?? 9) * rooms;
+
   return (
     <>
       {/* Backdrop */}
@@ -271,30 +280,44 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
               <div className="rbm-counter-row">
                 <div><div className="rbm-counter-label">Rooms</div></div>
                 <div className="rbm-counter-ctrl">
-                  <button className="rbm-counter-btn" disabled={rooms<=1} onClick={()=>setRooms(r=>Math.max(1,r-1))}>−</button>
+                  <button className="rbm-counter-btn" disabled={rooms<=1} onClick={()=>{
+                    const newRooms = Math.max(1, rooms-1);
+                    setRooms(newRooms);
+                    const base = maxOccupancy[roomType];
+                    if (base) {
+                      setAdults(a => Math.min(a, base.adults * newRooms));
+                      setChildren(c => Math.min(c, base.children * newRooms));
+                    }
+                  }}>−</button>
                   <span className="rbm-counter-num">{rooms}</span>
-                  <button className="rbm-counter-btn" disabled={rooms>=9} onClick={()=>setRooms(r=>Math.min(9,r+1))}>+</button>
+                  <button className="rbm-counter-btn" disabled={rooms>=9} onClick={()=>{
+                    const newRooms = Math.min(9, rooms+1);
+                    setRooms(newRooms);
+                  }}>+</button>
                 </div>
               </div>
               {/* Adults */}
               <div className="rbm-counter-row">
-                <div><div className="rbm-counter-label">Adults</div></div>
+                <div>
+                  <div className="rbm-counter-label">Adults</div>
+                  <div className="rbm-counter-sub">Max {maxAdults} per {rooms > 1 ? `${rooms} rooms` : 'room'}</div>
+                </div>
                 <div className="rbm-counter-ctrl">
                   <button className="rbm-counter-btn" disabled={adults<=1} onClick={()=>setAdults(a=>Math.max(1,a-1))}>−</button>
                   <span className="rbm-counter-num">{adults}</span>
-                  <button className="rbm-counter-btn" disabled={adults>=9} onClick={()=>setAdults(a=>Math.min(9,a+1))}>+</button>
+                  <button className="rbm-counter-btn" disabled={adults>=maxAdults} onClick={()=>setAdults(a=>Math.min(maxAdults,a+1))}>+</button>
                 </div>
               </div>
               {/* Children */}
               <div className="rbm-counter-row">
                 <div>
                   <div className="rbm-counter-label">Children</div>
-                  <div className="rbm-counter-sub">0–17 Years Old</div>
+                  <div className="rbm-counter-sub">0–17 yrs · Max {maxChildren} per {rooms > 1 ? `${rooms} rooms` : 'room'}</div>
                 </div>
                 <div className="rbm-counter-ctrl">
                   <button className="rbm-counter-btn" disabled={children<=0} onClick={()=>setChildren(c=>Math.max(0,c-1))}>−</button>
                   <span className="rbm-counter-num">{children}</span>
-                  <button className="rbm-counter-btn" disabled={children>=9} onClick={()=>setChildren(c=>Math.min(9,c+1))}>+</button>
+                  <button className="rbm-counter-btn" disabled={children>=maxChildren} onClick={()=>setChildren(c=>Math.min(maxChildren,c+1))}>+</button>
                 </div>
               </div>
 
