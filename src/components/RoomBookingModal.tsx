@@ -297,6 +297,22 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
                   <button className="rbm-counter-btn" disabled={children>=9} onClick={()=>setChildren(c=>Math.min(9,c+1))}>+</button>
                 </div>
               </div>
+
+              {/* Live price preview inside guest section */}
+              {nights > 0 && (
+                <div style={{
+                  background: '#f8f9fa', borderRadius: 10, padding: '12px 16px',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <span style={{ fontSize: 13, color: '#6b7280' }}>
+                    {rooms} Room{rooms>1?'s':''} × {nights} night{nights>1?'s':''}
+                  </span>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: accentColor }}>
+                    ₹{(price * nights * rooms).toLocaleString()}
+                  </span>
+                </div>
+              )}
+
               <button
                 onClick={() => setShowGuests(false)}
                 style={{
@@ -313,8 +329,12 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
         <div style={{ padding: '20px 26px 28px' }}>
           {nights > 0 && (
             <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 14 }}>
+              <strong style={{ color: '#111' }}>{rooms} Room{rooms>1?'s':''}</strong>
+              {' · '}
               <strong style={{ color: '#111' }}>{nights} night{nights!==1?'s':''}</strong>
-              {' · '}₹{(price * nights * rooms).toLocaleString()} total est.
+              {' · '}
+              <strong style={{ color: accentColor, fontSize: 15 }}>₹{(price * nights * rooms).toLocaleString()}</strong>
+              <span style={{ color: '#9ca3af' }}> total est.</span>
             </div>
           )}
           <button
