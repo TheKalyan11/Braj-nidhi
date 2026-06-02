@@ -22,15 +22,30 @@ export default function SPDivineBar() {
         right: 0,
         height: `${BAR_HEIGHT}px`,
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",
+        justifyContent: "space-between",
         zIndex: 1050,
         pointerEvents: "none",
         transform: scrolled ? `translateY(-${BAR_HEIGHT}px)` : "translateY(0)",
         transition: "transform 0.38s cubic-bezier(0.4,0,0.2,1)",
         background: "transparent",
+        padding: "0 20px",
       }}
     >
+      {/* Vrindavan Chandrodaya Mandir logo — left */}
+      <img
+        src="/LOGO1.jpg"
+        alt="Vrindavan Chandrodaya Mandir"
+        style={{
+          height: "52px",
+          width: "auto",
+          objectFit: "contain",
+          display: "block",
+          borderRadius: "6px",
+        }}
+      />
+
+      {/* SP logo — center */}
       <img
         src="/sp logo.png"
         alt="His Divine Grace Srila Prabhupada"
@@ -40,6 +55,9 @@ export default function SPDivineBar() {
           objectFit: "contain",
           display: "block",
           filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.22))",
+          position: "absolute",
+          left: "50%",
+          transform: "translateX(-50%)",
         }}
       />
     </div>
