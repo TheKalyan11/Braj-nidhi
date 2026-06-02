@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-const BAR_HEIGHT = 68; // px — keep in sync with globals.css header { top: 68px }
+const BAR_HEIGHT = 68;
 
 export default function SPDivineBar() {
   const [scrolled, setScrolled] = useState(false);
@@ -28,14 +28,14 @@ export default function SPDivineBar() {
         pointerEvents: "none",
         transform: scrolled ? `translateY(-${BAR_HEIGHT}px)` : "translateY(0)",
         transition: "transform 0.38s cubic-bezier(0.4,0,0.2,1)",
-        background: "transparent", // no gradient — no visual gap
+        background: "transparent",
       }}
     >
       <img
         src="/sp logo.png"
         alt="His Divine Grace Srila Prabhupada"
         style={{
-          height: "68px",    // fills the bar exactly — no extra space
+          height: "68px",
           width: "auto",
           objectFit: "contain",
           display: "block",

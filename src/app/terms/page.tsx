@@ -370,9 +370,13 @@ export default function TermsPage() {
       />
 
       <header id="main-header" className={scrolled ? "scrolled" : ""}>
-        <Link href="/" className="logo" style={{ textDecoration: "none" }}>
-          <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "60px", width: "auto" }} />
-        </Link>
+        <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '55px', width: 'auto', borderRadius: '6px', display: 'block' }} />
+            <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+            </Link>
+          </div>
         <nav>
           <ul>
             <li><a href="/guesthouse">Guesthouse</a></li>
