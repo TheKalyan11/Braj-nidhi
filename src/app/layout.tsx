@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 import LoadingTransition from "@/components/LoadingTransition";
 import { MusicProvider } from "@/lib/MusicContext";
 import SPDivineBar from "@/components/SPDivineBar";
+import FloatingLogo from "@/components/FloatingLogo";
 
 export default function RootLayout({
   children,
@@ -35,6 +36,7 @@ export default function RootLayout({
           <LoadingTransition />
           {children}
         </MusicProvider>
+        <FloatingLogo />
 
         {/* Chatling AI Chatbot — inject after page is interactive so config is set first */}
         <Script id="chatling-embed" strategy="afterInteractive">
