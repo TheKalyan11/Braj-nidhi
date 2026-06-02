@@ -54,12 +54,13 @@ const SECURITY_HEADERS: Record<string, string> = {
   'Strict-Transport-Security':         'max-age=63072000; includeSubDomains; preload',
   'Content-Security-Policy':
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://chatling.ai; " +
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://chatling.ai; " +
-    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://chatling.ai https://*.chatling.ai; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://chatling.ai https://*.chatling.ai; " +
+    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://*.chatling.ai; " +
     "img-src 'self' data: blob: https:; " +
-    "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://api.openai.com https://graph.facebook.com https://api.callmebot.com https://pankaj.vcmerp.in https://chatling.ai; " +
-    "frame-src https://api.razorpay.com https://checkout.razorpay.com https://www.google.com https://maps.google.com https://maps.googleapis.com; " +
+    "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://api.openai.com https://graph.facebook.com https://api.callmebot.com https://pankaj.vcmerp.in https://chatling.ai https://*.chatling.ai; " +
+    "frame-src https://api.razorpay.com https://checkout.razorpay.com https://www.google.com https://maps.google.com https://maps.googleapis.com https://chatling.ai https://*.chatling.ai; " +
+    "worker-src 'self' blob: https://chatling.ai https://*.chatling.ai; " +
     "object-src 'none'; " +
     "base-uri 'self';",
 };
