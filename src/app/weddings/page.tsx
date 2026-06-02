@@ -12,6 +12,7 @@ export default function Weddings() {
   const [heroImgIndex, setHeroImgIndex] = useState(0);
   const heroImages = ["/DSC02591.webp", "/DSC06003-HDR.webp"];
 
+  const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
@@ -22,6 +23,12 @@ export default function Weddings() {
       setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
       setUserName(localStorage.getItem('userName') || 'User');
     }
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const handleLogout = () => {
@@ -825,7 +832,7 @@ export default function Weddings() {
         </defs>
     </svg>
 
-    <header id="main-header" className="scrolled">
+    <header id="main-header" className={scrolled ? "scrolled" : ""}>
         <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '55px', width: 'auto', borderRadius: '6px', display: 'block' }} />
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
