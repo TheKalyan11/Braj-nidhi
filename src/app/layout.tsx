@@ -29,7 +29,7 @@ export default function RootLayout({
         <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js" async></script>
         {/* Chatling AI Chatbot */}
         <script dangerouslySetInnerHTML={{ __html: `window.chtlConfig = { chatbotId: "6846893215" }` }} />
-        <script async data-id="6846893215" id="chtl-script" src="https://chatling.ai/js/embed.js" />
+        <script async data-id="6846893215" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js" />
       </head>
       <body className="index-page antialiased">
         <MusicProvider>
