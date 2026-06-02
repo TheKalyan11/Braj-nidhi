@@ -76,6 +76,14 @@ header.scrolled .mobile-menu-btn {
     color: #000000 !important;
 }
 
+header.scrolled .logo img {
+    height: 38px !important;
+}
+
+header.scrolled .logo {
+    gap: 6px !important;
+}
+
 .mobile-menu-btn {
     display: none;
     background: transparent;
@@ -105,6 +113,7 @@ header.scrolled .btn-book:hover {
     letter-spacing: 1px;
     cursor: pointer;
     color: #000000;
+    flex-shrink: 0;
 }
 
 .logo span {
