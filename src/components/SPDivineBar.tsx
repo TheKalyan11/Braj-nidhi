@@ -29,7 +29,7 @@ export default function SPDivineBar() {
         transform: scrolled ? `translateY(-${BAR_HEIGHT}px)` : "translateY(0)",
         transition: "transform 0.38s cubic-bezier(0.4,0,0.2,1)",
         background: "transparent",
-        padding: "0 20px",
+        padding: "0 8%",
       }}
     >
       {/* Vrindavan Chandrodaya Mandir logo — left */}
