@@ -271,6 +271,14 @@ header.scrolled nav ul li a:hover {
     color: #ffffff;
 }
 
+/* Weddings page — black text in header (overrides .index-page white) */
+.index-page .weddings-page header:not(.scrolled) .logo,
+.index-page .weddings-page header:not(.scrolled) .logo span,
+.index-page .weddings-page header:not(.scrolled) nav ul li a,
+.index-page .weddings-page header:not(.scrolled) .btn-book {
+    color: #000000 !important;
+}
+
 /* --- Centered Hero Layout --- */
 .hero {
     position: relative;
