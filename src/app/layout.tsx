@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Braj Nidhi Guesthouse | Divine Stay in Vrindavan",
@@ -34,6 +35,18 @@ export default function RootLayout({
           <LoadingTransition />
           {children}
         </MusicProvider>
+
+        {/* Chatling AI Chatbot */}
+        <Script id="chatling-config" strategy="beforeInteractive">
+          {`window.chtlConfig = { chatbotId: "" }`}
+        </Script>
+        <Script
+          async
+          data-id=""
+          id="chtl-script"
+          src="https://chatling.ai/js/embed.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
