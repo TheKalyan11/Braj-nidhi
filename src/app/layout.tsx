@@ -38,11 +38,11 @@ export default function RootLayout({
 
         {/* Chatling AI Chatbot */}
         <Script id="chatling-config" strategy="beforeInteractive">
-          {`window.chtlConfig = { chatbotId: "" }`}
+          {`window.chtlConfig = { chatbotId: "6846893215" }`}
         </Script>
         <Script
           async
-          data-id=""
+          data-id="6846893215"
           id="chtl-script"
           src="https://chatling.ai/js/embed.js"
           strategy="afterInteractive"
