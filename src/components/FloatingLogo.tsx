@@ -20,7 +20,7 @@ export default function FloatingLogo() {
         src="/LOGO1.jpg"
         alt="Vrindavan Chandrodaya Mandir"
         style={{
-          height: "100px",
+          height: "65px",
           width: "auto",
           display: "block",
           borderRadius: "10px",
