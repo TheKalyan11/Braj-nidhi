@@ -33,6 +33,7 @@ import FloatingWidgets from '@/components/FloatingWidgets';
 import LoginModal from '@/components/LoginModal';
 import LoginJoinButton from '@/components/LoginJoinButton';
 import BookNowButton from '@/components/BookNowButton';
+import RoomUnavailablePopup from '@/components/RoomUnavailablePopup';
 
 // Types for booking details
 interface GuestDetails {
@@ -3372,77 +3373,20 @@ export default function BookingPage() {
         initialIsRegistering={loginModalInitialRegister}
       />
 
-      {/* Sold-out popup — fires when requested rooms exceed ERP availability */}
-      {soldOutPopup && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          style={{
-            position: 'fixed', inset: 0,
-            background: 'rgba(0,0,0,0.6)',
-            zIndex: 200000,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '20px',
-            backdropFilter: 'blur(3px)',
-          }}
-          onClick={() => setSoldOutPopup(false)}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              background: '#fff',
-              borderRadius: 18,
-              padding: '28px 26px 24px',
-              width: 'min(440px, calc(100vw - 32px))',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.32)',
-              fontFamily: "'Outfit', sans-serif",
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: 44, marginBottom: 10 }}>🙏</div>
-            <div style={{ fontSize: 19, fontWeight: 800, color: '#111', marginBottom: 8 }}>
-              No rooms available
-            </div>
-            <div style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.55, marginBottom: 6 }}>
-              We're sorry — you requested{' '}
-              <strong>{rooms} {getRoomTitle(roomType)}</strong>, but only{' '}
-              <strong>{Math.max(0, availMinForRange ?? 0)}</strong>{' '}
-              {(availMinForRange ?? 0) === 1 ? 'room is' : 'rooms are'} available for
-              <br />
-              <strong>{checkIn}</strong> → <strong>{checkOut}</strong>.
-            </div>
-            <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>
-              Please try other dates or reduce the number of rooms.
-              <br />Thank you for choosing Braj Nidhi 💛
-            </div>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => { setSoldOutPopup(false); setShowModify(true); }}
-                style={{
-                  background: '#1d6de5', color: '#fff', border: 'none',
-                  borderRadius: 50, padding: '11px 22px',
-                  fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                  fontFamily: 'inherit',
-                }}
-              >Try other dates</button>
-              {(availMinForRange ?? 0) > 0 && (availMinForRange ?? 0) < rooms && (
-                <button
-                  onClick={() => {
-                    setRooms(availMinForRange!);
-                    setSoldOutPopup(false);
-                  }}
-                  style={{
-                    background: '#f3f4f6', color: '#111', border: 'none',
-                    borderRadius: 50, padding: '11px 22px',
-                    fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
-                >Book {availMinForRange} room{(availMinForRange ?? 0) > 1 ? 's' : ''} instead</button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Sold-out popup */}
+      <RoomUnavailablePopup
+        isOpen={soldOutPopup}
+        onClose={() => setSoldOutPopup(false)}
+        roomName={getRoomTitle(roomType)}
+        requested={rooms}
+        available={Math.max(0, availMinForRange ?? 0)}
+        checkIn={checkIn}
+        checkOut={checkOut}
+        onTryOtherDates={() => { setSoldOutPopup(false); setShowModify(true); }}
+        onBookAvailable={(availMinForRange ?? 0) > 0 && (availMinForRange ?? 0) < rooms
+          ? () => { setRooms(availMinForRange!); setSoldOutPopup(false); }
+          : undefined}
+      />
 
 
       {/* Add Guest Modal */}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import PremiumDoubleCalendar from './PremiumDoubleCalendar';
+import RoomUnavailablePopup from './RoomUnavailablePopup';
 
 interface RoomBookingModalProps {
   isOpen: boolean;
@@ -41,7 +42,8 @@ interface AvailabilityState {
     price: number;
     available: number;
   } | null;
-  rangeBlocked: boolean;   // true if any night in selected range is unavailable
+  rangeBlocked: boolean;
+  rangeMinAvail: number;   // minimum available rooms within selected range
   loading: boolean;
 }
 
@@ -73,6 +75,7 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
     lowAvailDates: {},
     upgradeRoom: null,
     rangeBlocked: false,
+    rangeMinAvail: 0,
     loading: false,
   });
 
@@ -139,14 +142,28 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
         else if (c <= 1) lowAvailDates[date] = c;
       }
 
-      // Check if selected range is blocked
+      // Check if selected range is blocked + compute min available in range
       const rangeBlocked = checkRangeBlocked(cin, cout, unavailableDates);
+      let rangeMinAvail = 0;
+      if (cin && cout && cin < cout) {
+        const cur = new Date(cin);
+        const end = new Date(cout);
+        let min = Infinity;
+        while (cur < end) {
+          const d = fmt(cur);
+          const c = (availability[d] ?? 0) as number;
+          if (c < min) min = c;
+          cur.setDate(cur.getDate() + 1);
+        }
+        rangeMinAvail = min === Infinity ? 0 : min;
+      }
 
       setAvail({
         unavailableDates,
         lowAvailDates,
         upgradeRoom: data.upgrade ?? null,
         rangeBlocked,
+        rangeMinAvail,
         loading: false,
       });
 
@@ -265,80 +282,25 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
 
   return (
     <>
-      {/* Sold-out popup — appears when selected dates have no availability */}
-      {soldOutPopup && (
-        <>
-          <div
-            style={{
-              position: 'fixed', inset: 0,
-              background: 'rgba(0,0,0,0.6)',
-              zIndex: 200000,
-              backdropFilter: 'blur(3px)',
-            }}
-            onClick={() => setSoldOutPopup(false)}
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            style={{
-              position: 'fixed',
-              top: '50%', left: '50%',
-              transform: 'translate(-50%,-50%)',
-              zIndex: 200001,
-              background: '#fff',
-              borderRadius: 18,
-              padding: '28px 26px 24px',
-              width: 'min(420px, calc(100vw - 32px))',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.32)',
-              fontFamily: "'Outfit', sans-serif",
-              textAlign: 'center',
-              animation: 'rbmFade 0.2s ease forwards',
-            }}
-          >
-            <div style={{ fontSize: 44, marginBottom: 10 }}>🙏</div>
-            <div style={{ fontSize: 19, fontWeight: 800, color: '#111', marginBottom: 8 }}>
-              No rooms available
-            </div>
-            <div style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.55, marginBottom: 6 }}>
-              We're sorry — <strong>{roomName}</strong> is fully booked for
-              <br />
-              <strong>{fmtDisplay(checkIn)}</strong> → <strong>{fmtDisplay(checkOut)}</strong>.
-            </div>
-            <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>
-              Please try other dates. Thank you for choosing Braj Nidhi 💛
-            </div>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-              <button
-                onClick={() => {
-                  setSoldOutPopup(false);
-                  setCalendarInitialSelection('in');
-                  setIsCalendarOpen(true);
-                }}
-                style={{
-                  background: accentColor, color: '#fff', border: 'none',
-                  borderRadius: 50, padding: '11px 22px',
-                  fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                  fontFamily: 'inherit',
-                }}
-              >Try other dates</button>
-              {avail.upgradeRoom && (
-                <button
-                  onClick={() => {
-                    setSoldOutPopup(false);
-                    handleUpgradeClick(avail.upgradeRoom!.roomType);
-                  }}
-                  style={{
-                    background: '#f3f4f6', color: '#111', border: 'none',
-                    borderRadius: 50, padding: '11px 22px',
-                    fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
-                >Upgrade instead</button>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+      {/* Sold-out popup */}
+      <RoomUnavailablePopup
+        isOpen={soldOutPopup}
+        onClose={() => setSoldOutPopup(false)}
+        roomName={roomName}
+        requested={rooms}
+        available={avail.rangeMinAvail}
+        checkIn={checkIn}
+        checkOut={checkOut}
+        onTryOtherDates={() => {
+          setSoldOutPopup(false);
+          setCalendarInitialSelection('in');
+          setIsCalendarOpen(true);
+        }}
+        onSelectOtherRoom={() => {
+          setSoldOutPopup(false);
+          onClose();
+        }}
+      />
 
       {/* Backdrop */}
       <div

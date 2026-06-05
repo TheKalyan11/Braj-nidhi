@@ -9,6 +9,7 @@ import {
 import LoginModal from '@/components/LoginModal';
 import BookNowButton from '@/components/BookNowButton';
 import LoginJoinButton from '@/components/LoginJoinButton';
+import RoomUnavailablePopup from '@/components/RoomUnavailablePopup';
 
 interface RoomOption {
   key: 'deluxe2' | 'deluxe3' | 'deluxe4';
@@ -758,64 +759,17 @@ function RoomsComboContent() {
       </div>
 
       {/* Sold-out popup */}
-      {soldOutPopup && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          style={{
-            position:'fixed',inset:0,
-            background:'rgba(0,0,0,0.6)',zIndex:200000,
-            display:'flex',alignItems:'center',justifyContent:'center',
-            padding:'20px',backdropFilter:'blur(3px)',
-          }}
-          onClick={() => setSoldOutPopup(null)}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              background:'#fff',borderRadius:18,padding:'28px 26px 24px',
-              width:'min(440px, calc(100vw - 32px))',
-              boxShadow:'0 24px 64px rgba(0,0,0,0.32)',
-              fontFamily:"'Outfit', sans-serif",textAlign:'center',
-            }}
-          >
-            <div style={{fontSize:44,marginBottom:10}}>🙏</div>
-            <div style={{fontSize:19,fontWeight:800,color:'#111',marginBottom:8}}>
-              No rooms available
-            </div>
-            <div style={{fontSize:14,color:'#4b5563',lineHeight:1.55,marginBottom:6}}>
-              We're sorry — <strong>{soldOutPopup.room.title}</strong> is fully booked
-              for your selected dates.
-              {(roomAvail[soldOutPopup.room.key] ?? 0) > 0 && (
-                <> Only <strong>{roomAvail[soldOutPopup.room.key]}</strong> room{(roomAvail[soldOutPopup.room.key] ?? 0) !== 1 ? 's' : ''} available (you need {roomsCount}).</>
-              )}
-            </div>
-            <div style={{fontSize:13,color:'#6b7280',marginBottom:20}}>
-              Please try other dates or select a different room.
-              <br/>Thank you for choosing Braj Nidhi 💛
-            </div>
-            <div style={{display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap'}}>
-              <Link
-                href="/"
-                style={{
-                  background:'#1d6de5',color:'#fff',border:'none',
-                  borderRadius:50,padding:'11px 22px',
-                  fontSize:14,fontWeight:700,cursor:'pointer',
-                  textDecoration:'none',display:'inline-block',
-                }}
-              >Try other dates</Link>
-              <button
-                onClick={() => setSoldOutPopup(null)}
-                style={{
-                  background:'#f3f4f6',color:'#111',border:'none',
-                  borderRadius:50,padding:'11px 22px',
-                  fontSize:14,fontWeight:700,cursor:'pointer',
-                }}
-              >Select another room</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <RoomUnavailablePopup
+        isOpen={!!soldOutPopup}
+        onClose={() => setSoldOutPopup(null)}
+        roomName={soldOutPopup?.room.title ?? ''}
+        requested={roomsCount}
+        available={Math.max(0, roomAvail[soldOutPopup?.room.key ?? 'deluxe2'] ?? 0)}
+        checkIn={checkIn}
+        checkOut={checkOut}
+        onTryOtherDates={() => { setSoldOutPopup(null); window.location.href = '/'; }}
+        onSelectOtherRoom={() => setSoldOutPopup(null)}
+      />
 
       {isLoginModalOpen && (
         <LoginModal
