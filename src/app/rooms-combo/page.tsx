@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -97,6 +97,39 @@ function RoomsComboContent() {
   const [expandedRoom, setExpandedRoom] = useState<string | null>('deluxe2');
   const [scrolled, setScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // ── ERP availability per room type ──────────────────────────────────────────
+  const [roomAvail, setRoomAvail] = useState<Record<string, number | null>>({
+    deluxe2: null, deluxe3: null, deluxe4: null,
+  });
+  const [availLoading, setAvailLoading] = useState(true);
+  const [soldOutPopup, setSoldOutPopup] = useState<{ room: RoomOption } | null>(null);
+  const availFetched = useRef(false);
+
+  useEffect(() => {
+    if (!checkIn || !checkOut || checkIn >= checkOut || availFetched.current) return;
+    availFetched.current = true;
+    setAvailLoading(true);
+
+    const types: Array<'deluxe2' | 'deluxe3' | 'deluxe4'> = ['deluxe2', 'deluxe3', 'deluxe4'];
+    Promise.all(
+      types.map(rt =>
+        fetch(`/api/availability?roomType=${rt}&from=${checkIn}&to=${checkOut}&rooms=${roomsCount}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            if (!data?.availability) return { rt, min: null };
+            const vals = Object.values(data.availability as Record<string, number>);
+            return { rt, min: vals.length ? Math.min(...vals) : 0 };
+          })
+          .catch(() => ({ rt, min: null }))
+      )
+    ).then(results => {
+      const map: Record<string, number | null> = {};
+      for (const { rt, min } of results) map[rt] = min;
+      setRoomAvail(map);
+      setAvailLoading(false);
+    });
+  }, [checkIn, checkOut, roomsCount]);
   const [userName, setUserName] = useState('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -476,9 +509,11 @@ function RoomsComboContent() {
             const discountPct = Math.round((1 - room.pricePerNight / room.mrpPrice) * 100);
             const isExpanded  = expandedRoom === room.key;
             const isSelected  = selectedRoom?.key === room.key;
+            const avail = roomAvail[room.key];
+            const isSoldOut = avail !== null && avail < roomsCount;
 
             return (
-              <div key={room.key} className={`rcp-room-card${isSelected ? ' selected' : ''}`}>
+              <div key={room.key} className={`rcp-room-card${isSelected ? ' selected' : ''}`} style={isSoldOut ? { opacity: 0.7 } : undefined}>
 
                 {/* Collapsible header row */}
                 <div className="rcp-room-header" onClick={() => setExpandedRoom(isExpanded ? null : room.key)}>
@@ -495,6 +530,29 @@ function RoomsComboContent() {
                         <span className={`rcp-tag ${room.key === 'deluxe2' ? 'green' : room.key === 'deluxe3' ? 'gold' : 'blue'}`}>
                           {room.tag}
                         </span>
+                        {/* ERP availability badge */}
+                        {!availLoading && avail !== null && (
+                          isSoldOut ? (
+                            <span style={{
+                              background:'#fef2f2',color:'#b91c1c',fontSize:'12px',fontWeight:700,
+                              padding:'4px 12px',borderRadius:'20px',border:'1px solid #fca5a5',
+                            }}>Sold Out</span>
+                          ) : (
+                            <span style={{
+                              background: avail <= 2 ? '#fff7ed' : '#f0fdf4',
+                              color: avail <= 2 ? '#c2410c' : '#166534',
+                              fontSize:'12px',fontWeight:700,
+                              padding:'4px 12px',borderRadius:'20px',
+                              border: `1px solid ${avail <= 2 ? '#fdba74' : '#bbf7d0'}`,
+                            }}>{avail} room{avail !== 1 ? 's' : ''} available</span>
+                          )
+                        )}
+                        {availLoading && (
+                          <span style={{
+                            background:'#f3f4f6',color:'#9ca3af',fontSize:'11px',fontWeight:600,
+                            padding:'4px 12px',borderRadius:'20px',
+                          }}>Checking...</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -531,16 +589,38 @@ function RoomsComboContent() {
                           <ShieldCheck size={15}/>
                           Free Cancellation up to 48 hrs before check-in
                         </div>
+                        {/* Availability detail in expanded body */}
+                        {!availLoading && avail !== null && (
+                          <div style={{
+                            display:'flex',alignItems:'center',gap:'8px',
+                            marginBottom:'14px',fontSize:'14px',fontWeight:700,
+                            color: isSoldOut ? '#b91c1c' : avail <= 2 ? '#c2410c' : '#166534',
+                          }}>
+                            {isSoldOut
+                              ? `No rooms available for your dates`
+                              : `${avail} room${avail !== 1 ? 's' : ''} available for ${nights} night${nights > 1 ? 's' : ''}`}
+                          </div>
+                        )}
                         <div className="rcp-room-actions">
-                          <button
-                            className="btn-select-room"
-                            onClick={() => {
-                              setSelectedRoom(room);
-                              document.getElementById('rcp-sidebar-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }}
-                          >
-                            {selectedRoom?.key === room.key ? <><Check size={15}/> Selected</> : <>Select Room <ArrowRight size={15}/></>}
-                          </button>
+                          {isSoldOut ? (
+                            <button
+                              className="btn-select-room"
+                              style={{ background:'#d1d5db', cursor:'not-allowed' }}
+                              onClick={(e) => { e.stopPropagation(); setSoldOutPopup({ room }); }}
+                            >
+                              Sold Out
+                            </button>
+                          ) : (
+                            <button
+                              className="btn-select-room"
+                              onClick={() => {
+                                setSelectedRoom(room);
+                                document.getElementById('rcp-sidebar-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                              }}
+                            >
+                              {selectedRoom?.key === room.key ? <><Check size={15}/> Selected</> : <>Select Room <ArrowRight size={15}/></>}
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -587,6 +667,41 @@ function RoomsComboContent() {
               </div>
             </div>
 
+            {/* Live availability summary */}
+            {!availLoading && (
+              <div style={{
+                background:'#f9fafb',border:'1px solid #e5e7eb',borderRadius:12,
+                padding:'14px 16px',marginBottom:18,
+              }}>
+                <div style={{fontSize:12,fontWeight:700,color:'#9CA3AF',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:10}}>
+                  Room Availability
+                </div>
+                {ROOMS.map(r => {
+                  const a = roomAvail[r.key];
+                  const soldOut = a !== null && a < roomsCount;
+                  return (
+                    <div key={r.key} style={{
+                      display:'flex',alignItems:'center',justifyContent:'space-between',
+                      padding:'6px 0',
+                      borderTop: r.key !== 'deluxe2' ? '1px solid #f3f4f6' : 'none',
+                    }}>
+                      <span style={{fontSize:14,fontWeight:600,color:'#374151'}}>{r.shortName}</span>
+                      {a === null ? (
+                        <span style={{fontSize:13,color:'#9ca3af'}}>—</span>
+                      ) : soldOut ? (
+                        <span style={{fontSize:13,fontWeight:700,color:'#b91c1c'}}>Sold Out</span>
+                      ) : (
+                        <span style={{
+                          fontSize:13,fontWeight:700,
+                          color: a <= 2 ? '#c2410c' : '#166534',
+                        }}>{a} room{a !== 1 ? 's' : ''}</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             {/* Selected room or prompt */}
             {selectedRoom ? (
               <div className="rcp-selected-summary">
@@ -606,10 +721,18 @@ function RoomsComboContent() {
               </div>
             )}
 
-            {selectedRoom ? (
+            {selectedRoom && !(roomAvail[selectedRoom.key] !== null && (roomAvail[selectedRoom.key] ?? 0) < roomsCount) ? (
               <Link href={bookingUrl(selectedRoom)} className="btn-book-now">
                 Proceed to Book <ArrowRight size={16}/>
               </Link>
+            ) : selectedRoom && (roomAvail[selectedRoom.key] !== null && (roomAvail[selectedRoom.key] ?? 0) < roomsCount) ? (
+              <button
+                className="btn-book-now"
+                style={{background:'#d1d5db',cursor:'not-allowed',color:'#6b7280'}}
+                onClick={() => setSoldOutPopup({ room: selectedRoom })}
+              >
+                Rooms Unavailable
+              </button>
             ) : (
               <div style={{width:'100%',padding:'15px',background:'#e5e7eb',color:'#9CA3AF',fontSize:'15px',fontWeight:700,borderRadius:'10px',textAlign:'center',marginBottom:'10px',cursor:'not-allowed'}}>
                 Proceed to Book
@@ -633,6 +756,66 @@ function RoomsComboContent() {
         </div>
 
       </div>
+
+      {/* Sold-out popup */}
+      {soldOutPopup && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position:'fixed',inset:0,
+            background:'rgba(0,0,0,0.6)',zIndex:200000,
+            display:'flex',alignItems:'center',justifyContent:'center',
+            padding:'20px',backdropFilter:'blur(3px)',
+          }}
+          onClick={() => setSoldOutPopup(null)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background:'#fff',borderRadius:18,padding:'28px 26px 24px',
+              width:'min(440px, calc(100vw - 32px))',
+              boxShadow:'0 24px 64px rgba(0,0,0,0.32)',
+              fontFamily:"'Outfit', sans-serif",textAlign:'center',
+            }}
+          >
+            <div style={{fontSize:44,marginBottom:10}}>🙏</div>
+            <div style={{fontSize:19,fontWeight:800,color:'#111',marginBottom:8}}>
+              No rooms available
+            </div>
+            <div style={{fontSize:14,color:'#4b5563',lineHeight:1.55,marginBottom:6}}>
+              We're sorry — <strong>{soldOutPopup.room.title}</strong> is fully booked
+              for your selected dates.
+              {(roomAvail[soldOutPopup.room.key] ?? 0) > 0 && (
+                <> Only <strong>{roomAvail[soldOutPopup.room.key]}</strong> room{(roomAvail[soldOutPopup.room.key] ?? 0) !== 1 ? 's' : ''} available (you need {roomsCount}).</>
+              )}
+            </div>
+            <div style={{fontSize:13,color:'#6b7280',marginBottom:20}}>
+              Please try other dates or select a different room.
+              <br/>Thank you for choosing Braj Nidhi 💛
+            </div>
+            <div style={{display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap'}}>
+              <Link
+                href="/"
+                style={{
+                  background:'#1d6de5',color:'#fff',border:'none',
+                  borderRadius:50,padding:'11px 22px',
+                  fontSize:14,fontWeight:700,cursor:'pointer',
+                  textDecoration:'none',display:'inline-block',
+                }}
+              >Try other dates</Link>
+              <button
+                onClick={() => setSoldOutPopup(null)}
+                style={{
+                  background:'#f3f4f6',color:'#111',border:'none',
+                  borderRadius:50,padding:'11px 22px',
+                  fontSize:14,fontWeight:700,cursor:'pointer',
+                }}
+              >Select another room</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isLoginModalOpen && (
         <LoginModal
