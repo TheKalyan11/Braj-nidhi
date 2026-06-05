@@ -148,6 +148,41 @@ export default function BookingPage() {
     deluxe4: 4999
   });
 
+  // ── Real-time ERP availability check ───────────────────────────────────────
+  const [availMinForRange, setAvailMinForRange] = useState<number | null>(null);
+  const [availChecking, setAvailChecking] = useState<boolean>(false);
+  const [soldOutPopup, setSoldOutPopup] = useState<boolean>(false);
+  const lastAvailKey = useRef<string>('');
+
+  useEffect(() => {
+    if (!checkIn || !checkOut || checkIn >= checkOut) return;
+    const key = `${roomType}|${checkIn}|${checkOut}|${rooms}`;
+    if (lastAvailKey.current === key) return;
+    lastAvailKey.current = key;
+
+    setAvailChecking(true);
+    const ctrl = new AbortController();
+    fetch(
+      `/api/availability?roomType=${roomType}&from=${checkIn}&to=${checkOut}&rooms=${rooms}`,
+      { signal: ctrl.signal },
+    )
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data?.availability) return;
+        const values = Object.values(data.availability as Record<string, number>);
+        const min = values.length ? Math.min(...values) : 0;
+        setAvailMinForRange(min);
+        if (min < rooms) setSoldOutPopup(true);
+      })
+      .catch(() => { /* network error — keep prior state */ })
+      .finally(() => setAvailChecking(false));
+
+    return () => ctrl.abort();
+  }, [roomType, checkIn, checkOut, rooms]);
+
+  const isInsufficient =
+    availMinForRange !== null && availMinForRange < rooms;
+
   // Quick special request badges
   const [specialRequests, setSpecialRequests] = useState<string[]>([]);
   const [showModify, setShowModify] = useState(false);
@@ -545,6 +580,23 @@ export default function BookingPage() {
       return;
     }
 
+    // Re-check availability right before charging — date/inventory could have changed.
+    try {
+      const r = await fetch(
+        `/api/availability?roomType=${roomType}&from=${checkIn}&to=${checkOut}&rooms=${rooms}`,
+      );
+      if (r.ok) {
+        const data = await r.json();
+        const values = Object.values((data.availability ?? {}) as Record<string, number>);
+        const min = values.length ? Math.min(...values) : 0;
+        setAvailMinForRange(min);
+        if (min < rooms) {
+          setSoldOutPopup(true);
+          return;
+        }
+      }
+    } catch { /* let booking attempt continue if check itself failed */ }
+
     setPaymentLoading(true);
     setPaymentStepText('Securing your room...');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -580,13 +632,13 @@ export default function BookingPage() {
             check_in_date: checkIn,
             check_out_date: checkOut,
             booking_type: "Walk-In",
-            hold_type: "BN-Website Hold-0001",
+            hold_type: "BN-VCM Web Site-0001",
             guest: {
               name: `${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}`,
               email: guestDetails.email,
               phone: guestDetails.phone
             },
-            rooms: [{ room_type: targetRoomType, qty: 1, adults, children }]
+            rooms: [{ room_type: targetRoomType, qty: rooms, adults, children }]
           })
         });
 
@@ -2877,27 +2929,30 @@ export default function BookingPage() {
                   </span>
                 </label>
                 <button
-                  onClick={proceedToPayment}
+                  onClick={isInsufficient ? () => setSoldOutPopup(true) : proceedToPayment}
+                  disabled={isInsufficient || availChecking}
                   style={{
                     width: '100%',
                     padding: '16px',
-                    background: 'linear-gradient(135deg, #1565C0, #1976D2, #1E88E5)',
-                    color: '#fff',
+                    background: isInsufficient
+                      ? '#d1d5db'
+                      : 'linear-gradient(135deg, #1565C0, #1976D2, #1E88E5)',
+                    color: isInsufficient ? '#6b7280' : '#fff',
                     fontSize: '16px',
                     fontWeight: '800',
                     fontFamily: 'Outfit, sans-serif',
                     letterSpacing: '1.5px',
                     border: 'none',
                     borderRadius: '10px',
-                    cursor: 'pointer',
+                    cursor: isInsufficient ? 'not-allowed' : 'pointer',
                     textTransform: 'uppercase',
-                    boxShadow: '0 6px 20px rgba(21, 101, 192, 0.4)',
+                    boxShadow: isInsufficient ? 'none' : '0 6px 20px rgba(21, 101, 192, 0.4)',
                     transition: 'all 0.25s'
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 10px 30px rgba(21, 101, 192, 0.55)')}
-                  onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(21, 101, 192, 0.4)')}
+                  onMouseEnter={e => { if (!isInsufficient) e.currentTarget.style.boxShadow = '0 10px 30px rgba(21, 101, 192, 0.55)'; }}
+                  onMouseLeave={e => { if (!isInsufficient) e.currentTarget.style.boxShadow = '0 6px 20px rgba(21, 101, 192, 0.4)'; }}
                 >
-                  PAY NOW
+                  {isInsufficient ? 'ROOMS UNAVAILABLE' : 'PAY NOW'}
                 </button>
               </div>
 
@@ -3316,6 +3371,78 @@ export default function BookingPage() {
         onLoginSuccess={handleLoginSuccess}
         initialIsRegistering={loginModalInitialRegister}
       />
+
+      {/* Sold-out popup — fires when requested rooms exceed ERP availability */}
+      {soldOutPopup && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: 'fixed', inset: 0,
+            background: 'rgba(0,0,0,0.6)',
+            zIndex: 200000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '20px',
+            backdropFilter: 'blur(3px)',
+          }}
+          onClick={() => setSoldOutPopup(false)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: 18,
+              padding: '28px 26px 24px',
+              width: 'min(440px, calc(100vw - 32px))',
+              boxShadow: '0 24px 64px rgba(0,0,0,0.32)',
+              fontFamily: "'Outfit', sans-serif",
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ fontSize: 44, marginBottom: 10 }}>🙏</div>
+            <div style={{ fontSize: 19, fontWeight: 800, color: '#111', marginBottom: 8 }}>
+              No rooms available
+            </div>
+            <div style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.55, marginBottom: 6 }}>
+              We're sorry — you requested{' '}
+              <strong>{rooms} {getRoomTitle(roomType)}</strong>, but only{' '}
+              <strong>{Math.max(0, availMinForRange ?? 0)}</strong>{' '}
+              {(availMinForRange ?? 0) === 1 ? 'room is' : 'rooms are'} available for
+              <br />
+              <strong>{checkIn}</strong> → <strong>{checkOut}</strong>.
+            </div>
+            <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>
+              Please try other dates or reduce the number of rooms.
+              <br />Thank you for choosing Braj Nidhi 💛
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => { setSoldOutPopup(false); setShowModify(true); }}
+                style={{
+                  background: '#1d6de5', color: '#fff', border: 'none',
+                  borderRadius: 50, padding: '11px 22px',
+                  fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                  fontFamily: 'inherit',
+                }}
+              >Try other dates</button>
+              {(availMinForRange ?? 0) > 0 && (availMinForRange ?? 0) < rooms && (
+                <button
+                  onClick={() => {
+                    setRooms(availMinForRange!);
+                    setSoldOutPopup(false);
+                  }}
+                  style={{
+                    background: '#f3f4f6', color: '#111', border: 'none',
+                    borderRadius: 50, padding: '11px 22px',
+                    fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >Book {availMinForRange} room{(availMinForRange ?? 0) > 1 ? 's' : ''} instead</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
 
       {/* Add Guest Modal */}
