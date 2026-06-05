@@ -174,8 +174,8 @@ export async function getAvailabilityForRange(
     (await getERPAvailability(roomType, from, to)) ??
     (await getERPAvailabilityFromDoctype(roomType, from, to));
 
-  // If ERP returned data, use it directly (ERP already accounts for its own bookings).
-  // Still subtract any local pending bookings that haven't synced to ERP yet.
+  // ERP returned hold-quota availability. Subtract any local bookings pending ERP sync
+  // (those will become hold-quota reservations once synced — avoid double-selling).
   if (erp) {
     const localBooked = await getBookedCountsForRange(roomType, from, to);
     const all = await readBookings();
@@ -273,10 +273,14 @@ const ERP_ROOM_TYPE_MAP: Record<RoomType, string> = {
   deluxe4: process.env.ERP_ROOM_TYPE_DELUXE4 || 'BN-DELUXE-3',
 };
 
-// In-memory cache for ERP availability (60s TTL) — avoids hammering ERP on every keystroke.
+// In-memory cache for ERP availability (10s TTL) — short enough for near-instant
+// sync when ERP changes, long enough to batch rapid UI interactions.
 type ErpCacheEntry = { fetchedAt: number; data: Record<string, number> };
 const ERP_CACHE = new Map<string, ErpCacheEntry>();
-const ERP_CACHE_TTL_MS = 60_000;
+const ERP_CACHE_TTL_MS = Number(process.env.ERP_CACHE_TTL_MS) || 10_000;
+
+/** Immediately invalidate the ERP availability cache (called by webhook / admin). */
+export function clearERPCache() { ERP_CACHE.clear(); }
 
 /**
  * Fetch per-date room availability from the ERP for a given website room type.
@@ -375,15 +379,18 @@ export async function getERPAvailabilityFromDoctype(
   if (cached && Date.now() - cached.fetchedAt < ERP_CACHE_TTL_MS) return cached.data;
 
   try {
-    // Only count reservations made through the website's booking channel —
-    // other channels (FOC, Walk-In direct, etc.) have their own hold quotas
-    // in ERP and shouldn't consume the website's allotment.
+    // Only count reservations that consume the website's hold quota.
+    // The ERP planner checks use_hold_rooms=1 AND hold_quota matches.
+    // We accept both the current and legacy hold type names.
+    const holdTypes = [ERP_HOLD_TYPE];
+    if (ERP_HOLD_TYPE !== 'BN-Website Hold-0001') holdTypes.push('BN-Website Hold-0001');
     const filters = JSON.stringify([
       ['property', '=', ERP_PROPERTY],
-      ['booking_type', '=', ERP_BOOKING_TYPE],
+      ['use_hold_rooms', '=', 1],
+      ['hold_quota', 'in', holdTypes],
       ['check_in', '<', to],
       ['check_out', '>', from],
-      ['status', '!=', 'Cancelled'],
+      ['status', 'not in', ['Cancelled', 'No-show']],
     ]);
     const fields = JSON.stringify(['name', 'check_in', 'check_out', 'status']);
     const url =

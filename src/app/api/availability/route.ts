@@ -50,7 +50,10 @@ export async function GET(req: NextRequest) {
       ? await suggestUpgrade(roomType, from, to, rooms)
       : null;
 
-    return Response.json({ availability, unavailableDates, upgrade });
+    return Response.json(
+      { availability, unavailableDates, upgrade },
+      { headers: { 'Cache-Control': 'no-store, max-age=0' } },
+    );
   } catch (e: any) {
     return Response.json({ error: e.message }, { status: 500 });
   }
