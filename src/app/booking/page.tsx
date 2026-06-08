@@ -396,7 +396,7 @@ export default function BookingPage() {
           guests: guestCount,
           rooms: 1,
           booking_type: "Walk-In",
-          hold_type: "BN-Website Hold-0001"
+          hold_type: "BN-VCM Web Site-0001"
         })
       });
 
@@ -414,33 +414,18 @@ export default function BookingPage() {
         // Dynamically map prices from ERP availableRooms
         const updatedPrices = { ...livePrices };
         data.availableRooms.forEach((room: any) => {
-          const typeId = (room.roomTypeId || '').toLowerCase();
+          const webType = erpToWebsiteType(room.roomTypeId);
           const amt = room.amount || room.pricePerNight || room.rate || 0;
-          if (amt > 0) {
-            if (typeId.includes('deluxe2') || typeId.includes('twin') || typeId.includes('2')) {
-              updatedPrices.deluxe2 = amt;
-            } else if (typeId.includes('deluxe3') || typeId.includes('triple') || typeId.includes('3')) {
-              updatedPrices.deluxe3 = amt;
-            } else if (typeId.includes('deluxe4') || typeId.includes('quad') || typeId.includes('family') || typeId.includes('4')) {
-              updatedPrices.deluxe4 = amt;
-            }
+          if (webType && amt > 0) {
+            updatedPrices[webType] = amt;
           }
         });
         setLivePrices(updatedPrices);
 
         // Auto-select first available room type if current selection becomes sold out
-        const hasDeluxe2 = data.availableRooms.some((r: any) => {
-          const tid = (r.roomTypeId || '').toLowerCase();
-          return tid.includes('deluxe2') || tid.includes('twin') || tid.includes('2');
-        });
-        const hasDeluxe3 = data.availableRooms.some((r: any) => {
-          const tid = (r.roomTypeId || '').toLowerCase();
-          return tid.includes('deluxe3') || tid.includes('triple') || tid.includes('3');
-        });
-        const hasDeluxe4 = data.availableRooms.some((r: any) => {
-          const tid = (r.roomTypeId || '').toLowerCase();
-          return tid.includes('deluxe4') || tid.includes('quad') || tid.includes('family') || tid.includes('4');
-        });
+        const hasDeluxe2 = data.availableRooms.some((r: any) => erpToWebsiteType(r.roomTypeId) === 'deluxe2');
+        const hasDeluxe3 = data.availableRooms.some((r: any) => erpToWebsiteType(r.roomTypeId) === 'deluxe3');
+        const hasDeluxe4 = data.availableRooms.some((r: any) => erpToWebsiteType(r.roomTypeId) === 'deluxe4');
 
         if (roomType === 'deluxe2' && !hasDeluxe2) {
           if (hasDeluxe3) setRoomType('deluxe3');
@@ -463,16 +448,18 @@ export default function BookingPage() {
   };
 
   // Helper to check room availability on live ERP API responses
+  const erpToWebsiteType = (erpId: string): 'deluxe2' | 'deluxe3' | 'deluxe4' | null => {
+    const id = (erpId || '').toUpperCase();
+    if (id === 'BN-DELUXE-1') return 'deluxe2';
+    if (id === 'BN-DELUXE-2') return 'deluxe3';
+    if (id === 'BN-DELUXE-3') return 'deluxe4';
+    return null;
+  };
+
   const isCategoryAvailable = (type: 'deluxe2' | 'deluxe3' | 'deluxe4'): boolean => {
     if (apiConnectionStatus !== 'live') return true;
     if (availableRoomsList.length === 0) return false;
-    return availableRoomsList.some((room: any) => {
-      const typeId = (room.roomTypeId || '').toLowerCase();
-      if (type === 'deluxe2' && (typeId.includes('deluxe2') || typeId.includes('twin') || typeId.includes('2'))) return true;
-      if (type === 'deluxe3' && (typeId.includes('deluxe3') || typeId.includes('triple') || typeId.includes('3'))) return true;
-      if (type === 'deluxe4' && (typeId.includes('deluxe4') || typeId.includes('quad') || typeId.includes('family') || typeId.includes('4'))) return true;
-      return false;
-    });
+    return availableRoomsList.some((room: any) => erpToWebsiteType(room.roomTypeId) === type);
   };
 
   // Trigger API search rooms when inputs or credentials change
@@ -615,13 +602,7 @@ export default function BookingPage() {
         else if (roomType === 'deluxe4') targetRoomType = 'Deluxe 4';
 
         if (availableRoomsList.length > 0) {
-          const found = availableRoomsList.find((r: any) => {
-            const typeId = (r.roomTypeId || '').toLowerCase();
-            if (roomType === 'deluxe2' && (typeId.includes('deluxe2') || typeId.includes('twin') || typeId.includes('2'))) return true;
-            if (roomType === 'deluxe3' && (typeId.includes('deluxe3') || typeId.includes('triple') || typeId.includes('3'))) return true;
-            if (roomType === 'deluxe4' && (typeId.includes('deluxe4') || typeId.includes('quad') || typeId.includes('family') || typeId.includes('4'))) return true;
-            return false;
-          });
+          const found = availableRoomsList.find((r: any) => erpToWebsiteType(r.roomTypeId) === roomType);
           if (found) targetRoomType = found.roomTypeId;
         }
 
@@ -2360,6 +2341,10 @@ export default function BookingPage() {
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
               <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+            </Link>
+            <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+              <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         
