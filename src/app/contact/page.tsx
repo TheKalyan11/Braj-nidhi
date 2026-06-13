@@ -732,7 +732,7 @@ export default function Contact() {
               transition={{ duration: 0.9, delay: 0.15 }}
             >
               <img
-                src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1200&auto=format&fit=crop"
+                src="/Mandir Nirman .jpg"
                 alt="Braj Nidhi hospitality"
               />
             </motion.div>
@@ -769,55 +769,7 @@ export default function Contact() {
           </div>
         </section>
 
-        {/* Quick Booking Bar */}
-        <section className="quick-booking-bar">
-          <div className="booking-tabs">
-            <button 
-              className={`booking-tab ${activeTab === 'guesthouse' ? 'active' : ''}`}
-              onClick={() => setActiveTab('guesthouse')}
-            >
-              <i className="fas fa-hotel" /> Guesthouse
-            </button>
-            <button 
-              className={`booking-tab ${activeTab === 'dining' ? 'active' : ''}`}
-              onClick={() => setActiveTab('dining')}
-            >
-              <i className="fas fa-utensils" /> Dining
-            </button>
-          </div>
-          <div className="booking-fields">
-            <div className="booking-field">
-              <div className="booking-field-label">Check-In</div>
-              <input type="date" />
-              <div className="booking-field-sub">Select arrival date</div>
-            </div>
-            <div className="booking-field">
-              <div className="booking-field-label">Check-Out</div>
-              <input type="date" />
-              <div className="booking-field-sub">Select departure date</div>
-            </div>
-            <div className="booking-field">
-              <div className="booking-field-label">Guests</div>
-              <select>
-                <option>1 Adult</option>
-                <option>2 Adults</option>
-                <option>2 Adults, 1 Child</option>
-                <option>2 Adults, 2 Children</option>
-                <option>Group (5+)</option>
-              </select>
-              <div className="booking-field-sub">Number of guests</div>
-            </div>
-            <motion.button
-              className="btn-check-availability"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Check Availability <i className="fas fa-arrow-right" />
-            </motion.button>
-          </div>
-        </section>
-
-        <section id="inquiry" className="inquiry-section">
+<section id="inquiry" className="inquiry-section">
           <div className="inquiry-container">
             <motion.div className="inquiry-info" {...fadeUp}>
               <motion.div className="inquiry-eyebrow">

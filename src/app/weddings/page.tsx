@@ -1035,7 +1035,7 @@ export default function Weddings() {
                 <a href="/guesthouse" className="btn-outline" style={{"border":"2px solid #1a1a1a","padding":"12px 25px","textDecoration":"none","color":"#1a1a1a","fontWeight":"800","textTransform":"uppercase","display":"inline-block","marginTop":"15px"}}>View Rooms & Suites</a>
             </motion.div>
             <motion.div className="split-image" variants={slideInLeft}>
-                <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1000&auto=format&fit=crop" alt="Luxury Suites" />
+                <img src="/DSC05963-HDR.webp" alt="Luxury Suites" />
             </motion.div>
         </motion.section>
 

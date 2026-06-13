@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -105,32 +105,53 @@ function RoomsComboContent() {
   });
   const [availLoading, setAvailLoading] = useState(true);
   const [soldOutPopup, setSoldOutPopup] = useState<{ room: RoomOption } | null>(null);
-  const availFetched = useRef(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIdx, setGalleryIdx] = useState(0);
 
-  useEffect(() => {
-    if (!checkIn || !checkOut || checkIn >= checkOut || availFetched.current) return;
-    availFetched.current = true;
-    setAvailLoading(true);
+  const GALLERY_PHOTOS = [
+    { src: '/DSC05963-HDR.webp', caption: 'Deluxe Room' },
+    { src: '/DSC05818-HDR.webp', caption: 'Deluxe Room – Twin Bedded' },
+    { src: '/d3.webp', caption: 'Deluxe 3 – Triple Room' },
+    { src: '/d31.webp', caption: 'Deluxe 3 – Room View' },
+  ];
+
+  const fetchAvailability = useCallback(async (isInitial = false) => {
+    if (!checkIn || !checkOut || checkIn >= checkOut) {
+      if (isInitial) setAvailLoading(false);
+      return;
+    }
+    if (isInitial) setAvailLoading(true);
 
     const types: Array<'deluxe2' | 'deluxe3' | 'deluxe4'> = ['deluxe2', 'deluxe3', 'deluxe4'];
-    Promise.all(
-      types.map(rt =>
-        fetch(`/api/availability?roomType=${rt}&from=${checkIn}&to=${checkOut}&rooms=${roomsCount}`)
-          .then(r => r.ok ? r.json() : null)
-          .then(data => {
-            if (!data?.availability) return { rt, min: null };
-            const vals = Object.values(data.availability as Record<string, number>);
-            return { rt, min: vals.length ? Math.min(...vals) : 0 };
-          })
-          .catch(() => ({ rt, min: null }))
-      )
-    ).then(results => {
+    try {
+      const results = await Promise.all(
+        types.map(rt =>
+          fetch(`/api/availability?roomType=${rt}&from=${checkIn}&to=${checkOut}&rooms=${roomsCount}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+              if (!data?.availability) return { rt, min: null };
+              const vals = Object.values(data.availability as Record<string, number>);
+              return { rt, min: vals.length ? Math.min(...vals) : 0 };
+            })
+            .catch(() => ({ rt, min: null }))
+        )
+      );
       const map: Record<string, number | null> = {};
       for (const { rt, min } of results) map[rt] = min;
-      setRoomAvail(map);
+      setRoomAvail(prev => {
+        const changed = types.some(rt => prev[rt] !== map[rt]);
+        return changed ? map : prev;
+      });
+    } finally {
       setAvailLoading(false);
-    });
+    }
   }, [checkIn, checkOut, roomsCount]);
+
+  useEffect(() => {
+    fetchAvailability(true);
+    const id = setInterval(() => fetchAvailability(false), 20_000);
+    return () => clearInterval(id);
+  }, [fetchAvailability]);
   const [userName, setUserName] = useState('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -195,12 +216,12 @@ function RoomsComboContent() {
         }
 
         /* ── Breadcrumb ── */
-        .rcp-crumb{background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 5%;display:flex;align-items:center;gap:8px;font-size:15px;color:#6B7280;}
+        .rcp-crumb{background:#fff;border-bottom:1px solid #e5e7eb;padding:8px 5%;display:flex;align-items:center;gap:8px;font-size:15px;color:#6B7280;}
         .rcp-crumb a{color:#6B7280;text-decoration:none;}.rcp-crumb a:hover{color:#C89B3C;}
         .rcp-crumb .cur{color:#C89B3C;font-weight:600;}
 
         /* ── Search summary strip ── */
-        .rcp-search-strip{background:#fff;border-bottom:1px solid #e5e7eb;padding:18px 5%;display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+        .rcp-search-strip{background:#fff;border-bottom:1px solid #e5e7eb;padding:10px 5%;display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
         .rcp-strip-item{display:flex;align-items:center;gap:9px;font-size:16px;color:#374151;}
         .rcp-strip-item svg{color:#C89B3C;flex-shrink:0;}
         .rcp-strip-item strong{color:#111;font-weight:700;}
@@ -473,40 +494,6 @@ function RoomsComboContent() {
         {/* ─── Left column ─── */}
         <div>
 
-          {/* Hotel card */}
-          <div className="rcp-hotel-card">
-            <div className="rcp-hotel-head">
-              <div className="rcp-hotel-name">
-                <h1>Braj Nidhi Guesthouse</h1>
-                <div className="rcp-hotel-stars">
-                  {[1,2,3,4].map(i => <Star key={i} size={14} fill="#f59e0b" stroke="none"/>)}
-                  <Star size={14} stroke="#f59e0b" fill="none"/>
-                </div>
-                <div className="rcp-hotel-loc">
-                  <MapPin size={13}/>
-                  Chattikara Road, Vrindavan · 0.7 km from Prem Mandir
-                </div>
-              </div>
-              <div className="rcp-rating-box">
-                <div className="rcp-score">4.8</div>
-                <div className="rcp-rating-lbl">Excellent</div>
-                <div className="rcp-rating-cnt">2,400+ ratings</div>
-              </div>
-            </div>
-            <div className="rcp-photos">
-              <div className="rcp-photo-main">
-                <img src="/hero.webp" alt="Braj Nidhi main view"/>
-              </div>
-              <div className="rcp-photo-thumb">
-                <img src="/DSC09652.webp" alt="Property view"/>
-              </div>
-              <div className="rcp-photo-thumb">
-                <img src="/DSC05818-HDR.webp" alt="Room view"/>
-                <span className="rcp-photo-pill">View All Photos</span>
-              </div>
-            </div>
-          </div>
-
           {/* Rooms section */}
           <div className="rcp-rooms-label">Available Rooms & Suites — Select to Continue</div>
 
@@ -635,6 +622,40 @@ function RoomsComboContent() {
             );
           })}
 
+          {/* Hotel card */}
+          <div className="rcp-hotel-card">
+            <div className="rcp-hotel-head">
+              <div className="rcp-hotel-name">
+                <h1>Braj Nidhi Guesthouse</h1>
+                <div className="rcp-hotel-stars">
+                  {[1,2,3,4].map(i => <Star key={i} size={14} fill="#f59e0b" stroke="none"/>)}
+                  <Star size={14} stroke="#f59e0b" fill="none"/>
+                </div>
+                <div className="rcp-hotel-loc">
+                  <MapPin size={13}/>
+                  Chattikara Road, Vrindavan · 0.7 km from Prem Mandir
+                </div>
+              </div>
+              <div className="rcp-rating-box">
+                <div className="rcp-score">4.8</div>
+                <div className="rcp-rating-lbl">Excellent</div>
+                <div className="rcp-rating-cnt">2,400+ ratings</div>
+              </div>
+            </div>
+            <div className="rcp-photos">
+              <div className="rcp-photo-main">
+                <img src="/hero.webp" alt="Braj Nidhi Guesthouse"/>
+              </div>
+              <div className="rcp-photo-thumb">
+                <img src="/DSC05963-HDR.webp" alt="Deluxe Room"/>
+              </div>
+              <div className="rcp-photo-thumb">
+                <img src="/DSC05818-HDR.webp" alt="Room view"/>
+                <span className="rcp-photo-pill" onClick={() => { setGalleryIdx(0); setGalleryOpen(true); }}>View All Photos</span>
+              </div>
+            </div>
+          </div>
+
           {/* Property info strip */}
           <div style={{background:'#fff',borderRadius:'12px',padding:'14px 18px',border:'1px solid #e5e7eb',display:'flex',alignItems:'center',gap:'9px',fontSize:'13px',color:'#374151',marginTop:'6px'}}>
             <Clock size={14} style={{color:'#C89B3C',flexShrink:0}}/>
@@ -761,6 +782,57 @@ function RoomsComboContent() {
         </div>
 
       </div>
+
+      {/* Photo gallery lightbox */}
+      {galleryOpen && (
+        <div
+          onClick={() => setGalleryOpen(false)}
+          style={{position:'fixed',inset:0,background:'rgba(0,0,0,.92)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}}
+        >
+          {/* Close */}
+          <button onClick={() => setGalleryOpen(false)} style={{position:'absolute',top:18,right:22,background:'none',border:'none',color:'#fff',fontSize:32,cursor:'pointer',lineHeight:1}}>×</button>
+
+          {/* Counter */}
+          <div style={{position:'absolute',top:22,left:'50%',transform:'translateX(-50%)',color:'rgba(255,255,255,.7)',fontSize:14,fontFamily:'Outfit,sans-serif'}}>
+            {galleryIdx + 1} / {GALLERY_PHOTOS.length}
+          </div>
+
+          {/* Prev */}
+          <button
+            onClick={e => { e.stopPropagation(); setGalleryIdx(i => (i - 1 + GALLERY_PHOTOS.length) % GALLERY_PHOTOS.length); }}
+            style={{position:'absolute',left:16,background:'rgba(255,255,255,.12)',border:'none',color:'#fff',fontSize:28,width:48,height:48,borderRadius:'50%',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
+          >‹</button>
+
+          {/* Image */}
+          <div onClick={e => e.stopPropagation()} style={{maxWidth:'88vw',maxHeight:'82vh',display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
+            <img
+              src={GALLERY_PHOTOS[galleryIdx].src}
+              alt={GALLERY_PHOTOS[galleryIdx].caption}
+              style={{maxWidth:'100%',maxHeight:'74vh',objectFit:'contain',borderRadius:10,boxShadow:'0 8px 40px rgba(0,0,0,.6)'}}
+            />
+            <div style={{color:'rgba(255,255,255,.75)',fontSize:14,fontFamily:'Outfit,sans-serif',textAlign:'center'}}>{GALLERY_PHOTOS[galleryIdx].caption}</div>
+          </div>
+
+          {/* Next */}
+          <button
+            onClick={e => { e.stopPropagation(); setGalleryIdx(i => (i + 1) % GALLERY_PHOTOS.length); }}
+            style={{position:'absolute',right:16,background:'rgba(255,255,255,.12)',border:'none',color:'#fff',fontSize:28,width:48,height:48,borderRadius:'50%',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
+          >›</button>
+
+          {/* Thumbnails strip */}
+          <div onClick={e => e.stopPropagation()} style={{position:'absolute',bottom:16,left:'50%',transform:'translateX(-50%)',display:'flex',gap:8,padding:'8px 12px',background:'rgba(0,0,0,.5)',borderRadius:12,backdropFilter:'blur(6px)'}}>
+            {GALLERY_PHOTOS.map((p, i) => (
+              <img
+                key={i}
+                src={p.src}
+                alt={p.caption}
+                onClick={() => setGalleryIdx(i)}
+                style={{width:56,height:40,objectFit:'cover',borderRadius:6,cursor:'pointer',border: i === galleryIdx ? '2px solid #C89B3C' : '2px solid transparent',opacity: i === galleryIdx ? 1 : 0.6,transition:'opacity .2s,border-color .2s'}}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Sold-out popup */}
       <RoomUnavailablePopup

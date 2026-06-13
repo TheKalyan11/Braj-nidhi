@@ -968,7 +968,7 @@ export default function Home() {
                             <span><i className="fas fa-om"></i> VIP Darshan</span>
                         </div>
                         
-                        <a href="/booking" className="btn-offer-full" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Claim Offer</a>
+                        <a href="/braj-yatra" className="btn-offer-full" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Claim Offer</a>
                     </div>
                 </div>
 
@@ -986,7 +986,7 @@ export default function Home() {
                             <span><i className="fas fa-users"></i> 50 Guests</span>
                         </div>
                         
-                        <a href="#contact" className="btn-offer-full" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Enquire Now</a>
+                        <a href="/weddings" className="btn-offer-full" style={{"display":"block","textAlign":"center","textDecoration":"none"}}>Enquire Now</a>
                     </div>
                 </div>
 
@@ -1004,7 +1004,7 @@ export default function Home() {
                             <span><i className="fas fa-bed"></i> Luxury Room</span>
                         </div>
                         
-                        <a href="#contact" className="btn-offer-full" style={{"display":"block","textAlign":"center","textDecoration":"none","marginTop":"15px"}}>Book This Package</a>
+                        <a href="/guesthouse" className="btn-offer-full" style={{"display":"block","textAlign":"center","textDecoration":"none","marginTop":"15px"}}>Book This Package</a>
                     </div>
                 </div>
             </div>

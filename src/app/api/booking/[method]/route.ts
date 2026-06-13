@@ -5,7 +5,7 @@ const ERP_API_KEY = process.env.ERP_API_KEY;
 const ERP_API_SECRET = process.env.ERP_API_SECRET;
 const ERP_BASE_URL =
   process.env.ERP_BASE_URL ||
-  'https://pankaj.vcmerp.in/api/method/guesthouse.website_booking_api';
+  'https://test.vcmerp.in/api/method/guesthouse.website_booking_api';
 
 /**
  * Whitelist of ERP methods that are safe to call from the frontend.
@@ -17,7 +17,6 @@ const ALLOWED_ERP_METHODS = new Set([
   'get_reservation',
   'cancel_reservation',
   'get_property_info',
-  'check_availability',
 ]);
 
 export async function POST(

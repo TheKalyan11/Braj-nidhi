@@ -121,7 +121,7 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
     // Window: 3 months from today for the calendar
     const today = new Date(); today.setHours(0,0,0,0);
     const windowFrom = fmt(today);
-    const windowTo = fmt(addDays(today, 92));
+    const windowTo = fmt(addDays(today, 89));
 
     setAvail(a => ({ ...a, loading: true }));
     try {
@@ -612,6 +612,51 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
           )}
         </div>
 
+        {/* Room Availability */}
+        {!avail.loading && !isBlocked && nights > 0 && (
+          <div style={{
+            margin: '16px 20px 0',
+            padding: '14px 18px',
+            background: avail.rangeMinAvail <= 2 ? '#fff7ed' : '#f0fdf4',
+            border: `1px solid ${avail.rangeMinAvail <= 2 ? '#fdba74' : '#86efac'}`,
+            borderRadius: 12,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{
+                display: 'inline-block', width: 8, height: 8, borderRadius: '50%',
+                background: avail.rangeMinAvail <= 2 ? '#f97316' : '#16a34a',
+                boxShadow: `0 0 0 4px ${avail.rangeMinAvail <= 2 ? 'rgba(249,115,22,.18)' : 'rgba(22,163,74,.18)'}`,
+              }}/>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: '#6b7280' }}>
+                  Room Availability
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#111', marginTop: 2 }}>
+                  {avail.rangeMinAvail} {avail.rangeMinAvail === 1 ? 'room' : 'rooms'} available
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#6b7280' }}> · {nights} night{nights>1?'s':''}</span>
+                </div>
+              </div>
+            </div>
+            {avail.rangeMinAvail <= 2 && (
+              <span style={{
+                fontSize: 11, fontWeight: 700, color: '#c2410c',
+                background: '#fed7aa', padding: '4px 10px', borderRadius: 20,
+              }}>Hurry!</span>
+            )}
+          </div>
+        )}
+
+        {avail.loading && (
+          <div style={{ margin: '16px 20px 0', padding: '14px 18px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, fontSize: 13, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid #d1d5db', borderTopColor: '#6b7280', borderRadius: '50%', animation: 'rbmSpin 0.7s linear infinite' }}/>
+            <style>{`@keyframes rbmSpin { to { transform: rotate(360deg); } }`}</style>
+            Checking live ERP availability…
+          </div>
+        )}
+
         {/* Booking error */}
         {booking === 'error' && (
           <div style={{ margin: '14px 20px 0', padding: '12px 16px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, fontSize: 13, color: '#b91c1c', fontWeight: 600 }}>
@@ -669,21 +714,6 @@ export default function RoomBookingModal({ isOpen, onClose, roomType, roomName, 
             )}
           </button>
 
-          {/* Legend */}
-          {(avail.unavailableDates.length > 0 || Object.keys(avail.lowAvailDates).length > 0) && !isBlocked && (
-            <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 11, color: '#9ca3af' }}>
-              {avail.unavailableDates.length > 0 && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ color: '#ef4444', fontWeight: 700, textDecoration: 'line-through' }}>15</span> Sold out
-                </span>
-              )}
-              {Object.keys(avail.lowAvailDates).length > 0 && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#f97316' }} /> Low availability
-                </span>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </>

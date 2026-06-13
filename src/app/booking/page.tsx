@@ -396,7 +396,7 @@ export default function BookingPage() {
           guests: guestCount,
           rooms: 1,
           booking_type: "Walk-In",
-          hold_type: "BN-VCM Web Site-0001"
+          hold_type: "BN-BN-VCM Web Site-0001-0001"
         })
       });
 
@@ -450,9 +450,9 @@ export default function BookingPage() {
   // Helper to check room availability on live ERP API responses
   const erpToWebsiteType = (erpId: string): 'deluxe2' | 'deluxe3' | 'deluxe4' | null => {
     const id = (erpId || '').toUpperCase();
-    if (id === 'BN-DELUXE-1') return 'deluxe2';
-    if (id === 'BN-DELUXE-2') return 'deluxe3';
-    if (id === 'BN-DELUXE-3') return 'deluxe4';
+    if (id === 'BN-DELUXE-2') return 'deluxe2';
+    if (id === 'BN-DELUXE-3') return 'deluxe3';
+    if (id === 'BN-DELUXE-4') return 'deluxe4';
     return null;
   };
 
@@ -462,9 +462,13 @@ export default function BookingPage() {
     return availableRoomsList.some((room: any) => erpToWebsiteType(room.roomTypeId) === type);
   };
 
-  // Trigger API search rooms when inputs or credentials change
+  // Trigger API search rooms when inputs change + poll every 20s
   useEffect(() => {
     searchRoomsApi(checkIn, checkOut, adults + children);
+    const id = setInterval(() => {
+      searchRoomsApi(checkIn, checkOut, adults + children);
+    }, 20_000);
+    return () => clearInterval(id);
   }, [checkIn, checkOut, adults, children]);
 
   // Handle auto-fill if user logs in via shared LoginModal
@@ -614,7 +618,7 @@ export default function BookingPage() {
             check_in_date: checkIn,
             check_out_date: checkOut,
             booking_type: "Walk-In",
-            hold_type: "BN-VCM Web Site-0001",
+            hold_type: "BN-BN-VCM Web Site-0001-0001",
             guest: {
               name: `${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}`,
               email: guestDetails.email,

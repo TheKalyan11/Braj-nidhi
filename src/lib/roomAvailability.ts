@@ -5,12 +5,10 @@ import path from 'path';
 
 export type RoomType = 'deluxe2' | 'deluxe3' | 'deluxe4';
 
-// Hold quota for the website (BN-VCM Web Site-0001). Matches the row totals
-// shown in ERP Reservation Planner. Override via ERP_HOLD_QUOTA_DELUXE{2,3,4}.
 export const TOTAL_ROOMS: Record<RoomType, number> = {
-  deluxe2: Number(process.env.ERP_HOLD_QUOTA_DELUXE2) || 1, // BN-DELUXE-1
-  deluxe3: Number(process.env.ERP_HOLD_QUOTA_DELUXE3) || 2, // BN-DELUXE-2
-  deluxe4: Number(process.env.ERP_HOLD_QUOTA_DELUXE4) || 1, // BN-DELUXE-3
+  deluxe2: Number(process.env.ERP_HOLD_QUOTA_DELUXE2) || 1,
+  deluxe3: Number(process.env.ERP_HOLD_QUOTA_DELUXE3) || 2,
+  deluxe4: Number(process.env.ERP_HOLD_QUOTA_DELUXE4) || 1,
 };
 
 export const UPGRADE_ORDER: RoomType[] = ['deluxe2', 'deluxe3', 'deluxe4'];
@@ -130,7 +128,10 @@ export function dateRange(from: string, to: string): string[] {
   const cur = new Date(from + 'T00:00:00');
   const end = new Date(to + 'T00:00:00');
   while (cur < end) {
-    dates.push(cur.toISOString().split('T')[0]);
+    const y = cur.getFullYear();
+    const m = String(cur.getMonth() + 1).padStart(2, '0');
+    const d = String(cur.getDate()).padStart(2, '0');
+    dates.push(`${y}-${m}-${d}`);
     cur.setDate(cur.getDate() + 1);
   }
   return dates;
@@ -183,10 +184,14 @@ export async function getAvailabilityForRange(
     for (const date of dates) {
       let n = 0;
       for (const b of all) {
+        // Only subtract bookings still *pending* ERP sync — those will soon become
+        // hold-quota reservations, so reserve their rooms to avoid double-selling.
+        // 'failed' bookings never reached ERP, so ERP's count already reflects the
+        // true (un-held) state; subtracting them would wrongly mark rooms sold out.
         if (
           b.roomType === roomType &&
           b.status === 'confirmed' &&
-          b.erpSyncStatus !== 'synced' &&
+          b.erpSyncStatus === 'pending' &&
           b.checkIn <= date && date < b.checkOut
         ) {
           n += b.rooms;
@@ -261,16 +266,12 @@ const ERP_BASE = (process.env.ERP_BASE_URL ?? '').replace(/\/$/, '');
 const ERP_AUTH = `token ${process.env.ERP_API_KEY ?? ''}:${process.env.ERP_API_SECRET ?? ''}`;
 const ERP_PROPERTY = process.env.ERP_PROPERTY ?? 'BRAJ-NIDHI-GUEST-HOUSE-VRN';
 const ERP_BOOKING_TYPE = process.env.ERP_BOOKING_TYPE ?? 'Walk-In';
-const ERP_HOLD_TYPE = process.env.ERP_HOLD_TYPE ?? 'BN-Website Hold-0001';
+const ERP_HOLD_TYPE = process.env.ERP_HOLD_TYPE ?? 'BN-BN-VCM Web Site-0001-0001';
 
-// Website room types map to ERP room types as:
-//   deluxe2 → BN-DELUXE-1 (Twin)
-//   deluxe3 → BN-DELUXE-2 (Triple)
-//   deluxe4 → BN-DELUXE-3 (Family)
 const ERP_ROOM_TYPE_MAP: Record<RoomType, string> = {
-  deluxe2: process.env.ERP_ROOM_TYPE_DELUXE2 || 'BN-DELUXE-1',
-  deluxe3: process.env.ERP_ROOM_TYPE_DELUXE3 || 'BN-DELUXE-2',
-  deluxe4: process.env.ERP_ROOM_TYPE_DELUXE4 || 'BN-DELUXE-3',
+  deluxe2: process.env.ERP_ROOM_TYPE_DELUXE2 || 'BN-DELUXE-2',
+  deluxe3: process.env.ERP_ROOM_TYPE_DELUXE3 || 'BN-DELUXE-3',
+  deluxe4: process.env.ERP_ROOM_TYPE_DELUXE4 || 'BN-DELUXE-4',
 };
 
 // In-memory cache for ERP availability (10s TTL) — short enough for near-instant
@@ -283,9 +284,59 @@ const ERP_CACHE_TTL_MS = Number(process.env.ERP_CACHE_TTL_MS) || 10_000;
 export function clearERPCache() { ERP_CACHE.clear(); }
 
 /**
- * Fetch per-date room availability from the ERP for a given website room type.
- * Returns a map { 'YYYY-MM-DD': availableRooms }. Returns null on error so callers
- * can fall back to local TOTAL_ROOMS counting.
+ * Fetch availability for a single date from ERP via `search_rooms`.
+ * Caches per date+roomType with the standard TTL.
+ */
+async function fetchERPDateAvailability(
+  erpRoomTypeId: string,
+  date: string,
+): Promise<number | null> {
+  const cacheKey = `single:${erpRoomTypeId}:${date}`;
+  const cached = ERP_CACHE.get(cacheKey);
+  if (cached && Date.now() - cached.fetchedAt < ERP_CACHE_TTL_MS) {
+    return cached.data[date] ?? null;
+  }
+
+  try {
+    const nextDay = new Date(date + 'T12:00:00');
+    nextDay.setDate(nextDay.getDate() + 1);
+    const toDate = `${nextDay.getFullYear()}-${String(nextDay.getMonth() + 1).padStart(2, '0')}-${String(nextDay.getDate()).padStart(2, '0')}`;
+
+    const res = await fetch(`${ERP_BASE}.search_rooms`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: ERP_AUTH },
+      body: JSON.stringify({
+        property: ERP_PROPERTY,
+        check_in_date: date,
+        check_out_date: toDate,
+        hold_type: ERP_HOLD_TYPE,
+      }),
+      signal: AbortSignal.timeout(8_000),
+    });
+
+    if (!res.ok) return null;
+    const text = await res.text();
+    let data: any;
+    try { data = JSON.parse(text); } catch { return null; }
+
+    const payload = data.message ?? data;
+    const available = (payload.availableRooms ?? []) as Array<{
+      roomTypeId: string; availableCount: number;
+    }>;
+    const match = available.find(r => r.roomTypeId === erpRoomTypeId);
+    const count = match?.availableCount ?? 0;
+
+    ERP_CACHE.set(cacheKey, { fetchedAt: Date.now(), data: { [date]: count } });
+    return count;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetch per-date room availability from the ERP via `search_rooms`.
+ * Makes parallel 1-night calls so each date reflects the exact hold matrix value.
+ * Returns null on error so callers can fall back to local counting.
  */
 export async function getERPAvailability(
   roomType: RoomType,
@@ -297,68 +348,25 @@ export async function getERPAvailability(
   const erpRoomTypeId = ERP_ROOM_TYPE_MAP[roomType];
   if (!erpRoomTypeId) return null;
 
-  const cacheKey = `${erpRoomTypeId}:${from}:${to}`;
-  const cached = ERP_CACHE.get(cacheKey);
-  if (cached && Date.now() - cached.fetchedAt < ERP_CACHE_TTL_MS) {
-    return cached.data;
+  const dates = dateRange(from, to);
+  if (dates.length === 0) return null;
+
+  const counts = await Promise.all(
+    dates.map(d => fetchERPDateAvailability(erpRoomTypeId, d)),
+  );
+
+  if (counts.every(c => c === null)) return null;
+
+  const result: Record<string, number> = {};
+  for (let i = 0; i < dates.length; i++) {
+    result[dates[i]] = counts[i] ?? 0;
   }
-
-  try {
-    const url = new URL(`${ERP_BASE}.get_availability`);
-    url.searchParams.set('property', ERP_PROPERTY);
-    url.searchParams.set('room_type', erpRoomTypeId);
-    url.searchParams.set('from_date', from);
-    url.searchParams.set('to_date', to);
-    url.searchParams.set('hold_type', ERP_HOLD_TYPE);
-
-    const res = await fetch(url.toString(), {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json', Authorization: ERP_AUTH },
-      signal: AbortSignal.timeout(8_000),
-    });
-
-    if (!res.ok) return null;
-    const text = await res.text();
-    let data: any;
-    try { data = JSON.parse(text); } catch { return null; }
-
-    // Frappe wraps responses in { message: ... }. Unwrap and normalize a few shapes.
-    const payload = data.message ?? data;
-    const result: Record<string, number> = {};
-
-    if (Array.isArray(payload)) {
-      // Shape: [{ date, available }, ...]
-      for (const row of payload) {
-        const d = row.date || row.day;
-        const a = row.available ?? row.availability ?? row.qty ?? row.count;
-        if (d && typeof a === 'number') result[d] = a;
-      }
-    } else if (payload && typeof payload === 'object') {
-      if (payload.availability && typeof payload.availability === 'object') {
-        // Shape: { availability: { 'YYYY-MM-DD': n } }
-        for (const [d, a] of Object.entries(payload.availability)) {
-          if (typeof a === 'number') result[d] = a;
-        }
-      } else {
-        // Shape: { 'YYYY-MM-DD': n }
-        for (const [d, a] of Object.entries(payload)) {
-          if (/^\d{4}-\d{2}-\d{2}$/.test(d) && typeof a === 'number') result[d] = a;
-        }
-      }
-    }
-
-    if (Object.keys(result).length === 0) return null;
-    ERP_CACHE.set(cacheKey, { fetchedAt: Date.now(), data: result });
-    return result;
-  } catch (e) {
-    console.error('[ERP] get_availability error:', e);
-    return null;
-  }
+  return result;
 }
 
 /**
  * Fallback that computes availability from the Frappe Reservation doctype directly,
- * for ERPs that don't expose a custom `get_availability` method.
+ * for ERPs where `search_rooms` doesn't return per-date granularity.
  * Counts confirmed (docstatus 1) and draft (docstatus 0) reservations of room_type
  * overlapping the date range, subtracts from the website's hold quota.
  */
@@ -379,15 +387,10 @@ export async function getERPAvailabilityFromDoctype(
   if (cached && Date.now() - cached.fetchedAt < ERP_CACHE_TTL_MS) return cached.data;
 
   try {
-    // Only count reservations that consume the website's hold quota.
-    // The ERP planner checks use_hold_rooms=1 AND hold_quota matches.
-    // We accept both the current and legacy hold type names.
-    const holdTypes = [ERP_HOLD_TYPE];
-    if (ERP_HOLD_TYPE !== 'BN-Website Hold-0001') holdTypes.push('BN-Website Hold-0001');
     const filters = JSON.stringify([
       ['property', '=', ERP_PROPERTY],
       ['use_hold_rooms', '=', 1],
-      ['hold_quota', 'in', holdTypes],
+      ['hold_quota', '=', ERP_HOLD_TYPE],
       ['check_in', '<', to],
       ['check_out', '>', from],
       ['status', 'not in', ['Cancelled', 'No-show']],
