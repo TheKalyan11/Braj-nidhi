@@ -6,9 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
-import LoginModal from '@/components/LoginModal';
 import BookNowButton from '@/components/BookNowButton';
-import LoginJoinButton from '@/components/LoginJoinButton';
 import RoomBookingModal from '@/components/RoomBookingModal';
 
 // Self-contained Room Card Slideshow to isolate slide re-renders
@@ -23,61 +21,38 @@ const RoomCardSlideshow = ({ images, alt, interval = 4000 }: { images: string[];
   }, [images.length, interval]);
 
   return (
-    <AnimatePresence mode="popLayout">
-      <motion.img
-        key={imgIndex}
-        src={images[imgIndex]}
-        alt={alt}
-        className="room-bg-img"
-        initial={{ opacity: 0, scale: 1.2 }}
-        animate={{ opacity: 1, scale: 1.05 }}
-        exit={{ opacity: 0, scale: 1 }}
-        transition={{ 
-          opacity: { duration: 1.5, ease: "easeInOut" },
-          scale: { duration: 6, ease: "linear" } 
-        }}
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-      />
-    </AnimatePresence>
+    <>
+      {images.map((src, i) => (
+        <motion.img
+          key={src}
+          src={src}
+          alt={i === imgIndex ? alt : ''}
+          className="room-bg-img"
+          initial={false}
+          animate={{
+            opacity: i === imgIndex ? 1 : 0,
+            scale: i === imgIndex ? 1.07 : 1.0,
+          }}
+          transition={{
+            opacity: { duration: 1.4, ease: 'easeInOut' },
+            scale: { duration: 8, ease: 'linear' },
+          }}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+        />
+      ))}
+    </>
   );
 };
 
 export default function Guesthouse() {
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
   // Room booking modal
   const [roomModal, setRoomModal] = useState<{ open: boolean; roomType: 'deluxe2'|'deluxe3'|'deluxe4'; roomName: string; price: number }>({
     open: false, roomType: 'deluxe2', roomName: '', price: 0
   });
   const openRoomModal = (roomType: 'deluxe2'|'deluxe3'|'deluxe4', roomName: string, price: number) => {
     setRoomModal({ open: true, roomType, roomName, price });
-  };
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
-      setUserName(localStorage.getItem('userName') || 'User');
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userName');
-    setIsLoggedIn(false);
-    window.location.reload();
-  };
-
-  const getUserInitials = (name: string) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
   };
 
   useEffect(() => {
@@ -89,9 +64,9 @@ export default function Guesthouse() {
   }, []);
 
   // Slideshow image arrays
-  const deluxe2Images = ["DSC05818-HDR.webp", "DSC05963-HDR.webp"];
-  const deluxe3Images = ["d3.webp", "d31.webp"];
-  const deluxe4Images = ["DSC05963-HDR.webp", "d31.webp"];
+  const deluxe2Images = ["d1.png", "d2.png", "d3.png", "d4.png"];
+  const deluxe3Images = ["t1.png", "t2.png", "t3.png", "t4.png"];
+  const deluxe4Images = ["f1.png", "f2.png", "f3.png"];
   const [showSuiteCards, setShowSuiteCards] = useState(false);
 
   // Hero section image slider
@@ -1488,8 +1463,8 @@ export default function Guesthouse() {
                 <path d="M50,0 L50,95" stroke="#006400" strokeWidth="2"/>
             </g>
             <g id="krishna-flute-feather">
-                <path d="M10,75 L90,45" stroke="#DAA520" strokeWidth="12" stroke-linecap="round"/>
-                <path d="M12,73 L88,44" stroke="#F0E68C" strokeWidth="6" stroke-linecap="round"/>
+                <path d="M10,75 L90,45" stroke="#DAA520" strokeWidth="12" strokeLinecap="round"/>
+                <path d="M12,73 L88,44" stroke="#F0E68C" strokeWidth="6" strokeLinecap="round"/>
                 <line x1="20" y1="76" x2="25" y2="63" stroke="#DC143C" strokeWidth="3"/>
                 <line x1="23" y1="75" x2="28" y2="62" stroke="#DC143C" strokeWidth="3"/>
                 <circle cx="40" cy="62" r="2.5" fill="#3e2723"/>
@@ -1527,38 +1502,13 @@ export default function Guesthouse() {
         </nav>
 
         <div className="nav-btns">
-            {isLoggedIn ? (
-                <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
-                        <div className="user-info-text">
-                            <span className="user-label">Braj Club Member</span>
-                            <span className="user-name">{userName}</span>
-                        </div>
-                        <div className="user-profile-badge">
-                            {getUserInitials(userName)}
-                        </div>
-                    </div>
-                    <button onClick={handleLogout} className="btn-login">Logout</button>
-                </>
-            ) : (
-                <LoginJoinButton onClick={() => setIsLoginModalOpen(true)} />
-            )}
             <BookNowButton href="#rooms-suites" />
         </div>
 
         {/* Mobile Header Actions Flex Wrapper */}
         <div className="mobile-header-actions">
-            {isLoggedIn ? (
-                <button onClick={handleLogout} className="mobile-logout-btn">
-                    Logout
-                </button>
-            ) : (
-                <button onClick={() => setIsLoginModalOpen(true)} className="mobile-login-join">
-                    Login / Join
-                </button>
-            )}
-            <button 
-              className="mobile-menu-btn" 
+            <button
+              className="mobile-menu-btn"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -1588,15 +1538,6 @@ export default function Guesthouse() {
             </ul>
           </div>
           <div className="mobile-menu-footer">
-            {isLoggedIn ? (
-              <div className="mobile-user-profile">
-                <span className="user-label">Braj Club Member</span>
-                <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
-                <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
-              </div>
-            ) : (
-              <LoginJoinButton onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
-            )}
             <BookNowButton href="#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
           </div>
         </div>
@@ -1717,7 +1658,7 @@ export default function Guesthouse() {
                         onClick={(e) => scrollToSection('deluxe2-detail', e)}
                     >
                         <div className="featured-room-img-wrap">
-                            <img src="DSC05818-HDR.webp" alt="Deluxe 2 – Twin Bedded Room" />
+                            <img src="d1.png" alt="Deluxe 2 – Twin Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 2 – Twin Bedded Room</div>
                     </a>
@@ -1727,7 +1668,7 @@ export default function Guesthouse() {
                         onClick={(e) => scrollToSection('deluxe3-detail', e)}
                     >
                         <div className="featured-room-img-wrap">
-                            <img src="DSC05963-HDR.webp" alt="Deluxe 3 – 3 Bedded Room" />
+                            <img src="t1.png" alt="Deluxe 3 – 3 Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 3 – 3 Bedded Room</div>
                     </a>
@@ -1737,7 +1678,7 @@ export default function Guesthouse() {
                         onClick={(e) => scrollToSection('deluxe4-detail', e)}
                     >
                         <div className="featured-room-img-wrap">
-                            <img src="d3.webp" alt="Deluxe 4 – 4 Bedded Room" />
+                            <img src="f1.png" alt="Deluxe 4 – 4 Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 4 – 4 Bedded Room</div>
                     </a>
@@ -1789,9 +1730,9 @@ export default function Guesthouse() {
                                 <h3>Deluxe 2 – Twin Bedded Room</h3>
                                 <p className="room-location" style={{color: "rgba(255,255,255,0.8)", fontSize: "0.9rem", marginBottom: "15px"}}>Ideal for 2 Adults</p>
                                 <div className="room-amenities">
-                                    <span><i className="fas fa-bed"></i> Twin Beds</span>
-                                    <span><i className="fas fa-wifi"></i> Free WiFi</span>
-                                    <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
+                                    <span><i className="fas fa-wifi"></i> Free Wi-Fi Access</span>
+                                    <span><i className="fas fa-concierge-bell"></i> 24/7 Room Service</span>
+                                    <span><i className="fas fa-pump-soap"></i> Premium Grooming Kit</span>
                                 </div>
                                 <button className="btn-availability" style={{ border: "none", cursor: "pointer", width: "100%" }} onClick={() => openRoomModal('deluxe2', 'Deluxe 2 – Twin Bedded Room', 3500)}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></button>
                             </div>
@@ -1805,9 +1746,10 @@ export default function Guesthouse() {
                                 <h3>Deluxe 3 – 3 Bedded Room</h3>
                                 <p className="room-location" style={{color: "rgba(255,255,255,0.8)", fontSize: "0.9rem", marginBottom: "15px"}}>Ideal for 2 Adults + 1 Child OR 3 Adults</p>
                                 <div className="room-amenities">
-                                    <span><i className="fas fa-couch"></i> Living Area</span>
-                                    <span><i className="fas fa-bath"></i> Deep Tub</span>
-                                    <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
+                                    <span><i className="fas fa-wifi"></i> Free Wi-Fi Access</span>
+                                    <span><i className="fas fa-concierge-bell"></i> 24/7 Room Service</span>
+                                    <span><i className="fas fa-pump-soap"></i> Premium Grooming Kit</span>
+                                    <span><i className="fas fa-place-of-worship"></i> Temple Access</span>
                                 </div>
                                 <button className="btn-availability" style={{ border: "none", cursor: "pointer", width: "100%" }} onClick={() => openRoomModal('deluxe3', 'Deluxe 3 – 3 Bedded Room', 4500)}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></button>
                             </div>
@@ -1821,9 +1763,11 @@ export default function Guesthouse() {
                                 <h3>Deluxe 4 – 4 Bedded Room</h3>
                                 <p className="room-location" style={{color: "rgba(255,255,255,0.8)", fontSize: "0.9rem", marginBottom: "15px"}}>Ideal for 3 Adults + 1 Child OR 4 Adults</p>
                                 <div className="room-amenities">
-                                    <span><i className="fas fa-crown"></i> 4-Poster Bed</span>
-                                    <span><i className="fas fa-bed"></i> Living Area</span>
-                                    <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
+                                    <span><i className="fas fa-wifi"></i> Free Wi-Fi Access</span>
+                                    <span><i className="fas fa-concierge-bell"></i> 24/7 Room Service</span>
+                                    <span><i className="fas fa-pump-soap"></i> Premium Grooming Kit</span>
+                                    <span><i className="fas fa-place-of-worship"></i> Temple Access</span>
+                                    <span><i className="fas fa-tree"></i> Vrindavan Chandrodaya Mandir Park Access</span>
                                 </div>
                                 <button className="btn-availability" style={{ border: "none", cursor: "pointer", width: "100%" }} onClick={() => openRoomModal('deluxe4', 'Deluxe 4 – 4 Bedded Room', 4999)}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></button>
                             </div>
@@ -2040,11 +1984,6 @@ export default function Guesthouse() {
     {/* Global Floating Features */}
     <FloatingWidgets />
     
-    <AnimatePresence>
-        {isLoginModalOpen && (
-            <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
-        )}
-    </AnimatePresence>
     <RoomBookingModal
       isOpen={roomModal.open}
       onClose={() => setRoomModal(m => ({ ...m, open: false }))}

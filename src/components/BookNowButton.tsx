@@ -19,111 +19,93 @@ export default function BookNowButton({
   return (
     <>
       <style>{`
-        .bnb-btn {
-          all: unset;
-          position: relative;
-          display: inline-flex;
-          height: 3.2rem;
-          align-items: center;
-          border-radius: 9999px;
-          padding-left: 1.8rem;
-          padding-right: 1.8rem;
-          font-family: 'Outfit', 'Segoe UI', sans-serif;
-          font-size: 1rem;
-          font-weight: 700;
-          color: #1d1d1f;
-          letter-spacing: 0.01em;
-          cursor: pointer;
-          text-decoration: none;
-          white-space: nowrap;
+        .bnb-96,
+        .bnb-96 *,
+        .bnb-96 :after,
+        .bnb-96 :before,
+        .bnb-96:after,
+        .bnb-96:before {
+          border: 0 solid;
           box-sizing: border-box;
         }
-        .bnb-bg {
-          overflow: hidden;
-          border-radius: 9999px;
-          position: absolute;
-          top: 0; left: 0;
-          width: 100%; height: 100%;
-          background-color: rgba(255, 208, 116);
-          border: 2px solid rgba(255, 208, 116);
-          transform: scale(1);
-          transition: transform 1.8s cubic-bezier(0.19, 1, 0.22, 1);
+        .bnb-96 {
+          -webkit-tap-highlight-color: transparent;
+          background-color: #000;
+          background-image: none;
+          color: #fff;
+          cursor: pointer;
+          font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+          font-size: 100%;
+          line-height: 1.5;
+          margin: 0;
+          padding: 0;
+          text-decoration: none;
           display: block;
-        }
-        .bnb-layers {
-          display: block;
-          position: absolute;
-          left: 50%;
-          transform: translateX(-50%);
-          top: -60%;
-          aspect-ratio: 1 / 1;
-          width: max(200%, 10rem);
-        }
-        .bnb-layer {
-          border-radius: 9999px;
-          position: absolute;
-          top: 0; left: 0;
-          width: 100%; height: 100%;
-          transform: scale(0);
-          display: block;
-        }
-        .bnb-layer-1 { background-color: rgba(163, 116, 255); }
-        .bnb-layer-2 { background-color: rgba(23, 241, 209); }
-        .bnb-layer-3 { background-color: rgba(255, 208, 116); }
-
-        .bnb-inner {
-          pointer-events: none;
-          display: block;
+          font-weight: 900;
+          -webkit-mask-image: none;
+          padding: 0.6rem 1.4rem;
+          perspective: 800px;
           position: relative;
+          text-transform: uppercase;
+          transform-style: preserve-3d;
+          letter-spacing: 0.05em;
+          font-size: 13px;
         }
-        .bnb-static,
-        .bnb-hover {
-          pointer-events: none;
-          display: block;
-        }
-        .bnb-hover {
+        .bnb-96 span {
+          background: #fff;
+          color: #000;
+          display: grid;
+          inset: 0;
+          place-items: center;
           position: absolute;
-          top: 0; left: 0;
-          opacity: 0;
-          transform: translateY(70%);
+          transform: rotateX(0deg);
+          transform-origin: top center;
+          transition: 0.2s;
+          font-size: 13px;
+          font-weight: 900;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          font-family: 'Outfit', ui-sans-serif, sans-serif;
         }
-
-        /* Hover transitions */
-        .bnb-btn:hover .bnb-static {
-          opacity: 0;
-          transform: translateY(-70%);
-          transition: transform 1.4s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.3s linear;
+        .bnb-96:hover span {
+          transform: rotateX(35deg);
         }
-        .bnb-btn:hover .bnb-hover {
-          opacity: 1;
-          transform: translateY(0);
-          transition: transform 1.4s cubic-bezier(0.19, 1, 0.22, 1), opacity 1.4s cubic-bezier(0.19, 1, 0.22, 1);
+        .bnb-96:after,
+        .bnb-96:before {
+          background: #ddd;
+          content: "";
+          height: 100%;
+          left: 0;
+          position: absolute;
+          top: 0;
+          width: 100%;
+          z-index: -1;
         }
-        .bnb-btn:hover .bnb-layer {
-          transition: transform 1.3s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.3s linear;
+        .bnb-96:after {
+          background: #ccc;
+          width: 0;
         }
-        .bnb-btn:hover .bnb-layer-1 { transform: scale(1); }
-        .bnb-btn:hover .bnb-layer-2 { transform: scale(1); transition-delay: 0.1s; }
-        .bnb-btn:hover .bnb-layer-3 { transform: scale(1); transition-delay: 0.2s; }
+        .bnb-96:hover:after {
+          animation: bnb-progress 1.2s;
+        }
+        @keyframes bnb-progress {
+          0%   { opacity: 1; width: 0; }
+          10%  { opacity: 1; width: 15%; }
+          25%  { opacity: 1; width: 25%; }
+          40%  { opacity: 1; width: 35%; }
+          55%  { opacity: 1; width: 75%; }
+          60%  { opacity: 1; width: 100%; }
+          to   { opacity: 0; width: 100%; }
+        }
       `}</style>
-
       <a
         href={href}
         onClick={onClick}
-        className={`bnb-btn ${className}`.trim()}
+        className={`bnb-96 ${className}`.trim()}
         style={style}
       >
-        <span className="bnb-bg">
-          <span className="bnb-layers">
-            <span className="bnb-layer bnb-layer-1" />
-            <span className="bnb-layer bnb-layer-2" />
-            <span className="bnb-layer bnb-layer-3" />
-          </span>
-        </span>
-        <span className="bnb-inner">
-          <span className="bnb-static">{label}</span>
-          <span className="bnb-hover">{label} →</span>
-        </span>
+        <span>{label}</span>
+        {label}
       </a>
     </>
   );

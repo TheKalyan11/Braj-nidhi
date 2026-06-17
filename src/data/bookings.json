@@ -1,3 +1,19 @@
 {
-  "bookings": []
+  "bookings": [
+    {
+      "id": "BK1781677590588-M388",
+      "roomType": "deluxe2",
+      "checkIn": "2026-06-17",
+      "checkOut": "2026-06-18",
+      "rooms": 1,
+      "adults": 2,
+      "children": 0,
+      "guestName": "",
+      "guestEmail": "",
+      "guestPhone": "",
+      "bookedAt": "2026-06-17T06:26:30.588Z",
+      "status": "confirmed",
+      "erpSyncStatus": "failed"
+    }
+  ]
 }

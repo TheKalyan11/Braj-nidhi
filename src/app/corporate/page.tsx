@@ -5,8 +5,6 @@ import { Menu, X } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import BookNowButton from '@/components/BookNowButton';
 import Link from 'next/link';
-import LoginModal from '@/components/LoginModal';
-import LoginJoinButton from '@/components/LoginJoinButton';
 
 export default function Corporate() {
   const [heroImgIndex, setHeroImgIndex] = useState(0);
@@ -14,38 +12,11 @@ export default function Corporate() {
 
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
-      setUserName(localStorage.getItem('userName') || 'User');
-    }
-  }, []);
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userName');
-    setIsLoggedIn(false);
-    window.location.reload();
-  };
-
-  const getUserInitials = (name: string) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
-  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -863,34 +834,13 @@ export default function Corporate() {
             </ul>
         </nav>
         <div className="nav-btns">
-            {isLoggedIn ? (
-                <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
-                        <div className="user-info-text">
-                            <span className="user-label">Braj Club Member</span>
-                            <span className="user-name">{userName}</span>
-                        </div>
-                        <div className="user-profile-badge">
-                            {getUserInitials(userName)}
-                        </div>
-                    </div>
-                    <button onClick={handleLogout} className="btn-login">Logout</button>
-                </>
-            ) : (
-                <LoginJoinButton onClick={() => setIsLoginModalOpen(true)} />
-            )}
             <BookNowButton href="/guesthouse#rooms-suites" />
         </div>
 
         {/* Hamburger Toggle Button */}
         <div className="mobile-header-actions">
-            {isLoggedIn ? (
-                <button onClick={handleLogout} className="mobile-logout-btn">Logout</button>
-            ) : (
-                <button onClick={() => setIsLoginModalOpen(true)} className="mobile-login-join">Login / Join</button>
-            )}
-            <button 
-              className="mobile-menu-btn" 
+            <button
+              className="mobile-menu-btn"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -920,15 +870,6 @@ export default function Corporate() {
             </ul>
           </div>
           <div className="mobile-menu-footer">
-            {isLoggedIn ? (
-              <div className="mobile-user-profile">
-                <span className="user-label">Braj Club Member</span>
-                <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
-                <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
-              </div>
-            ) : (
-              <LoginJoinButton onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
-            )}
             <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
           </div>
         </div>
@@ -1347,8 +1288,8 @@ export default function Corporate() {
                         </div>
                         <div className="form-group full-width">
                             <label>Event Type</label>
-                            <select required>
-                                <option value="conference" selected>Day Conference</option>
+                            <select required defaultValue="conference">
+                                <option value="conference">Day Conference</option>
                                 <option value="retreat">Leadership Retreat / Offsite</option>
                                 <option value="meeting">Board Meeting</option>
                                 <option value="other">Other</option>
@@ -1427,7 +1368,6 @@ export default function Corporate() {
     </footer>
 
     <FloatingWidgets />
-    <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     
     </div>
   );

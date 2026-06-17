@@ -27,11 +27,11 @@ import {
   Coffee,
   Wifi,
   CalendarDays,
-  Moon
+  Moon,
+  CreditCard,
+  IndianRupee
 } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
-import LoginModal from '@/components/LoginModal';
-import LoginJoinButton from '@/components/LoginJoinButton';
 import BookNowButton from '@/components/BookNowButton';
 import RoomUnavailablePopup from '@/components/RoomUnavailablePopup';
 
@@ -69,10 +69,6 @@ export default function BookingPage() {
 
 
   // Login State
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [userName, setUserName] = useState<string>('Guest');
-  const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
-  const [loginModalInitialRegister, setLoginModalInitialRegister] = useState<boolean>(false);
   const [headerScrolled, setHeaderScrolled] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   
@@ -135,6 +131,8 @@ export default function BookingPage() {
   const [paymentLoading, setPaymentLoading] = useState<boolean>(false);
   const [paymentStepText, setPaymentStepText] = useState<string>('');
   const [bookingRef, setBookingRef] = useState<string>('');
+  const [razorpayPaymentId, setRazorpayPaymentId] = useState<string>('');
+  const [razorpayOrderId, setRazorpayOrderId] = useState<string>('');
 
   // ERP Live API Connection States
   const [reservationId, setReservationId] = useState<string>('');
@@ -239,6 +237,9 @@ export default function BookingPage() {
 
   const nights = getNights();
 
+  const checkInTime  = checkIn  ? new Date(`${checkIn}T14:00:00`).toLocaleTimeString('en-US',  { hour: 'numeric', minute: '2-digit', hour12: true }) : '2:00 PM';
+  const checkOutTime = checkOut ? new Date(`${checkOut}T11:00:00`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : '11:00 AM';
+
   // Price calculations
   const pricePerNight = livePrices[roomType] || getRoomPrice(roomType);
   const roomCost = pricePerNight * nights * rooms;
@@ -249,7 +250,7 @@ export default function BookingPage() {
   
   // Discounts
   // Member discount is 10% of Room cost if logged in
-  const memberDiscount = isLoggedIn ? Math.round(roomCost * 0.10) : 0;
+  const memberDiscount = 0;
   const baseTotal = roomCost + darshanCost + cabCost;
   const totalDiscount = memberDiscount;
 
@@ -350,21 +351,6 @@ export default function BookingPage() {
         }
       }
 
-      // Load login state from localStorage
-      const storedLogin = localStorage.getItem('isLoggedIn') === 'true';
-      if (storedLogin) {
-        setIsLoggedIn(true);
-        const storedName = localStorage.getItem('userName') || '';
-        setUserName(storedName || 'Guest');
-        const parts = storedName.split(' ');
-        setGuestDetails(prev => ({
-          ...prev,
-          firstName: parts[0] || '',
-          lastName: parts[1] || '',
-          email: localStorage.getItem('userEmail') || '',
-          phone: localStorage.getItem('userPhone') || ''
-        }));
-      }
     };
 
     window.requestAnimationFrame(initializeFromQuery);
@@ -410,17 +396,11 @@ export default function BookingPage() {
       
       if (data.availableRooms && Array.isArray(data.availableRooms)) {
         setAvailableRoomsList(data.availableRooms);
-        
-        // Dynamically map prices from ERP availableRooms
-        const updatedPrices = { ...livePrices };
-        data.availableRooms.forEach((room: any) => {
-          const webType = erpToWebsiteType(room.roomTypeId);
-          const amt = room.amount || room.pricePerNight || room.rate || 0;
-          if (webType && amt > 0) {
-            updatedPrices[webType] = amt;
-          }
-        });
-        setLivePrices(updatedPrices);
+
+        // Website displays canonical per-night rates (deluxe2: 3500, deluxe3: 4500, deluxe4: 4999).
+        // ERP returns its own per-stay/tax-adjusted amounts which differ from the website rate card,
+        // so we intentionally do NOT overwrite livePrices here — that caused the displayed
+        // ₹3,500/night to be silently replaced by an ERP figure (e.g. 6666.66) on the fare summary.
 
         // Auto-select first available room type if current selection becomes sold out
         const hasDeluxe2 = data.availableRooms.some((r: any) => erpToWebsiteType(r.roomTypeId) === 'deluxe2');
@@ -471,39 +451,6 @@ export default function BookingPage() {
     return () => clearInterval(id);
   }, [checkIn, checkOut, adults, children]);
 
-  // Handle auto-fill if user logs in via shared LoginModal
-  const handleLoginSuccess = (name: string) => {
-    setIsLoggedIn(true);
-    setUserName(name);
-    
-    // Auto-populate guest details
-    const emailVal = localStorage.getItem('userEmail') || '';
-    const phoneVal = localStorage.getItem('userPhone') || '';
-    
-    const parts = name.split(' ');
-    setGuestDetails(prev => ({
-      ...prev,
-      firstName: parts[0] || '',
-      lastName: parts[1] || '',
-      email: emailVal,
-      phone: phoneVal
-    }));
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userName');
-    setUserName('User');
-    
-    setGuestDetails({
-      title: 'Mr',
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: ''
-    });
-  };
 
   const handleRequestBadgeToggle = (badge: string) => {
     if (specialRequests.includes(badge)) {
@@ -594,51 +541,18 @@ export default function BookingPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     let resId = 'MOCK-RES-' + Math.floor(100000 + Math.random() * 900000);
-    let amount = finalTotal;
+    const amount = finalTotal;
 
-    // Create ERP reservation if live
-    if (apiConnectionStatus !== 'sandbox') {
-      try {
-        setPaymentStepText('Holding your room in ERP...');
-        let targetRoomType = 'Deluxe';
-        if (roomType === 'deluxe2') targetRoomType = 'Deluxe 2';
-        else if (roomType === 'deluxe3') targetRoomType = 'Deluxe 3';
-        else if (roomType === 'deluxe4') targetRoomType = 'Deluxe 4';
-
-        if (availableRoomsList.length > 0) {
-          const found = availableRoomsList.find((r: any) => erpToWebsiteType(r.roomTypeId) === roomType);
-          if (found) targetRoomType = found.roomTypeId;
-        }
-
-        const response = await fetch('/api/booking/create_reservation', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            property: "BRAJ-NIDHI-GUEST-HOUSE-VRN",
-            check_in_date: checkIn,
-            check_out_date: checkOut,
-            booking_type: "Walk-In",
-            hold_type: "BN-BN-VCM Web Site-0001-0001",
-            guest: {
-              name: `${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}`,
-              email: guestDetails.email,
-              phone: guestDetails.phone
-            },
-            rooms: [{ room_type: targetRoomType, qty: rooms, adults, children }]
-          })
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          resId = result.reservationId || result.reservation_id || resId;
-          if (result.amount) amount = Number(result.amount);
-          else if (result.net_amount) amount = Number(result.net_amount);
-          setErpAmount(amount);
-        }
-      } catch (err: any) {
-        console.error('ERP reservation error:', err);
-        setApiConnectionStatus('error');
-      }
+    // Always use the canonical ERP room type IDs — override with live ERP value if available
+    const erpRoomTypeMap: Record<string, string> = {
+      deluxe2: 'BN-DELUXE-2',
+      deluxe3: 'BN-DELUXE-3',
+      deluxe4: 'BN-DELUXE-4',
+    };
+    let targetRoomType = erpRoomTypeMap[roomType] || 'BN-DELUXE-2';
+    if (availableRoomsList.length > 0) {
+      const found = availableRoomsList.find((r: any) => erpToWebsiteType(r.roomTypeId) === roomType);
+      if (found?.roomTypeId) targetRoomType = found.roomTypeId;
     }
 
     setReservationId(resId);
@@ -681,7 +595,7 @@ export default function BookingPage() {
               razorpay_signature: response.razorpay_signature,
               // Pass booking details for notifications
               bookingDetails: {
-                guestName: `${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}`.trim(),
+                guestName: `${guestDetails.firstName} ${guestDetails.lastName}`.trim(),
                 guestEmail: guestDetails.email,
                 guestPhone: guestDetails.phone,
                 roomType,
@@ -701,24 +615,76 @@ export default function BookingPage() {
           const verifyData = await verifyRes.json();
           if (!verifyRes.ok) throw new Error(verifyData.error || 'Payment verification failed');
 
-          setPaymentStepText('Confirming booking...');
+          // Create ERP reservation only after payment is verified
+          let erpReservationCreated = false;
           try {
-            const confirmRes = await fetch('/api/booking/confirm_payment', {
+            setPaymentStepText('Creating reservation in ERP...');
+            const guestName = `${guestDetails.firstName} ${guestDetails.lastName}`.trim();
+            const additionalGuestsPayload = savedGuests.map(g => ({
+              guest_name: `${g.firstName} ${g.lastName}`.trim(),
+              is_child: g.isChild ? 1 : 0,
+            }));
+
+            const erpRes = await fetch('/api/booking/create_reservation', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                reservation_id: resId,
-                amount,
-                mode_of_payment: 'Razorpay',
+                property: "BRAJ-NIDHI-GUEST-HOUSE-VRN",
+                check_in_date: checkIn,
+                check_out_date: checkOut,
+                booking_type: "Walk-In",
+                hold_type: "BN-BN-VCM Web Site-0001-0001",
+                guest_name: guestName,
+                guest_email: guestDetails.email,
+                guest_phone: guestDetails.phone,
+                rooms: [{ room_type: targetRoomType, qty: rooms, adults, children }],
+                additional_guests: additionalGuestsPayload,
                 gateway_payment_id: response.razorpay_payment_id,
-              }),
+                gateway_order_id: response.razorpay_order_id,
+              })
             });
-            const confirmData = await confirmRes.json();
-            const ref = confirmData.bookingReference || confirmData.bookingRef || confirmData.reservationId || resId;
-            setBookingRef(ref);
-          } catch {
-            setBookingRef(response.razorpay_payment_id);
+            const erpResult = await erpRes.json();
+            if (erpRes.ok) {
+              resId = erpResult.reservationId || erpResult.reservation_id || erpResult.name || resId;
+              erpReservationCreated = true;
+            } else {
+              console.error('ERP create_reservation failed:', erpResult);
+            }
+          } catch (err: any) {
+            console.error('ERP reservation error:', err);
           }
+
+          if (erpReservationCreated) {
+            setPaymentStepText('Sending payment details to ERP...');
+            try {
+              const confirmRes = await fetch('/api/booking/confirm_payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  reservation_id: resId,
+                  amount,
+                  mode_of_payment: 'Razorpay',
+                  gateway_payment_id: response.razorpay_payment_id,
+                  gateway_order_id: response.razorpay_order_id,
+                  gateway_signature: response.razorpay_signature,
+                  payment_status: 'Captured',
+                }),
+              });
+              const confirmData = await confirmRes.json();
+              if (!confirmRes.ok) console.error('ERP confirm_payment failed:', confirmData);
+              const ref = confirmData.bookingReference || confirmData.bookingRef || confirmData.reservationId || confirmData.name || resId;
+              setBookingRef(ref);
+            } catch (err: any) {
+              console.error('ERP confirm_payment error:', err);
+              setBookingRef(resId);
+            }
+          } else {
+            setBookingRef(resId);
+          }
+
+          setRazorpayPaymentId(response.razorpay_payment_id);
+          setRazorpayOrderId(response.razorpay_order_id);
+          setReservationId(resId);
 
           setPaymentLoading(false);
           setCurrentStep(3);
@@ -1527,7 +1493,7 @@ export default function BookingPage() {
 
         .form-grid-mmt {
           display: grid;
-          grid-template-columns: 2fr 5fr 5fr;
+          grid-template-columns: 1fr 1fr;
           gap: 16px;
           margin-bottom: 20px;
         }
@@ -2157,7 +2123,7 @@ export default function BookingPage() {
         .confirmation-mmt-wrapper { max-width: 1280px; margin: 0 auto; padding: 0 0 60px; }
         .conf-status-header { display: flex; flex-direction: column; gap: 8px; padding-bottom: 30px; border-bottom: 1px solid rgba(212, 175, 55, 0.15); margin-bottom: 30px; }
         .conf-check-circle { width: 56px; height: 56px; border-radius: 50%; background: rgba(22,163,74,0.08); border: 2px solid rgba(22,163,74,0.2); display: flex; align-items: center; justify-content: center; color: #16a34a; margin-bottom: 8px; }
-        .conf-status-label { font-size: 15px; color: #6B7280; font-weight: 500; }
+        .conf-status-label { font-size: 22px; color: #16a34a; font-weight: 800; letter-spacing: 0.3px; }
         .conf-status-title { font-size: 42px; font-weight: 800; color: #000000; line-height: 1.1; margin: 0; }
         .conf-action-pills { display: flex; gap: 12px; margin-top: 10px; }
         /* ── Add to Calendar button ── */
@@ -2191,12 +2157,15 @@ export default function BookingPage() {
         .conf-detail-actions { display: flex; gap: 8px; margin-left: auto; }
         .conf-action-btn { display: flex; align-items: center; gap: 5px; padding: 8px 16px; border: 1px solid rgba(200,155,60,0.2); border-radius: 8px; font-size: 13px; font-weight: 600; color: #6B7280; background: transparent; cursor: pointer; transition: all 0.2s; }
         .conf-action-btn:hover { border-color: #C89B3C; color: #C89B3C; }
-        .conf-guest-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 22px 26px; }
-        .conf-guest-card { background: rgba(200,155,60,0.06); border: 1px solid rgba(200,155,60,0.14); border-radius: 14px; padding: 18px; display: flex; align-items: flex-start; gap: 14px; }
-        .conf-guest-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #C89B3C, #D4AF37); color: #000000; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .conf-guest-info h5 { font-size: 15px; font-weight: 700; color: #000000; margin: 0 0 4px; }
-        .conf-guest-info span { font-size: 13px; color: #6B7280; }
-        .conf-paid-tag { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #16a34a; font-weight: 600; margin-top: 8px; }
+        .conf-guest-section-title { padding: 18px 26px 4px; font-size: 13px; font-weight: 800; color: rgba(44,37,32,0.55); letter-spacing: 0.6px; text-transform: uppercase; }
+        .conf-guest-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 14px 26px 24px; }
+        .conf-guest-card { background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(200,155,60,0.04)); border: 1px solid rgba(200,155,60,0.22); border-radius: 16px; padding: 20px; display: flex; align-items: flex-start; gap: 16px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px rgba(200,155,60,0.06); }
+        .conf-guest-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(200,155,60,0.18); }
+        .conf-guest-avatar { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #C89B3C, #D4AF37); color: #fff; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(200,155,60,0.35); letter-spacing: 0.5px; }
+        .conf-guest-info { flex: 1; min-width: 0; }
+        .conf-guest-info h5 { font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 6px; letter-spacing: 0.2px; }
+        .conf-guest-info span { font-size: 14px; color: #6B7280; font-weight: 500; display: block; }
+        .conf-paid-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: #16a34a; font-weight: 700; margin-top: 10px; padding: 5px 11px; background: rgba(22,163,74,0.1); border: 1px solid rgba(22,163,74,0.22); border-radius: 999px; }
         .conf-bottom-actions { display: flex; align-items: center; gap: 20px; margin-top: 24px; flex-wrap: wrap; }
         /* ── Return to Home button ── */
         .rth-btn { position: relative; overflow: hidden; border: 1px solid #18181a; color: #18181a; display: inline-block; font-size: 15px; line-height: 15px; padding: 18px 28px 17px; cursor: pointer; background: #fff; user-select: none; font-family: 'Outfit', sans-serif; font-weight: 600; text-decoration: none; }
@@ -2363,29 +2332,11 @@ export default function BookingPage() {
         </nav>
 
         <div className="nav-btns">
-          {isLoggedIn ? (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
-                <div className="user-info-text">
-                  <span className="user-label">Braj Club Member</span>
-                  <span className="user-name">{userName}</span>
-                </div>
-              </div>
-              <LoginJoinButton onClick={handleLogout} label="Logout" />
-            </>
-          ) : (
-            <LoginJoinButton onClick={() => setLoginModalOpen(true)} />
-          )}
           <BookNowButton href="/guesthouse#rooms-suites" />
         </div>
 
         {/* Mobile Header Actions Wrapper */}
         <div className="mobile-header-actions">
-            {isLoggedIn ? (
-                <button onClick={handleLogout} className="mobile-logout-btn">Logout</button>
-            ) : (
-                <button onClick={() => setLoginModalOpen(true)} className="mobile-login-join">Login / Join</button>
-            )}
             <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -2412,15 +2363,6 @@ export default function BookingPage() {
               </ul>
             </div>
             <div className="mobile-menu-footer">
-              {isLoggedIn ? (
-                <div className="mobile-user-profile">
-                  <span className="user-label">Braj Club Member</span>
-                  <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#C89B3C' }}>{userName}</span>
-                  <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
-                </div>
-              ) : (
-                <LoginJoinButton onClick={() => { setLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
-              )}
               <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
             </div>
           </div>
@@ -2448,13 +2390,11 @@ export default function BookingPage() {
                   <div>
                     <h3 style={{ fontSize: '20px', marginBottom: '5px', color: '#111' }}>Braj Nidhi Guesthouse</h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '5px' }}>
-                      {[1,2,3,4].map(i => <Star key={i} size={13} fill="#f59e0b" stroke="none"/>)}
-                      <Star size={13} stroke="#f59e0b" fill="none"/>
-                      <span style={{ background: '#e8f5e9', color: '#2e7d32', fontSize: '11px', fontWeight: '700', padding: '2px 9px', borderRadius: '12px', marginLeft: '8px' }}>Spiritual Heritage</span>
+                      {[1,2,3,4,5].map(i => <Star key={i} size={13} fill="#f59e0b" stroke="none"/>)}
                     </div>
                     <div style={{ fontSize: '12px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <MapPin size={11} style={{ color: '#C89B3C' }}/>
-                      Chattikara Road, Vrindavan, Uttar Pradesh
+                      Vrindavan, Uttar Pradesh
                     </div>
                   </div>
                   <img src={getRoomImage(roomType)} alt="Room" style={{ width: '84px', height: '62px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0, border: '1px solid #e5e7eb' }}/>
@@ -2469,7 +2409,7 @@ export default function BookingPage() {
                     <div style={{ fontSize: '14px', fontWeight: '800', color: '#111', lineHeight: 1.3 }}>
                       {new Date(checkIn).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>2:00 PM</div>
+                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>{checkInTime}</div>
                   </div>
 
                   <div className="bk-nights-bubble" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px' }}>
@@ -2484,7 +2424,7 @@ export default function BookingPage() {
                     <div style={{ fontSize: '14px', fontWeight: '800', color: '#111', lineHeight: 1.3 }}>
                       {new Date(checkOut).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>11:00 AM</div>
+                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>{checkOutTime}</div>
                   </div>
 
                   <div style={{ paddingLeft: '16px' }}>
@@ -2601,8 +2541,7 @@ export default function BookingPage() {
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginBottom: '10px' }}>
                     <span style={{ fontSize: '12px', color: '#374151' }}>• Room Only</span>
-                    <span style={{ fontSize: '12px', color: '#374151' }}>• Sattvic Vegetarian Meals Access</span>
-                    <span style={{ fontSize: '12px', color: '#374151' }}>• Free High-Speed Wi-Fi</span>
+<span style={{ fontSize: '12px', color: '#374151' }}>• Free High-Speed Wi-Fi</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', background: '#f0fdf4', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
                     <ShieldCheck size={13} style={{ color: '#16a34a' }}/>
@@ -2616,7 +2555,6 @@ export default function BookingPage() {
                 <h3 style={{ fontSize: '18px', fontFamily: 'Outfit, sans-serif', fontWeight: '700', color: '#111', marginBottom: '16px' }}>Important Information</h3>
                 <div style={{ border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: '#f0fdf4', borderBottom: '1px solid #e5e7eb' }}>
-                    <span style={{ fontSize: '16px' }}>🕉️</span>
                     <span style={{ fontSize: '13px', fontWeight: '700', color: '#166534' }}>Spiritual Property Rules</span>
                   </div>
                   <div style={{ padding: '12px 16px' }}>
@@ -2629,7 +2567,7 @@ export default function BookingPage() {
                       <li style={{ fontSize: '13px', color: '#16a34a', fontWeight: '500' }}>Smoking strictly prohibited inside rooms and all common areas.</li>
                       <li style={{ fontSize: '13px', color: '#374151' }}>Male-only groups and family groups are welcome.</li>
                       <li style={{ fontSize: '13px', color: '#374151' }}>Valid ID proof required at check-in: Aadhaar, Passport, Driving Licence, or Voter ID.</li>
-                      <li style={{ fontSize: '13px', color: '#374151' }}>Check-in: 2:00 PM &nbsp;·&nbsp; Check-out: 11:00 AM</li>
+                      <li style={{ fontSize: '13px', color: '#374151' }}>Check-in: {checkInTime} &nbsp;·&nbsp; Check-out: {checkOutTime}</li>
                       <li style={{ fontSize: '13px', color: '#374151' }}>Free cancellation up to 48 hours before check-in. No refund thereafter.</li>
                     </ul>
                   </div>
@@ -2835,7 +2773,7 @@ export default function BookingPage() {
                             {g.firstName[0]?.toUpperCase()}
                           </div>
                           <div>
-                            <div style={{ fontSize: '14px', fontWeight: '600', color: '#111' }}>{g.title}. {g.firstName} {g.lastName}</div>
+                            <div style={{ fontSize: '14px', fontWeight: '600', color: '#111' }}>{g.firstName} {g.lastName}</div>
                             {g.isChild && <div style={{ fontSize: '11px', color: '#9CA3AF' }}>Below 12 years</div>}
                           </div>
                         </div>
@@ -2846,17 +2784,6 @@ export default function BookingPage() {
                 )}
 
                 <div className="form-grid-mmt">
-                  <div className="input-wrapper-mmt">
-                    <label>Salutation</label>
-                    <select 
-                      value={guestDetails.title} 
-                      onChange={(e) => setGuestDetails(prev => ({ ...prev, title: e.target.value }))}
-                    >
-                      <option value="Mr">Mr.</option>
-                      <option value="Mrs">Mrs.</option>
-                      <option value="Ms">Ms.</option>
-                    </select>
-                  </div>
                   <div className="input-wrapper-mmt">
                     <label>First Name *</label>
                     <input 
@@ -3084,14 +3011,6 @@ export default function BookingPage() {
                     </div>
                   )}
 
-                  {/* ── Discounts ── */}
-                  {isLoggedIn && (
-                    <div className="summary-row-mmt discount">
-                      <span>✨ 10% Club Member Discount</span>
-                      <span>−₹{memberDiscount.toLocaleString()}</span>
-                    </div>
-                  )}
-
                   {/* ── Taxes ── */}
                   <div style={{ borderTop: '1px dashed rgba(0,0,0,0.1)', margin: '10px 0', paddingTop: 10 }}>
                     <div className="summary-row-mmt" style={{ color: '#6b7280', fontSize: 13 }}>
@@ -3162,7 +3081,7 @@ export default function BookingPage() {
               <div className="conf-check-circle">
                 <CheckCircle2 size={22} strokeWidth={2.5} />
               </div>
-              <span className="conf-status-label">Booking Confirmed ✨</span>
+              <span className="conf-status-label">Booking Confirmed</span>
               <h2 className="conf-status-title">
                 Radhe Radhe! Your stay at Braj Nidhi,{' '}
                 {new Date(checkIn).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })} is confirmed!
@@ -3171,8 +3090,8 @@ export default function BookingPage() {
                 <button className="atc-btn" onClick={() => {
                   const fmt = (d: string) => d.replace(/-/g, '');
                   const title = encodeURIComponent(`Braj Nidhi Stay — ${getRoomTitle(roomType)}`);
-                  const details = encodeURIComponent(`Booking Ref: ${bookingRef}\nGuest: ${guestDetails.title}. ${guestDetails.firstName} ${guestDetails.lastName}\nTotal Paid: Rs.${payableTotal.toLocaleString()}`);
-                  const location = encodeURIComponent('Braj Nidhi Guesthouse, Raman Reti Road, Vrindavan, UP');
+                  const details = encodeURIComponent(`Booking Ref: ${bookingRef}\nGuest: ${guestDetails.firstName} ${guestDetails.lastName}\nTotal Paid: Rs.${payableTotal.toLocaleString()}`);
+                  const location = encodeURIComponent('Braj Nidhi Guesthouse, Vrindavan, UP');
                   window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(checkIn)}/${fmt(checkOut)}&details=${details}&location=${location}`, '_blank');
                 }}>
                   <svg xmlns="http://www.w3.org/2000/svg" width={24} viewBox="0 0 24 24" height={24} fill="none" className="atc-icon"><g strokeWidth={2} strokeLinecap="round" stroke="#fff"><rect y={5} x={4} width={16} rx={2} height={16} /><path d="m8 3v4" /><path d="m16 3v4" /><path d="m4 11h16" /></g></svg>
@@ -3203,7 +3122,7 @@ export default function BookingPage() {
                     <img src="/Braj_nidhi_.png" alt="Braj Nidhi" className="conf-property-avatar" />
                     <div className="conf-property-details">
                       <h4>Braj Nidhi Guesthouse</h4>
-                      <span>Raman Reti Road, Vrindavan</span>
+                      <span>Vrindavan, UP</span>
                     </div>
                   </div>
                 </div>
@@ -3212,11 +3131,18 @@ export default function BookingPage() {
               {/* RIGHT DETAILS */}
               <div className="conf-right-side">
                 <div className="conf-accordion">
-                  <div className="conf-accordion-header"><span>▾ Booking Details</span></div>
+                  <div className="conf-accordion-header"><span>Booking Details</span></div>
                   <div className="conf-detail-row">
-                    <div className="conf-detail-icon"><MapPin size={16} /></div>
-                    <span className="conf-detail-label">Property</span>
-                    <span className="conf-detail-value">Braj Nidhi, Raman Reti Road, Vrindavan</span>
+                    <div className="conf-detail-icon"><Check size={16} /></div>
+                    <span className="conf-detail-label">Reservation ID</span>
+                    <span className="conf-detail-value" style={{ color: '#C89B3C', fontWeight: 700 }}>{bookingRef}</span>
+                  </div>
+                  <div className="conf-detail-row">
+                    <div className="conf-detail-icon"><Users size={16} /></div>
+                    <span className="conf-detail-label">Name</span>
+                    <span className="conf-detail-value" style={{ color: '#C89B3C', fontWeight: 700 }}>
+                      {guestDetails.firstName} {guestDetails.lastName}
+                    </span>
                   </div>
                   <div className="conf-detail-row">
                     <div className="conf-detail-icon"><Phone size={16} /></div>
@@ -3232,28 +3158,26 @@ export default function BookingPage() {
                     <div className="conf-detail-icon"><Calendar size={16} /></div>
                     <span className="conf-detail-label">Check-In</span>
                     <span className="conf-detail-value">
-                      {new Date(checkIn).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · 12:00 PM
+                      {new Date(checkIn).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · {checkInTime}
                     </span>
                   </div>
                   <div className="conf-detail-row">
                     <div className="conf-detail-icon"><Calendar size={16} /></div>
                     <span className="conf-detail-label">Check-Out</span>
                     <span className="conf-detail-value">
-                      {new Date(checkOut).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · 11:00 AM
+                      {new Date(checkOut).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · {checkOutTime}
                     </span>
                   </div>
                   <div className="conf-detail-row">
-                    <div className="conf-detail-icon"><Users size={16} /></div>
-                    <span className="conf-detail-label">Your Contact</span>
-                    <span className="conf-detail-value" style={{ color: '#C89B3C', fontWeight: 700 }}>
-                      {guestDetails.title}. {guestDetails.firstName} {guestDetails.lastName}
-                    </span>
+                    <div className="conf-detail-icon"><MapPin size={16} /></div>
+                    <span className="conf-detail-label">Property</span>
+                    <span className="conf-detail-value">Braj Nidhi, Vrindavan UP</span>
                   </div>
                 </div>
 
                 <div className="conf-accordion">
-                  <div className="conf-accordion-header"><span>▾ Your Information</span></div>
-                  <div style={{ padding: '8px 22px 2px', fontSize: '13px', fontWeight: 700, color: 'rgba(44,37,32,0.55)' }}>Guest Details</div>
+                  <div className="conf-accordion-header"><span>Your Information</span></div>
+                  <div className="conf-guest-section-title">Guest Details</div>
                   <div className="conf-guest-cards">
                     <div className="conf-guest-card">
                       <div className="conf-guest-avatar">
@@ -3278,15 +3202,47 @@ export default function BookingPage() {
                   </div>
                 </div>
 
+                <div className="conf-accordion">
+                  <div className="conf-accordion-header"><span>Payment Details</span></div>
+                  <div className="conf-detail-row">
+                    <div className="conf-detail-icon"><CreditCard size={16} /></div>
+                    <span className="conf-detail-label">Payment Method</span>
+                    <span className="conf-detail-value">Razorpay (Online)</span>
+                  </div>
+                  <div className="conf-detail-row">
+                    <div className="conf-detail-icon"><ShieldCheck size={16} /></div>
+                    <span className="conf-detail-label">Payment Status</span>
+                    <span className="conf-detail-value" style={{ color: '#16a34a', fontWeight: 700 }}>✓ Captured</span>
+                  </div>
+                  <div className="conf-detail-row">
+                    <div className="conf-detail-icon"><IndianRupee size={16} /></div>
+                    <span className="conf-detail-label">Amount Paid</span>
+                    <span className="conf-detail-value" style={{ fontWeight: 700 }}>₹{payableTotal.toLocaleString()}</span>
+                  </div>
+                  {razorpayPaymentId && (
+                    <div className="conf-detail-row">
+                      <div className="conf-detail-icon"><Check size={16} /></div>
+                      <span className="conf-detail-label">Payment ID</span>
+                      <span className="conf-detail-value" style={{ fontSize: '12px', wordBreak: 'break-all' }}>{razorpayPaymentId}</span>
+                    </div>
+                  )}
+                  {razorpayOrderId && (
+                    <div className="conf-detail-row">
+                      <div className="conf-detail-icon"><Check size={16} /></div>
+                      <span className="conf-detail-label">Order ID</span>
+                      <span className="conf-detail-value" style={{ fontSize: '12px', wordBreak: 'break-all' }}>{razorpayOrderId}</span>
+                    </div>
+                  )}
+                </div>
 
                 {/* Hidden receipt — only rendered when printing */}
                 <div className="pr-receipt-print">
                   <div style={{ textAlign: 'center', fontWeight: 700, fontSize: '13px' }}>Braj Nidhi Guesthouse</div>
-                  <div style={{ textAlign: 'center' }}>Raman Reti Road, Vrindavan, UP</div>
+                  <div style={{ textAlign: 'center' }}>Vrindavan, UP</div>
                   <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
                   <div>Ref: {bookingRef}</div>
                   <div>Date: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
-                  <div>Guest: {guestDetails.title}. {guestDetails.firstName} {guestDetails.lastName}</div>
+                  <div>Guest: {guestDetails.firstName} {guestDetails.lastName}</div>
                   {guestDetails.phone && <div>Phone: {guestDetails.phone}</div>}
                   <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -3354,14 +3310,6 @@ export default function BookingPage() {
 
       </main>
 
-      {/* 5. UNIFIED PREMIUM SHARED LOGIN MODAL */}
-      <LoginModal
-        isOpen={loginModalOpen}
-        onClose={() => setLoginModalOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-        initialIsRegistering={loginModalInitialRegister}
-      />
-
       {/* Sold-out popup */}
       <RoomUnavailablePopup
         isOpen={soldOutPopup}
@@ -3401,7 +3349,7 @@ export default function BookingPage() {
                         {g.firstName[0]?.toUpperCase()}
                       </div>
                       <div>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#111' }}>{g.title}. {g.firstName} {g.lastName}</div>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#111' }}>{g.firstName} {g.lastName}</div>
                         {g.isChild && <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '1px' }}>Below 12 years</div>}
                       </div>
                     </div>
@@ -3412,37 +3360,85 @@ export default function BookingPage() {
             )}
 
             {/* Add Guests form */}
-            <div style={{ margin: '0 24px 16px', background: '#EEF5FB', borderRadius: '12px', padding: '18px' }}>
+            <div className="ag-form-card" style={{ margin: '0 24px 16px', background: '#EEF5FB', borderRadius: '12px', padding: '18px' }}>
+              <style>{`
+                .ag-form-card .ag-grid {
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 10px;
+                  margin-bottom: 14px;
+                }
+                .ag-form-card .ag-field { display: flex; flex-direction: column; min-width: 0; }
+                .ag-form-card .ag-label {
+                  font-size: 11px; font-weight: 700; color: #6B7280;
+                  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+                }
+                .ag-form-card .ag-input,
+                .ag-form-card .ag-select {
+                  width: 100%;
+                  padding: 11px 12px;
+                  border: 1px solid #e5e7eb;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  background: #fff;
+                  outline: none;
+                  font-family: 'Outfit', sans-serif;
+                  box-sizing: border-box;
+                  min-width: 0;
+                  transition: border-color 0.15s, box-shadow 0.15s;
+                }
+                .ag-form-card .ag-input:focus,
+                .ag-form-card .ag-select:focus {
+                  border-color: #1d6de5;
+                  box-shadow: 0 0 0 3px rgba(29, 109, 229, 0.12);
+                }
+                .ag-form-card .ag-select { cursor: pointer; padding-right: 8px; }
+                .ag-form-card .ag-add-btn {
+                  width: 100%;
+                  padding: 12px 24px;
+                  background: #1d6de5;
+                  border: none;
+                  border-radius: 10px;
+                  font-size: 13px;
+                  font-weight: 700;
+                  color: #fff;
+                  cursor: pointer;
+                  letter-spacing: 0.8px;
+                  font-family: 'Outfit', sans-serif;
+                  text-transform: uppercase;
+                  transition: background 0.2s, transform 0.1s;
+                }
+                .ag-form-card .ag-add-btn:hover { background: #1557c0; }
+                .ag-form-card .ag-add-btn:active { transform: scale(0.98); }
+                @media (max-width: 480px) {
+                  .ag-form-card .ag-grid {
+                    grid-template-columns: 1fr;
+                  }
+                }
+              `}</style>
               <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#111', marginBottom: '4px', fontFamily: 'Outfit, sans-serif' }}>Add Guests</h3>
               <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '16px', lineHeight: '1.5' }}>
                 Name should be as per official govt. ID &amp; travelers below 18 years of age cannot travel alone
               </p>
 
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px', marginBottom: '12px' }}>
-                <div style={{ minWidth: '95px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>TITLE</div>
-                  <select value={newGuestTitle} onChange={e => setNewGuestTitle(e.target.value)} style={{ width: '100%', padding: '10px 8px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', background: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer' }}>
-                    <option value="Mr">Mr</option>
-                    <option value="Mrs">Mrs</option>
-                    <option value="Ms">Ms</option>
-                  </select>
+              <div className="ag-grid">
+                <div className="ag-field">
+                  <div className="ag-label">First Name</div>
+                  <input className="ag-input" type="text" placeholder="First name" value={newGuestFirstName} onChange={e => setNewGuestFirstName(e.target.value)} />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>FULL NAME</div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <input type="text" placeholder="First name" value={newGuestFirstName} onChange={e => setNewGuestFirstName(e.target.value)} style={{ flex: 1, padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', background: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', minWidth: 0 }}/>
-                    <input type="text" placeholder="Last name" value={newGuestLastName} onChange={e => setNewGuestLastName(e.target.value)} style={{ flex: 1, padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', background: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', minWidth: 0 }}/>
-                  </div>
+                <div className="ag-field">
+                  <div className="ag-label">Last Name</div>
+                  <input className="ag-input" type="text" placeholder="Last name" value={newGuestLastName} onChange={e => setNewGuestLastName(e.target.value)} />
                 </div>
               </div>
 
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '16px' }}>
-                <input type="checkbox" checked={newGuestIsChild} onChange={e => setNewGuestIsChild(e.target.checked)} style={{ width: '15px', height: '15px', accentColor: '#1d6de5', cursor: 'pointer' }}/>
+                <input type="checkbox" checked={newGuestIsChild} onChange={e => setNewGuestIsChild(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#1d6de5', cursor: 'pointer' }}/>
                 <span style={{ fontSize: '13px', color: '#374151' }}>Below 12 years of age</span>
               </label>
 
-              <button onClick={handleAddGuest} style={{ padding: '10px 24px', background: 'transparent', border: '2px solid #1d6de5', borderRadius: '24px', fontSize: '13px', fontWeight: '700', color: '#1d6de5', cursor: 'pointer', letterSpacing: '0.5px', fontFamily: 'Outfit, sans-serif', textTransform: 'uppercase', transition: 'all 0.2s' }}>
-                ADD TO SAVED GUESTS
+              <button className="ag-add-btn" onClick={handleAddGuest}>
+                + Add to Saved Guests
               </button>
             </div>
 

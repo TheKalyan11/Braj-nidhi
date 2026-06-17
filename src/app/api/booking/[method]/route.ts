@@ -17,6 +17,7 @@ const ALLOWED_ERP_METHODS = new Set([
   'get_reservation',
   'cancel_reservation',
   'get_property_info',
+  'confirm_payment',
 ]);
 
 export async function POST(

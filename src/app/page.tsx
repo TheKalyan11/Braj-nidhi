@@ -4,8 +4,6 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import FloatingWidgets from '@/components/FloatingWidgets';
-import LoginModal from '@/components/LoginModal';
-import LoginJoinButton from '@/components/LoginJoinButton';
 import BookNowButton from '@/components/BookNowButton';
 import SectionLinkButton from '@/components/SectionLinkButton';
 import PremiumDoubleCalendar from '@/components/PremiumDoubleCalendar';
@@ -59,22 +57,26 @@ const RoomCardSlideshow = ({ images, alt, interval = 4000 }: { images: string[];
   }, [images.length, interval]);
 
   return (
-    <AnimatePresence mode="popLayout">
-      <motion.img
-        key={imgIndex}
-        src={images[imgIndex]}
-        alt={alt}
-        className="room-bg-img"
-        initial={{ opacity: 0, scale: 1.2 }}
-        animate={{ opacity: 1, scale: 1.05 }}
-        exit={{ opacity: 0, scale: 1 }}
-        transition={{ 
-          opacity: { duration: 1.5, ease: "easeInOut" },
-          scale: { duration: 6, ease: "linear" } 
-        }}
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-      />
-    </AnimatePresence>
+    <>
+      {images.map((src, i) => (
+        <motion.img
+          key={src}
+          src={src}
+          alt={i === imgIndex ? alt : ''}
+          className="room-bg-img"
+          initial={false}
+          animate={{
+            opacity: i === imgIndex ? 1 : 0,
+            scale: i === imgIndex ? 1.07 : 1.0,
+          }}
+          transition={{
+            opacity: { duration: 1.4, ease: 'easeInOut' },
+            scale: { duration: 8, ease: 'linear' },
+          }}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+        />
+      ))}
+    </>
   );
 };
 
@@ -82,10 +84,6 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('');
-  
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [calendarInitialSelection, setCalendarInitialSelection] = useState<'in' | 'out'>('in');
 
@@ -109,39 +107,17 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
-      setUserName(localStorage.getItem('userName') || 'User');
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userName');
-    setIsLoggedIn(false);
-    window.location.reload();
-  };
-
-  const getUserInitials = (name: string) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
-  };
-
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Slideshow image arrays
-  const deluxe2Images = ["DSC05818-HDR.webp", "DSC05963-HDR.webp"];
-  const deluxe3Images = ["d3.webp", "d31.webp"];
-  const deluxe4Images = ["DSC05963-HDR.webp", "d31.webp"];
+  const deluxe2Images = ["d1.png", "d2.png", "d3.png", "d4.png"];
+  const deluxe3Images = ["t1.png", "t2.png", "t3.png", "t4.png"];
+  const deluxe4Images = ["f1.png", "f2.png", "f3.png"];
   const heroImages = [
+    "h11.jpg",
+    "hero.png",
     "DSC09652.webp",
     "DSC09672.webp",
-    "hero.webp",
     "DSC02591.webp",
     "DSC06003-HDR.webp",
     "DSC05818-HDR.webp",
@@ -486,38 +462,13 @@ export default function Home() {
         </nav>
 
         <div className="nav-btns">
-            {isLoggedIn ? (
-                <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
-                        <div className="user-info-text">
-                            <span className="user-label">Braj Club Member</span>
-                            <span className="user-name">{userName}</span>
-                        </div>
-                        <div className="user-profile-badge">
-                            {getUserInitials(userName)}
-                        </div>
-                    </div>
-                    <LoginJoinButton onClick={handleLogout} label="Logout" />
-                </>
-            ) : (
-                <LoginJoinButton onClick={() => setIsLoginModalOpen(true)} />
-            )}
             <BookNowButton href="/guesthouse#rooms-suites" />
         </div>
 
         {/* Mobile Header Actions Flex Wrapper */}
         <div className="mobile-header-actions">
-            {isLoggedIn ? (
-                <button onClick={handleLogout} className="mobile-logout-btn">
-                    Logout
-                </button>
-            ) : (
-                <button onClick={() => setIsLoginModalOpen(true)} className="mobile-login-join">
-                    Login / Join
-                </button>
-            )}
-            <button 
-              className="mobile-menu-btn" 
+            <button
+              className="mobile-menu-btn"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -547,15 +498,6 @@ export default function Home() {
             </ul>
           </div>
           <div className="mobile-menu-footer">
-            {isLoggedIn ? (
-              <div className="mobile-user-profile">
-                <span className="user-label">Braj Club Member</span>
-                <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
-                <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
-              </div>
-            ) : (
-              <LoginJoinButton onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
-            )}
             <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
           </div>
         </div>
@@ -904,9 +846,9 @@ export default function Home() {
                     <div className="room-content">
                         <h3>Deluxe 2 – Twin Bedded Room</h3>
                         <div className="room-amenities">
-                            <span><i className="fas fa-bed"></i> Twin Beds</span>
-                            <span><i className="fas fa-wifi"></i> Free WiFi</span>
-                            <span><i className="fas fa-coffee"></i> Tea/Coffee</span>
+                            <span><i className="fas fa-wifi"></i> Free Wi-Fi Access</span>
+                            <span><i className="fas fa-concierge-bell"></i> 24/7 Room Service</span>
+                            <span><i className="fas fa-pump-soap"></i> Premium Grooming Kit</span>
                         </div>
                         <button className="btn-availability" style={{ display: "block", width: "100%", textAlign: "center", border: "none", cursor: "pointer" }} onClick={() => openRoomModal('deluxe2', 'Deluxe 2 – Twin Bedded Room', 3500)}>Book for ₹3,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
@@ -919,9 +861,10 @@ export default function Home() {
                     <div className="room-content">
                         <h3>Deluxe 3 – 3 Bedded Room</h3>
                         <div className="room-amenities">
-                            <span><i className="fas fa-couch"></i> Living Area</span>
-                            <span><i className="fas fa-bath"></i> Deep Tub</span>
-                            <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
+                            <span><i className="fas fa-wifi"></i> Free Wi-Fi Access</span>
+                            <span><i className="fas fa-concierge-bell"></i> 24/7 Room Service</span>
+                            <span><i className="fas fa-pump-soap"></i> Premium Grooming Kit</span>
+                            <span><i className="fas fa-place-of-worship"></i> Temple Access</span>
                         </div>
                         <button className="btn-availability" style={{ display: "block", width: "100%", textAlign: "center", border: "none", cursor: "pointer" }} onClick={() => openRoomModal('deluxe3', 'Deluxe 3 – 3 Bedded Room', 4500)}>Book for ₹4,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
@@ -934,9 +877,11 @@ export default function Home() {
                     <div className="room-content">
                         <h3>Deluxe 4 – 4 Bedded Room</h3>
                         <div className="room-amenities">
-                            <span><i className="fas fa-crown"></i> 4-Poster Bed</span>
-                            <span><i className="fas fa-bed"></i> Living Area</span>
-                            <span><i className="fas fa-concierge-bell"></i> 24/7 Service</span>
+                            <span><i className="fas fa-wifi"></i> Free Wi-Fi Access</span>
+                            <span><i className="fas fa-concierge-bell"></i> 24/7 Room Service</span>
+                            <span><i className="fas fa-pump-soap"></i> Premium Grooming Kit</span>
+                            <span><i className="fas fa-place-of-worship"></i> Temple Access</span>
+                            <span><i className="fas fa-tree"></i> Vrindavan Chandrodaya Mandir Park Access</span>
                         </div>
                         <button className="btn-availability" style={{ display: "block", width: "100%", textAlign: "center", border: "none", cursor: "pointer" }} onClick={() => openRoomModal('deluxe4', 'Deluxe 4 – 4 Bedded Room', 4999)}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></button>
                     </div>
@@ -1029,8 +974,8 @@ export default function Home() {
                             <span>Free Wi-Fi in rooms</span>
                         </div>
                         <div className="amenity-card">
-                            <i className="fa-solid fa-car"></i>
-                            <span>Valet parking</span>
+                            <i className="fa-solid fa-place-of-worship"></i>
+                            <span>Mandir Access</span>
                         </div>
                         <div className="amenity-card">
                             <i className="fa-solid fa-clock"></i>
@@ -1600,7 +1545,6 @@ export default function Home() {
 
     <FloatingWidgets />
 
-    <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     <RoomBookingModal
       isOpen={roomModal.open}
       onClose={() => setRoomModal(m => ({ ...m, open: false }))}

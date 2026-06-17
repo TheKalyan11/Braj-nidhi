@@ -6,9 +6,7 @@ import {
   BedDouble, Users, Calendar, Star, MapPin, ShieldCheck, Wifi, Coffee,
   Leaf, ArrowRight, Check, Clock, Info, Menu, X, ChevronDown, ChevronUp, Moon
 } from 'lucide-react';
-import LoginModal from '@/components/LoginModal';
 import BookNowButton from '@/components/BookNowButton';
-import LoginJoinButton from '@/components/LoginJoinButton';
 import RoomUnavailablePopup from '@/components/RoomUnavailablePopup';
 
 interface RoomOption {
@@ -36,7 +34,7 @@ const ROOMS: RoomOption[] = [
     mrpPrice: 5000,
     image: '/DSC05818-HDR.webp',
     sqft: '280 sq.ft',
-    amenities: ['Free High-Speed Wi-Fi', 'Tea & Coffee Maker', 'Air Conditioning', 'Sattvic Dining Access'],
+    amenities: ['Free Wi-Fi Access', '24/7 Room Service', 'Premium Grooming Kit'],
     tag: 'Best Value'
   },
   {
@@ -49,7 +47,7 @@ const ROOMS: RoomOption[] = [
     mrpPrice: 6500,
     image: '/d3.webp',
     sqft: '340 sq.ft',
-    amenities: ['Free High-Speed Wi-Fi', 'Tea & Coffee Maker', 'Living Lounge Area', 'Sattvic Dining Access'],
+    amenities: ['Free Wi-Fi Access', '24/7 Room Service', 'Premium Grooming Kit', 'Temple Access'],
     tag: 'Most Popular'
   },
   {
@@ -62,7 +60,7 @@ const ROOMS: RoomOption[] = [
     mrpPrice: 7200,
     image: '/DSC05963-HDR.webp',
     sqft: '420 sq.ft',
-    amenities: ['Free High-Speed Wi-Fi', 'Tea & Coffee Maker', 'Bathtub Suite', 'Sattvic Dining Access'],
+    amenities: ['Free Wi-Fi Access', '24/7 Room Service', 'Premium Grooming Kit', 'Temple Access', 'Vrindavan Chandrodaya Mandir Park Access'],
     tag: 'Premium Suite'
   }
 ];
@@ -97,7 +95,19 @@ function RoomsComboContent() {
   const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(null);
   const [expandedRoom, setExpandedRoom] = useState<string | null>('deluxe2');
   const [scrolled, setScrolled] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cameFromGuesthouse, setCameFromGuesthouse] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const fromParam = searchParams.get('from');
+    if (fromParam === 'guesthouse') { setCameFromGuesthouse(true); return; }
+    try {
+      const ref = document.referrer ? new URL(document.referrer) : null;
+      if (ref && ref.host === window.location.host && ref.pathname.startsWith('/guesthouse')) {
+        setCameFromGuesthouse(true);
+      }
+    } catch { /* ignore */ }
+  }, [searchParams]);
 
   // ── ERP availability per room type ──────────────────────────────────────────
   const [roomAvail, setRoomAvail] = useState<Record<string, number | null>>({
@@ -109,10 +119,17 @@ function RoomsComboContent() {
   const [galleryIdx, setGalleryIdx] = useState(0);
 
   const GALLERY_PHOTOS = [
-    { src: '/DSC05963-HDR.webp', caption: 'Deluxe Room' },
-    { src: '/DSC05818-HDR.webp', caption: 'Deluxe Room – Twin Bedded' },
-    { src: '/d3.webp', caption: 'Deluxe 3 – Triple Room' },
-    { src: '/d31.webp', caption: 'Deluxe 3 – Room View' },
+    { src: '/d1.png', caption: 'Deluxe 2 – Twin Bedded Room' },
+    { src: '/d2.png', caption: 'Deluxe 2 – Room View' },
+    { src: '/d3.png', caption: 'Deluxe 2 – Room Interior' },
+    { src: '/d4.png', caption: 'Deluxe 2 – Room Details' },
+    { src: '/t1.png', caption: 'Deluxe 3 – Triple Room' },
+    { src: '/t2.png', caption: 'Deluxe 3 – Room View' },
+    { src: '/t3.png', caption: 'Deluxe 3 – Room Interior' },
+    { src: '/t4.png', caption: 'Deluxe 3 – Room Details' },
+    { src: '/f1.png', caption: 'Deluxe 4 – 4 Bedded Room' },
+    { src: '/f2.png', caption: 'Deluxe 4 – Room View' },
+    { src: '/f3.png', caption: 'Deluxe 4 – Room Details' },
   ];
 
   const fetchAvailability = useCallback(async (isInitial = false) => {
@@ -152,8 +169,6 @@ function RoomsComboContent() {
     const id = setInterval(() => fetchAvailability(false), 20_000);
     return () => clearInterval(id);
   }, [fetchAvailability]);
-  const [userName, setUserName] = useState('');
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -161,23 +176,6 @@ function RoomsComboContent() {
     window.addEventListener('scroll', h);
     return () => window.removeEventListener('scroll', h);
   }, []);
-
-  useEffect(() => {
-    setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
-    setUserName(localStorage.getItem('userName') || '');
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userName');
-    setIsLoggedIn(false);
-    window.location.reload();
-  };
-
-  const getUserInitials = (name: string) => {
-    const parts = name.split(' ');
-    return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : (parts[0]?.[0] || 'U').toUpperCase();
-  };
 
   const bookingUrl = (room: RoomOption) =>
     `/booking?roomType=${room.key}&checkin=${checkIn}&checkout=${checkOut}&rooms=${roomsCount}&adults=${adults}&children=${children}&guests=${encodeURIComponent(guestsStr)}`;
@@ -216,9 +214,15 @@ function RoomsComboContent() {
         }
 
         /* ── Breadcrumb ── */
-        .rcp-crumb{background:#fff;border-bottom:1px solid #e5e7eb;padding:8px 5%;display:flex;align-items:center;gap:8px;font-size:15px;color:#6B7280;}
-        .rcp-crumb a{color:#6B7280;text-decoration:none;}.rcp-crumb a:hover{color:#C89B3C;}
-        .rcp-crumb .cur{color:#C89B3C;font-weight:600;}
+        .rcp-crumb{background:#fff;border-bottom:1px solid #e5e7eb;padding:10px 5%;display:flex;align-items:center;flex-wrap:nowrap;gap:8px;font-size:15px;color:#6B7280;white-space:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+        .rcp-crumb::-webkit-scrollbar{display:none;}
+        .rcp-crumb a{color:#6B7280;text-decoration:none;flex-shrink:0;}
+        .rcp-crumb a:hover{color:#C89B3C;}
+        .rcp-crumb .cur{color:#C89B3C;font-weight:600;flex-shrink:0;}
+        .rcp-crumb-sep{color:#9CA3AF;flex-shrink:0;line-height:1;display:inline-flex;align-items:center;}
+        @media (max-width:640px){
+          .rcp-crumb{font-size:13px;gap:6px;padding:10px 16px;}
+        }
 
         /* ── Search summary strip ── */
         .rcp-search-strip{background:#fff;border-bottom:1px solid #e5e7eb;padding:10px 5%;display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
@@ -397,28 +401,9 @@ function RoomsComboContent() {
           </ul>
         </nav>
         <div className="nav-btns">
-          {isLoggedIn ? (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
-                <div className="user-info-text">
-                  <span className="user-label">Braj Club Member</span>
-                  <span className="user-name">{userName}</span>
-                </div>
-                <div className="user-profile-badge">{getUserInitials(userName)}</div>
-              </div>
-              <LoginJoinButton onClick={handleLogout} label="Logout" />
-            </>
-          ) : (
-            <LoginJoinButton onClick={() => setIsLoginModalOpen(true)} />
-          )}
           <BookNowButton href="/guesthouse#rooms-suites" />
         </div>
         <div className="mobile-header-actions">
-          {isLoggedIn ? (
-            <button onClick={handleLogout} className="mobile-logout-btn">Logout</button>
-          ) : (
-            <button onClick={() => setIsLoginModalOpen(true)} className="mobile-login-join">Login / Join</button>
-          )}
           <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -445,15 +430,6 @@ function RoomsComboContent() {
               </ul>
             </div>
             <div className="mobile-menu-footer">
-              {isLoggedIn ? (
-                <div className="mobile-user-profile">
-                  <span className="user-label">Braj Club Member</span>
-                  <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
-                  <LoginJoinButton onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} label="Logout" className="mobile-ljb" />
-                </div>
-              ) : (
-                <LoginJoinButton onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} label="Login / Create Account" className="mobile-ljb" />
-              )}
               <BookNowButton href="/guesthouse#rooms-suites" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', marginTop: '4px' }} />
             </div>
           </div>
@@ -461,13 +437,17 @@ function RoomsComboContent() {
       )}
 
       {/* ── Breadcrumb ── */}
-      <div className="rcp-crumb">
+      <nav className="rcp-crumb" aria-label="Breadcrumb">
         <Link href="/">Home</Link>
-        <span>›</span>
-        <Link href="/guesthouse">Guesthouse</Link>
-        <span>›</span>
+        <span className="rcp-crumb-sep">›</span>
+        {cameFromGuesthouse && (
+          <>
+            <Link href="/guesthouse">Guesthouse</Link>
+            <span className="rcp-crumb-sep">›</span>
+          </>
+        )}
         <span className="cur">Select Your Room</span>
-      </div>
+      </nav>
 
       {/* ── Search summary strip ── */}
       <div className="rcp-search-strip">
@@ -847,13 +827,6 @@ function RoomsComboContent() {
         onSelectOtherRoom={() => setSoldOutPopup(null)}
       />
 
-      {isLoginModalOpen && (
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-          onLoginSuccess={(name) => { setIsLoggedIn(true); setUserName(name); setIsLoginModalOpen(false); }}
-        />
-      )}
     </div>
   );
 }

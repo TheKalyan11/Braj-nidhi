@@ -2,46 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import LoginJoinButton from '@/components/LoginJoinButton';
 import BookNowButton from '@/components/BookNowButton';
 
-interface SharedHeaderProps {
-  onLoginOpen: () => void;
-}
-
-export default function SharedHeader({ onLoginOpen }: SharedHeaderProps) {
+export default function SharedHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
-      setUserName(localStorage.getItem('userName') || '');
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userName');
-    setIsLoggedIn(false);
-    window.location.reload();
-  };
-
-  const getUserInitials = (name: string) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
-    return parts.length >= 2
-      ? (parts[0][0] + parts[1][0]).toUpperCase()
-      : parts[0][0].toUpperCase();
-  };
 
   return (
     <>
@@ -100,30 +71,11 @@ export default function SharedHeader({ onLoginOpen }: SharedHeaderProps) {
         </nav>
 
         <div className="nav-btns">
-          {isLoggedIn ? (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginRight: '10px' }}>
-                <div className="user-info-text">
-                  <span className="user-label">Braj Club Member</span>
-                  <span className="user-name">{userName}</span>
-                </div>
-                <div className="user-profile-badge">{getUserInitials(userName)}</div>
-              </div>
-              <LoginJoinButton onClick={handleLogout} label="Logout" />
-            </>
-          ) : (
-            <LoginJoinButton onClick={onLoginOpen} />
-          )}
           <BookNowButton href="/guesthouse#rooms-suites" />
         </div>
 
         {/* Mobile actions */}
         <div className="mobile-header-actions">
-          {isLoggedIn ? (
-            <button onClick={handleLogout} className="mobile-logout-btn">Logout</button>
-          ) : (
-            <button onClick={onLoginOpen} className="mobile-login-join">Login / Join</button>
-          )}
           <button
             className="mobile-menu-btn"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -155,23 +107,6 @@ export default function SharedHeader({ onLoginOpen }: SharedHeaderProps) {
               </ul>
             </div>
             <div className="mobile-menu-footer">
-              {isLoggedIn ? (
-                <div className="mobile-user-profile">
-                  <span className="user-label">Braj Club Member</span>
-                  <span className="user-name" style={{ fontSize: '15px', fontWeight: '800', color: '#8b0000' }}>{userName}</span>
-                  <LoginJoinButton
-                    onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                    label="Logout"
-                    className="mobile-ljb"
-                  />
-                </div>
-              ) : (
-                <LoginJoinButton
-                  onClick={() => { onLoginOpen(); setIsMobileMenuOpen(false); }}
-                  label="Login / Create Account"
-                  className="mobile-ljb"
-                />
-              )}
               <BookNowButton
                 href="/guesthouse#rooms-suites"
                 onClick={() => setIsMobileMenuOpen(false)}
