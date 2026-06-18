@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { BRAJ_NIDHI_KNOWLEDGE } from "@/lib/aiKnowledge";
 import { TextWidget } from "@livechat/widget-react";
+import { useMusic } from "@/lib/MusicContext";
 
 export default function FloatingWidgets() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { isPlaying, togglePlay } = useMusic();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 40);
@@ -27,37 +27,7 @@ export default function FloatingWidgets() {
     return () => observer.disconnect();
   }, []);
 
-  const toggleMusic = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-    } else {
-      try {
-        if (audio.readyState < 2) {
-          audio.load();
-        }
-        await audio.play();
-        setIsPlaying(true);
-      } catch (err) {
-        console.warn("Primary audio source failed, trying fallback:", err);
-        audio.src = "/hare-krishna-original.mp3";
-        audio.load();
-        try {
-          await audio.play();
-          setIsPlaying(true);
-        } catch (fallbackErr) {
-          console.error("Fallback audio also failed:", fallbackErr);
-          setIsPlaying(false);
-        }
-      }
-    }
-  };
 
-  const handleAudioEnd = () => setIsPlaying(false);
-  const handleAudioPause = () => setIsPlaying(false);
-  const handleAudioPlay = () => setIsPlaying(true);
 
   return (
     <>
@@ -129,7 +99,7 @@ export default function FloatingWidgets() {
             name="musicToggle"
             type="checkbox"
             checked={isPlaying}
-            onChange={toggleMusic}
+            onChange={togglePlay}
           />
           <label className="toggle-label" htmlFor="musicToggle">
             <div className="cont-label-play">
@@ -137,25 +107,6 @@ export default function FloatingWidgets() {
             </div>
           </label>
         </div>
-        <audio
-          ref={audioRef}
-          id="bgMusic"
-          loop
-          preload="auto"
-          onEnded={handleAudioEnd}
-          onPause={handleAudioPause}
-          onPlay={handleAudioPlay}
-        >
-          <source src="/hare-krishna-original.mp3" type="audio/mpeg" />
-          <source
-            src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3"
-            type="audio/mpeg"
-          />
-          <source
-            src="https://cdn.pixabay.com/audio/2022/02/22/audio_d0a13e6912.mp3"
-            type="audio/mpeg"
-          />
-        </audio>
       </div>
     </>
   );

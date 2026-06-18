@@ -64,13 +64,13 @@ export default function Guesthouse() {
   }, []);
 
   // Slideshow image arrays
-  const deluxe2Images = ["d1.png", "d2.png", "d3.png", "d4.png"];
-  const deluxe3Images = ["t1.png", "t2.png", "t3.png", "t4.png"];
-  const deluxe4Images = ["f1.png", "f2.png", "f3.png"];
+  const deluxe2Images = ["d1.webp", "d2.webp", "d3.webp", "d4.webp"];
+  const deluxe3Images = ["t1.webp", "t2.webp", "t3.webp", "t4.webp"];
+  const deluxe4Images = ["f1.webp", "f2.webp", "f3.webp"];
   const [showSuiteCards, setShowSuiteCards] = useState(false);
 
   // Hero section image slider
-  const heroImages = ["/z.png", "/DSC05963-HDR.webp", "/d3.png"];
+  const heroImages = ["/z.png", "/DSC05963-HDR.webp", "/d3.webp"];
   const [heroIndex, setHeroIndex] = useState(0);
 
   useEffect(() => {
@@ -1658,7 +1658,7 @@ export default function Guesthouse() {
                         onClick={(e) => scrollToSection('deluxe2-detail', e)}
                     >
                         <div className="featured-room-img-wrap">
-                            <img src="d1.png" alt="Deluxe 2 – Twin Bedded Room" />
+                            <img src="d1.webp" alt="Deluxe 2 – Twin Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 2 – Twin Bedded Room</div>
                     </a>
@@ -1668,7 +1668,7 @@ export default function Guesthouse() {
                         onClick={(e) => scrollToSection('deluxe3-detail', e)}
                     >
                         <div className="featured-room-img-wrap">
-                            <img src="t1.png" alt="Deluxe 3 – 3 Bedded Room" />
+                            <img src="t1.webp" alt="Deluxe 3 – 3 Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 3 – 3 Bedded Room</div>
                     </a>
@@ -1678,7 +1678,7 @@ export default function Guesthouse() {
                         onClick={(e) => scrollToSection('deluxe4-detail', e)}
                     >
                         <div className="featured-room-img-wrap">
-                            <img src="f1.png" alt="Deluxe 4 – 4 Bedded Room" />
+                            <img src="f1.webp" alt="Deluxe 4 – 4 Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 4 – 4 Bedded Room</div>
                     </a>

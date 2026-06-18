@@ -33,11 +33,21 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       {/* Hidden audio element — lives in the layout so it never unmounts on page navigation */}
       <audio
         ref={audioRef}
-        src="/hare-krishna-original.mp3"
+        id="bgMusic"
         loop
         preload="auto"
         style={{ display: "none" }}
-      />
+      >
+        <source src="/hare-krishna-original.mp3" type="audio/mpeg" />
+        <source
+          src="https://ia601402.us.archive.org/19/items/melodic-hare-krishna/HareKrishnaMahamantra.mp3"
+          type="audio/mpeg"
+        />
+        <source
+          src="https://cdn.pixabay.com/audio/2022/02/22/audio_d0a13e6912.mp3"
+          type="audio/mpeg"
+        />
+      </audio>
       {children}
     </MusicContext.Provider>
   );

@@ -519,6 +519,18 @@ export default function BookingPage() {
       return;
     }
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(guestDetails.email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    const phoneRegex = /^(?:\+91|91)?[6789]\d{9}$/;
+    if (!phoneRegex.test(guestDetails.phone.replace(/[\s-]/g, ''))) {
+      alert('Please enter a valid Indian mobile number.');
+      return;
+    }
+
     // Re-check availability right before charging — date/inventory could have changed.
     try {
       const r = await fetch(
@@ -2811,12 +2823,19 @@ export default function BookingPage() {
                       <input 
                         type="email" 
                         placeholder="email@example.com" 
-                        style={{ paddingLeft: '40px', width: '100%' }}
+                        style={{ 
+                          paddingLeft: '40px', 
+                          width: '100%', 
+                          borderColor: guestDetails.email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(guestDetails.email) ? '#ef4444' : undefined 
+                        }}
                         value={guestDetails.email}
                         onChange={(e) => setGuestDetails(prev => ({ ...prev, email: e.target.value }))}
                       />
                       <Mail size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: 'rgba(0,0,0,0.35)' }} />
                     </div>
+                    {guestDetails.email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(guestDetails.email) && (
+                      <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '6px', fontWeight: '500' }}>Please enter a valid email address</div>
+                    )}
                   </div>
                   <div className="input-wrapper-mmt">
                     <label>Mobile Number *</label>
@@ -2824,12 +2843,19 @@ export default function BookingPage() {
                       <input 
                         type="tel" 
                         placeholder="+91 XXXXX XXXXX"
-                        style={{ paddingLeft: '40px', width: '100%' }}
+                        style={{ 
+                          paddingLeft: '40px', 
+                          width: '100%',
+                          borderColor: guestDetails.phone && !/^(?:\+91|91)?[6789]\d{9}$/.test(guestDetails.phone.replace(/[\s-]/g, '')) ? '#ef4444' : undefined 
+                        }}
                         value={guestDetails.phone}
                         onChange={(e) => setGuestDetails(prev => ({ ...prev, phone: e.target.value }))}
                       />
                       <Phone size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: 'rgba(0,0,0,0.35)' }} />
                     </div>
+                    {guestDetails.phone && !/^(?:\+91|91)?[6789]\d{9}$/.test(guestDetails.phone.replace(/[\s-]/g, '')) && (
+                      <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '6px', fontWeight: '500' }}>Please enter a valid Indian mobile number</div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2845,32 +2871,41 @@ export default function BookingPage() {
                     <a href="/cancellation-policy" style={{ color: '#1d6de5', textDecoration: 'none', fontWeight: '600' }}>Cancellation &amp; Property Booking Policies</a>.
                   </span>
                 </label>
-                <button
-                  onClick={isInsufficient ? () => setSoldOutPopup(true) : proceedToPayment}
-                  disabled={isInsufficient || availChecking}
-                  style={{
-                    width: '100%',
-                    padding: '16px',
-                    background: isInsufficient
-                      ? '#d1d5db'
-                      : 'linear-gradient(135deg, #1565C0, #1976D2, #1E88E5)',
-                    color: isInsufficient ? '#6b7280' : '#fff',
-                    fontSize: '16px',
-                    fontWeight: '800',
-                    fontFamily: 'Outfit, sans-serif',
-                    letterSpacing: '1.5px',
-                    border: 'none',
-                    borderRadius: '10px',
-                    cursor: isInsufficient ? 'not-allowed' : 'pointer',
-                    textTransform: 'uppercase',
-                    boxShadow: isInsufficient ? 'none' : '0 6px 20px rgba(21, 101, 192, 0.4)',
-                    transition: 'all 0.25s'
-                  }}
-                  onMouseEnter={e => { if (!isInsufficient) e.currentTarget.style.boxShadow = '0 10px 30px rgba(21, 101, 192, 0.55)'; }}
-                  onMouseLeave={e => { if (!isInsufficient) e.currentTarget.style.boxShadow = '0 6px 20px rgba(21, 101, 192, 0.4)'; }}
-                >
-                  {isInsufficient ? 'ROOMS UNAVAILABLE' : 'PAY NOW'}
-                </button>
+                {(() => {
+                  const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(guestDetails.email || '');
+                  const isPhoneValid = /^(?:\+91|91)?[6789]\d{9}$/.test((guestDetails.phone || '').replace(/[\s-]/g, ''));
+                  const isFormValid = (guestDetails.firstName || '').trim() && (guestDetails.lastName || '').trim() && isEmailValid && isPhoneValid;
+                  const isDisabled = isInsufficient || availChecking || !isFormValid;
+
+                  return (
+                    <button
+                      onClick={isInsufficient ? () => setSoldOutPopup(true) : proceedToPayment}
+                      disabled={isDisabled}
+                      style={{
+                        width: '100%',
+                        padding: '16px',
+                        background: isDisabled
+                          ? '#d1d5db'
+                          : 'linear-gradient(135deg, #1565C0, #1976D2, #1E88E5)',
+                        color: isDisabled ? '#6b7280' : '#fff',
+                        fontSize: '16px',
+                        fontWeight: '800',
+                        fontFamily: 'Outfit, sans-serif',
+                        letterSpacing: '1.5px',
+                        border: 'none',
+                        borderRadius: '10px',
+                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        textTransform: 'uppercase',
+                        boxShadow: isDisabled ? 'none' : '0 6px 20px rgba(21, 101, 192, 0.4)',
+                        transition: 'all 0.25s'
+                      }}
+                      onMouseEnter={e => { if (!isDisabled) e.currentTarget.style.boxShadow = '0 10px 30px rgba(21, 101, 192, 0.55)'; }}
+                      onMouseLeave={e => { if (!isDisabled) e.currentTarget.style.boxShadow = '0 6px 20px rgba(21, 101, 192, 0.4)'; }}
+                    >
+                      {isInsufficient ? 'ROOMS UNAVAILABLE' : (!isFormValid ? 'FILL DETAILS TO PAY' : 'PAY NOW')}
+                    </button>
+                  );
+                })()}
               </div>
 
             </div>

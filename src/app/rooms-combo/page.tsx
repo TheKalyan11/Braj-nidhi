@@ -119,17 +119,17 @@ function RoomsComboContent() {
   const [galleryIdx, setGalleryIdx] = useState(0);
 
   const GALLERY_PHOTOS = [
-    { src: '/d1.png', caption: 'Deluxe 2 – Twin Bedded Room' },
-    { src: '/d2.png', caption: 'Deluxe 2 – Room View' },
-    { src: '/d3.png', caption: 'Deluxe 2 – Room Interior' },
-    { src: '/d4.png', caption: 'Deluxe 2 – Room Details' },
-    { src: '/t1.png', caption: 'Deluxe 3 – Triple Room' },
-    { src: '/t2.png', caption: 'Deluxe 3 – Room View' },
-    { src: '/t3.png', caption: 'Deluxe 3 – Room Interior' },
-    { src: '/t4.png', caption: 'Deluxe 3 – Room Details' },
-    { src: '/f1.png', caption: 'Deluxe 4 – 4 Bedded Room' },
-    { src: '/f2.png', caption: 'Deluxe 4 – Room View' },
-    { src: '/f3.png', caption: 'Deluxe 4 – Room Details' },
+    { src: '/d1.webp', caption: 'Deluxe 2 – Twin Bedded Room' },
+    { src: '/d2.webp', caption: 'Deluxe 2 – Room View' },
+    { src: '/d3.webp', caption: 'Deluxe 2 – Room Interior' },
+    { src: '/d4.webp', caption: 'Deluxe 2 – Room Details' },
+    { src: '/t1.webp', caption: 'Deluxe 3 – Triple Room' },
+    { src: '/t2.webp', caption: 'Deluxe 3 – Room View' },
+    { src: '/t3.webp', caption: 'Deluxe 3 – Room Interior' },
+    { src: '/t4.webp', caption: 'Deluxe 3 – Room Details' },
+    { src: '/f1.webp', caption: 'Deluxe 4 – 4 Bedded Room' },
+    { src: '/f2.webp', caption: 'Deluxe 4 – Room View' },
+    { src: '/f3.webp', caption: 'Deluxe 4 – Room Details' },
   ];
 
   const fetchAvailability = useCallback(async (isInitial = false) => {

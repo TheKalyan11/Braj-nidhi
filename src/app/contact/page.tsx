@@ -14,8 +14,8 @@ const visitRows = [
     value: "Braj Nidhi Guest House, Near Bankey Bihari Mandir, Vrindavan, Mathura, UP 281121",
   },
   { label: "Open Daily:", value: "24/7 Front Desk · Check-in 12:00 PM" },
-  { label: "Phone:", value: "+91 98765 43210 · +91 98765 43211" },
-  { label: "Email:", value: "info@brajnidhi.com · bookings@brajnidhi.com" },
+  { label: "Phone:", value: "xx" },
+  { label: "Email:", value: "xx" },
 ];
 
 export default function Contact() {
@@ -669,7 +669,7 @@ export default function Contact() {
               transition={{ duration: 0.9, delay: 0.15 }}
             >
               <img
-                src="/Mandir Nirman .jpg"
+                src="/h11.jpg"
                 alt="Braj Nidhi hospitality"
               />
             </motion.div>
@@ -874,7 +874,7 @@ export default function Contact() {
                   </div>
                   <div className="location-item-content">
                     <h4>Phone</h4>
-                    <p>+91 98765 43210 | +91 98765 43211</p>
+                    <p>xx</p>
                   </div>
                 </div>
                 <div className="location-item">
@@ -883,7 +883,7 @@ export default function Contact() {
                   </div>
                   <div className="location-item-content">
                     <h4>Email</h4>
-                    <p>info@brajnidhi.com | bookings@brajnidhi.com</p>
+                    <p>xx</p>
                   </div>
                 </div>
                 <div className="location-item">

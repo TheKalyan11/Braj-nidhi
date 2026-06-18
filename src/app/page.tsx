@@ -110,9 +110,9 @@ export default function Home() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Slideshow image arrays
-  const deluxe2Images = ["d1.png", "d2.png", "d3.png", "d4.png"];
-  const deluxe3Images = ["t1.png", "t2.png", "t3.png", "t4.png"];
-  const deluxe4Images = ["f1.png", "f2.png", "f3.png"];
+  const deluxe2Images = ["d1.webp", "d2.webp", "d3.webp", "d4.webp"];
+  const deluxe3Images = ["t1.webp", "t2.webp", "t3.webp", "t4.webp"];
+  const deluxe4Images = ["f1.webp", "f2.webp", "f3.webp"];
   const heroImages = [
     "h11.jpg",
     "hero.png",
