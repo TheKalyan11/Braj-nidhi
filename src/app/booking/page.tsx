@@ -31,6 +31,7 @@ import {
   CreditCard,
   IndianRupee
 } from 'lucide-react';
+import InvoiceReceipt from '@/components/InvoiceReceipt';
 import FloatingWidgets from '@/components/FloatingWidgets';
 import BookNowButton from '@/components/BookNowButton';
 import RoomUnavailablePopup from '@/components/RoomUnavailablePopup';
@@ -193,6 +194,7 @@ export default function BookingPage() {
   const [newGuestFirstName, setNewGuestFirstName] = useState('');
   const [newGuestLastName, setNewGuestLastName] = useState('');
   const [newGuestIsChild, setNewGuestIsChild] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const requestBadges = ["Late Check-out (2 hrs)", "Spiritual Literature in Room", "Quiet Room", "Extra Bedding", "Temple Prasadam Delivery"];
 
   const getRoomPrice = (type: string): number => {
@@ -697,6 +699,31 @@ export default function BookingPage() {
           setRazorpayPaymentId(response.razorpay_payment_id);
           setRazorpayOrderId(response.razorpay_order_id);
           setReservationId(resId);
+
+          // Save local booking record to decrement website availability
+          try {
+            setPaymentStepText('Updating availability...');
+            await fetch('/api/availability/book', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                roomType,
+                checkIn,
+                checkOut,
+                rooms,
+                adults,
+                children,
+                guestName: `${guestDetails.firstName} ${guestDetails.lastName}`.trim(),
+                guestEmail: guestDetails.email,
+                guestPhone: guestDetails.phone,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                erpReservationId: erpReservationCreated ? resId : undefined,
+              }),
+            });
+          } catch (err: any) {
+            console.error('Local booking save error:', err);
+          }
 
           setPaymentLoading(false);
           setCurrentStep(3);
@@ -2862,8 +2889,13 @@ export default function BookingPage() {
 
               {/* Terms + PAY NOW */}
               <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '20px 24px', marginBottom: '16px' }}>
-                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '16px' }}>
-                  <input type="checkbox" defaultChecked style={{ marginTop: '2px', accentColor: '#1d6de5', width: '15px', height: '15px', flexShrink: 0, cursor: 'pointer' }}/>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: termsAccepted ? '16px' : '8px' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    style={{ marginTop: '2px', accentColor: '#1d6de5', width: '15px', height: '15px', flexShrink: 0, cursor: 'pointer', outline: !termsAccepted ? '1px solid #ef4444' : 'none' }}
+                  />
                   <span style={{ fontSize: '13px', color: '#374151', lineHeight: '1.5' }}>
                     By proceeding, I agree to Braj Nidhi's{' '}
                     <a href="/terms" style={{ color: '#1d6de5', textDecoration: 'none', fontWeight: '600' }}>Terms of Service</a>,{' '}
@@ -2871,11 +2903,16 @@ export default function BookingPage() {
                     <a href="/cancellation-policy" style={{ color: '#1d6de5', textDecoration: 'none', fontWeight: '600' }}>Cancellation &amp; Property Booking Policies</a>.
                   </span>
                 </label>
+                {!termsAccepted && (
+                  <div style={{ color: '#ef4444', fontSize: '12px', marginBottom: '16px', fontWeight: '500', paddingLeft: '25px' }}>
+                    Please check this box to agree to the policies and proceed
+                  </div>
+                )}
                 {(() => {
                   const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(guestDetails.email || '');
                   const isPhoneValid = /^(?:\+91|91)?[6789]\d{9}$/.test((guestDetails.phone || '').replace(/[\s-]/g, ''));
                   const isFormValid = (guestDetails.firstName || '').trim() && (guestDetails.lastName || '').trim() && isEmailValid && isPhoneValid;
-                  const isDisabled = isInsufficient || availChecking || !isFormValid;
+                  const isDisabled = isInsufficient || availChecking || !isFormValid || !termsAccepted;
 
                   return (
                     <button
@@ -3138,27 +3175,57 @@ export default function BookingPage() {
             {/* SPLIT LAYOUT */}
             <div className="confirmation-split">
               
-              {/* LEFT CARD */}
-              <div className="conf-left-card">
-                <img src={getRoomImage(roomType)} alt="Room Preview" className="conf-left-image" />
-                <div className="conf-left-body">
-                  <div className="conf-room-title-line">
-                    <h3>{getRoomTitle(roomType)}</h3>
-                    <span>Braj Nidhi Guesthouse, Vrindavan</span>
-                  </div>
-                  <div className="conf-price-row">
-                    <div className="conf-price-tag">
-                      <MapPin size={13} style={{ color: '#C89B3C' }} />
-                      ₹{pricePerNight.toLocaleString()} / night
+              {/* LEFT CARD & GUEST INFO */}
+              <div className="conf-left-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div className="conf-left-card">
+                  <img src={getRoomImage(roomType)} alt="Room Preview" className="conf-left-image" />
+                  <div className="conf-left-body">
+                    <div className="conf-room-title-line">
+                      <h3>{getRoomTitle(roomType)}</h3>
+                      <span>Braj Nidhi Guesthouse, Vrindavan</span>
                     </div>
-                    <div className="conf-ref-badge"><Check size={10} />{bookingRef}</div>
-                  </div>
-                  <div className="conf-property-box">
-                    <img src="/Braj_nidhi_.png" alt="Braj Nidhi" className="conf-property-avatar" />
-                    <div className="conf-property-details">
-                      <h4>Braj Nidhi Guesthouse</h4>
-                      <span>Vrindavan, UP</span>
+                    <div className="conf-price-row">
+                      <div className="conf-price-tag">
+                        <MapPin size={13} style={{ color: '#C89B3C' }} />
+                        ₹{pricePerNight.toLocaleString()} / night
+                      </div>
+                      <div className="conf-ref-badge"><Check size={10} />{bookingRef}</div>
                     </div>
+                    <div className="conf-property-box">
+                      <img src="/Braj_nidhi_.png" alt="Braj Nidhi" className="conf-property-avatar" />
+                      <div className="conf-property-details">
+                        <h4>Braj Nidhi Guesthouse</h4>
+                        <span>Vrindavan, UP</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Your Information */}
+                <div className="conf-accordion">
+                  <div className="conf-accordion-header"><span>Your Information</span></div>
+                  <div className="conf-guest-section-title">Guest Details</div>
+                  <div className="conf-guest-cards" style={{ gridTemplateColumns: '1fr' }}>
+                    <div className="conf-guest-card">
+                      <div className="conf-guest-avatar">
+                        {(guestDetails.firstName?.[0] || 'G').toUpperCase()}{(guestDetails.lastName?.[0] || 'U').toUpperCase()}
+                      </div>
+                      <div className="conf-guest-info">
+                        <h5>{guestDetails.firstName} {guestDetails.lastName}</h5>
+                        <span>{adults} Adult{adults > 1 ? 's' : ''} · {nights} Night{nights > 1 ? 's' : ''}</span>
+                        <div className="conf-paid-tag"><Check size={11} />₹{payableTotal.toLocaleString()} Paid</div>
+                      </div>
+                    </div>
+                    {children > 0 && (
+                      <div className="conf-guest-card" style={{ background: 'rgba(212,175,55,0.06)', borderColor: 'rgba(212,175,55,0.2)' }}>
+                        <div className="conf-guest-avatar" style={{ background: 'linear-gradient(135deg, #d4af37, #8b6914)' }}>{children}C</div>
+                        <div className="conf-guest-info">
+                          <h5>{children} Child{children > 1 ? 'ren' : ''}</h5>
+                          <span>Accompanying guests</span>
+                          <div className="conf-paid-tag" style={{ color: '#d4af37' }}><Check size={11} />Included</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -3210,32 +3277,7 @@ export default function BookingPage() {
                   </div>
                 </div>
 
-                <div className="conf-accordion">
-                  <div className="conf-accordion-header"><span>Your Information</span></div>
-                  <div className="conf-guest-section-title">Guest Details</div>
-                  <div className="conf-guest-cards">
-                    <div className="conf-guest-card">
-                      <div className="conf-guest-avatar">
-                        {(guestDetails.firstName?.[0] || 'G').toUpperCase()}{(guestDetails.lastName?.[0] || 'U').toUpperCase()}
-                      </div>
-                      <div className="conf-guest-info">
-                        <h5>{guestDetails.firstName} {guestDetails.lastName}</h5>
-                        <span>{adults} Adult{adults > 1 ? 's' : ''} · {nights} Night{nights > 1 ? 's' : ''}</span>
-                        <div className="conf-paid-tag"><Check size={11} />₹{payableTotal.toLocaleString()} Paid</div>
-                      </div>
-                    </div>
-                    {children > 0 && (
-                      <div className="conf-guest-card" style={{ background: 'rgba(212,175,55,0.06)', borderColor: 'rgba(212,175,55,0.2)' }}>
-                        <div className="conf-guest-avatar" style={{ background: 'linear-gradient(135deg, #d4af37, #8b6914)' }}>{children}C</div>
-                        <div className="conf-guest-info">
-                          <h5>{children} Child{children > 1 ? 'ren' : ''}</h5>
-                          <span>Accompanying guests</span>
-                          <div className="conf-paid-tag" style={{ color: '#d4af37' }}><Check size={11} />Included</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+
 
                 <div className="conf-accordion">
                   <div className="conf-accordion-header"><span>Payment Details</span></div>
@@ -3271,63 +3313,19 @@ export default function BookingPage() {
                 </div>
 
                 {/* Hidden receipt — only rendered when printing */}
-                <div className="pr-receipt-print">
-                  <div style={{ textAlign: 'center', fontWeight: 700, fontSize: '13px' }}>Braj Nidhi Guesthouse</div>
-                  <div style={{ textAlign: 'center' }}>Vrindavan, UP</div>
-                  <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
-                  <div>Ref: {bookingRef}</div>
-                  <div>Date: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
-                  <div>Guest: {guestDetails.firstName} {guestDetails.lastName}</div>
-                  {guestDetails.phone && <div>Phone: {guestDetails.phone}</div>}
-                  <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <tbody>
-                      <tr>
-                        <td style={{ fontWeight: 700 }}>Item</td>
-                        <td style={{ fontWeight: 700, textAlign: 'center', width: '40px' }}>Qty</td>
-                        <td style={{ fontWeight: 700, textAlign: 'right' }}>Price</td>
-                      </tr>
-                      <tr>
-                        <td>{getRoomTitle(roomType)}</td>
-                        <td style={{ textAlign: 'center' }}>{nights}N</td>
-                        <td style={{ textAlign: 'right' }}>Rs.{roomCost.toLocaleString()}</td>
-                      </tr>
-                      <tr>
-                        <td>Guests</td>
-                        <td style={{ textAlign: 'center' }}>{adults}A{children > 0 ? `+${children}C` : ''}</td>
-                        <td style={{ textAlign: 'right' }}>Incl.</td>
-                      </tr>
-                      {totalDiscount > 0 && (
-                        <tr>
-                          <td>Discount</td>
-                          <td></td>
-                          <td style={{ textAlign: 'right' }}>-Rs.{totalDiscount.toLocaleString()}</td>
-                        </tr>
-                      )}
-                      <tr>
-                        <td>Check-In</td>
-                        <td></td>
-                        <td style={{ textAlign: 'right' }}>{new Date(checkIn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-                      </tr>
-                      <tr>
-                        <td>Check-Out</td>
-                        <td></td>
-                        <td style={{ textAlign: 'right' }}>{new Date(checkOut).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontWeight: 700 }}>
-                    <tbody>
-                      <tr>
-                        <td>Total Paid</td>
-                        <td style={{ textAlign: 'right' }}>Rs.{payableTotal.toLocaleString()}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div style={{ borderTop: '1px dashed #888', margin: '4px 0' }} />
-                  <div style={{ textAlign: 'center', marginTop: '4px' }}>Radhe Radhe! Thank you for choosing Braj Nidhi.</div>
-                </div>
+                <InvoiceReceipt 
+                  bookingRef={bookingRef || 'BN-1234'}
+                  date={new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  guestName={`${guestDetails.firstName || ''} ${guestDetails.lastName || ''}`}
+                  guestEmail={guestDetails.email || ''}
+                  guestPhone={guestDetails.phone || ''}
+                  roomTitle={getRoomTitle(roomType)}
+                  pricePerNight={pricePerNight}
+                  nights={nights}
+                  subtotal={payableTotal}
+                  tax={0}
+                  grandTotal={payableTotal}
+                />
 
                 <div className="conf-bottom-actions">
                   <Link href="/" className="rth-btn">

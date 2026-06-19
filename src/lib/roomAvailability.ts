@@ -40,6 +40,8 @@ export interface BookingRecord {
   status: 'confirmed' | 'cancelled';
   erpReservationId?: string;
   erpSyncStatus?: 'synced' | 'pending' | 'failed';
+  razorpayPaymentId?: string;
+  razorpayOrderId?: string;
 }
 
 // ─── Storage Abstraction ──────────────────────────────────────────────────────
@@ -474,11 +476,9 @@ export async function syncToERP(booking: BookingRecord): Promise<{
         check_out_date: booking.checkOut,
         booking_type: ERP_BOOKING_TYPE,
         hold_type: ERP_HOLD_TYPE,
-        guest: {
-          name: booking.guestName || 'Guest',
-          email: booking.guestEmail || '',
-          phone: booking.guestPhone || '',
-        },
+        guest_name: booking.guestName || 'Guest',
+        guest_email: booking.guestEmail || '',
+        guest_phone: booking.guestPhone || '',
         rooms: [
           {
             room_type: erpRoomTypeId,
@@ -487,6 +487,8 @@ export async function syncToERP(booking: BookingRecord): Promise<{
             children: booking.children,
           },
         ],
+        ...(booking.razorpayPaymentId && { gateway_payment_id: booking.razorpayPaymentId }),
+        ...(booking.razorpayOrderId && { gateway_order_id: booking.razorpayOrderId }),
       }),
       signal: AbortSignal.timeout(10_000),
     });
@@ -523,6 +525,9 @@ export async function createBooking(params: {
   guestName?: string;
   guestEmail?: string;
   guestPhone?: string;
+  razorpayPaymentId?: string;
+  razorpayOrderId?: string;
+  erpReservationId?: string;
 }): Promise<{ success: boolean; booking?: BookingRecord; error?: string; erpError?: string }> {
   // Check availability
   const avail = await getAvailabilityForRange(params.roomType, params.checkIn, params.checkOut);
@@ -539,6 +544,7 @@ export async function createBooking(params: {
 
   // Build and save booking
   const bookings = await readBookings();
+  const alreadySynced = !!params.erpReservationId;
   const booking: BookingRecord = {
     id: `BK${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
     roomType: params.roomType,
@@ -552,28 +558,36 @@ export async function createBooking(params: {
     guestPhone: params.guestPhone,
     bookedAt: new Date().toISOString(),
     status: 'confirmed',
-    erpSyncStatus: 'pending',
+    erpReservationId: params.erpReservationId,
+    erpSyncStatus: alreadySynced ? 'synced' : 'pending',
+    razorpayPaymentId: params.razorpayPaymentId,
+    razorpayOrderId: params.razorpayOrderId,
   };
 
   bookings.push(booking);
   await writeBookings(bookings);
 
-  // ERP sync (non-blocking)
+  // Invalidate ERP cache so next availability check is fresh
+  clearERPCache();
+
+  // ERP sync — skip if already synced (reservation created by payment handler)
   let erpError: string | undefined;
-  try {
-    const erpResult = await syncToERP(booking);
-    const all = await readBookings();
-    const idx = all.findIndex(b => b.id === booking.id);
-    if (idx !== -1) {
-      all[idx].erpSyncStatus = erpResult.status;
-      if (erpResult.erpReservationId) all[idx].erpReservationId = erpResult.erpReservationId;
-      await writeBookings(all);
-      booking.erpSyncStatus = erpResult.status;
-      booking.erpReservationId = erpResult.erpReservationId;
+  if (!alreadySynced) {
+    try {
+      const erpResult = await syncToERP(booking);
+      const all = await readBookings();
+      const idx = all.findIndex(b => b.id === booking.id);
+      if (idx !== -1) {
+        all[idx].erpSyncStatus = erpResult.status;
+        if (erpResult.erpReservationId) all[idx].erpReservationId = erpResult.erpReservationId;
+        await writeBookings(all);
+        booking.erpSyncStatus = erpResult.status;
+        booking.erpReservationId = erpResult.erpReservationId;
+      }
+      if (erpResult.status === 'failed') erpError = erpResult.error;
+    } catch (e: any) {
+      erpError = e.message;
     }
-    if (erpResult.status === 'failed') erpError = erpResult.error;
-  } catch (e: any) {
-    erpError = e.message;
   }
 
   return { success: true, booking, erpError };

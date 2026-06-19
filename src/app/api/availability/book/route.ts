@@ -24,6 +24,9 @@ export async function POST(req: NextRequest) {
       guestName,
       guestEmail,
       guestPhone,
+      razorpayPaymentId,
+      razorpayOrderId,
+      erpReservationId,
     } = body;
 
     // ── Input validation ──────────────────────────────────────────────────────
@@ -85,6 +88,9 @@ export async function POST(req: NextRequest) {
       guestName: cleanName,
       guestEmail: cleanEmail,
       guestPhone: cleanPhone,
+      razorpayPaymentId: typeof razorpayPaymentId === 'string' ? razorpayPaymentId : undefined,
+      razorpayOrderId: typeof razorpayOrderId === 'string' ? razorpayOrderId : undefined,
+      erpReservationId: typeof erpReservationId === 'string' ? erpReservationId : undefined,
     });
 
     if (!result.success) {
