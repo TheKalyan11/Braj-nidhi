@@ -476,9 +476,11 @@ export async function syncToERP(booking: BookingRecord): Promise<{
         check_out_date: booking.checkOut,
         booking_type: ERP_BOOKING_TYPE,
         hold_type: ERP_HOLD_TYPE,
-        guest_name: booking.guestName || 'Guest',
-        guest_email: booking.guestEmail || '',
-        guest_phone: booking.guestPhone || '',
+        guest: {
+          name: booking.guestName || 'Guest',
+          email: booking.guestEmail || '',
+          phone: booking.guestPhone || '',
+        },
         rooms: [
           {
             room_type: erpRoomTypeId,

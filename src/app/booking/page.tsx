@@ -631,6 +631,7 @@ export default function BookingPage() {
 
           // Create ERP reservation only after payment is verified
           let erpReservationCreated = false;
+          let erpAmountConfirmed = amount;
           try {
             setPaymentStepText('Creating reservation in ERP...');
             const guestName = `${guestDetails.firstName} ${guestDetails.lastName}`.trim();
@@ -648,9 +649,11 @@ export default function BookingPage() {
                 check_out_date: checkOut,
                 booking_type: "Walk-In",
                 hold_type: "BN-BN-VCM Web Site-0001-0001",
-                guest_name: guestName,
-                guest_email: guestDetails.email,
-                guest_phone: guestDetails.phone,
+                guest: {
+                  name: guestName,
+                  email: guestDetails.email,
+                  phone: guestDetails.phone,
+                },
                 rooms: [{ room_type: targetRoomType, qty: rooms, adults, children }],
                 additional_guests: additionalGuestsPayload,
                 gateway_payment_id: response.razorpay_payment_id,
@@ -660,6 +663,7 @@ export default function BookingPage() {
             const erpResult = await erpRes.json();
             if (erpRes.ok) {
               resId = erpResult.reservationId || erpResult.reservation_id || erpResult.name || resId;
+              if (erpResult.amount) erpAmountConfirmed = erpResult.amount;
               erpReservationCreated = true;
             } else {
               console.error('ERP create_reservation failed:', erpResult);
@@ -676,8 +680,8 @@ export default function BookingPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   reservation_id: resId,
-                  amount,
-                  mode_of_payment: 'Razorpay',
+                  amount: erpAmountConfirmed,
+                  mode_of_payment: 'Bank Transfer',
                   gateway_payment_id: response.razorpay_payment_id,
                   gateway_order_id: response.razorpay_order_id,
                   gateway_signature: response.razorpay_signature,
