@@ -286,7 +286,7 @@ export default function FloatingWidgets() {
         roomName = "Deluxe 3 – 3 Bedded Room"; price = 4500; image = "d3.webp";
         features = ["Triple Beds", "Temple View Balcony", "Premium Bath Amenities"];
       } else if (guestNum >= 4) {
-        roomName = "Deluxe 4 – 4 Bedded Room"; price = 4999; image = "d31.webp";
+        roomName = "Deluxe 4 – 4 Bedded Room"; price = 5500; image = "d31.webp";
         features = ["Grand Suite Lounge", "Spacious Living Room", "Panoramic Views", "VVIP Guest Services"];
       }
 

@@ -1769,7 +1769,7 @@ export default function Guesthouse() {
                                     <span><i className="fas fa-place-of-worship"></i> Temple Access</span>
                                     <span><i className="fas fa-tree"></i> Vrindavan Chandrodaya Mandir Park Access</span>
                                 </div>
-                                <button className="btn-availability" style={{ border: "none", cursor: "pointer", width: "100%" }} onClick={() => openRoomModal('deluxe4', 'Deluxe 4 – 4 Bedded Room', 4999)}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></button>
+                                <button className="btn-availability" style={{ border: "none", cursor: "pointer", width: "100%" }} onClick={() => openRoomModal('deluxe4', 'Deluxe 4 – 4 Bedded Room', 5500)}>Book for ₹5,500 <i className="fas fa-chevron-right"></i></button>
                             </div>
                         </div>
                     </div>

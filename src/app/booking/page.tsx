@@ -145,7 +145,7 @@ export default function BookingPage() {
   const [livePrices, setLivePrices] = useState<Record<string, number>>({
     deluxe2: 3500,
     deluxe3: 4500,
-    deluxe4: 4999
+    deluxe4: 5500
   });
 
   // ── Real-time ERP availability check ───────────────────────────────────────
@@ -200,7 +200,7 @@ export default function BookingPage() {
   const getRoomPrice = (type: string): number => {
     switch (type) {
       case 'deluxe3': return 4500;
-      case 'deluxe4': return 4999;
+      case 'deluxe4': return 5500;
       case 'deluxe2':
       default:
         return 3500;
@@ -242,25 +242,22 @@ export default function BookingPage() {
   const checkInTime  = checkIn  ? new Date(`${checkIn}T14:00:00`).toLocaleTimeString('en-US',  { hour: 'numeric', minute: '2-digit', hour12: true }) : '2:00 PM';
   const checkOutTime = checkOut ? new Date(`${checkOut}T11:00:00`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : '11:00 AM';
 
-  // Price calculations
+  // Price calculations — displayed prices are GST-inclusive (5%)
+  const gstRate = 0.05;
   const pricePerNight = livePrices[roomType] || getRoomPrice(roomType);
   const roomCost = pricePerNight * nights * rooms;
-  
+
   // Add-ons Cost
   const darshanCost = darshanGuide ? 1500 : 0;
   const cabCost = airportCab ? 2500 : 0;
-  
-  // Discounts
-  // Member discount is 10% of Room cost if logged in
-  const memberDiscount = 0;
-  const baseTotal = roomCost + darshanCost + cabCost;
-  const totalDiscount = memberDiscount;
 
-  // Tax calculations
-  const taxableAmount = Math.max(0, baseTotal - totalDiscount);
-  const gstAmount = Math.round(taxableAmount * 0.12);
-  const finalTotal = taxableAmount + gstAmount;
-  
+  // Discounts
+  const memberDiscount = 0;
+  const totalInclGst = roomCost + darshanCost + cabCost - memberDiscount;
+  const taxableAmount = Math.round(totalInclGst / (1 + gstRate));
+  const gstAmount = totalInclGst - taxableAmount;
+  const finalTotal = totalInclGst;
+
   // Dynamic ERP total override
   const payableTotal = erpAmount !== null ? erpAmount : finalTotal;
 
@@ -399,7 +396,7 @@ export default function BookingPage() {
       if (data.availableRooms && Array.isArray(data.availableRooms)) {
         setAvailableRoomsList(data.availableRooms);
 
-        // Website displays canonical per-night rates (deluxe2: 3500, deluxe3: 4500, deluxe4: 4999).
+        // Website displays canonical per-night rates (deluxe2: 3500, deluxe3: 4500, deluxe4: 5500).
         // ERP returns its own per-stay/tax-adjusted amounts which differ from the website rate card,
         // so we intentionally do NOT overwrite livePrices here — that caused the displayed
         // ₹3,500/night to be silently replaced by an ERP figure (e.g. 6666.66) on the fare summary.
@@ -3091,10 +3088,10 @@ export default function BookingPage() {
                   <div style={{ borderTop: '1px dashed rgba(0,0,0,0.1)', margin: '10px 0', paddingTop: 10 }}>
                     <div className="summary-row-mmt" style={{ color: '#6b7280', fontSize: 13 }}>
                       <span>Subtotal (before tax)</span>
-                      <span>₹{(baseTotal - totalDiscount).toLocaleString()}</span>
+                      <span>₹{taxableAmount.toLocaleString()}</span>
                     </div>
                     <div className="summary-row-mmt" style={{ color: '#6b7280', fontSize: 13 }}>
-                      <span>GST 12%</span>
+                      <span>GST 5%</span>
                       <span>₹{gstAmount.toLocaleString()}</span>
                     </div>
                   </div>

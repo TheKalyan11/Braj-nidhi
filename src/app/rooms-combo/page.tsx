@@ -56,7 +56,7 @@ const ROOMS: RoomOption[] = [
     shortName: 'Deluxe 4',
     beds: '4-Poster Beds',
     maxGuests: 4,
-    pricePerNight: 4999,
+    pricePerNight: 5500,
     mrpPrice: 7200,
     image: '/DSC05963-HDR.webp',
     sqft: '420 sq.ft',
@@ -757,7 +757,7 @@ function RoomsComboContent() {
             <div className="rcp-policy-item"><Leaf size={14}/><span>Pure Sattvic vegetarian — no meat, alcohol or tobacco</span></div>
             <div className="rcp-policy-item"><ShieldCheck size={14}/><span>Free cancellation up to 48 hrs before arrival</span></div>
             <div className="rcp-policy-item"><Wifi size={14}/><span>Complimentary high-speed Wi-Fi in all rooms</span></div>
-            <div className="rcp-policy-item"><Info size={14}/><span>Prices inclusive of 12% GST</span></div>
+            <div className="rcp-policy-item"><Info size={14}/><span>Prices inclusive of 5% GST</span></div>
           </div>
         </div>
 

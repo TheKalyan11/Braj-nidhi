@@ -50,7 +50,7 @@ export const BRAJ_NIDHI_KNOWLEDGE = {
     {
       id: "deluxe-4",
       name: "Deluxe 4 – 4 Bedded Room",
-      price: 4999,
+      price: 5500,
       description: "Ideal for 3 Adults + 1 Child OR 4 Adults. The ultimate family suite offering palatial space, luxurious furnishings, and a panoramic view of local temple domes.",
       features: [
         "2 Ultra-comfortable King Beds in distinct partitioned areas",

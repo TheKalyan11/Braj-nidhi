@@ -135,7 +135,7 @@ export default function Home() {
   const roomPrices: Record<string, number> = {
     'Deluxe 2 – Twin Bedded Room': 3500,
     'Deluxe 3 – 3 Bedded Room': 4500,
-    'Deluxe 4 – 4 Bedded Room': 4999
+    'Deluxe 4 – 4 Bedded Room': 5500
   };
 
   const roomOccupancy: Record<string, string> = {
@@ -883,7 +883,7 @@ export default function Home() {
                             <span><i className="fas fa-place-of-worship"></i> Temple Access</span>
                             <span><i className="fas fa-tree"></i> Vrindavan Chandrodaya Mandir Park Access</span>
                         </div>
-                        <button className="btn-availability" style={{ display: "block", width: "100%", textAlign: "center", border: "none", cursor: "pointer" }} onClick={() => openRoomModal('deluxe4', 'Deluxe 4 – 4 Bedded Room', 4999)}>Book for ₹4,999 <i className="fas fa-chevron-right"></i></button>
+                        <button className="btn-availability" style={{ display: "block", width: "100%", textAlign: "center", border: "none", cursor: "pointer" }} onClick={() => openRoomModal('deluxe4', 'Deluxe 4 – 4 Bedded Room', 5500)}>Book for ₹5,500 <i className="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
             </div>
