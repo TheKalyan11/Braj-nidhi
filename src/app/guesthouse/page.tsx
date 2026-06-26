@@ -1632,7 +1632,7 @@ export default function Guesthouse() {
 
                     <div className="bento-box bento-beige">
                         <i className="fas fa-spa bento-icon"></i>
-                        <h4>AYURVEDIC SPA & WELLNESS</h4>
+                        <h4>CULTURAL & DEVOTIONAL ACTIVITIES</h4>
                         <p>Rejuvenate your senses with traditional holistic therapies</p>
                     </div>
 

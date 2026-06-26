@@ -10,6 +10,10 @@ import PremiumDoubleCalendar from '@/components/PremiumDoubleCalendar';
 import RoomBookingModal from '@/components/RoomBookingModal';
 
 // Self-contained Hero Slideshow Component to prevent top-level page re-renders
+const imagePositions: Record<string, string> = {
+  "m1.JPEG": "center 30%",
+};
+
 const HeroSlideshow = ({ images }: { images: string[] }) => {
   const [heroBgIndex, setHeroBgIndex] = useState(0);
 
@@ -20,6 +24,8 @@ const HeroSlideshow = ({ images }: { images: string[] }) => {
     return () => clearInterval(timer);
   }, [images.length]);
 
+  const currentImage = images[heroBgIndex];
+
   return (
     <AnimatePresence mode="popLayout">
       <motion.div
@@ -29,15 +35,15 @@ const HeroSlideshow = ({ images }: { images: string[] }) => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 1.8, ease: "easeInOut" }}
-        style={{ 
+        style={{
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: `linear-gradient(to bottom, rgba(10, 14, 20, 0.45), rgba(10, 14, 20, 0.75)), url(/${images[heroBgIndex]})`,
+          backgroundImage: `linear-gradient(to bottom, rgba(10, 14, 20, 0.45), rgba(10, 14, 20, 0.75)), url(/${currentImage})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: imagePositions[currentImage] ?? 'center',
           backgroundRepeat: 'no-repeat'
         }}
       />
@@ -114,8 +120,10 @@ export default function Home() {
   const deluxe3Images = ["t1.webp", "t2.webp", "t3.webp", "t4.webp"];
   const deluxe4Images = ["f1.webp", "f2.webp", "f3.webp"];
   const heroImages = [
+    "m1.JPEG",
+    "m2.JPEG",
+    "m3.JPG",
     "h11.jpg",
-    "hero.png",
     "DSC09652.webp",
     "DSC09672.webp",
     "DSC02591.webp",
@@ -1005,6 +1013,15 @@ export default function Home() {
             </div>
             <div className="gallery-slider swiper">
                 <div className="swiper-wrapper">
+                    <div className="swiper-slide">
+                        <img src="/m1.JPEG" alt="Vrindavan Chandrodaya Mandir" />
+                    </div>
+                    <div className="swiper-slide">
+                        <img src="/m2.JPEG" alt="Gallery View M2" />
+                    </div>
+                    <div className="swiper-slide">
+                        <img src="/m3.JPG" alt="Gallery View M3" />
+                    </div>
                     <div className="swiper-slide">
                         <img src="/hero.webp" alt="Braj Nidhi Hero View" />
                     </div>
