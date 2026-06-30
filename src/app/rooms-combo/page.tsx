@@ -6,8 +6,10 @@ import {
   BedDouble, Users, Calendar, Star, MapPin, ShieldCheck, Wifi, Coffee,
   Leaf, ArrowRight, Check, Clock, Info, Menu, X, ChevronDown, ChevronUp, Moon
 } from 'lucide-react';
-import BookNowButton from '@/components/BookNowButton';
-import RoomUnavailablePopup from '@/components/RoomUnavailablePopup';
+import dynamic from 'next/dynamic';
+
+const BookNowButton = dynamic(() => import('@/components/BookNowButton'), { ssr: false });
+const RoomUnavailablePopup = dynamic(() => import('@/components/RoomUnavailablePopup'), { ssr: false });
 
 interface RoomOption {
   key: 'deluxe2' | 'deluxe3' | 'deluxe4';
@@ -381,14 +383,14 @@ function RoomsComboContent() {
       {/* Header */}
       <header id="main-header" className={scrolled ? 'scrolled' : ''}>
         <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
+            <img loading="lazy" decoding="async" src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         <nav>
@@ -415,7 +417,7 @@ function RoomsComboContent() {
         <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-menu-header">
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '45px', width: 'auto' }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '45px', width: 'auto' }} />
               <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
                 <X size={24} />
               </button>
@@ -491,7 +493,7 @@ function RoomsComboContent() {
                 <div className="rcp-room-header" onClick={() => setExpandedRoom(isExpanded ? null : room.key)}>
                   <div className="rcp-room-header-left">
                     <div className="rcp-room-thumb">
-                      <img src={room.image} alt={room.shortName}/>
+                      <img loading="lazy" decoding="async" src={room.image} alt={room.shortName} />
                     </div>
                     <div className="rcp-room-name">
                       <h3>{room.shortName}</h3>
@@ -546,7 +548,7 @@ function RoomsComboContent() {
                   <div className="rcp-room-body">
                     <div className="rcp-room-body-grid">
                       <div className="rcp-room-img">
-                        <img src={room.image} alt={room.title}/>
+                        <img loading="lazy" decoding="async" src={room.image} alt={room.title} />
                       </div>
                       <div>
                         <div className="rcp-room-amenities">
@@ -624,13 +626,13 @@ function RoomsComboContent() {
             </div>
             <div className="rcp-photos">
               <div className="rcp-photo-main">
-                <img src="/hero.webp" alt="Braj Nidhi Guesthouse"/>
+                <img loading="lazy" decoding="async" src="/hero.webp" alt="Braj Nidhi Guesthouse" />
               </div>
               <div className="rcp-photo-thumb">
-                <img src="/DSC05963-HDR.webp" alt="Deluxe Room"/>
+                <img loading="lazy" decoding="async" src="/DSC05963-HDR.webp" alt="Deluxe Room" />
               </div>
               <div className="rcp-photo-thumb">
-                <img src="/DSC05818-HDR.webp" alt="Room view"/>
+                <img loading="lazy" decoding="async" src="/DSC05818-HDR.webp" alt="Room view" />
                 <span className="rcp-photo-pill" onClick={() => { setGalleryIdx(0); setGalleryOpen(true); }}>View All Photos</span>
               </div>
             </div>
@@ -785,11 +787,9 @@ function RoomsComboContent() {
 
           {/* Image */}
           <div onClick={e => e.stopPropagation()} style={{maxWidth:'88vw',maxHeight:'82vh',display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
-            <img
-              src={GALLERY_PHOTOS[galleryIdx].src}
+            <img loading="lazy" decoding="async" src={GALLERY_PHOTOS[galleryIdx].src}
               alt={GALLERY_PHOTOS[galleryIdx].caption}
-              style={{maxWidth:'100%',maxHeight:'74vh',objectFit:'contain',borderRadius:10,boxShadow:'0 8px 40px rgba(0,0,0,.6)'}}
-            />
+              style={{maxWidth:'100%',maxHeight:'74vh',objectFit:'contain',borderRadius:10,boxShadow:'0 8px 40px rgba(0,0,0,.6)'}} />
             <div style={{color:'rgba(255,255,255,.75)',fontSize:14,fontFamily:'Outfit,sans-serif',textAlign:'center'}}>{GALLERY_PHOTOS[galleryIdx].caption}</div>
           </div>
 
@@ -802,8 +802,7 @@ function RoomsComboContent() {
           {/* Thumbnails strip */}
           <div onClick={e => e.stopPropagation()} style={{position:'absolute',bottom:16,left:'50%',transform:'translateX(-50%)',display:'flex',gap:8,padding:'8px 12px',background:'rgba(0,0,0,.5)',borderRadius:12,backdropFilter:'blur(6px)'}}>
             {GALLERY_PHOTOS.map((p, i) => (
-              <img
-                key={i}
+              <img loading="lazy" decoding="async" key={i}
                 src={p.src}
                 alt={p.caption}
                 onClick={() => setGalleryIdx(i)}

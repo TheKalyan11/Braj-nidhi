@@ -31,8 +31,7 @@ export default function SPDivineBar() {
         background: "transparent",
       }}
     >
-      <img
-        src="/sp logo.png"
+      <img loading="lazy" decoding="async" src="/sp logo.png"
         alt="His Divine Grace Srila Prabhupada"
         style={{
           height: "68px",
@@ -40,8 +39,7 @@ export default function SPDivineBar() {
           objectFit: "contain",
           display: "block",
           filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.22))",
-        }}
-      />
+        }} />
     </div>
   );
 }

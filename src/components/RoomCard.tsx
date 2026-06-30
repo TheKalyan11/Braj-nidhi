@@ -22,11 +22,9 @@ const RoomCard: React.FC<RoomCardProps> = ({ title, description, image, price, s
       className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-border/50"
     >
       <div className="relative h-80 overflow-hidden">
-        <img
-          src={image}
+        <img loading="lazy" decoding="async" src={image}
           alt={title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
         <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg">
           <span className="text-primary font-bold">{price}</span>
           <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider"> / Night</span>

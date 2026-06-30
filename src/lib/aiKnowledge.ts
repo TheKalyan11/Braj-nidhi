@@ -11,7 +11,7 @@ export const BRAJ_NIDHI_KNOWLEDGE = {
     tagline: "Luxury Spiritual Dwelling in Vrindavan",
     description: "Braj Nidhi is an ultra-luxury spiritual guesthouse and sanctuary designed for seekers, pilgrims, and families seeking absolute tranquility, luxury, and spiritual elevation in the holy land of Vrindavan.",
     address: "Braj Nidhi Dham, near Prem Mandir, Raman Reti, Vrindavan, Uttar Pradesh, PIN 281121",
-    phone: "+91 99999 88888",
+    phone: "+91 70377 94300",
     email: "yatra@brajnidhi.com",
     checkInTime: "12:00 PM",
     checkOutTime: "11:00 AM",

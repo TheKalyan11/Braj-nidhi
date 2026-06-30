@@ -37,8 +37,7 @@ export default function SharedHeader() {
             : 'linear-gradient(180deg, rgba(255,252,245,0.92) 60%, transparent 100%)',
         }}
       >
-        <img
-          src="/sp logo.png"
+        <img loading="lazy" decoding="async" src="/sp logo.png"
           alt="His Divine Grace Srila Prabhupada"
           style={{
             height: '108px',
@@ -46,8 +45,7 @@ export default function SharedHeader() {
             objectFit: 'contain',
             filter: 'drop-shadow(0 4px 14px rgba(139,0,0,0.18))',
             marginTop: '-4px',
-          }}
-        />
+          }} />
       </div>
 
       {/* ── Main Header — pushed below SP bar when visible ───────────────────── */}
@@ -57,7 +55,7 @@ export default function SharedHeader() {
         style={{ top: scrolled ? undefined : '82px' }}
       >
         <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
-          <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '60px', width: 'auto' }} />
+          <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '60px', width: 'auto' }} />
         </Link>
 
         <nav>
@@ -91,7 +89,7 @@ export default function SharedHeader() {
           <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-menu-header">
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'flex', alignItems: 'center' }}>
-                <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '45px', width: 'auto' }} />
+                <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '45px', width: 'auto' }} />
               </Link>
               <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
                 <X size={24} />

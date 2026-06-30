@@ -72,15 +72,13 @@ export default function LoadingTransition() {
                             gap: '20px'
                         }}
                     >
-                        <img 
-                            src="/Braj_nidhi_.png" 
+                        <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" 
                             alt="Braj Nidhi Loading" 
                             style={{ 
                                 width: '220px', 
                                 height: 'auto',
                                 filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.08))' 
-                            }} 
-                        />
+                            }} />
                     </motion.div>
                     
                     <motion.div

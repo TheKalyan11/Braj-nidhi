@@ -115,7 +115,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialIsR
         <div className="lm-card-top">
           <button className="lm-close" onClick={onClose}><X size={13} strokeWidth={2.5} /></button>
           <div className="lm-logo">
-            <img src="/Braj_nidhi_.png" alt="Braj Nidhi" />
+            <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi" />
           </div>
           <h2 className="lm-heading">{isRegistering ? 'Create Account' : 'Welcome Back'}</h2>
           <p className="lm-sub">{isRegistering ? 'Join Braj Nidhi for exclusive benefits' : 'Sign in to your Braj Nidhi account'}</p>

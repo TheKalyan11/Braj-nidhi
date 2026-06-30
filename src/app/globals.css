@@ -1882,7 +1882,7 @@ header.scrolled nav ul li a:hover {
 .cta-card {
     position: relative;
     background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1920');
+                url('/m3.JPG');
     background-size: cover;
     background-position: center;
     border-radius: 50px; /* Very rounded corners as seen in image */
@@ -1923,20 +1923,53 @@ header.scrolled nav ul li a:hover {
 
 .cta-btn {
     display: inline-block;
-    background: #4ade80; /* Bright minty green like in image */
-    color: #0d2a1f;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.15) 100%);
+    color: #fff;
     padding: 18px 45px;
     border-radius: 50px;
     font-size: 1.1rem;
     font-weight: 700;
     text-decoration: none;
-    transition: all 0.3s ease;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 
+        0 8px 32px 0 rgba(0, 0, 0, 0.3),
+        inset 0 4px 4px rgba(255, 255, 255, 0.25),
+        inset 0 -4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.cta-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: all 0.8s ease;
 }
 
 .cta-btn:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
-    background: #39cc6e;
+    transform: translateY(-4px) scale(1.02);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.2) 100%);
+    box-shadow: 
+        0 12px 40px 0 rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(255, 255, 255, 0.15),
+        inset 0 4px 4px rgba(255, 255, 255, 0.3),
+        inset 0 -4px 6px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #fff;
+}
+
+.cta-btn:hover::before {
+    left: 150%;
 }
 
 @media (max-width: 768px) {
@@ -2102,8 +2135,7 @@ header.scrolled nav ul li a:hover {
     line-height: 0.75;
     text-transform: uppercase;
     text-align: center;
-    /* Use an architectural image for the text mask */
-    background: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1920') center 60% / cover;
+    background: url('/m2.JPEG') center 40% / cover;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     padding-top: 40px;
@@ -4873,4 +4905,33 @@ header.scrolled .mobile-logout-btn {
   width: 40%;
   height: 20px;
   background: #FFB800;
+}
+
+/* === Global Custom Transparent Scrollbar === */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }

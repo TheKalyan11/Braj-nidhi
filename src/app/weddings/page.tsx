@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
-import FloatingWidgets from '@/components/FloatingWidgets';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import BookNowButton from '@/components/BookNowButton';
+
+const FloatingWidgets = dynamic(() => import('@/components/FloatingWidgets'), { ssr: false });
+const BookNowButton = dynamic(() => import('@/components/BookNowButton'), { ssr: false });
 
 export default function Weddings() {
   const [heroImgIndex, setHeroImgIndex] = useState(0);
@@ -805,14 +807,14 @@ export default function Weddings() {
 
     <header id="main-header" className={scrolled ? "scrolled" : ""}>
         <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
+            <img loading="lazy" decoding="async" src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         <nav>
@@ -842,7 +844,7 @@ export default function Weddings() {
         <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
           <div className="mobile-menu-header">
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
             </Link>
             <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
               <X size={24} />
@@ -911,7 +913,7 @@ export default function Weddings() {
                     <p>An open-air venue perfect for traditional ceremonies under the stars. Accommodates up to 500 guests with customized mandap setups.</p>
                 </motion.div>
                 <motion.div className="bento-item" variants={fadeInUp}>
-                    <i className="fas fa-glass-cheers"></i>
+                    <i className="fas fa-place-of-worship"></i>
                     <h4>Royal Banquet</h4>
                     <p>A fully air-conditioned, pillar-less hall designed for grand receptions and sangeet nights. Premium acoustics and lighting included.</p>
                 </motion.div>
@@ -963,7 +965,7 @@ export default function Weddings() {
                 </ul>
             </motion.div>
             <motion.div className="split-image" variants={slideInRight}>
-                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop" alt="Fine Dining" />
+                <img loading="lazy" decoding="async" src="/the-design-thoughtfully.jpg" alt="Sattvic Culinary Excellence" />
             </motion.div>
         </motion.section>
 
@@ -976,7 +978,7 @@ export default function Weddings() {
                 <a href="/guesthouse" className="btn-outline" style={{"border":"2px solid #1a1a1a","padding":"12px 25px","textDecoration":"none","color":"#1a1a1a","fontWeight":"800","textTransform":"uppercase","display":"inline-block","marginTop":"15px"}}>View Rooms & Suites</a>
             </motion.div>
             <motion.div className="split-image" variants={slideInLeft}>
-                <img src="/DSC05963-HDR.webp" alt="Luxury Suites" />
+                <img loading="lazy" decoding="async" src="/DSC05963-HDR.webp" alt="Luxury Suites" />
             </motion.div>
         </motion.section>
 
@@ -988,19 +990,22 @@ export default function Weddings() {
             </motion.div>
             <motion.div className="gallery-grid" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
                 <motion.div className="gallery-item large" variants={fadeInUp}>
-                    <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000&auto=format&fit=crop" alt="Wedding Couple" />
-                </motion.div>
-                <motion.div className="gallery-item" variants={fadeInUp}>
-                    <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1000&auto=format&fit=crop" alt="Wedding Decor" />
+                    <img loading="lazy" decoding="async" src="/we8.jpg" alt="Wedding Celebration" style={{objectPosition: 'center center'}} />
                 </motion.div>
                 <motion.div className="gallery-item tall" variants={fadeInUp}>
-                    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop" alt="Wedding Ceremony" />
-                </motion.div>
-                <motion.div className="gallery-item" variants={fadeInUp}>
-                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop" alt="Wedding Mandap" />
+                    <img loading="lazy" decoding="async" src="/we1.jpg" alt="Wedding Moments" style={{objectPosition: 'center center'}} />
                 </motion.div>
                 <motion.div className="gallery-item wide" variants={fadeInUp}>
-                    <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1000&auto=format&fit=crop" alt="Wedding Reception" />
+                    <img loading="lazy" decoding="async" src="/we2.jpg" alt="Wedding Decor" style={{objectPosition: 'center center'}} />
+                </motion.div>
+                <motion.div className="gallery-item" variants={fadeInUp}>
+                    <img loading="lazy" decoding="async" src="/we4.jpeg" alt="Wedding Ceremony" style={{objectPosition: 'center center'}} />
+                </motion.div>
+                <motion.div className="gallery-item tall" variants={fadeInUp}>
+                    <img loading="lazy" decoding="async" src="/we5.JPG" alt="Wedding Reception" style={{objectPosition: 'center center'}} />
+                </motion.div>
+                <motion.div className="gallery-item wide" variants={fadeInUp}>
+                    <img loading="lazy" decoding="async" src="/we7.jpeg" alt="Wedding Rituals" style={{objectPosition: 'center center'}} />
                 </motion.div>
             </motion.div>
         </section>
@@ -1077,7 +1082,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Our wedding at Braj Nidhi was like a dream come true. The spiritual atmosphere combined with royal service made our special day truly divine. The team went above and beyond!"</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1615114814213-a2450f03ebe1?q=80&w=150&auto=format&fit=crop" alt="Priya & Aarav" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1615114814213-a2450f03ebe1?q=80&w=150&auto=format&fit=crop" alt="Priya & Aarav" />
                                 <div>
                                     <h4>Priya & Aarav</h4>
                                     <span>Wedding Couple</span>
@@ -1090,7 +1095,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"The mandap setup was absolutely breathtaking. Every detail, from the floral decorations to the authentic Sattvic catering, was handled with so much care and grace."</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Kavita Sharma" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Kavita Sharma" />
                                 <div>
                                     <h4>Kavita Sharma</h4>
                                     <span>Bride</span>
@@ -1103,7 +1108,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"We couldn't have asked for a better venue. The team at Braj Nidhi made sure everything was perfect for our traditional Vedic ceremony. Truly unforgettable experience!"</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&auto=format&fit=crop" alt="Vikram & Anjali" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&auto=format&fit=crop" alt="Vikram & Anjali" />
                                 <div>
                                     <h4>Vikram & Anjali</h4>
                                     <span>Anniversary Celebration</span>
@@ -1116,7 +1121,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Exceptional hospitality! Our guests are still talking about the beautiful surroundings and the peace they felt during the entire event. Highly recommended for destination weddings."</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Rajesh Khanna" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Rajesh Khanna" />
                                 <div>
                                     <h4>Rajesh Khanna</h4>
                                     <span>Father of the Bride</span>
@@ -1129,7 +1134,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"The Ganga Aarti theme was perfect for our reception. Braj Nidhi understood our vision and delivered beyond expectations. Our families are forever grateful!"</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=150&auto=format&fit=crop" alt="Meera & Arjun" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=150&auto=format&fit=crop" alt="Meera & Arjun" />
                                 <div>
                                     <h4>Meera & Arjun</h4>
                                     <span>Wedding Couple</span>
@@ -1142,7 +1147,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"From the moment we arrived, we felt like royalty. The warm hospitality, pristine grounds, and spiritual ambiance made our daughter's wedding magical. Thank you Braj Nidhi!"</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Devi" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Devi" />
                                 <div>
                                     <h4>Sunita Devi</h4>
                                     <span>Mother of the Bride</span>
@@ -1155,7 +1160,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Our wedding at Braj Nidhi was like a dream come true. The spiritual atmosphere combined with royal service made our special day truly divine. The team went above and beyond!"</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1615114814213-a2450f03ebe1?q=80&w=150&auto=format&fit=crop" alt="Priya & Aarav" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1615114814213-a2450f03ebe1?q=80&w=150&auto=format&fit=crop" alt="Priya & Aarav" />
                                 <div>
                                     <h4>Priya & Aarav</h4>
                                     <span>Wedding Couple</span>
@@ -1167,7 +1172,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"The mandap setup was absolutely breathtaking. Every detail, from the floral decorations to the authentic Sattvic catering, was handled with so much care and grace."</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Kavita Sharma" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Kavita Sharma" />
                                 <div>
                                     <h4>Kavita Sharma</h4>
                                     <span>Bride</span>
@@ -1179,7 +1184,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"We couldn't have asked for a better venue. The team at Braj Nidhi made sure everything was perfect for our traditional Vedic ceremony. Truly unforgettable experience!"</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&auto=format&fit=crop" alt="Vikram & Anjali" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&auto=format&fit=crop" alt="Vikram & Anjali" />
                                 <div>
                                     <h4>Vikram & Anjali</h4>
                                     <span>Anniversary Celebration</span>
@@ -1191,7 +1196,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Exceptional hospitality! Our guests are still talking about the beautiful surroundings and the peace they felt during the entire event. Highly recommended for destination weddings."</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Rajesh Khanna" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Rajesh Khanna" />
                                 <div>
                                     <h4>Rajesh Khanna</h4>
                                     <span>Father of the Bride</span>
@@ -1203,7 +1208,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"The Ganga Aarti theme was perfect for our reception. Braj Nidhi understood our vision and delivered beyond expectations. Our families are forever grateful!"</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=150&auto=format&fit=crop" alt="Meera & Arjun" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=150&auto=format&fit=crop" alt="Meera & Arjun" />
                                 <div>
                                     <h4>Meera & Arjun</h4>
                                     <span>Wedding Couple</span>
@@ -1215,7 +1220,7 @@ export default function Weddings() {
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"From the moment we arrived, we felt like royalty. The warm hospitality, pristine grounds, and spiritual ambiance made our daughter's wedding magical. Thank you Braj Nidhi!"</p>
                             <div className="testi-user">
-                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Devi" />
+                                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Devi" />
                                 <div>
                                     <h4>Sunita Devi</h4>
                                     <span>Mother of the Bride</span>
@@ -1370,7 +1375,7 @@ export default function Weddings() {
         
         <div className="footer-middle-bar">
             <Link href="/privacy">Privacy Policy</Link>
-            <span>Copyright &copy; BRAJNIDHI 2026</span>
+            <span>Copyright &copy; BRAJNIDHI {new Date().getFullYear()}</span>
             <Link href="/terms">Terms Of Use</Link>
         </div>
 

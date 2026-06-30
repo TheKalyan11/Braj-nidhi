@@ -136,6 +136,15 @@ export default function Corporate() {
             color: #1a1a1a;
         }
 
+        /* Header overrides to show black text on light background */
+        .index-page .corporate-page header:not(.scrolled) nav ul li a,
+        .index-page .corporate-page header:not(.scrolled) .mobile-menu-btn {
+            color: #1a1a1a !important;
+        }
+        .index-page .corporate-page header:not(.scrolled) nav ul li a:hover {
+            color: #C89B3C !important;
+        }
+
         .events-hero {
             background-color: #ffffff;
             padding: 120px 0 60px 0;
@@ -814,14 +823,14 @@ export default function Corporate() {
 
     <header id="main-header" className={scrolled ? "scrolled" : ""}>
         <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
+            <img loading="lazy" decoding="async" src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         <nav>
@@ -854,7 +863,7 @@ export default function Corporate() {
         <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
           <div className="mobile-menu-header">
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
             </Link>
             <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
               <X size={24} />
@@ -1020,7 +1029,7 @@ export default function Corporate() {
                 className="split-image"
                 variants={slideInRight}
             >
-                <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop" alt="Corporate Strategy Meeting" />
+                <img loading="lazy" decoding="async" src="/IMG_3683.jpg" alt="Corporate Strategy Meeting" />
             </motion.div>
         </motion.section>
 
@@ -1031,14 +1040,14 @@ export default function Corporate() {
                 <p>Elevate your corporate gatherings with thoughtfully curated sattvic dining experiences designed to energize, refresh, and inspire. From executive lunches and high-tea sessions to premium dinner setups, every meal at Braj Nidhi is prepared with purity, authenticity, and hospitality.</p>
                 <p>Blending soulful flavors with elegant presentation, we create dining experiences that perfectly complement conferences, retreats, and leadership gatherings.</p>
                 <ul className="package-features" style={{"marginTop":"20px"}}>
-                    <li><i className="fas fa-check"></i> Premium Tea & Coffee Experiences</li>
+                    <li><i className="fas fa-check"></i> Vedic Tea & Coffee Experiences</li>
                     <li><i className="fas fa-check"></i> Curated Sattvic Buffet Setups</li>
                     <li><i className="fas fa-check"></i> Executive Dining & Retreat Catering</li>
                     <li><i className="fas fa-check"></i> Elegant Dinner & Gathering Experiences</li>
                 </ul>
             </motion.div>
             <motion.div className="split-image" variants={slideInLeft}>
-                <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=1200&auto=format&fit=crop" alt="Sattvic Dining" />
+                <img loading="lazy" decoding="async" src="/the-design-thoughtfully.jpg" alt="Sattvic Dining" />
             </motion.div>
         </motion.section>
 
@@ -1136,79 +1145,79 @@ export default function Corporate() {
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Hosting our annual leadership retreat at Braj Nidhi was the best decision. The state-of-the-art AV hall was perfectly equipped, and the serene environment led to our most productive strategy session yet."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Raj Malhotra" /><div><h4>Raj Malhotra</h4><span>CEO, TechVision India</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Raj Malhotra" /><div><h4>Raj Malhotra</h4><span>CEO, TechVision India</span></div></div>
                         </div>
                         {/* Card 2 - Priya Iyer */}
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"The hospitality team went above and beyond for our offsite. The working lunches were fantastic, and the morning meditation sessions completely recharged the entire team."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="Priya Iyer" /><div><h4>Priya Iyer</h4><span>HR Director, GlobalCorp</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="Priya Iyer" /><div><h4>Priya Iyer</h4><span>HR Director, GlobalCorp</span></div></div>
                         </div>
                         {/* Card 3 - Vikram Sethi */}
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Braj Nidhi offers a unique blend of modern facilities and spiritual peace. It's the perfect place for team building and deep focus away from the city noise."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" alt="Vikram Sethi" /><div><h4>Vikram Sethi</h4><span>Operations Manager</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" alt="Vikram Sethi" /><div><h4>Vikram Sethi</h4><span>Operations Manager</span></div></div>
                         </div>
                         {/* Card 4 - Anjali Patel */}
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"The pure vegetarian catering was a huge hit with our international clients. The attention to detail in the Bose sound system and AV setup made our conference absolutely seamless."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Anjali Patel" /><div><h4>Anjali Patel</h4><span>Executive Director</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Anjali Patel" /><div><h4>Anjali Patel</h4><span>Executive Director</span></div></div>
                         </div>
                         {/* Card 5 - Sanjay Kumar */}
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"We've hosted multiple offsites at Braj Nidhi. The combination of luxury rooms, professional AV facilities, and the peaceful Braj atmosphere makes it our go-to choice."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="Sanjay Kumar" /><div><h4>Sanjay Kumar</h4><span>VP Operations, Indigo Tech</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="Sanjay Kumar" /><div><h4>Sanjay Kumar</h4><span>VP Operations, Indigo Tech</span></div></div>
                         </div>
                         {/* Card 6 - Sunita Reddy */}
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Our leadership team returned refreshed and recharged after the Braj Yatra experience. The perfect blend of business infrastructure and spiritual wellness. Highly recommended!"</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Reddy" /><div><h4>Sunita Reddy</h4><span>CHRO, Reliance infra</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Reddy" /><div><h4>Sunita Reddy</h4><span>CHRO, Reliance infra</span></div></div>
                         </div>
                         {/* Duplicated for loop */}
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Hosting our annual leadership retreat at Braj Nidhi was the best decision. The state-of-the-art AV hall was perfectly equipped, and the serene environment led to our most productive strategy session yet."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Raj Malhotra" /><div><h4>Raj Malhotra</h4><span>CEO, TechVision India</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="Raj Malhotra" /><div><h4>Raj Malhotra</h4><span>CEO, TechVision India</span></div></div>
                         </div>
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"The hospitality team went above and beyond for our offsite. The working lunches were fantastic, and the morning meditation sessions completely recharged the entire team."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="Priya Iyer" /><div><h4>Priya Iyer</h4><span>HR Director, GlobalCorp</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="Priya Iyer" /><div><h4>Priya Iyer</h4><span>HR Director, GlobalCorp</span></div></div>
                         </div>
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Braj Nidhi offers a unique blend of modern facilities and spiritual peace. It's the perfect place for team building and deep focus away from the city noise."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" alt="Vikram Sethi" /><div><h4>Vikram Sethi</h4><span>Operations Manager</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" alt="Vikram Sethi" /><div><h4>Vikram Sethi</h4><span>Operations Manager</span></div></div>
                         </div>
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"The pure vegetarian catering was a huge hit with our international clients. The attention to detail in the Bose sound system and AV setup made our conference absolutely seamless."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Anjali Patel" /><div><h4>Anjali Patel</h4><span>Executive Director</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?q=80&w=150&auto=format&fit=crop" alt="Anjali Patel" /><div><h4>Anjali Patel</h4><span>Executive Director</span></div></div>
                         </div>
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"We've hosted multiple offsites at Braj Nidhi. The combination of luxury rooms, professional AV facilities, and the peaceful Braj atmosphere makes it our go-to choice."</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="Sanjay Kumar" /><div><h4>Sanjay Kumar</h4><span>VP Operations, Indigo Tech</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" alt="Sanjay Kumar" /><div><h4>Sanjay Kumar</h4><span>VP Operations, Indigo Tech</span></div></div>
                         </div>
                         <div className="testi-card">
                             <div className="testi-quote"><i className="fas fa-quote-left"></i></div>
                             <div className="testi-stars">★★★★★</div>
                             <p className="testi-text">"Our leadership team returned refreshed and recharged after the Braj Yatra experience. The perfect blend of business infrastructure and spiritual wellness. Highly recommended!"</p>
-                            <div className="testi-user"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Reddy" /><div><h4>Sunita Reddy</h4><span>CHRO, Reliance infra</span></div></div>
+                            <div className="testi-user"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" alt="Sunita Reddy" /><div><h4>Sunita Reddy</h4><span>CHRO, Reliance infra</span></div></div>
                         </div>
 </div>
                 </div>
@@ -1358,7 +1367,7 @@ export default function Corporate() {
         
         <div className="footer-middle-bar">
             <Link href="/privacy">Privacy Policy</Link>
-            <span>Copyright &copy; BRAJNIDHI 2026</span>
+            <span>Copyright &copy; BRAJNIDHI {new Date().getFullYear()}</span>
             <Link href="/terms">Terms Of Use</Link>
         </div>
 

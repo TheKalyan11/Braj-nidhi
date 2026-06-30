@@ -11,11 +11,11 @@ import BookNowButton from "@/components/BookNowButton";
 const visitRows = [
   {
     label: "Location:",
-    value: "Braj Nidhi Guest House, Near Bankey Bihari Mandir, Vrindavan, Mathura, UP 281121",
+    value: "Braj Nidhi Dham, near Prem Mandir, Raman Reti, Vrindavan, Uttar Pradesh, PIN 281121",
   },
   { label: "Open Daily:", value: "24/7 Front Desk · Check-in 12:00 PM" },
-  { label: "Phone:", value: "xx" },
-  { label: "Email:", value: "xx" },
+  { label: "Phone:", value: "+91 70377 94300" },
+  { label: "Email:", value: "xx@thebrajnidhi.com" },
 ];
 
 export default function Contact() {
@@ -589,14 +589,14 @@ export default function Contact() {
 
       <header id="main-header" className={scrolled ? "scrolled" : ""}>
         <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
+            <img loading="lazy" decoding="async" src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         <nav>
@@ -629,7 +629,7 @@ export default function Contact() {
           <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-menu-header">
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
+                <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
               </Link>
               <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
                 <X size={24} />
@@ -668,10 +668,8 @@ export default function Contact() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, delay: 0.15 }}
             >
-              <img
-                src="/h11.jpg"
-                alt="Braj Nidhi hospitality"
-              />
+              <img loading="lazy" decoding="async" src="/h11.jpg"
+                alt="Braj Nidhi hospitality" />
             </motion.div>
             <motion.div
               className="contact-hero-panel"
@@ -865,7 +863,7 @@ export default function Contact() {
                   </div>
                   <div className="location-item-content">
                     <h4>Address</h4>
-                    <p>Braj Nidhi Guest House, Near Bankey Bihari Mandir, Vrindavan, UP 281121</p>
+                    <p>Braj Nidhi Dham, near Prem Mandir, Raman Reti, Vrindavan, Uttar Pradesh, PIN 281121</p>
                   </div>
                 </div>
                 <div className="location-item">
@@ -874,7 +872,7 @@ export default function Contact() {
                   </div>
                   <div className="location-item-content">
                     <h4>Phone</h4>
-                    <p>xx</p>
+                    <p><a href="tel:+917037794300" className="hover:text-gold transition-colors">+91 70377 94300</a></p>
                   </div>
                 </div>
                 <div className="location-item">
@@ -883,7 +881,7 @@ export default function Contact() {
                   </div>
                   <div className="location-item-content">
                     <h4>Email</h4>
-                    <p>xx</p>
+                    <p><a href="mailto:xx@thebrajnidhi.com" className="hover:text-gold transition-colors">xx@thebrajnidhi.com</a></p>
                   </div>
                 </div>
                 <div className="location-item">
@@ -906,10 +904,10 @@ export default function Contact() {
               transition={{ duration: 0.8 }}
             >
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6974793!3d27.5815647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736fc201c10711%3A0xbcc1c54b2ce8f41e!2sShri%20Bankey%20Bihari%20Ji%20Temple%2C%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.7180523761876!2d77.64352459999999!3d27.571259500000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736d95ffadb1e5%3A0x964d0da837084cf6!2sBraj%20Nidhi%20Guest%20House!5e0!3m2!1sen!2sin!4v1782829856223!5m2!1sen!2sin"
                 allowFullScreen
                 loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
+                referrerPolicy="strict-origin-when-cross-origin"
                 title="Braj Nidhi Location"
               />
             </motion.div>

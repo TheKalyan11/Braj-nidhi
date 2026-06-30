@@ -9,13 +9,13 @@ import Link from 'next/link';
 /* ─── DATA ─── */
 const packages = [
   {
-    id: 1, tag: "Heritage", title: "Braj Heritage Yatra",
-    subtitle: "Divine Land of Pastimes",
-    desc: "Immerse yourself in the divine essence of Braj by visiting the most divine destinations — Nandgaon, Barsana, Mathura, and Gokul. Walk the very paths where Shri Radha Krishna played their divine leelas.",
+    id: 1, tag: "Popular", title: "Chaurasi Kos Yatra",
+    subtitle: "Complete Circumambulation of Braj",
+    desc: "Experience the ultimate spiritual journey covering all 84 Kos of Braj Bhoomi. Visit the most sacred forests, kunds, and pastime places of Radha and Krishna.",
     price: "₹29,999", priceLabel: "Starting From", duration: "3 Days / 2 Nights",
     ideal: ["Families", "Pilgrims", "Spiritual Groups"],
     highlights: ["Temple Darshan", "Heritage Walk", "Cultural Immersion", "Sattvic Meals"],
-    image: "/nand_baba.webp", badge: "Most Popular", color: "#d4af37",
+    image: "/IMG_3846.JPG", badge: "Most Popular", color: "#d4af37",
   },
   {
     id: 2, tag: "Vrindavan", title: "Sapt Devalaya Darshan",
@@ -24,7 +24,7 @@ const packages = [
     price: "₹14,999", priceLabel: "Starting From", duration: "1 Day / 2 Days",
     ideal: ["Devotees", "Seekers", "Solo Travelers"],
     highlights: ["7 Temple Darshan", "Expert Guide", "Prasad Included", "Flexible Timing"],
-    image: "/temple_tour.webp", badge: "Devotee's Choice", color: "#c87941",
+    image: "/Radha Vallabh Dwar.jpg", badge: "Devotee's Choice", color: "#c87941",
   },
   {
     id: 3, tag: "Exclusive", title: "Customized Yatra",
@@ -33,15 +33,15 @@ const packages = [
     price: "On Request", priceLabel: "Custom Pricing", duration: "Flexible",
     ideal: ["Couples", "VIPs", "Corporate Groups"],
     highlights: ["Private Vehicle", "Personal Guide", "Premium Hotels", "Custom Itinerary"],
-    image: "/spiritual_retreat.png", badge: "Premium", color: "#6b8f5e",
+    image: "/keshi ghat.jpg", badge: "Premium", color: "#6b8f5e",
   },
 ];
 
 const destinations = [
-  { name: "Vrindavan", label: "Braj Bhoomi", image: "/temple_tour_1.webp", span: "wide" },
-  { name: "Mathura", label: "Birthplace of Krishna", image: "/temple_tour_3.webp", span: "normal" },
-  { name: "Nandgaon", label: "Krishna's Childhood Home", image: "/nand_baba.webp", span: "normal" },
-  { name: "Barsana", label: "Radha's Divine Abode", image: "/spiritual_5.webp", span: "wide" },
+  { name: "Vrindavan", label: "Braj Bhoomi", image: "https://upload.wikimedia.org/wikipedia/commons/7/77/Vrindavan_Chandrodaya_Mandir.jpg", span: "wide" },
+  { name: "Mathura", label: "Birthplace of Krishna", image: "/599049187978314472.jpg", span: "normal" },
+  { name: "Nandgaon", label: "Krishna's Childhood Home", image: "/IMG_3846.JPG", span: "normal" },
+  { name: "Barsana", label: "Radha's Divine Abode", image: "/IMG_3637.JPG", span: "wide" },
 ];
 
 const journeySteps = [
@@ -120,11 +120,10 @@ function useCounter(end: number, duration: number = 2000) {
 }
 
 const sliderImages = [
-  { url: "/yamuna_ghat.png", title: "Yamuna Ghat, Mathura" },
-  { url: "/temple_tour_1.webp", title: "Banke Bihari, Vrindavan" },
-  { url: "/nand_baba.webp", title: "Nand Bhavan, Nandgaon" },
-  { url: "/spiritual_5.webp", title: "Radha Rani Temple, Barsana" },
-  { url: "/temple_tour_3.webp", title: "Prem Mandir, Vrindavan" }
+  { url: "https://upload.wikimedia.org/wikipedia/commons/7/77/Vrindavan_Chandrodaya_Mandir.jpg", title: "Vrindavan, Braj Bhoomi" },
+  { url: "/599049187978314472.jpg", title: "Mathura, Birthplace of Krishna" },
+  { url: "/IMG_3846.JPG", title: "Nandgaon, Krishna's Childhood Home" },
+  { url: "/IMG_3637.JPG", title: "Barsana, Radha's Divine Abode" }
 ];
 
 function HeroSlider() {
@@ -446,9 +445,9 @@ export default function BrajYatra() {
           box-shadow: 0 25px 60px rgba(15, 23, 42, 0.1);
           border: 10px solid #ffffff;
           background: #ffffff;
-          aspect-ratio: 21 / 9;
+          aspect-ratio: 16 / 9;
           min-height: 360px;
-          max-height: 540px;
+          max-height: 700px;
           z-index: 5;
         }
         
@@ -1154,9 +1153,10 @@ export default function BrajYatra() {
         /* ═══ CTA ═══ */
         .y-cta { padding: 0 8% 70px; background: #fff; }
         .y-cta-box {
-          background-image: linear-gradient(to right, rgba(10, 14, 20, 0.9) 0%, rgba(10, 14, 20, 0.65) 100%), url('/braj_yatra_cta_bg.png') !important;
+          background-image: linear-gradient(to right, rgba(10, 14, 20, 0.85) 0%, rgba(10, 14, 20, 0.5) 100%), url('https://experiencemyindia.com/wp-content/uploads/2025/03/rog5xhi8eunkjcl0t9fn.webp') !important;
           background-size: cover !important;
           background-position: center !important;
+          background-repeat: no-repeat !important;
           border-radius: 32px;
           padding: 70px 64px;
           display: grid;
@@ -1243,6 +1243,10 @@ export default function BrajYatra() {
           font-weight: 700 !important;
           color: #0c1829 !important;
         }
+        .braj-yatra-page .testimonials-slider {
+          -webkit-mask-image: linear-gradient(to right, transparent, white 10%, white 90%, transparent);
+          mask-image: linear-gradient(to right, transparent, white 10%, white 90%, transparent);
+        }
         .braj-yatra-page .testimonials-slider .swiper-slide {
           width: 310px !important;
         }
@@ -1295,14 +1299,14 @@ export default function BrajYatra() {
       {/* ═══ HEADER ═══ */}
       <header id="main-header" className={scrolled ? "scrolled" : ""}>
         <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
+            <img loading="lazy" decoding="async" src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         <nav>
@@ -1330,7 +1334,7 @@ export default function BrajYatra() {
           <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-menu-header">
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
+                <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
               </Link>
               <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}><X size={24} /></button>
             </div>
@@ -1456,8 +1460,8 @@ export default function BrajYatra() {
           <motion.div {...fadeUp} transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" as const }}>
             <div className="y-intro-imgs">
               <div className="y-intro-ring" />
-              <img src="/temple_tour_1.webp" alt="Temple Darshan" className="y-intro-main" />
-              <img src="/nand_baba.webp" alt="Braj Heritage" className="y-intro-accent" />
+              <img loading="lazy" decoding="async" src="/%23Vrindavan.jpg" alt="Temple Darshan" className="y-intro-main" />
+              <img loading="lazy" decoding="async" src="/keshi%20ghat.jpg" alt="Braj Heritage" className="y-intro-accent" />
               <motion.div className="y-intro-badge" initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true } as const} transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" as const }}>
                 <strong>20+</strong><span>Years of<br />Experience</span>
               </motion.div>
@@ -1562,67 +1566,92 @@ export default function BrajYatra() {
             </button>
           </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activePackage}
-              className="y-bento"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: "easeOut" as const }}
-              onMouseEnter={() => setPkgPaused(true)}
-              onMouseLeave={() => setPkgPaused(false)}
-            >
-              <div className="y-bento-img">
-                <img src={packages[activePackage].image} alt={packages[activePackage].title} />
-                <div className="y-bento-img-overlay" />
-                
-                {/* Left/Right Overlaid Arrow Buttons */}
-                <button 
-                  className="y-bento-img-arrow left" 
-                  onClick={(e) => { e.stopPropagation(); prevPackage(); }} 
-                  aria-label="Previous Package"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <button 
-                  className="y-bento-img-arrow right" 
-                  onClick={(e) => { e.stopPropagation(); nextPackage(); }} 
-                  aria-label="Next Package"
-                >
-                  <ChevronRight size={20} />
-                </button>
+          <div
+            className="y-bento"
+            onMouseEnter={() => setPkgPaused(true)}
+            onMouseLeave={() => setPkgPaused(false)}
+          >
+            <div className="y-bento-img">
+              <AnimatePresence mode="popLayout">
+                <motion.img
+                  key={packages[activePackage].image}
+                  src={packages[activePackage].image}
+                  alt={packages[activePackage].title}
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </AnimatePresence>
+              <div className="y-bento-img-overlay" />
+              
+              {/* Left/Right Overlaid Arrow Buttons */}
+              <button 
+                className="y-bento-img-arrow left" 
+                onClick={(e) => { e.stopPropagation(); prevPackage(); }} 
+                aria-label="Previous Package"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button 
+                className="y-bento-img-arrow right" 
+                onClick={(e) => { e.stopPropagation(); nextPackage(); }} 
+                aria-label="Next Package"
+              >
+                <ChevronRight size={20} />
+              </button>
 
-                <div className="y-bento-img-content">
-                  <div className="y-badge">{packages[activePackage].badge}</div>
-                  <h3 className="y-pkg-title">{packages[activePackage].title}</h3>
-                  <p className="y-pkg-sub">{packages[activePackage].subtitle}</p>
-                  <span className="y-duration"><i className="far fa-clock"></i>{packages[activePackage].duration}</span>
-                </div>
+              <div className="y-bento-img-content">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activePackage}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -15 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                  >
+                    <div className="y-badge">{packages[activePackage].badge}</div>
+                    <h3 className="y-pkg-title">{packages[activePackage].title}</h3>
+                    <p className="y-pkg-sub">{packages[activePackage].subtitle}</p>
+                    <span className="y-duration"><i className="far fa-clock"></i>{packages[activePackage].duration}</span>
+                  </motion.div>
+                </AnimatePresence>
               </div>
-              <div className="y-bento-info">
-                <div className="y-info-card">
-                  <div className="y-price-lbl">{packages[activePackage].priceLabel}</div>
-                  <div className="y-price">{packages[activePackage].price}</div>
-                  <div className="y-price-note">per person, taxes applicable</div>
-                  <p className="y-pkg-desc">{packages[activePackage].desc}</p>
-                  <a href="/contact" className="y-btn-book"><i className="fas fa-paper-plane"></i>Book This Package</a>
-                </div>
-                <div className="y-highlights">
-                  <div className="y-highlights-lbl">What&apos;s Included</div>
-                  <div className="y-pills">
-                    {packages[activePackage].highlights.map(h => (
-                      <span className="y-pill" key={h}><i className="fas fa-check-circle"></i>{h}</span>
-                    ))}
+            </div>
+            <div className="y-bento-info">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activePackage}
+                  initial={{ opacity: 0, x: 15 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -15 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}
+                >
+                  <div className="y-info-card">
+                    <div className="y-price-lbl">{packages[activePackage].priceLabel}</div>
+                    <div className="y-price">{packages[activePackage].price}</div>
+                    <div className="y-price-note">per person, taxes applicable</div>
+                    <p className="y-pkg-desc">{packages[activePackage].desc}</p>
+                    <a href="/contact" className="y-btn-book"><i className="fas fa-paper-plane"></i>Book This Package</a>
                   </div>
-                  <div className="y-ideal">
-                    <span className="y-ideal-lbl">Ideal For:</span>
-                    {packages[activePackage].ideal.map(t => <span className="y-ideal-tag" key={t}>{t}</span>)}
+                  <div className="y-highlights">
+                    <div className="y-highlights-lbl">What&apos;s Included</div>
+                    <div className="y-pills">
+                      {packages[activePackage].highlights.map(h => (
+                        <span className="y-pill" key={h}><i className="fas fa-check-circle"></i>{h}</span>
+                      ))}
+                    </div>
+                    <div className="y-ideal">
+                      <span className="y-ideal-lbl">Ideal For:</span>
+                      {packages[activePackage].ideal.map(t => <span className="y-ideal-tag" key={t}>{t}</span>)}
+                    </div>
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
         </section>
 
         {/* ═══ DESTINATIONS ═══ */}
@@ -1634,7 +1663,7 @@ export default function BrajYatra() {
           <div className="y-dest-grid">
             {destinations.map((dest, i) => (
               <motion.div key={dest.name} className="y-dest" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true } as const} transition={{ duration: 0.7, delay: i * 0.12, ease: "easeOut" as const }}>
-                <img src={dest.image} alt={dest.name} />
+                <img loading="lazy" decoding="async" src={dest.image} alt={dest.name} />
                 <div className="y-dest-overlay" />
                 <div className="y-dest-arrow"><i className="fas fa-arrow-right"></i></div>
                 <div className="y-dest-content">
@@ -1662,7 +1691,7 @@ export default function BrajYatra() {
                   <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                   <p className="testimonial-text">&ldquo;{t.text}&rdquo;</p>
                   <div className="testimonial-user">
-                    <img src={t.avatar} alt={t.name} />
+                    <img loading="lazy" decoding="async" src={t.avatar} alt={t.name} />
                     <div>
                       <h4>{t.name}</h4>
                       <span>{t.location}</span>
@@ -1713,7 +1742,7 @@ export default function BrajYatra() {
 
             {/* Card 3 — bottom, spanning 2 cols */}
             <motion.div className="y-why-lcard span2" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true } as const} transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" as const }}>
-              <div className="y-why-lcard-icon"><i className="fas fa-star-and-crescent"></i></div>
+              <div className="y-why-lcard-icon"><i className="fas fa-map-marked-alt"></i></div>
               <h3 className="y-why-lcard-title">12+ Divine Destinations Covered</h3>
               <p className="y-why-lcard-desc">Braj Nidhi covers the complete Braj Mandal — from Vrindavan&apos;s sacred groves and Mathura&apos;s ghats to Nandgaon, Barsana, Govardhan, and beyond. We handle all logistics so you can focus entirely on your bhakti and connection with the divine.</p>
             </motion.div>
@@ -1730,7 +1759,7 @@ export default function BrajYatra() {
             </div>
             <div className="y-cta-btns">
               <a href="/contact" className="y-btn-cta"><i className="fas fa-paper-plane"></i>Plan My Yatra</a>
-              <a href="tel:+91XXXXXXXXXX" className="y-btn-cta-outline"><i className="fas fa-phone-alt"></i>Call Us Now</a>
+              <a href="tel:+917037794300" className="y-btn-cta-outline"><i className="fas fa-phone-alt"></i>Call Us Now</a>
             </div>
           </motion.div>
         </section>
@@ -1745,7 +1774,7 @@ export default function BrajYatra() {
           <div className="footer-col"><h3>Help & Support</h3><a href="#">FAQ</a><a href="/contact">Contact Us</a><a href="#">Direction Map</a><a href="#">Group Inquiries</a></div>
           <div className="footer-col"><h3>Information</h3><Link href="/privacy">Privacy Policy</Link><Link href="/terms">Terms of Service</Link><Link href="/guest-policy">Guest Policy</Link><Link href="/cancellation-policy">Cancellation Policy</Link></div>
         </div>
-        <div className="footer-middle-bar"><Link href="/privacy">Privacy Policy</Link><span>Copyright &copy; BRAJNIDHI 2026</span><Link href="/terms">Terms Of Use</Link></div>
+        <div className="footer-middle-bar"><Link href="/privacy">Privacy Policy</Link><span>Copyright &copy; BRAJNIDHI {new Date().getFullYear()}</span><Link href="/terms">Terms Of Use</Link></div>
         <div className="footer-massive-text">BRAJNIDHI</div>
       </footer>
 

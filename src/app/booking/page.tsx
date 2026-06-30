@@ -530,6 +530,12 @@ export default function BookingPage() {
       return;
     }
 
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    if (checkIn < todayStr) {
+      alert('Backdated reservations are not allowed. Please select a valid check-in date.');
+      return;
+    }
+
     // Re-check availability right before charging — date/inventory could have changed.
     try {
       const r = await fetch(
@@ -552,7 +558,7 @@ export default function BookingPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     let resId = 'MOCK-RES-' + Math.floor(100000 + Math.random() * 900000);
-    const amount = finalTotal;
+    const amount = payableTotal;
 
     // Always use the canonical ERP room type IDs — override with live ERP value if available
     const erpRoomTypeMap: Record<string, string> = {
@@ -2350,14 +2356,14 @@ export default function BookingPage() {
       {/* 1. STUNNING HEADER NAVIGATION IN MMT STYLE */}
       <header id="main-header" className={headerScrolled ? "scrolled" : ""}>
         <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
+            <img loading="lazy" decoding="async" src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         
@@ -2388,7 +2394,7 @@ export default function BookingPage() {
         <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-menu-header">
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto" }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto" }} />
               <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
                 <X size={24} />
               </button>
@@ -2437,7 +2443,7 @@ export default function BookingPage() {
                       Vrindavan, Uttar Pradesh
                     </div>
                   </div>
-                  <img src={getRoomImage(roomType)} alt="Room" style={{ width: '84px', height: '62px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0, border: '1px solid #e5e7eb' }}/>
+                  <img loading="lazy" decoding="async" src={getRoomImage(roomType)} alt="Room" style={{ width: '84px', height: '62px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0, border: '1px solid #e5e7eb' }} />
                 </div>
 
                 <div style={{ borderTop: '1px solid #f0f0f0', margin: '14px 0' }}/>
@@ -2752,6 +2758,7 @@ export default function BookingPage() {
                     <input 
                       type="date" 
                       value={checkIn}
+                      min={new Date().toLocaleDateString('en-CA')}
                       onChange={(e) => setCheckIn(e.target.value)}
                     />
                   </div>
@@ -2760,6 +2767,7 @@ export default function BookingPage() {
                     <input 
                       type="date" 
                       value={checkOut}
+                      min={checkIn || new Date().toLocaleDateString('en-CA')}
                       onChange={(e) => setCheckOut(e.target.value)}
                     />
                   </div>
@@ -3179,7 +3187,7 @@ export default function BookingPage() {
               {/* LEFT CARD & GUEST INFO */}
               <div className="conf-left-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 <div className="conf-left-card">
-                  <img src={getRoomImage(roomType)} alt="Room Preview" className="conf-left-image" />
+                  <img loading="lazy" decoding="async" src={getRoomImage(roomType)} alt="Room Preview" className="conf-left-image" />
                   <div className="conf-left-body">
                     <div className="conf-room-title-line">
                       <h3>{getRoomTitle(roomType)}</h3>
@@ -3193,7 +3201,7 @@ export default function BookingPage() {
                       <div className="conf-ref-badge"><Check size={10} />{bookingRef}</div>
                     </div>
                     <div className="conf-property-box">
-                      <img src="/Braj_nidhi_.png" alt="Braj Nidhi" className="conf-property-avatar" />
+                      <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi" className="conf-property-avatar" />
                       <div className="conf-property-details">
                         <h4>Braj Nidhi Guesthouse</h4>
                         <span>Vrindavan, UP</span>
@@ -3496,7 +3504,7 @@ export default function BookingPage() {
         </div>
         <div className="footer-middle-bar">
           <Link href="/privacy">Privacy Policy</Link>
-          <span>Copyright &copy; BRAJNIDHI 2026</span>
+          <span>Copyright &copy; BRAJNIDHI {new Date().getFullYear()}</span>
           <Link href="/terms">Terms Of Use</Link>
         </div>
         <div className="footer-massive-text">BRAJNIDHI</div>

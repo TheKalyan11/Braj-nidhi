@@ -107,11 +107,14 @@ export default function Guesthouse() {
 
   // Promo Section 1 image slider
   const promoImages = [
-    "/temple_tour_1.webp",
-    "/temple_tour_3.webp",
-    "/yamuna_ghat.png",
-    "/nand_baba.webp",
-    "/spiritual_5.webp"
+    "/%23Vrindavan.jpg",
+    "/download%20(1).jpg",
+    "/keshi%20ghat.jpg",
+    "/nidhi%20van%20,%20Vrindavan.jpg",
+    "/Radha%20Vallabh%20Dwar.jpg",
+    "/Raman%20Reti,%20Vrindavan.jpg",
+    "/Samadhi%20temple%20of%20neem%20karoli%20baba,%20Vrindavan.jpg",
+    "/%F0%9F%93%8DShri%20Banke%20Bihari%20Mandir,%20Vrindavan.jpg"
   ];
   const [promoIndex, setPromoIndex] = useState(0);
 
@@ -1480,14 +1483,14 @@ export default function Guesthouse() {
 
     <header id="main-header" className={scrolled ? "scrolled" : ""}>
         <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
+            <img loading="lazy" decoding="async" src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         
@@ -1522,7 +1525,7 @@ export default function Guesthouse() {
         <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
           <div className="mobile-menu-header">
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto", cursor: "pointer" }} />
             </Link>
             <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
               <X size={24} />
@@ -1658,7 +1661,7 @@ export default function Guesthouse() {
                         onClick={(e) => scrollToSection('deluxe2-detail', e)}
                     >
                         <div className="featured-room-img-wrap">
-                            <img src="d1.webp" alt="Deluxe 2 – Twin Bedded Room" />
+                            <img loading="lazy" decoding="async" src="d1.webp" alt="Deluxe 2 – Twin Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 2 – Twin Bedded Room</div>
                     </a>
@@ -1668,7 +1671,7 @@ export default function Guesthouse() {
                         onClick={(e) => scrollToSection('deluxe3-detail', e)}
                     >
                         <div className="featured-room-img-wrap">
-                            <img src="t1.webp" alt="Deluxe 3 – 3 Bedded Room" />
+                            <img loading="lazy" decoding="async" src="t1.webp" alt="Deluxe 3 – 3 Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 3 – 3 Bedded Room</div>
                     </a>
@@ -1678,7 +1681,7 @@ export default function Guesthouse() {
                         onClick={(e) => scrollToSection('deluxe4-detail', e)}
                     >
                         <div className="featured-room-img-wrap">
-                            <img src="f1.webp" alt="Deluxe 4 – 4 Bedded Room" />
+                            <img loading="lazy" decoding="async" src="f1.webp" alt="Deluxe 4 – 4 Bedded Room" />
                         </div>
                         <div className="featured-room-title">Deluxe 4 – 4 Bedded Room</div>
                     </a>
@@ -1696,7 +1699,7 @@ export default function Guesthouse() {
                                 onClick={(e) => scrollToSection('deluxe4-detail', e)}
                             >
                                 <div className="featured-room-img-wrap">
-                                    <img src="DSC05963-HDR.webp" alt="Deluxe Suite" />
+                                    <img loading="lazy" decoding="async" src="DSC05963-HDR.webp" alt="Deluxe Suite" />
                                 </div>
                                 <div className="featured-room-title">Deluxe Suite</div>
                             </a>
@@ -1706,7 +1709,7 @@ export default function Guesthouse() {
                                 onClick={(e) => scrollToSection('deluxe4-detail', e)}
                             >
                                 <div className="featured-room-img-wrap">
-                                    <img src="d31.webp" alt="Heritage Suite" />
+                                    <img loading="lazy" decoding="async" src="d31.webp" alt="Heritage Suite" />
                                 </div>
                                 <div className="featured-room-title">Heritage Suite</div>
                             </a>
@@ -1913,7 +1916,7 @@ export default function Guesthouse() {
             </div>
             
             <div className="promo2-col-right">
-                <img src="z.png" alt="Deluxe Room" />
+                <img loading="lazy" decoding="async" src="z.png" alt="Deluxe Room" />
                 <div className="promo2-price-badge">
                     <div className="price-top">
                         <span className="price-num">3.5</span>
@@ -1970,7 +1973,7 @@ export default function Guesthouse() {
         
         <div className="footer-middle-bar">
             <Link href="/privacy">Privacy Policy</Link>
-            <span>Copyright &copy; BRAJNIDHI 2026</span>
+            <span>Copyright &copy; BRAJNIDHI {new Date().getFullYear()}</span>
             <Link href="/terms">Terms Of Use</Link>
         </div>
 

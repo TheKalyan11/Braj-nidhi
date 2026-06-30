@@ -16,16 +16,14 @@ export default function FloatingLogo() {
         zIndex: 9998,
       }}
     >
-      <img
-        src="/LOGO1.jpg"
+      <img loading="lazy" decoding="async" src="/LOGO1.jpg"
         alt="Vrindavan Chandrodaya Mandir"
         style={{
           height: "65px",
           width: "auto",
           display: "block",
           borderRadius: "10px",
-        }}
-      />
+        }} />
       {/* Dismiss button */}
       <button
         onClick={() => setVisible(false)}

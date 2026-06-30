@@ -55,11 +55,9 @@ const InstagramIconComp = () => (
 const GlowingAvatar = () => (
   <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center bg-gradient-to-tr from-[#9F7AEA] via-[#EC4899] to-[#3B82F6] shadow-[0_0_12px_rgba(159,122,234,0.4)]">
     <div className="absolute inset-[1.5px] rounded-full bg-white flex items-center justify-center overflow-hidden">
-      <img
-        src="/1200x630wa-removebg-preview.png"
+      <img loading="lazy" decoding="async" src="/1200x630wa-removebg-preview.png"
         alt="Braj Nidhi Avatar"
-        className="w-6 h-6 object-contain"
-      />
+        className="w-6 h-6 object-contain" />
     </div>
     <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-blue-500/10 mix-blend-overlay animate-pulse" />
   </div>
@@ -243,7 +241,7 @@ export default function FloatingWidgets() {
       const data = await response.json();
       return data.reply || "Blessed seeker, please try again.";
     } catch {
-      return "Radhe Radhe! 🙏 For direct room reservations or support, please speak directly to our concierge team at +91 98765 43210.";
+      return "Radhe Radhe! 🙏 For direct room reservations or support, please speak directly to our concierge team at +91 70377 94300.";
     }
   };
 
@@ -436,8 +434,10 @@ export default function FloatingWidgets() {
     <>
       {/* WhatsApp - Left */}
       <motion.a
-        href="#"
-        title="WhatsApp Chat (Coming Soon)"
+        href="https://wa.me/917037794300"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Chat on WhatsApp"
         className="fixed left-5 bottom-[196px] z-50 w-12 h-12 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_25px_rgba(37,211,102,0.6)]"
         whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.9 }}
         initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
@@ -499,11 +499,9 @@ export default function FloatingWidgets() {
             {isChatOpen ? (
               <X className="w-6 h-6 text-[#7137F1] stroke-[2.5]" />
             ) : (
-              <img
-                src="/1200x630wa-removebg-preview.png"
+              <img loading="lazy" decoding="async" src="/1200x630wa-removebg-preview.png"
                 alt="Braj Nidhi AI"
-                className="w-10 h-10 object-contain hover:scale-110 transition-transform duration-300"
-              />
+                className="w-10 h-10 object-contain hover:scale-110 transition-transform duration-300" />
             )}
           </div>
         </div>
@@ -673,11 +671,9 @@ export default function FloatingWidgets() {
                           className="bg-white rounded-[28px] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-[#ECEAF3] ml-1.5 mr-1.5"
                         >
                           <div className="relative h-36 overflow-hidden bg-stone-100">
-                            <img
-                              src={`/${image}`}
+                            <img loading="lazy" decoding="async" src={`/${image}`}
                               alt={roomName}
-                              className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
-                            />
+                              className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                             <div className="absolute top-3 right-3 bg-[#7137F1] text-white text-[9px] font-black px-3 py-1 rounded-full shadow-md tracking-wider">
                               RECOMMENDED SUITE
@@ -704,8 +700,10 @@ export default function FloatingWidgets() {
 
                             <div className="flex gap-2.5 mt-5">
                               <a
-                                href="#"
-                                title="WhatsApp Chat (Coming Soon)"
+                                href="https://wa.me/917037794300"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Chat on WhatsApp"
                                 className="flex-1 bg-[#25D366] hover:bg-[#20ba56] text-white text-xs font-bold py-3 rounded-2xl text-center flex items-center justify-center gap-1.5 transition-all duration-300 shadow-sm"
                               >
                                 <WhatsAppIcon className="w-3.5 h-3.5" /> WhatsApp
@@ -997,7 +995,7 @@ export default function FloatingWidgets() {
                       </div>
 
                       <a
-                        href="tel:+919876543210"
+                        href="tel:+917037794300"
                         className="w-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-2.5 rounded-xl text-center shadow-md transition-all block mt-2"
                       >
                         Call VIP Desk Support

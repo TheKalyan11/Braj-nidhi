@@ -3,11 +3,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
-import FloatingWidgets from '@/components/FloatingWidgets';
-import BookNowButton from '@/components/BookNowButton';
-import SectionLinkButton from '@/components/SectionLinkButton';
-import PremiumDoubleCalendar from '@/components/PremiumDoubleCalendar';
-import RoomBookingModal from '@/components/RoomBookingModal';
+import dynamic from 'next/dynamic';
+
+const FloatingWidgets = dynamic(() => import('@/components/FloatingWidgets'), { ssr: false });
+const BookNowButton = dynamic(() => import('@/components/BookNowButton'), { ssr: false });
+const SectionLinkButton = dynamic(() => import('@/components/SectionLinkButton'), { ssr: false });
+const PremiumDoubleCalendar = dynamic(() => import('@/components/PremiumDoubleCalendar'), { ssr: false });
+const RoomBookingModal = dynamic(() => import('@/components/RoomBookingModal'), { ssr: false });
 
 // Self-contained Hero Slideshow Component to prevent top-level page re-renders
 const imagePositions: Record<string, string> = {
@@ -448,14 +450,14 @@ export default function Home() {
 
     <header id="main-header" className={scrolled ? "scrolled" : ""}>
         <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
+            <img loading="lazy" decoding="async" src="/sp logo.png" alt="Srila Prabhupada" style={{ height: '60px', width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }} />
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '55px', width: 'auto', display: 'block' }} />
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         
@@ -490,7 +492,7 @@ export default function Home() {
         <div className="mobile-menu-drawer" onClick={(e) => e.stopPropagation()}>
           <div className="mobile-menu-header">
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto" }} />
+              <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: "45px", width: "auto" }} />
             </Link>
             <button className="mobile-menu-close" onClick={() => setIsMobileMenuOpen(false)}>
               <X size={24} />
@@ -773,8 +775,8 @@ export default function Home() {
                     <SectionLinkButton href="/guesthouse">Explore Rooms</SectionLinkButton>
                 </div>
                 <div className="image-grid">
-                    <img src="/z.png" alt="Luxury Suite Room View 1" className="main-img" />
-                    <img src="/351.webp" alt="Luxury Suite Room View 2" className="secondary-img" />
+                    <img loading="lazy" decoding="async" src="/z.png" alt="Luxury Suite Room View 1" className="main-img" />
+                    <img loading="lazy" decoding="async" src="/351.webp" alt="Luxury Suite Room View 2" className="secondary-img" />
                 </div>
             </div>
         </section>
@@ -787,8 +789,8 @@ export default function Home() {
                     <SectionLinkButton href="/weddings">Plan Your Wedding</SectionLinkButton>
                 </div>
                 <div className="image-grid">
-                    <img src="DSC02591.webp" alt="Wedding Hall" className="main-img" />
-                    <img src="DSC06003-HDR.webp" alt="Wedding Decor" className="secondary-img" />
+                    <img loading="lazy" decoding="async" src="DSC02591.webp" alt="Wedding Hall" className="main-img" />
+                    <img loading="lazy" decoding="async" src="DSC06003-HDR.webp" alt="Wedding Decor" className="secondary-img" />
                 </div>
             </div>
         </section>
@@ -801,8 +803,8 @@ export default function Home() {
                     <SectionLinkButton href="/corporate">Book Corporate Hall</SectionLinkButton>
                 </div>
                 <div className="image-grid">
-                    <img src="DSC09652.webp" alt="Premium AV Hall" className="main-img" />
-                    <img src="DSC09672.webp" alt="Corporate Collaborative Space" className="secondary-img" />
+                    <img loading="lazy" decoding="async" src="DSC09652.webp" alt="Premium AV Hall" className="main-img" />
+                    <img loading="lazy" decoding="async" src="DSC09672.webp" alt="Corporate Collaborative Space" className="secondary-img" />
                 </div>
             </div>
         </section>
@@ -811,7 +813,7 @@ export default function Home() {
             <div className="stats-container">
                 {/*  God Krishna Ornament with Music Animation  */}
                 <div className="krishna-ornament-wrapper">
-                    <img src="kk.png" alt="God Krishna Playing Flute" className="krishna-image" />
+                    <img loading="lazy" decoding="async" src="kk.png" alt="God Krishna Playing Flute" className="krishna-image" />
                     <div className="music-notes">
                         <i className="fas fa-music note-1"></i>
                         <i className="fas fa-music note-2"></i>
@@ -909,7 +911,7 @@ export default function Home() {
             </div>
             <div className="offers-grid">
                 <div className="offer-card immersive">
-                    <img src="spiritual_retreat.png" alt="Spiritual Retreat" className="offer-bg-img" />
+                    <img loading="lazy" decoding="async" src="royal.webp" alt="Spiritual Retreat" className="offer-bg-img" />
                     <div className="offer-gradient-blur"></div>
                     
                     <div className="offer-content">
@@ -927,7 +929,7 @@ export default function Home() {
 
                 {/*  Offer Card 2  */}
                 <div className="offer-card immersive">
-                    <img src="wedding_package.webp" alt="Royal Wedding" className="offer-bg-img" />
+                    <img loading="lazy" decoding="async" src="0e8512e05fcc4674c32b279cd6aa7031.jpg.webp" alt="Royal Wedding" className="offer-bg-img" />
                     <div className="offer-gradient-blur"></div>
                     
                     <div className="offer-content">
@@ -945,7 +947,7 @@ export default function Home() {
 
                 {/*  Offer Card 3  */}
                 <div className="offer-card immersive">
-                    <img src="corporate_package.png" alt="Weekend Serenity" className="offer-bg-img" />
+                    <img loading="lazy" decoding="async" src="weekend.JPG" alt="Weekend Serenity" className="offer-bg-img" />
                     <div className="offer-gradient-blur"></div>
                     
                     <div className="offer-content">
@@ -972,7 +974,7 @@ export default function Home() {
                 <div className="about-hotel-content">
                     <div className="about-hotel-text">
                         <p>Situated about 25 minutes' walk from the Gaudiya Vaishnava Krishna Balaram Temple Complex, Braj Nidhi Guesthouse offers a peaceful sanctuary with a range of modern amenities. The guesthouse features cars for rent, as well as Wi-Fi in public areas.</p>
-                        <p>The Pagal Baba Temple is 2.5 km away, and the Shri Radha Vallabh Temple is 2.9 km from this Vrindavan stay. Religious sights in the area include the Shri Rang Ji Temple (3.9 km) and the Vrindavan Chandrodaya Mandir (2.1 km). You will find the Braj Nidhi Guesthouse 75 km from Agra airport.</p>
+                        <p>The magnificent Prem Mandir is just a 5-minute walk (500m) away, and the historic ISKCON Temple is only 1.2 km from this Vrindavan stay. Other key spiritual landmarks nearby include the revered Banke Bihari Temple (3.6 km) and the sacred forest of Nidhivan (3.5 km). You will find the Braj Nidhi Guesthouse approximately 12 km from Mathura Railway Station and 160 km from Delhi International Airport.</p>
                         <p>Offering a multi-channel TV, the rooms come with air conditioning to ensure a comfortable stay. Also, there is a personal safe, a minibar fridge and coffee/tea making facilities provided. Bathroom amenities include a modern shower and separate toilet, along with premium comforts.</p>
                         <p>The Guesthouse features a daily continental breakfast. You can visit our in-house restaurant for breakfast and eat authentic vegetarian dishes. Offering city views, an Indian restaurant is located onsite. There are also various dining options serving multiple cuisines approximately a 5-minute walk away.</p>
                     </div>
@@ -1014,40 +1016,40 @@ export default function Home() {
             <div className="gallery-slider swiper">
                 <div className="swiper-wrapper">
                     <div className="swiper-slide">
-                        <img src="/m1.JPEG" alt="Vrindavan Chandrodaya Mandir" />
+                        <img loading="lazy" decoding="async" src="/m1.JPEG" alt="Vrindavan Chandrodaya Mandir" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/m2.JPEG" alt="Gallery View M2" />
+                        <img loading="lazy" decoding="async" src="/m2.JPEG" alt="Gallery View M2" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/m3.JPG" alt="Gallery View M3" />
+                        <img loading="lazy" decoding="async" src="/m3.JPG" alt="Gallery View M3" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/hero.webp" alt="Braj Nidhi Hero View" />
+                        <img loading="lazy" decoding="async" src="/hero.webp" alt="Braj Nidhi Hero View" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/DSC09672.webp" alt="Gallery View 1" />
+                        <img loading="lazy" decoding="async" src="/DSC09672.webp" alt="Gallery View 1" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/DSC09652.webp" alt="Gallery View 2" />
+                        <img loading="lazy" decoding="async" src="/DSC09652.webp" alt="Gallery View 2" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/DSC02591.webp" alt="Gallery View 3" />
+                        <img loading="lazy" decoding="async" src="/DSC02591.webp" alt="Gallery View 3" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/DSC06003-HDR.webp" alt="Gallery View 4" />
+                        <img loading="lazy" decoding="async" src="/DSC06003-HDR.webp" alt="Gallery View 4" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/DSC05963-HDR.webp" alt="Gallery View 5" />
+                        <img loading="lazy" decoding="async" src="/DSC05963-HDR.webp" alt="Gallery View 5" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/d3.webp" alt="Gallery View 6" />
+                        <img loading="lazy" decoding="async" src="/d3.webp" alt="Gallery View 6" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/351.webp" alt="Gallery View 7" />
+                        <img loading="lazy" decoding="async" src="/351.webp" alt="Gallery View 7" />
                     </div>
                     <div className="swiper-slide">
-                        <img src="/352.webp" alt="Gallery View 8" />
+                        <img loading="lazy" decoding="async" src="/352.webp" alt="Gallery View 8" />
                     </div>
                 </div>
                 {/*  Navigation Buttons  */}
@@ -1125,7 +1127,7 @@ export default function Home() {
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"Exceeded our expectations with impeccable service that brought our spiritual journey to life - a truly remarkable stay."</p>
                     <div className="testimonial-user">
-                        <img src="https://images.unsplash.com/photo-1531123897727-8f129e1bf98c?auto=format&fit=crop&q=80&w=150&h=150" alt="Anjali Sharma" />
+                        <img loading="lazy" decoding="async" src="https://ui-avatars.com/api/?name=Anjali+Sharma&background=6b8f5e&color=fff&size=150" alt="Anjali Sharma" />
                         <div>
                             <h4>Anjali Sharma</h4>
                             <span>Family Trip</span>
@@ -1138,7 +1140,7 @@ export default function Home() {
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"Their ability to capture the spiritual essence in every detail is unparalleled - an invaluable cultural experience."</p>
                     <div className="testimonial-user">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150" alt="Rajesh Kumar" />
+                        <img loading="lazy" decoding="async" src="https://ui-avatars.com/api/?name=Rajesh+Kumar&background=d4af37&color=fff&size=150" alt="Rajesh Kumar" />
                         <div>
                             <h4>Rajesh Kumar</h4>
                             <span>Spiritual Retreat</span>
@@ -1151,7 +1153,7 @@ export default function Home() {
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"Gracious hosts who listen, understand, and craft captivating experiences - a team that truly understands our needs."</p>
                     <div className="testimonial-user">
-                        <img src="https://images.unsplash.com/photo-1524502397800-2eeaad7c3fe5?auto=format&fit=crop&q=80&w=150&h=150" alt="Kavita Singh" />
+                        <img loading="lazy" decoding="async" src="https://ui-avatars.com/api/?name=Kavita+Singh&background=6b8f5e&color=fff&size=150" alt="Kavita Singh" />
                         <div>
                             <h4>Kavita Singh</h4>
                             <span>Weekend Getaway</span>
@@ -1164,7 +1166,7 @@ export default function Home() {
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"A refreshing and peaceful environment that consistently delivers exceptional comfort - highly recommended for any visit."</p>
                     <div className="testimonial-user">
-                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150" alt="Vikram Verma" />
+                        <img loading="lazy" decoding="async" src="https://ui-avatars.com/api/?name=Vikram+Verma&background=d4af37&color=fff&size=150" alt="Vikram Verma" />
                         <div>
                             <h4>Vikram Verma</h4>
                             <span>Solo Traveler</span>
@@ -1177,7 +1179,7 @@ export default function Home() {
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"From concept to execution, their hospitality knows no bounds - a game-changer for our family vacation."</p>
                     <div className="testimonial-user">
-                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150" alt="Priya Patel" />
+                        <img loading="lazy" decoding="async" src="https://ui-avatars.com/api/?name=Priya+Patel&background=6b8f5e&color=fff&size=150" alt="Priya Patel" />
                         <div>
                             <h4>Priya Patel</h4>
                             <span>Family Vacation</span>
@@ -1190,7 +1192,7 @@ export default function Home() {
                     <div className="quote-icon"><i className="fas fa-quote-left"></i></div>
                     <p className="testimonial-text">"A truly spiritual experience. The view of the temple from my room was breathtaking, and the hospitality was exceptional."</p>
                     <div className="testimonial-user">
-                        <img src="https://images.unsplash.com/photo-1499996860827-1b5edc223c8a?auto=format&fit=crop&q=80&w=150&h=150" alt="Amit Desai" />
+                        <img loading="lazy" decoding="async" src="https://ui-avatars.com/api/?name=Amit+Desai&background=d4af37&color=fff&size=150" alt="Amit Desai" />
                         <div>
                             <h4>Amit Desai</h4>
                             <span>Pilgrimage</span>
@@ -1252,7 +1254,7 @@ export default function Home() {
                             <i className="fas fa-chevron-down"></i>
                         </div>
                         <div className="faq-answer">
-                            <p>You can book directly through our 'Reserve Now' buttons on this website or reach out to us at +91 98765 43210 for group bookings and weddings.</p>
+                            <p>You can book directly through our 'Reserve Now' buttons on this website or reach out to us at +91 70377 94300 for group bookings and weddings.</p>
                         </div>
                     </div>
                 </div>
@@ -1276,17 +1278,17 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Banke_Bihari_Vrindavan.jpg/960px-Banke_Bihari_Vrindavan.jpg" alt="Banke Bihari Temple" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Radha Vallabh Dwar.jpg" alt="Radha Vallabh Temple" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">3.69 km</div>
                             <div className="attraction-content">
                                 <div className="title-row">
-                                    <h3>Banke Bihari Temple</h3>
+                                    <h3>Radha Vallabh Temple</h3>
                                     <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
                                 </div>
                                 <div className="location-line">
                                     <i className="fas fa-map-marker-alt"></i>
-                                    <span>Bihari Pura, Vrindavan</span>
+                                    <span>Gotam Nagar, Vrindavan</span>
                                 </div>
                                 <div className="flip-hint-text">
                                     <i className="fas fa-sync-alt"></i> Click for Map
@@ -1304,7 +1306,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/PremMandirSideViewFromCanteen.jpg/960px-PremMandirSideViewFromCanteen.jpg" alt="Prem Mandir" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Prem Mandir.jpg" alt="Prem Mandir" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">0.69 km</div>
                             <div className="attraction-content">
@@ -1332,17 +1334,17 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Iskon_Temple%2C_Vrindawan.jpg/960px-Iskon_Temple%2C_Vrindawan.jpg" alt="ISKCON Temple" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/keshi ghat.jpg" alt="Keshi Ghat" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">1.20 km</div>
                             <div className="attraction-content">
                                 <div className="title-row">
-                                    <h3>ISKCON Vrindavan</h3>
+                                    <h3>Keshi Ghat</h3>
                                     <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.8</span>
                                 </div>
                                 <div className="location-line">
                                     <i className="fas fa-map-marker-alt"></i>
-                                    <span>Raman Reti, Vrindavan</span>
+                                    <span>Banks of Yamuna, Vrindavan</span>
                                 </div>
                                 <div className="flip-hint-text">
                                     <i className="fas fa-sync-alt"></i> Click for Map
@@ -1360,7 +1362,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Nidhivan.jpg/960px-Nidhivan.jpg" alt="Nidhivan" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/nidhi van , Vrindavan.jpg" alt="Nidhivan" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">3.55 km</div>
                             <div className="attraction-content">
@@ -1388,7 +1390,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Radha_Raman_Temple_2.jpg/960px-Radha_Raman_Temple_2.jpg" alt="Radha Raman Temple" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/%23Vrindavan.jpg" alt="Radha Raman Temple" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">3.45 km</div>
                             <div className="attraction-content">
@@ -1416,7 +1418,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img src="/neem_karoli.png" alt="Neem Karoli Ashram" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Samadhi temple of neem karoli baba, Vrindavan.jpg" alt="Neem Karoli Ashram" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">2.72 km</div>
                             <div className="attraction-content">
@@ -1444,7 +1446,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img src="/raman_reti.png" alt="Raman Reti" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Raman Reti, Vrindavan.jpg" alt="Raman Reti" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">15.39 km</div>
                             <div className="attraction-content">
@@ -1472,7 +1474,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img src="/nand_baba.webp" alt="Shri Nand Baba Temple" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Nandgaon holi %23vrindavan.jpg" alt="Shri Nand Baba Temple" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">31.64 km</div>
                             <div className="attraction-content">
@@ -1488,6 +1490,56 @@ export default function Home() {
                         </div>
                         <div className="flip-card-back">
                             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.4214793!3d27.7845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sShri%20Nand%20Baba%20Temple!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 9  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img loading="lazy" decoding="async" src="/Vishram Ghat Mathura – Sacred Yamuna Aarti & Spiritual Vibes🌸.jpg" alt="Vishram Ghat Mathura" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">12.5 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Vishram Ghat Mathura</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 4.9</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Mathura</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6814793!3d27.5045647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sVishram%20Ghat!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/*  Attraction 10  */}
+                <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
+                    <div className="flip-card-inner">
+                        <div className="flip-card-front">
+                            <img loading="lazy" decoding="async" src="/📍Shri Banke Bihari Mandir, Vrindavan.jpg" alt="Shri Banke Bihari Mandir" className="attraction-bg" />
+                            <div className="card-overlay-gradient"></div>
+                            <div className="distance-pill">3.69 km</div>
+                            <div className="attraction-content">
+                                <div className="title-row">
+                                    <h3>Shri Banke Bihari Mandir</h3>
+                                    <span className="rating-pill"><i className="fas fa-star" style={{"color":"#ffd700"}}></i> 5.0</span>
+                                </div>
+                                <div className="location-line">
+                                    <i className="fas fa-map-marker-alt"></i>
+                                    <span>Bihari Pura, Vrindavan</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flip-card-back">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6974793!3d27.5815647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736fc201c10711%3A0xbcc1c54b2ce8f41e!2sShri%20Bankey%20Bihari%20Ji%20Temple%2C%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin" width="100%" height="100%" style={{"border":"0"}} allowFullScreen={true} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
                             <div className="flip-back-hint"><i className="fas fa-undo"></i> Click to flip back</div>
                         </div>
                     </div>
@@ -1551,7 +1603,7 @@ export default function Home() {
         
         <div className="footer-middle-bar">
             <Link href="/privacy">Privacy Policy</Link>
-            <span>Copyright &copy; BRAJNIDHI 2026</span>
+            <span>Copyright &copy; BRAJNIDHI {new Date().getFullYear()}</span>
             <Link href="/terms">Terms Of Use</Link>
         </div>
 
