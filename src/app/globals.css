@@ -317,7 +317,6 @@ header.scrolled nav ul li a:hover {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    transition: transform 15s ease-out, opacity 1.8s ease-in-out;
     will-change: opacity, transform;
 }
 

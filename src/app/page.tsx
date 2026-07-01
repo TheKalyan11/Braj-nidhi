@@ -47,8 +47,11 @@ const HeroSlideshow = ({ images, mobileImages }: { images: string[]; mobileImage
         className="hero-slider-bg"
         initial={{ opacity: 0, scale: 1.05, zIndex: 1 }}
         animate={{ opacity: 1, scale: 1, zIndex: 2 }}
-        exit={{ opacity: 1, scale: 0.95, zIndex: 0 }}
-        transition={{ duration: 1.8, ease: "easeInOut" }}
+        exit={{ opacity: 0.99, scale: 0.95, zIndex: 0 }}
+        transition={{ 
+          opacity: { duration: 1.8, ease: "easeInOut" },
+          scale: { duration: 15, ease: "easeOut" }
+        }}
         style={{
           position: 'absolute',
           top: 0,
