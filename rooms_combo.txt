@@ -1,0 +1,200 @@
+﻿"use client";
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import {
+  BedDouble, Users, Calendar, Star, MapPin, ShieldCheck, Wifi, Coffee,
+  Leaf, ArrowRight, Check, Clock, Info, Menu, X, ChevronDown, ChevronUp, Moon
+} from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const BookNowButton = dynamic(() => import('@/components/BookNowButton'), { ssr: false });
+const RoomUnavailablePopup = dynamic(() => import('@/components/RoomUnavailablePopup'), { ssr: false });
+
+interface RoomOption {
+  key: 'deluxe2' | 'deluxe3' | 'deluxe4';
+  title: string;
+  shortName: string;
+  beds: string;
+  maxGuests: number;
+  pricePerNight: number;
+  mrpPrice: number;
+  image: string;
+  sqft: string;
+  amenities: string[];
+  tag: string;
+}
+
+const ROOMS: RoomOption[] = [
+  {
+    key: 'deluxe2',
+    title: 'Deluxe 2 â€“ Twin Bedded Room',
+    shortName: 'Deluxe 2',
+    beds: 'Twin Beds',
+    maxGuests: 2,
+    pricePerNight: 3500,
+    mrpPrice: 5000,
+    image: '/DSC05818-HDR.webp',
+    sqft: '280 sq.ft',
+    amenities: ['Free Wi-Fi Access', '24/7 Room Service', 'Premium Grooming Kit'],
+    tag: 'Best Value'
+  },
+  {
+    key: 'deluxe3',
+    title: 'Deluxe 3 â€“ 3 Bedded Room',
+    shortName: 'Deluxe 3',
+    beds: '3 Single Beds',
+    maxGuests: 3,
+    pricePerNight: 4500,
+    mrpPrice: 6500,
+    image: '/d3.webp',
+    sqft: '340 sq.ft',
+    amenities: ['Free Wi-Fi Access', '24/7 Room Service', 'Premium Grooming Kit', 'Temple Access'],
+    tag: 'Most Popular'
+  },
+  {
+    key: 'deluxe4',
+    title: 'Deluxe 4 â€“ 4 Bedded Room',
+    shortName: 'Deluxe 4',
+    beds: '4-Poster Beds',
+    maxGuests: 4,
+    pricePerNight: 5500,
+    mrpPrice: 7200,
+    image: '/DSC05963-HDR.webp',
+    sqft: '420 sq.ft',
+    amenities: ['Free Wi-Fi Access', '24/7 Room Service', 'Premium Grooming Kit', 'Temple Access', 'Vrindavan Chandrodaya Mandir Park Access'],
+    tag: 'Premium Suite'
+  }
+];
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  try {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${d} ${months[m - 1]} '${String(y).slice(-2)}`;
+  } catch { return dateStr; }
+}
+
+function getNights(checkIn: string, checkOut: string): number {
+  try {
+    const diff = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000);
+    return diff > 0 ? diff : 1;
+  } catch { return 1; }
+}
+
+function RoomsComboContent() {
+  const searchParams = useSearchParams();
+  const checkIn  = searchParams.get('checkin')  || '';
+  const checkOut = searchParams.get('checkout') || '';
+  const roomsCount = Math.max(1, parseInt(searchParams.get('rooms')    || '1'));
+  const adults     = Math.max(1, parseInt(searchParams.get('adults')   || '2'));
+  const children   = Math.max(0, parseInt(searchParams.get('children') || '0'));
+  const guestsStr  = searchParams.get('guests') || `${adults} Adults`;
+  const nights     = getNights(checkIn, checkOut);
+  const totalGuests = adults + children;
+
+  const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(null);
+  const [expandedRoom, setExpandedRoom] = useState<string | null>('deluxe2');
+  const [scrolled, setScrolled] = useState(false);
+  const [cameFromGuesthouse, setCameFromGuesthouse] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const fromParam = searchParams.get('from');
+    if (fromParam === 'guesthouse') { setCameFromGuesthouse(true); return; }
+    try {
+      const ref = document.referrer ? new URL(document.referrer) : null;
+      if (ref && ref.host === window.location.host && ref.pathname.startsWith('/guesthouse')) {
+        setCameFromGuesthouse(true);
+      }
+    } catch { /* ignore */ }
+  }, [searchParams]);
+
+  // â”€â”€ ERP availability per room type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const [roomAvail, setRoomAvail] = useState<Record<string, number | null>>({
+    deluxe2: null, deluxe3: null, deluxe4: null,
+  });
+  const [availLoading, setAvailLoading] = useState(true);
+  const [soldOutPopup, setSoldOutPopup] = useState<{ room: RoomOption } | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIdx, setGalleryIdx] = useState(0);
+
+  const GALLERY_PHOTOS = [
+    { src: '/d1.webp', caption: 'Deluxe 2 â€“ Twin Bedded Room' },
+    { src: '/d2.webp', caption: 'Deluxe 2 â€“ Room View' },
+    { src: '/d3.webp', caption: 'Deluxe 2 â€“ Room Interior' },
+    { src: '/d4.webp', caption: 'Deluxe 2 â€“ Room Details' },
+    { src: '/t1.webp', caption: 'Deluxe 3 â€“ Triple Room' },
+    { src: '/t2.webp', caption: 'Deluxe 3 â€“ Room View' },
+    { src: '/t3.webp', caption: 'Deluxe 3 â€“ Room Interior' },
+    { src: '/t4.webp', caption: 'Deluxe 3 â€“ Room Details' },
+    { src: '/f1.webp', caption: 'Deluxe 4 â€“ 4 Bedded Room' },
+    { src: '/f2.webp', caption: 'Deluxe 4 â€“ Room View' },
+    { src: '/f3.webp', caption: 'Deluxe 4 â€“ Room Details' },
+  ];
+
+  const fetchAvailability = useCallback(async (isInitial = false) => {
+    if (!checkIn || !checkOut || checkIn >= checkOut) {
+      if (isInitial) setAvailLoading(false);
+      return;
+    }
+    if (isInitial) setAvailLoading(true);
+
+    const types: Array<'deluxe2' | 'deluxe3' | 'deluxe4'> = ['deluxe2', 'deluxe3', 'deluxe4'];
+    try {
+      const results = await Promise.all(
+        types.map(rt =>
+          fetch(`/api/availability?roomType=${rt}&from=${checkIn}&to=${checkOut}&rooms=${roomsCount}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+              if (!data?.availability) return { rt, min: null };
+              const vals = Object.values(data.availability as Record<string, number>);
+              return { rt, min: vals.length ? Math.min(...vals) : 0 };
+            })
+            .catch(() => ({ rt, min: null }))
+        )
+      );
+      const map: Record<string, number | null> = {};
+      for (const { rt, min } of results) map[rt] = min;
+      setRoomAvail(prev => {
+        const changed = types.some(rt => prev[rt] !== map[rt]);
+        return changed ? map : prev;
+      });
+    } finally {
+      setAvailLoading(false);
+    }
+  }, [checkIn, checkOut, roomsCount]);
+
+  useEffect(() => {
+    fetchAvailability(true);
+    const id = setInterval(() => fetchAvailability(false), 20_000);
+    return () => clearInterval(id);
+  }, [fetchAvailability]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const h = () => setScrolled(window.scrollY > 30);
+    window.addEventListener('scroll', h);
+    return () => window.removeEventListener('scroll', h);
+  }, []);
+
+  const bookingUrl = (room: RoomOption) =>
+    `/booking?roomType=${room.key}&checkin=${checkIn}&checkout=${checkOut}&rooms=${roomsCount}&adults=${adults}&children=${children}&guests=${encodeURIComponent(guestsStr)}`;
+
+  return (
+    <div className="rcp">
+      <style dangerouslySetInnerHTML={{ __html: `
+        *{box-sizing:border-box;}
+        .rcp{background:#f4f0e8;min-height:100vh;font-family:'Outfit',sans-serif;color:#111;padding-top:88px;}
+        .rcp *{font-family:'Outfit',sans-serif;}
+        .rcp h1,.rcp h2,.rcp h3,.rcp h4{font-family:'Bebas Neue',cursive!important;font-weight:400!important;letter-spacing:.5px;color:#111;}
+
+        /* â”€â”€ Header: solid white when not scrolled, normal pill when scrolled â”€â”€ */
+        .rcp #main-header:not(.scrolled) {
+          background: rgba(255,255,255,0.97);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(229,231,235,0.85);
+        }
+        /* Restore Bebas Neue for nav links (overridden by .rcp * rule) */

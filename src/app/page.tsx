@@ -241,10 +241,7 @@ export default function Home() {
     tomorrow.setDate(today.getDate() + 2);
 
     const formatDate = (d: Date) => {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
+      return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(d);
     };
 
     setBookingData(prev => ({
@@ -522,7 +519,7 @@ export default function Home() {
 
             {/* Luxury Yacht Style Horizontal Booking widget */}
             <div className="luxury-search-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 'auto', marginBottom: '0px', zIndex: 10 }}>
-                <div className="search-label-above" style={{ margin: '0 0 15px 0', textAlign: 'center' }}>Find now your luxury suites</div>
+                <div className="search-label-above" style={{ margin: '0 0 15px 0', textAlign: 'center' }}>FIND NOW YOUR LUXURY SUITES</div>
                 <div className="luxury-search-bar" style={{ maxWidth: '720px', margin: '0 auto' }}>
 
                     {/* Check-In block */}
@@ -624,7 +621,7 @@ export default function Home() {
                                 {/* Row 1: Room */}
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Room</span>
-                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '12px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '30px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
                                         <button 
                                             type="button"
                                             onClick={() => setTempRooms(Math.max(1, tempRooms - 1))}
@@ -646,7 +643,7 @@ export default function Home() {
                                 {/* Row 2: Adults */}
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Adults</span>
-                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '12px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '30px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
                                         <button 
                                             type="button"
                                             onClick={() => setTempAdults(Math.max(1, tempAdults - 1))}
@@ -657,7 +654,7 @@ export default function Home() {
                                         <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempAdults}</span>
                                         <button 
                                             type="button"
-                                            onClick={() => setTempAdults(Math.min(9, tempAdults + 1))}
+                                            onClick={() => setTempAdults(Math.min(30, tempAdults + 1))}
                                             style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
                                         >
                                             &#43;
@@ -671,7 +668,7 @@ export default function Home() {
                                         <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Children</span>
                                         <span style={{ fontSize: '11px', color: '#8c8272', marginTop: '2px' }}>0 - 17 Years Old</span>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '12px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '30px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
                                         <button 
                                             type="button"
                                             onClick={() => setTempChildren(Math.max(0, tempChildren - 1))}
@@ -682,7 +679,7 @@ export default function Home() {
                                         <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempChildren}</span>
                                         <button 
                                             type="button"
-                                            onClick={() => setTempChildren(Math.min(9, tempChildren + 1))}
+                                            onClick={() => setTempChildren(Math.min(30, tempChildren + 1))}
                                             style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
                                         >
                                             &#43;

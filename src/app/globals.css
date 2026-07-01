@@ -403,9 +403,9 @@ header.scrolled nav ul li a:hover {
 
 .search-label-above {
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
     color: rgba(255, 255, 255, 0.95);
-    letter-spacing: 1.5px;
+    letter-spacing: 3px;
     text-transform: uppercase;
     text-shadow: 0 2px 5px rgba(0,0,0,0.4);
     margin-left: 24px;
@@ -496,7 +496,7 @@ header.scrolled nav ul li a:hover {
     font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #777777;
+    color: #9ca3af;
     font-weight: 700;
 }
 

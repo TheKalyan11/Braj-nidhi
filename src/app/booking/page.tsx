@@ -50,14 +50,22 @@ export default function BookingPage() {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   
   // Room Type Selection
-  const [roomType, setRoomType] = useState<'deluxe2' | 'deluxe3' | 'deluxe4'>('deluxe2');
+  const [roomSelections, setRoomSelections] = useState<Record<string, number>>({'deluxe2': 1});
+  
+  // Backwards compatibility for single-room logic in some components
+  const roomType = Object.keys(roomSelections).find(k => roomSelections[k] > 0) || 'deluxe2';
+  const rooms = Object.values(roomSelections).reduce((a, b) => a + b, 0) || 1;
+  const setRoomType = (type: string) => setRoomSelections({ [type]: rooms });
+  const setRooms = (n: number) => {
+    const firstKey = Object.keys(roomSelections).find(k => roomSelections[k] > 0) || 'deluxe2';
+    setRoomSelections({ [firstKey]: n });
+  };
   
   // Interactive Dates
   const [checkIn, setCheckIn] = useState<string>('2026-05-18');
   const [checkOut, setCheckOut] = useState<string>('2026-05-20');
   
-  // Rooms count (passed from RoomBookingModal)
-  const [rooms, setRooms] = useState<number>(1);
+  // Interactive Dates
 
   // Guests
   const [adults, setAdults] = useState<number>(2);
@@ -242,10 +250,13 @@ export default function BookingPage() {
   const checkInTime  = checkIn  ? new Date(`${checkIn}T14:00:00`).toLocaleTimeString('en-US',  { hour: 'numeric', minute: '2-digit', hour12: true }) : '2:00 PM';
   const checkOutTime = checkOut ? new Date(`${checkOut}T11:00:00`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : '11:00 AM';
 
-  // Price calculations — displayed prices are GST-inclusive (5%)
+  // Price calculations - displayed prices are GST-inclusive (5%)
   const gstRate = 0.05;
+  const roomCost = Object.entries(roomSelections).reduce((sum, [type, count]) => {
+    const price = livePrices[type] || getRoomPrice(type);
+    return sum + (price * nights * count);
+  }, 0);
   const pricePerNight = livePrices[roomType] || getRoomPrice(roomType);
-  const roomCost = pricePerNight * nights * rooms;
 
   // Add-ons Cost
   const darshanCost = darshanGuide ? 1500 : 0;
@@ -269,12 +280,27 @@ export default function BookingPage() {
       const params = new URLSearchParams(window.location.search);
       
       // 1. Room Type Selection
-      const paramRoom = params.get('roomType') || params.get('room') || params.get('room_type') || params.get('hotelId');
-      if (paramRoom) {
-        const roomLower = paramRoom.toLowerCase();
-        if (roomLower.includes('royal') || roomLower.includes('deluxe4') || roomLower.includes('deluxe-4') || roomLower.includes('family')) setRoomType('deluxe4');
-        else if (roomLower.includes('deluxe3') || roomLower.includes('deluxe-3') || roomLower.includes('triple')) setRoomType('deluxe3');
-        else setRoomType('deluxe2');
+      const selections: Record<string, number> = {};
+      ['deluxe2', 'deluxe3', 'deluxe4'].forEach(key => {
+        const val = params.get(key);
+        if (val && !isNaN(Number(val)) && Number(val) > 0) {
+          selections[key] = Number(val);
+        }
+      });
+      
+      if (Object.keys(selections).length > 0) {
+        setRoomSelections(selections);
+      } else {
+        const paramRoom = params.get('roomType') || params.get('room') || params.get('room_type') || params.get('hotelId');
+        const paramRooms = params.get('rooms');
+        const qty = (paramRooms && !isNaN(Number(paramRooms))) ? Math.max(1, Number(paramRooms)) : 1;
+        
+        if (paramRoom) {
+          const roomLower = paramRoom.toLowerCase();
+          if (roomLower.includes('royal') || roomLower.includes('deluxe4') || roomLower.includes('deluxe-4') || roomLower.includes('family')) setRoomSelections({'deluxe4': qty});
+          else if (roomLower.includes('deluxe3') || roomLower.includes('deluxe-3') || roomLower.includes('triple')) setRoomSelections({'deluxe3': qty});
+          else setRoomSelections({'deluxe2': qty});
+        }
       }
 
       // Helper to parse date
@@ -310,12 +336,6 @@ export default function BookingPage() {
 
       setCheckIn(parsedCheckIn || formatDate(today));
       setCheckOut(parsedCheckOut || formatDate(tomorrow));
-
-      // 3. Rooms
-      const paramRooms = params.get('rooms');
-      if (paramRooms && !isNaN(Number(paramRooms))) {
-        setRooms(Math.max(1, Number(paramRooms)));
-      }
 
       // 4. Guests
       const paramAdults = params.get('adults');
@@ -407,14 +427,14 @@ export default function BookingPage() {
         const hasDeluxe4 = data.availableRooms.some((r: any) => erpToWebsiteType(r.roomTypeId) === 'deluxe4');
 
         if (roomType === 'deluxe2' && !hasDeluxe2) {
-          if (hasDeluxe3) setRoomType('deluxe3');
-          else if (hasDeluxe4) setRoomType('deluxe4');
+          if (hasDeluxe3) setRoomSelections({ 'deluxe3': rooms });
+          else if (hasDeluxe4) setRoomSelections({ 'deluxe4': rooms });
         } else if (roomType === 'deluxe3' && !hasDeluxe3) {
-          if (hasDeluxe2) setRoomType('deluxe2');
-          else if (hasDeluxe4) setRoomType('deluxe4');
+          if (hasDeluxe2) setRoomSelections({ 'deluxe2': rooms });
+          else if (hasDeluxe4) setRoomSelections({ 'deluxe4': rooms });
         } else if (roomType === 'deluxe4' && !hasDeluxe4) {
-          if (hasDeluxe2) setRoomType('deluxe2');
-          else if (hasDeluxe3) setRoomType('deluxe3');
+          if (hasDeluxe2) setRoomSelections({ 'deluxe2': rooms });
+          else if (hasDeluxe3) setRoomSelections({ 'deluxe3': rooms });
         }
       }
     } catch (err: any) {
@@ -530,7 +550,7 @@ export default function BookingPage() {
       return;
     }
 
-    const todayStr = new Date().toLocaleDateString('en-CA');
+    const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
     if (checkIn < todayStr) {
       alert('Backdated reservations are not allowed. Please select a valid check-in date.');
       return;
@@ -657,7 +677,12 @@ export default function BookingPage() {
                   email: guestDetails.email,
                   phone: guestDetails.phone,
                 },
-                rooms: [{ room_type: targetRoomType, qty: rooms, adults, children }],
+                rooms: Object.entries(roomSelections).filter(([_, qty]) => qty > 0).map(([rt, qty]) => ({
+                  room_type: erpRoomTypeMap[rt] || 'BN-DELUXE-2',
+                  qty,
+                  adults: Math.max(1, Math.floor(adults / rooms)),
+                  children: Math.floor(children / rooms)
+                })),
                 additional_guests: additionalGuestsPayload,
                 gateway_payment_id: response.razorpay_payment_id,
                 gateway_order_id: response.razorpay_order_id,
@@ -770,7 +795,7 @@ export default function BookingPage() {
       {/* Dynamic Scoped CSS Stylesheet */}
       <style dangerouslySetInnerHTML={{ __html: `
         .booking-page-mmt {
-          background: #f5f0e8;
+          background: #f4f6f8;
           color: #000000;
           font-family: 'Outfit', sans-serif;
           min-height: 100vh;
@@ -2443,7 +2468,18 @@ export default function BookingPage() {
                       Vrindavan, Uttar Pradesh
                     </div>
                   </div>
-                  <img loading="lazy" decoding="async" src={getRoomImage(roomType)} alt="Room" style={{ width: '84px', height: '62px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0, border: '1px solid #e5e7eb' }} />
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                    {Object.entries(roomSelections).filter(([_, count]) => count > 0).map(([rt, count]) => (
+                      <div key={rt} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: '12px', fontWeight: 'bold' }}>{count}x {getRoomTitle(rt).split(' – ')[0]}</div>
+                          <div style={{ fontSize: '10px', color: '#6B7280' }}>₹{getRoomPrice(rt)} / night</div>
+                        </div>
+                        <img loading="lazy" decoding="async" src={getRoomImage(rt)} alt={rt} style={{ width: '54px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e5e7eb' }} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div style={{ borderTop: '1px solid #f0f0f0', margin: '14px 0' }}/>
@@ -2476,7 +2512,7 @@ export default function BookingPage() {
                   <div style={{ paddingLeft: '16px' }}>
                     <div style={{ fontSize: '10px', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '4px' }}>GUESTS & ROOMS</div>
                     <div style={{ fontSize: '14px', fontWeight: '800', color: '#111', lineHeight: 1.3 }}>
-                      {nights} Nights · {adults + children} Guest{adults + children > 1 ? 's' : ''} · 1 Room
+                      {nights} Nights · {adults + children} Guest{adults + children > 1 ? 's' : ''} · {rooms} Room{rooms > 1 ? 's' : ''}
                     </div>
                     <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>
                       {adults} Adult{adults > 1 ? 's' : ''}{children > 0 ? `, ${children} Child${children > 1 ? 'ren' : ''}` : ''}
@@ -2758,7 +2794,7 @@ export default function BookingPage() {
                     <input 
                       type="date" 
                       value={checkIn}
-                      min={new Date().toLocaleDateString('en-CA')}
+                      min={new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())}
                       onChange={(e) => setCheckIn(e.target.value)}
                     />
                   </div>
@@ -2767,7 +2803,7 @@ export default function BookingPage() {
                     <input 
                       type="date" 
                       value={checkOut}
-                      min={checkIn || new Date().toLocaleDateString('en-CA')}
+                      min={checkIn || new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())}
                       onChange={(e) => setCheckOut(e.target.value)}
                     />
                   </div>

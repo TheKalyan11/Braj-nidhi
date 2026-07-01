@@ -356,6 +356,7 @@ export default function Guesthouse() {
             background: rgba(255, 255, 255, 0.4);
             cursor: pointer;
             transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
         .hero-slider-dot.active {
@@ -647,18 +648,44 @@ export default function Guesthouse() {
         }
 
         @media (max-width: 600px) {
+            .guesthouse-hero {
+                padding: 90px 0 30px 0;
+            }
+            .hero-bento-container {
+                padding: 0 12px;
+            }
+            .bento-box {
+                padding: 25px 20px;
+            }
             .hero-bento-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
             }
             .bento-yellow {
                 grid-column: span 1;
             }
             .hero-title-large {
-                font-size: 12vw;
-                margin-bottom: -6vw;
+                font-size: 7.5vw;
+                margin-bottom: -15px;
+                padding: 10px 20px;
+                line-height: 1.1;
+                z-index: 2;
+                position: relative;
             }
             .hero-main-img-wrap {
-                min-height: 420px;
+                min-height: 320px;
+                border-radius: 16px;
+            }
+            .hero-slider-dots {
+                bottom: 50px;
+                right: 50%;
+                transform: translateX(50%);
+            }
+            .hero-orange-banner {
+                width: 100%;
+                justify-content: center;
+                padding: 15px;
+                font-size: 1rem;
             }
         }
 

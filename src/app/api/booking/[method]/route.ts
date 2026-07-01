@@ -48,6 +48,20 @@ export async function POST(
     }
 
     const body = await request.json();
+
+    if (method === 'create_reservation') {
+      const checkInDate = body.check_in_date;
+      if (checkInDate) {
+        const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+        if (checkInDate < todayStr) {
+          return Response.json(
+            { error: 'Backdated reservations are not allowed' },
+            { status: 400 },
+          );
+        }
+      }
+    }
+
     const targetUrl = `${ERP_BASE_URL.replace(/\/$/, '')}.${method}`;
 
     const erpResponse = await fetch(targetUrl, {

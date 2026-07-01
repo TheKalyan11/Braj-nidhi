@@ -94,7 +94,7 @@ function RoomsComboContent() {
   const nights     = getNights(checkIn, checkOut);
   const totalGuests = adults + children;
 
-  const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(null);
+  const [roomSelections, setRoomSelections] = useState<Record<string, number>>({});
   const [expandedRoom, setExpandedRoom] = useState<string | null>('deluxe2');
   const [scrolled, setScrolled] = useState(false);
   const [cameFromGuesthouse, setCameFromGuesthouse] = useState(false);
@@ -179,8 +179,11 @@ function RoomsComboContent() {
     return () => window.removeEventListener('scroll', h);
   }, []);
 
-  const bookingUrl = (room: RoomOption) =>
-    `/booking?roomType=${room.key}&checkin=${checkIn}&checkout=${checkOut}&rooms=${roomsCount}&adults=${adults}&children=${children}&guests=${encodeURIComponent(guestsStr)}`;
+  const bookingUrl = () => {
+    const parts = Object.entries(roomSelections).filter(([_, q]) => q > 0).map(([k, q]) => `${k}=${q}`);
+    const rQuery = parts.length > 0 ? '&' + parts.join('&') : '';
+    return `/booking?checkin=${checkIn}&checkout=${checkOut}&adults=${adults}&children=${children}&guests=${encodeURIComponent(guestsStr)}${rQuery}`;
+  };
 
   return (
     <div className="rcp">
@@ -482,7 +485,7 @@ function RoomsComboContent() {
           {ROOMS.map((room) => {
             const discountPct = Math.round((1 - room.pricePerNight / room.mrpPrice) * 100);
             const isExpanded  = expandedRoom === room.key;
-            const isSelected  = selectedRoom?.key === room.key;
+            const isSelected  = (roomSelections[room.key] || 0) > 0;
             const avail = roomAvail[room.key];
             const isSoldOut = avail !== null && avail < roomsCount;
 
@@ -575,27 +578,50 @@ function RoomsComboContent() {
                               : `${avail} room${avail !== 1 ? 's' : ''} available for ${nights} night${nights > 1 ? 's' : ''}`}
                           </div>
                         )}
-                        <div className="rcp-room-actions">
-                          {isSoldOut ? (
-                            <button
-                              className="btn-select-room"
-                              style={{ background:'#d1d5db', cursor:'not-allowed' }}
-                              onClick={(e) => { e.stopPropagation(); setSoldOutPopup({ room }); }}
-                            >
-                              Sold Out
-                            </button>
-                          ) : (
-                            <button
-                              className="btn-select-room"
-                              onClick={() => {
-                                setSelectedRoom(room);
-                                document.getElementById('rcp-sidebar-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                              }}
-                            >
-                              {selectedRoom?.key === room.key ? <><Check size={15}/> Selected</> : <>Select Room <ArrowRight size={15}/></>}
-                            </button>
-                          )}
-                        </div>
+                          <div className="rcp-room-actions">
+                            {isSoldOut ? (
+                              <button
+                                className="btn-select-room"
+                                style={{ background:'#d1d5db', cursor:'not-allowed' }}
+                                onClick={(e) => { e.stopPropagation(); setSoldOutPopup({ room }); }}
+                              >
+                                Sold Out
+                              </button>
+                            ) : (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                {roomSelections[room.key] > 0 ? (
+                                  <div style={{ display: 'flex', alignItems: 'center', background: '#f3f4f6', borderRadius: '8px', padding: '4px' }}>
+                                    <button 
+                                      onClick={() => setRoomSelections(prev => ({ ...prev, [room.key]: prev[room.key] - 1 }))}
+                                      style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                                    >-</button>
+                                    <span style={{ width: '40px', textAlign: 'center', fontWeight: 'bold', fontSize: '16px' }}>
+                                      {roomSelections[room.key]}
+                                    </span>
+                                    <button 
+                                      onClick={() => {
+                                        if (avail === null || roomSelections[room.key] < avail) {
+                                          setRoomSelections(prev => ({ ...prev, [room.key]: prev[room.key] + 1 }));
+                                        } else {
+                                          setSoldOutPopup({ room });
+                                        }
+                                      }}
+                                      style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                                    >+</button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    className="btn-select-room"
+                                    onClick={() => {
+                                      setRoomSelections(prev => ({ ...prev, [room.key]: 1 }));
+                                    }}
+                                  >
+                                    Add to Booking <ArrowRight size={15}/>
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
                       </div>
                     </div>
                   </div>
@@ -711,36 +737,47 @@ function RoomsComboContent() {
             )}
 
             {/* Selected room or prompt */}
-            {selectedRoom ? (
+            {Object.keys(roomSelections).some(k => roomSelections[k] > 0) ? (
               <div className="rcp-selected-summary">
-                <div className="rcp-sel-label">Selected Room</div>
-                <div className="rcp-sel-name">{selectedRoom.title}</div>
-                <div className="rcp-sel-price">₹{selectedRoom.pricePerNight.toLocaleString('en-IN')}</div>
-                <div className="rcp-sel-sub">Per room / night (excl. taxes)</div>
-                <div className="rcp-sel-total">
-                  Total for {nights} night{nights>1?'s':''} × {roomsCount} room{roomsCount>1?'s':''}:{' '}
-                  <strong>₹{(selectedRoom.pricePerNight * nights * roomsCount).toLocaleString('en-IN')}</strong>
+                <div className="rcp-sel-label">Selected Rooms</div>
+                {Object.entries(roomSelections)
+                  .filter(([k, v]) => v > 0)
+                  .map(([k, v]) => {
+                    const room = ROOMS.find(r => r.key === k);
+                    if (!room) return null;
+                    return (
+                      <div key={k} style={{ marginBottom: '8px' }}>
+                        <div className="rcp-sel-name">{room.title}</div>
+                        <div className="rcp-sel-price" style={{ fontSize: '14px' }}>
+                          ₹{room.pricePerNight.toLocaleString('en-IN')} × {v} room{v > 1 ? 's' : ''}
+                        </div>
+                      </div>
+                    );
+                })}
+                <div className="rcp-sel-total" style={{ marginTop: '12px', borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
+                  Total for {nights} night{nights > 1 ? 's' : ''}:{' '}
+                  <strong>
+                    ₹{Object.entries(roomSelections)
+                        .filter(([k, v]) => v > 0)
+                        .reduce((sum, [k, v]) => {
+                          const r = ROOMS.find(x => x.key === k);
+                          return sum + (r ? r.pricePerNight * nights * v : 0);
+                        }, 0)
+                        .toLocaleString('en-IN')}
+                  </strong>
                   <span style={{fontSize:'11px',color:'#9CA3AF',marginLeft:'4px'}}>+ taxes</span>
                 </div>
               </div>
             ) : (
               <div className="rcp-no-select">
-                ← Select a room to see pricing &amp; proceed
+                ← Add rooms to see pricing & proceed
               </div>
             )}
 
-            {selectedRoom && !(roomAvail[selectedRoom.key] !== null && (roomAvail[selectedRoom.key] ?? 0) < roomsCount) ? (
-              <Link href={bookingUrl(selectedRoom)} className="btn-book-now">
+            {Object.keys(roomSelections).some(k => roomSelections[k] > 0) ? (
+              <Link href={bookingUrl()} className="btn-book-now">
                 Proceed to Book <ArrowRight size={16}/>
               </Link>
-            ) : selectedRoom && (roomAvail[selectedRoom.key] !== null && (roomAvail[selectedRoom.key] ?? 0) < roomsCount) ? (
-              <button
-                className="btn-book-now"
-                style={{background:'#d1d5db',cursor:'not-allowed',color:'#6b7280'}}
-                onClick={() => setSoldOutPopup({ room: selectedRoom })}
-              >
-                Rooms Unavailable
-              </button>
             ) : (
               <div style={{width:'100%',padding:'15px',background:'#e5e7eb',color:'#9CA3AF',fontSize:'15px',fontWeight:700,borderRadius:'10px',textAlign:'center',marginBottom:'10px',cursor:'not-allowed'}}>
                 Proceed to Book

@@ -47,9 +47,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Don't allow booking in the past
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (new Date(checkIn) < today) {
+    const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+    if (checkIn < todayStr) {
       return Response.json({ error: 'Cannot book past dates' }, { status: 400 });
     }
 
