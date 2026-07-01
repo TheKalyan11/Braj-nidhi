@@ -70,7 +70,7 @@ export default function Guesthouse() {
   const [showSuiteCards, setShowSuiteCards] = useState(false);
 
   // Hero section image slider
-  const heroImages = ["/z.png", "/DSC05963-HDR.webp", "/d3.webp"];
+  const heroImages = ["/z.webp", "/DSC05963-HDR.webp", "/d3.webp"];
   const [heroIndex, setHeroIndex] = useState(0);
 
   useEffect(() => {
@@ -1517,7 +1517,7 @@ export default function Guesthouse() {
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.webp" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         
@@ -1943,7 +1943,7 @@ export default function Guesthouse() {
             </div>
             
             <div className="promo2-col-right">
-                <img loading="lazy" decoding="async" src="z.png" alt="Deluxe Room" />
+                <img loading="lazy" decoding="async" src="z.webp" alt="Deluxe Room" />
                 <div className="promo2-price-badge">
                     <div className="price-top">
                         <span className="price-num">3.5</span>

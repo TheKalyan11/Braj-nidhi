@@ -814,7 +814,7 @@ export default function Weddings() {
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.webp" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         <nav>
@@ -965,7 +965,7 @@ export default function Weddings() {
                 </ul>
             </motion.div>
             <motion.div className="split-image" variants={slideInRight}>
-                <img loading="lazy" decoding="async" src="/the-design-thoughtfully.jpg" alt="Sattvic Culinary Excellence" />
+                <img loading="lazy" decoding="async" src="/the-design-thoughtfully.webp" alt="Sattvic Culinary Excellence" />
             </motion.div>
         </motion.section>
 
@@ -990,22 +990,22 @@ export default function Weddings() {
             </motion.div>
             <motion.div className="gallery-grid" variants={staggerContainer} initial="initial" whileInView="whileInView" viewport={{ once: true }}>
                 <motion.div className="gallery-item large" variants={fadeInUp}>
-                    <img loading="lazy" decoding="async" src="/we8.jpg" alt="Wedding Celebration" style={{objectPosition: 'center center'}} />
+                    <img loading="lazy" decoding="async" src="/we8.webp" alt="Wedding Celebration" style={{objectPosition: 'center center'}} />
                 </motion.div>
                 <motion.div className="gallery-item tall" variants={fadeInUp}>
-                    <img loading="lazy" decoding="async" src="/we1.jpg" alt="Wedding Moments" style={{objectPosition: 'center center'}} />
+                    <img loading="lazy" decoding="async" src="/we1.webp" alt="Wedding Moments" style={{objectPosition: 'center center'}} />
                 </motion.div>
                 <motion.div className="gallery-item wide" variants={fadeInUp}>
-                    <img loading="lazy" decoding="async" src="/we2.jpg" alt="Wedding Decor" style={{objectPosition: 'center center'}} />
+                    <img loading="lazy" decoding="async" src="/we2.webp" alt="Wedding Decor" style={{objectPosition: 'center center'}} />
                 </motion.div>
                 <motion.div className="gallery-item" variants={fadeInUp}>
-                    <img loading="lazy" decoding="async" src="/we4.jpeg" alt="Wedding Ceremony" style={{objectPosition: 'center center'}} />
+                    <img loading="lazy" decoding="async" src="/we4.webp" alt="Wedding Ceremony" style={{objectPosition: 'center center'}} />
                 </motion.div>
                 <motion.div className="gallery-item tall" variants={fadeInUp}>
-                    <img loading="lazy" decoding="async" src="/we5.JPG" alt="Wedding Reception" style={{objectPosition: 'center center'}} />
+                    <img loading="lazy" decoding="async" src="/we5.webp" alt="Wedding Reception" style={{objectPosition: 'center center'}} />
                 </motion.div>
                 <motion.div className="gallery-item wide" variants={fadeInUp}>
-                    <img loading="lazy" decoding="async" src="/we7.jpeg" alt="Wedding Rituals" style={{objectPosition: 'center center'}} />
+                    <img loading="lazy" decoding="async" src="/we7.webp" alt="Wedding Rituals" style={{objectPosition: 'center center'}} />
                 </motion.div>
             </motion.div>
         </section>

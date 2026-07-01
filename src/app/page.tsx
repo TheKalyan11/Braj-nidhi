@@ -13,7 +13,7 @@ const RoomBookingModal = dynamic(() => import('@/components/RoomBookingModal'), 
 
 // Self-contained Hero Slideshow Component to prevent top-level page re-renders
 const imagePositions: Record<string, string> = {
-  "m1.JPEG": "center 30%",
+  "m1.webp": "center 30%",
 };
 
 const HeroSlideshow = ({ images }: { images: string[] }) => {
@@ -122,10 +122,10 @@ export default function Home() {
   const deluxe3Images = ["t1.webp", "t2.webp", "t3.webp", "t4.webp"];
   const deluxe4Images = ["f1.webp", "f2.webp", "f3.webp"];
   const heroImages = [
-    "m1.JPEG",
-    "m2.JPEG",
-    "m3.JPG",
-    "h11.jpg",
+    "m1.webp",
+    "m2.webp",
+    "m3.webp",
+    "h11.webp",
     "DSC09652.webp",
     "DSC09672.webp",
     "DSC02591.webp",
@@ -454,7 +454,7 @@ export default function Home() {
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.webp" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         
@@ -772,7 +772,7 @@ export default function Home() {
                     <SectionLinkButton href="/guesthouse">Explore Rooms</SectionLinkButton>
                 </div>
                 <div className="image-grid">
-                    <img loading="lazy" decoding="async" src="/z.png" alt="Luxury Suite Room View 1" className="main-img" />
+                    <img loading="lazy" decoding="async" src="/z.webp" alt="Luxury Suite Room View 1" className="main-img" />
                     <img loading="lazy" decoding="async" src="/351.webp" alt="Luxury Suite Room View 2" className="secondary-img" />
                 </div>
             </div>
@@ -810,7 +810,7 @@ export default function Home() {
             <div className="stats-container">
                 {/*  God Krishna Ornament with Music Animation  */}
                 <div className="krishna-ornament-wrapper">
-                    <img loading="lazy" decoding="async" src="kk.png" alt="God Krishna Playing Flute" className="krishna-image" />
+                    <img loading="lazy" decoding="async" src="kk.webp" alt="God Krishna Playing Flute" className="krishna-image" />
                     <div className="music-notes">
                         <i className="fas fa-music note-1"></i>
                         <i className="fas fa-music note-2"></i>
@@ -944,7 +944,7 @@ export default function Home() {
 
                 {/*  Offer Card 3  */}
                 <div className="offer-card immersive">
-                    <img loading="lazy" decoding="async" src="weekend.JPG" alt="Weekend Serenity" className="offer-bg-img" />
+                    <img loading="lazy" decoding="async" src="weekend.webp" alt="Weekend Serenity" className="offer-bg-img" />
                     <div className="offer-gradient-blur"></div>
                     
                     <div className="offer-content">
@@ -1013,13 +1013,13 @@ export default function Home() {
             <div className="gallery-slider swiper">
                 <div className="swiper-wrapper">
                     <div className="swiper-slide">
-                        <img loading="lazy" decoding="async" src="/m1.JPEG" alt="Vrindavan Chandrodaya Mandir" />
+                        <img loading="lazy" decoding="async" src="/m1.webp" alt="Vrindavan Chandrodaya Mandir" />
                     </div>
                     <div className="swiper-slide">
-                        <img loading="lazy" decoding="async" src="/m2.JPEG" alt="Gallery View M2" />
+                        <img loading="lazy" decoding="async" src="/m2.webp" alt="Gallery View M2" />
                     </div>
                     <div className="swiper-slide">
-                        <img loading="lazy" decoding="async" src="/m3.JPG" alt="Gallery View M3" />
+                        <img loading="lazy" decoding="async" src="/m3.webp" alt="Gallery View M3" />
                     </div>
                     <div className="swiper-slide">
                         <img loading="lazy" decoding="async" src="/hero.webp" alt="Braj Nidhi Hero View" />
@@ -1275,7 +1275,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img loading="lazy" decoding="async" src="/Radha Vallabh Dwar.jpg" alt="Radha Vallabh Temple" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Radha Vallabh Dwar.webp" alt="Radha Vallabh Temple" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">3.69 km</div>
                             <div className="attraction-content">
@@ -1303,7 +1303,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img loading="lazy" decoding="async" src="/Prem Mandir.jpg" alt="Prem Mandir" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Prem Mandir.webp" alt="Prem Mandir" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">0.69 km</div>
                             <div className="attraction-content">
@@ -1331,7 +1331,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img loading="lazy" decoding="async" src="/keshi ghat.jpg" alt="Keshi Ghat" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/keshi ghat.webp" alt="Keshi Ghat" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">1.20 km</div>
                             <div className="attraction-content">
@@ -1359,7 +1359,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img loading="lazy" decoding="async" src="/nidhi van , Vrindavan.jpg" alt="Nidhivan" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/nidhi van , Vrindavan.webp" alt="Nidhivan" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">3.55 km</div>
                             <div className="attraction-content">
@@ -1415,7 +1415,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img loading="lazy" decoding="async" src="/Samadhi temple of neem karoli baba, Vrindavan.jpg" alt="Neem Karoli Ashram" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Samadhi temple of neem karoli baba, Vrindavan.webp" alt="Neem Karoli Ashram" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">2.72 km</div>
                             <div className="attraction-content">
@@ -1443,7 +1443,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img loading="lazy" decoding="async" src="/Raman Reti, Vrindavan.jpg" alt="Raman Reti" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Raman Reti, Vrindavan.webp" alt="Raman Reti" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">15.39 km</div>
                             <div className="attraction-content">
@@ -1496,7 +1496,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img loading="lazy" decoding="async" src="/Vishram Ghat Mathura – Sacred Yamuna Aarti & Spiritual Vibes🌸.jpg" alt="Vishram Ghat Mathura" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/Vishram Ghat Mathura – Sacred Yamuna Aarti & Spiritual Vibes🌸.webp" alt="Vishram Ghat Mathura" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">12.5 km</div>
                             <div className="attraction-content">
@@ -1521,7 +1521,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img loading="lazy" decoding="async" src="/📍Shri Banke Bihari Mandir, Vrindavan.jpg" alt="Shri Banke Bihari Mandir" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/📍Shri Banke Bihari Mandir, Vrindavan.webp" alt="Shri Banke Bihari Mandir" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">3.69 km</div>
                             <div className="attraction-content">

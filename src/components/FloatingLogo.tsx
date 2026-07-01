@@ -16,7 +16,7 @@ export default function FloatingLogo() {
         zIndex: 9998,
       }}
     >
-      <img loading="lazy" decoding="async" src="/LOGO1.jpg"
+      <img loading="lazy" decoding="async" src="/LOGO1.webp"
         alt="Vrindavan Chandrodaya Mandir"
         style={{
           height: "65px",

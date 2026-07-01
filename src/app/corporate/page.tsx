@@ -830,7 +830,7 @@ export default function Corporate() {
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.webp" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         <nav>
@@ -1029,7 +1029,7 @@ export default function Corporate() {
                 className="split-image"
                 variants={slideInRight}
             >
-                <img loading="lazy" decoding="async" src="/IMG_3683.jpg" alt="Corporate Strategy Meeting" />
+                <img loading="lazy" decoding="async" src="/IMG_3683.webp" alt="Corporate Strategy Meeting" />
             </motion.div>
         </motion.section>
 
@@ -1047,7 +1047,7 @@ export default function Corporate() {
                 </ul>
             </motion.div>
             <motion.div className="split-image" variants={slideInLeft}>
-                <img loading="lazy" decoding="async" src="/the-design-thoughtfully.jpg" alt="Sattvic Dining" />
+                <img loading="lazy" decoding="async" src="/the-design-thoughtfully.webp" alt="Sattvic Dining" />
             </motion.div>
         </motion.section>
 

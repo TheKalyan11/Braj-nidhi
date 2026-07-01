@@ -50,7 +50,7 @@ const attractions: Attraction[] = [
     rating: "4.9",
     location: "Gotam Nagar, Vrindavan",
     distance: "3.69 km",
-    image: "/Radha Vallabh Dwar.jpg",
+    image: "/Radha Vallabh Dwar.webp",
     mapSrc:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6974793!3d27.5815647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736fc201c10711%3A0xbcc1c54b2ce8f41e!2sShri%20Bankey%20Bihari%20Ji%20Temple%2C%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin",
     alt: "Radha Vallabh Temple",
@@ -60,7 +60,7 @@ const attractions: Attraction[] = [
     rating: "5.0",
     location: "Chattikara Road, Vrindavan",
     distance: "0.69 km",
-    image: "/Prem Mandir.jpg",
+    image: "/Prem Mandir.webp",
     mapSrc:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6774793!3d27.5615647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPrem%20Mandir!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin",
     alt: "Prem Mandir",
@@ -70,7 +70,7 @@ const attractions: Attraction[] = [
     rating: "4.8",
     location: "Banks of Yamuna, Vrindavan",
     distance: "1.20 km",
-    image: "/keshi ghat.jpg",
+    image: "/keshi ghat.webp",
     mapSrc:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6874793!3d27.5715647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sISKCON%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin",
     alt: "Keshi Ghat",
@@ -80,7 +80,7 @@ const attractions: Attraction[] = [
     rating: "4.7",
     location: "Goshala Nagar, Vrindavan",
     distance: "3.55 km",
-    image: "/nidhi van , Vrindavan.jpg",
+    image: "/nidhi van , Vrindavan.webp",
     mapSrc:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6984793!3d27.5825647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNidhivan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin",
     alt: "Nidhivan",
@@ -100,7 +100,7 @@ const attractions: Attraction[] = [
     rating: "4.9",
     location: "Mathura Road, Vrindavan",
     distance: "2.72 km",
-    image: "/Samadhi temple of neem karoli baba, Vrindavan.jpg",
+    image: "/Samadhi temple of neem karoli baba, Vrindavan.webp",
     mapSrc:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6914793!3d27.5845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNeem%20Karoli%20Baba%20Ashram!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin",
     alt: "Neem Karoli Ashram",
@@ -110,7 +110,7 @@ const attractions: Attraction[] = [
     rating: "4.8",
     location: "Gokul, Uttar Pradesh",
     distance: "15.39 km",
-    image: "/Raman Reti, Vrindavan.jpg",
+    image: "/Raman Reti, Vrindavan.webp",
     mapSrc:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.7214793!3d27.4845647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRaman%20Reti!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin",
     alt: "Raman Reti",
@@ -130,7 +130,7 @@ const attractions: Attraction[] = [
     rating: "4.9",
     location: "Mathura",
     distance: "12.5 km",
-    image: "/Vishram Ghat Mathura – Sacred Yamuna Aarti & Spiritual Vibes🌸.jpg",
+    image: "/Vishram Ghat Mathura – Sacred Yamuna Aarti & Spiritual Vibes🌸.webp",
     mapSrc:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6814793!3d27.5045647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sVishram%20Ghat!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin",
     alt: "Vishram Ghat Mathura",
@@ -140,7 +140,7 @@ const attractions: Attraction[] = [
     rating: "5.0",
     location: "Bihari Pura, Vrindavan",
     distance: "3.69 km",
-    image: "/📍Shri Banke Bihari Mandir, Vrindavan.jpg",
+    image: "/📍Shri Banke Bihari Mandir, Vrindavan.webp",
     mapSrc:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6974793!3d27.5815647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39736fc201c10711%3A0xbcc1c54b2ce8f41e!2sShri%20Bankey%20Bihari%20Ji%20Temple%2C%20Vrindavan!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin",
     alt: "Shri Banke Bihari Mandir",

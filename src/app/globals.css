@@ -1892,7 +1892,7 @@ header.scrolled nav ul li a:hover {
 .cta-card {
     position: relative;
     background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                url('/m3.JPG');
+                url('/m3.webp');
     background-size: cover;
     background-position: center;
     border-radius: 50px; /* Very rounded corners as seen in image */
@@ -2145,7 +2145,7 @@ header.scrolled nav ul li a:hover {
     line-height: 0.75;
     text-transform: uppercase;
     text-align: center;
-    background: url('/m2.JPEG') center 40% / cover;
+    background: url('/m2.webp') center 40% / cover;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     padding-top: 40px;

@@ -15,7 +15,7 @@ const packages = [
     price: "₹29,999", priceLabel: "Starting From", duration: "3 Days / 2 Nights",
     ideal: ["Families", "Pilgrims", "Spiritual Groups"],
     highlights: ["Temple Darshan", "Heritage Walk", "Cultural Immersion", "Sattvic Meals"],
-    image: "/IMG_3846.JPG", badge: "Most Popular", color: "#d4af37",
+    image: "/IMG_3846.webp", badge: "Most Popular", color: "#d4af37",
   },
   {
     id: 2, tag: "Vrindavan", title: "Sapt Devalaya Darshan",
@@ -33,15 +33,15 @@ const packages = [
     price: "On Request", priceLabel: "Custom Pricing", duration: "Flexible",
     ideal: ["Couples", "VIPs", "Corporate Groups"],
     highlights: ["Private Vehicle", "Personal Guide", "Premium Hotels", "Custom Itinerary"],
-    image: "/keshi ghat.jpg", badge: "Premium", color: "#6b8f5e",
+    image: "/keshi ghat.webp", badge: "Premium", color: "#6b8f5e",
   },
 ];
 
 const destinations = [
   { name: "Vrindavan", label: "Braj Bhoomi", image: "https://upload.wikimedia.org/wikipedia/commons/7/77/Vrindavan_Chandrodaya_Mandir.jpg", span: "wide" },
-  { name: "Mathura", label: "Birthplace of Krishna", image: "/599049187978314472.jpg", span: "normal" },
-  { name: "Nandgaon", label: "Krishna's Childhood Home", image: "/IMG_3846.JPG", span: "normal" },
-  { name: "Barsana", label: "Radha's Divine Abode", image: "/IMG_3637.JPG", span: "wide" },
+  { name: "Mathura", label: "Birthplace of Krishna", image: "/599049187978314472.webp", span: "normal" },
+  { name: "Nandgaon", label: "Krishna's Childhood Home", image: "/IMG_3846.webp", span: "normal" },
+  { name: "Barsana", label: "Radha's Divine Abode", image: "/IMG_3637.webp", span: "wide" },
 ];
 
 const journeySteps = [
@@ -121,9 +121,9 @@ function useCounter(end: number, duration: number = 2000) {
 
 const sliderImages = [
   { url: "https://upload.wikimedia.org/wikipedia/commons/7/77/Vrindavan_Chandrodaya_Mandir.jpg", title: "Vrindavan, Braj Bhoomi" },
-  { url: "/599049187978314472.jpg", title: "Mathura, Birthplace of Krishna" },
-  { url: "/IMG_3846.JPG", title: "Nandgaon, Krishna's Childhood Home" },
-  { url: "/IMG_3637.JPG", title: "Barsana, Radha's Divine Abode" }
+  { url: "/599049187978314472.webp", title: "Mathura, Birthplace of Krishna" },
+  { url: "/IMG_3846.webp", title: "Nandgaon, Krishna's Childhood Home" },
+  { url: "/IMG_3637.webp", title: "Barsana, Radha's Divine Abode" }
 ];
 
 function HeroSlider() {
@@ -1306,7 +1306,7 @@ export default function BrajYatra() {
             </Link>
             <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.3)' }} />
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <img loading="lazy" decoding="async" src="/LOGO1.jpg" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
+              <img loading="lazy" decoding="async" src="/LOGO1.webp" alt="Vrindavan Chandrodaya Mandir" style={{ height: '50px', width: 'auto', display: 'block', borderRadius: '6px' }} />
             </Link>
           </div>
         <nav>
