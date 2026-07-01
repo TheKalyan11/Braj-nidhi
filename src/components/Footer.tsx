@@ -70,9 +70,14 @@ const Footer = () => {
                 <Phone size={18} className="text-gold" />
                 <a href="tel:+917037794300" className="text-white/70 hover:text-gold transition-colors text-sm">+91 70377 94300</a>
               </li>
-              <li className="flex items-center gap-3">
-                <Mail size={18} className="text-gold" />
-                <span className="text-white/70 text-sm">stay@brajnidhi.com</span>
+              <li className="flex items-start gap-3">
+                <Mail size={18} className="text-gold mt-1" />
+                <div className="flex flex-col gap-1 text-sm text-white/70">
+                  <a href="mailto:support@thebrajnidhi.com" className="hover:text-gold transition-colors">support@thebrajnidhi.com</a>
+                  <a href="mailto:bookings@thebrajnidhi.com" className="hover:text-gold transition-colors">bookings@thebrajnidhi.com</a>
+                  <a href="mailto:corporateevents@thebrajnidhi.com" className="hover:text-gold transition-colors">corporateevents@thebrajnidhi.com</a>
+                  <a href="mailto:weddings@thebrajnidhi.com" className="hover:text-gold transition-colors">weddings@thebrajnidhi.com</a>
+                </div>
               </li>
             </ul>
           </div>

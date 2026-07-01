@@ -2256,14 +2256,7 @@ export default function BookingPage() {
         .vb-btn::after { content: ""; position: absolute; background-color: #FF4655; width: 0.3rem; height: 0.3rem; bottom: -1px; right: -1px; transition: background-color 0.15s ease-in-out; }
         .vb-btn:hover::before { background-color: white; }
         .vb-btn:hover::after { background-color: white; }
-        /* Hidden receipt — only visible when printing */
-        .pr-receipt-print { display: none; }
-        @page { size: A5 portrait; margin: 10mm; }
-        @media print {
-          * { visibility: hidden !important; }
-          .pr-receipt-print { visibility: visible !important; display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; width: 260px !important; padding: 0 !important; margin: 0 !important; font-family: "Courier New", Courier, monospace !important; font-size: 11px !important; line-height: 1.7 !important; color: #000 !important; background: #fff !important; page-break-inside: avoid !important; }
-          .pr-receipt-print * { visibility: visible !important; }
-        }
+
 
         /* ── Footer reset: fully restore global site-footer styles ── */
         .booking-page-mmt .site-footer {

@@ -515,8 +515,7 @@ export default function FloatingWidgets() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.93, y: 35 }}
             transition={{ type: "spring", damping: 26, stiffness: 340 }}
-            style={{ position: "fixed", right: "24px", bottom: "100px", zIndex: 9999 }}
-            className="w-[380px] h-[610px] max-h-[85vh] rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(113,55,241,0.12)] flex flex-col bg-[#F6F5FA] border border-[#E8E6F0] text-[#332A42]"
+            className="fixed right-2 md:right-6 bottom-[100px] z-[9999] w-[calc(100%-16px)] max-w-[380px] md:w-[380px] h-[610px] max-h-[85vh] rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(113,55,241,0.12)] flex flex-col bg-[#F6F5FA] border border-[#E8E6F0] text-[#332A42]"
           >
             {/* ──────── Header Block ──────── */}
             {activeTab === "home" ? (

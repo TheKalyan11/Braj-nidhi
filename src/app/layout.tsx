@@ -18,6 +18,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* === Performance: DNS prefetch & preconnect for all external resources === */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+        
+        {/* === Performance: Preload hero image to improve LCP score === */}
+        <link rel="preload" as="image" href="/hero.webp" type="image/webp" />
+        
+        {/* Google Fonts — display=swap prevents FOIT (Flash of Invisible Text) */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Bebas+Neue&display=swap"
+        />
+        
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"

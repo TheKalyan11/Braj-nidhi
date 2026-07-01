@@ -23,11 +23,14 @@
 
 html {
     scroll-behavior: smooth;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 body {
     background-color: var(--bg-dark);
     color: var(--text-main);
+    max-width: 100vw;
     overflow-x: hidden;
 }
 
@@ -837,6 +840,7 @@ header.scrolled nav ul li a:hover {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center top;
     z-index: 1;
     transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
@@ -1274,8 +1278,10 @@ header.scrolled nav ul li a:hover {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center 20%;
     z-index: 1;
-    transition: transform 0.6s ease;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
 }
 
 .offer-card.immersive:hover .offer-bg-img {
@@ -1539,7 +1545,9 @@ header.scrolled nav ul li a:hover {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.8s ease;
+    object-position: center center;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
 }
 
 .attraction-card:hover .attraction-bg {
@@ -1667,20 +1675,22 @@ header.scrolled nav ul li a:hover {
 }
 
 .gallery-slider .swiper-slide {
-    width: 600px;
-    height: 400px;
+    width: min(600px, 85vw);
+    height: clamp(240px, 40vw, 400px);
     border-radius: 20px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 15px 50px rgba(0,0,0,0.2);
-    /* For standard Swiper reflections or shadows, they are added automatically if configured */
+    flex-shrink: 0;
 }
 
 .gallery-slider .swiper-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
     display: block;
+    will-change: transform;
 }
 
 .gallery-nav {
@@ -2140,7 +2150,7 @@ header.scrolled nav ul li a:hover {
     -webkit-text-fill-color: transparent;
     padding-top: 40px;
     white-space: nowrap;
-    overflow: hidden;
+    overflow: visible;
     user-select: none;
     letter-spacing: -0.06em;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -3503,7 +3513,8 @@ header.scrolled nav ul li a:hover {
     }
 
     .footer-massive-text {
-        font-size: 18vw !important;
+        font-size: 10vw !important;
+        letter-spacing: -0.03em !important;
     }
 }
 
@@ -4139,8 +4150,8 @@ html, body {
     }
 
     .footer-massive-text {
-        font-size: 20vw !important;
-        letter-spacing: 0.05em !important;
+        font-size: 9.5vw !important;
+        letter-spacing: -0.03em !important;
     }
 }
 
@@ -4354,6 +4365,12 @@ html, body {
     img {
         max-width: 100%;
         height: auto;
+        object-fit: cover;
+    }
+    
+    /* Ensure logos and icons do not get cropped */
+    .logo img, header img, footer img, [src$=".svg"], .icon {
+        object-fit: contain;
     }
 
     /* Tables on mobile */
@@ -4934,4 +4951,63 @@ html {
   background: rgba(255, 255, 255, 0.7);
   border: 2px solid transparent;
   background-clip: padding-box;
+}
+
+/* === Premium Global Image Animations & Transitions === */
+@keyframes smoothImageLoad {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+img:not(.no-animation, .logo img, header img, footer img, [src$=".svg"], .icon, .chat-header img, .bot-img, .bansuri-img) {
+  animation: smoothImageLoad 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform, filter;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Upgrade hover transitions across standard site widgets */
+.room-bg-img, 
+.gallery-slide-img, 
+.offer-bg-img, 
+.attraction-bg, 
+.image-grid img, 
+.y-slider-slide {
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* === Performance: content-visibility for below-fold sections ===
+ * This tells the browser to skip layout/paint for off-screen sections
+ * until the user scrolls near them — massive FCP improvement on slow networks.
+ */
+.gallery-section,
+.offers-section,
+.testimonials-section,
+.nearby-section,
+.stats-section,
+.destination-section,
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* === Performance: Optimize image rendering quality === */
+img {
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* === Ensure images with explicit aspect ratios don't distort === */
+[style*="aspect-ratio"] img,
+.aspect-ratio-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

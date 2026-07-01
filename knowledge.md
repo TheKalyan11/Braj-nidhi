@@ -6,7 +6,7 @@
 **Description:** Braj Nidhi is an ultra-luxury spiritual guesthouse and sanctuary designed for seekers, pilgrims, and families seeking absolute tranquility, luxury, and spiritual elevation in the holy land of Vrindavan.  
 **Address:** Braj Nidhi Dham, near Prem Mandir, Raman Reti, Vrindavan, Uttar Pradesh, PIN 281121  
 **Phone:** +91 99999 88888  
-**Email:** yatra@brajnidhi.com  
+**Email:** support@thebrajnidhi.com  
 **Check-in Time:** 12:00 PM  
 **Check-out Time:** 11:00 AM  
 

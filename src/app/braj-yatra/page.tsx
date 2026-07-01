@@ -24,7 +24,7 @@ const packages = [
     price: "₹14,999", priceLabel: "Starting From", duration: "1 Day / 2 Days",
     ideal: ["Devotees", "Seekers", "Solo Travelers"],
     highlights: ["7 Temple Darshan", "Expert Guide", "Prasad Included", "Flexible Timing"],
-    image: "/Radha Vallabh Dwar.jpg", badge: "Devotee's Choice", color: "#c87941",
+    image: "https://blog.yatradham.org/wp-content/uploads/2025/03/Shri-Radha-Raman-Temple.jpg", badge: "Devotee's Choice", color: "#c87941",
   },
   {
     id: 3, tag: "Exclusive", title: "Customized Yatra",
@@ -503,7 +503,7 @@ export default function BrajYatra() {
           text-transform: uppercase;
           line-height: 1;
           pointer-events: none;
-          white-space: nowrap;
+          width: 85%;
         }
 
         /* Circular Navigation Arrows */

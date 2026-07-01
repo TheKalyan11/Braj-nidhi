@@ -15,7 +15,7 @@ const visitRows = [
   },
   { label: "Open Daily:", value: "24/7 Front Desk · Check-in 12:00 PM" },
   { label: "Phone:", value: "+91 70377 94300" },
-  { label: "Email:", value: "xx@thebrajnidhi.com" },
+  { label: "Email:", value: "support@thebrajnidhi.com" },
 ];
 
 export default function Contact() {
@@ -881,7 +881,12 @@ export default function Contact() {
                   </div>
                   <div className="location-item-content">
                     <h4>Email</h4>
-                    <p><a href="mailto:xx@thebrajnidhi.com" className="hover:text-gold transition-colors">xx@thebrajnidhi.com</a></p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <p><a href="mailto:support@thebrajnidhi.com" className="hover:text-gold transition-colors">Support: support@thebrajnidhi.com</a></p>
+                      <p><a href="mailto:bookings@thebrajnidhi.com" className="hover:text-gold transition-colors">Bookings: bookings@thebrajnidhi.com</a></p>
+                      <p><a href="mailto:corporateevents@thebrajnidhi.com" className="hover:text-gold transition-colors">Corporate Events: corporateevents@thebrajnidhi.com</a></p>
+                      <p><a href="mailto:weddings@thebrajnidhi.com" className="hover:text-gold transition-colors">Weddings: weddings@thebrajnidhi.com</a></p>
+                    </div>
                   </div>
                 </div>
                 <div className="location-item">

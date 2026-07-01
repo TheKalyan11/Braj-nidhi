@@ -46,16 +46,7 @@ export default function InvoiceReceipt({
       {/* Header */}
       <div className="inv-header">
         <div className="inv-logo-area">
-          <div className="inv-logo-icon">
-            <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M40 20C40 20 60 20 60 50C60 80 40 80 40 80" stroke="#FFB800" strokeWidth="16" strokeLinecap="round"/>
-              <path d="M60 30C60 30 75 30 75 50C75 70 60 70 60 70" stroke="#FFB800" strokeWidth="16" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <div className="inv-logo-text">
-            <h2>BRAJ NIDHI.</h2>
-            <p>FOR YOUR VACATION</p>
-          </div>
+          <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi Logo" style={{ height: '60px', width: 'auto' }} />
         </div>
         <div className="inv-title-area">
           <h1>INVOICE</h1>
@@ -146,28 +137,16 @@ export default function InvoiceReceipt({
         <div className="inv-contacts">
           <div className="inv-contact-item">
             <div className="inv-icon"><Mail size={12}/></div>
-            <span>info@brajnidhi.com</span>
+            <span>support@thebrajnidhi.com</span>
           </div>
           <div className="inv-contact-item">
             <div className="inv-icon"><Phone size={12}/></div>
-            <span>+91 99999 99999</span>
+            <span>7037794300</span>
           </div>
           <div className="inv-contact-item">
             <div className="inv-icon"><Globe size={12}/></div>
-            <span>www.brajnidhi.com</span>
+            <span>thebrajnidhi.com</span>
           </div>
-        </div>
-        
-        <div className="inv-signature">
-          <div className="inv-sign-image">
-            {/* Placeholder for signature */}
-            <svg viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 40 C 40 10, 60 10, 80 40 S 120 70, 140 40 S 160 10, 180 40" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M60 40 C 80 20, 100 60, 120 40" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <div className="inv-sign-name">Braj Nidhi</div>
-          <div className="inv-sign-pos">Authorized Signatory</div>
         </div>
       </div>
 

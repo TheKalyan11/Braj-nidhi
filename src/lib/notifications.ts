@@ -263,12 +263,16 @@ function buildAdminWhatsAppMessage(p: BookingNotificationPayload): string {
 //   SMTP_FROM     → display name + address e.g. "Braj Nidhi" <bookings@brajnidhi.com>
 //                   (optional — defaults to SMTP_USER if not set)
 
+import { generateBookingPDF } from '@/lib/pdf';
+
 async function sendEmail(p: BookingNotificationPayload): Promise<{ sent: boolean; error?: string }> {
   const host = process.env.SMTP_HOST;
   const port = parseInt(process.env.SMTP_PORT ?? '587', 10);
-  const user = process.env.SMTP_USER;
+  const user = process.env.SMTP_USER || 'bookings@thebrajnidhi.com';
   const pass = process.env.SMTP_PASS;
-  const fromRaw = process.env.SMTP_FROM ?? user ?? '';
+  
+  // Use bookings@thebrajnidhi.com as the official sender and receiver
+  const fromRaw = `"Braj Nidhi" <bookings@thebrajnidhi.com>`;
 
   if (!host || !user || !pass) {
     return {
@@ -284,27 +288,38 @@ async function sendEmail(p: BookingNotificationPayload): Promise<{ sent: boolean
     const transporter = nodemailer.createTransport({
       host,
       port,
-      // port 465 → SSL (secure: true); port 587 → STARTTLS (secure: false + requireTLS: true)
       secure: port === 465,
       requireTLS: port === 587,
       auth: { user, pass },
       tls: {
-        // Allow self-signed certs on private hosting (cPanel, VPS, etc.)
         rejectUnauthorized: false,
       },
     });
 
+    const htmlContent = buildEmailHTML(p);
+    
+    // Generate the PDF
+    const pdfBuffer = await generateBookingPDF(htmlContent);
+
     await transporter.sendMail({
       from: fromRaw,
       to: p.guestEmail,
-      bcc: user, // BCC yourself for records
+      bcc: 'bookings@thebrajnidhi.com', // BCC the admin address
       subject: `✅ Booking Confirmed – ${p.bookingRef} | Braj Nidhi, Vrindavan`,
       text: buildEmailText(p),
-      html: buildEmailHTML(p),
+      html: htmlContent,
+      attachments: [
+        {
+          filename: `BrajNidhi_Booking_${p.bookingRef}.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf',
+        }
+      ]
     });
 
     return { sent: true };
   } catch (e: any) {
+    console.error('Error sending email:', e);
     return { sent: false, error: e.message };
   }
 }
@@ -380,10 +395,10 @@ async function sendWhatsAppCallMeBot(phone: string, message: string): Promise<{ 
 export async function sendBookingNotifications(
   p: BookingNotificationPayload,
 ): Promise<NotificationResult> {
-  const adminPhone = process.env.ADMIN_WHATSAPP_PHONE ?? '';
+  const adminPhone = process.env.ADMIN_WHATSAPP_PHONE ?? '7037794300';
 
   // Run all in parallel — failures in one channel don't block others
-  const [emailResult, guestWaResult, adminWaResult] = await Promise.all([
+  const [emailResult, guestWaResult, adminWaResult, ccAdminWaResult] = await Promise.all([
     // 1. Email to guest (+ BCC to yourself)
     sendEmail(p),
 
@@ -392,6 +407,9 @@ export async function sendBookingNotifications(
 
     // 3. WhatsApp admin alert — try CallMeBot (free, no per-message limit for admin)
     sendWhatsAppCallMeBot(adminPhone, buildAdminWhatsAppMessage(p)),
+    
+    // 4. CC admin on the exact same message sent to the guest
+    sendWhatsAppMeta('7037794300', buildWhatsAppMessage(p)),
   ]);
 
   // If Meta guest WA failed, log it but don't retry (guest already gets email)

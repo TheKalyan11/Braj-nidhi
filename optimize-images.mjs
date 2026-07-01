@@ -32,8 +32,24 @@ function processDirectory(dir) {
                     inner = inner.slice(0, -1).trim();
                 }
 
+                // Also ensure object-cover is present if className is present
+                // This prevents images from stretching when they have w-full h-full
+                let newTag = `<img loading="lazy" decoding="async" ${inner} ${hasClosingSlash ? '/' : ''}>`;
+                if (newTag.includes('className="') || newTag.includes("className='")) {
+                    if (!newTag.includes('object-cover') && !newTag.includes('object-contain') && !newTag.includes('object-none')) {
+                        // Find the className=" or className=' and inject object-cover 
+                        newTag = newTag.replace(/className=(['"])(.*?)\1/, (cMatch, quote, classes) => {
+                            // Don't add to logos or icons based on class
+                            if (classes.includes('logo') || classes.includes('icon') || classes.includes('avatar')) {
+                                return cMatch;
+                            }
+                            return `className=${quote}${classes} object-cover${quote}`;
+                        });
+                    }
+                }
+                
                 modified = true;
-                return `<img loading="lazy" decoding="async" ${inner} ${hasClosingSlash ? '/' : ''}>`;
+                return newTag;
             });
             
             // We also want to replace iframe with loading="lazy" if not present
