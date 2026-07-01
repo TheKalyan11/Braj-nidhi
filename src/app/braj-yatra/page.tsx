@@ -38,9 +38,9 @@ const packages = [
 ];
 
 const destinations = [
-  { name: "Vrindavan", label: "Braj Bhoomi", image: "https://upload.wikimedia.org/wikipedia/commons/7/77/Vrindavan_Chandrodaya_Mandir.jpg", span: "wide" },
-  { name: "Mathura", label: "Birthplace of Krishna", image: "/599049187978314472.webp", span: "normal" },
-  { name: "Nandgaon", label: "Krishna's Childhood Home", image: "/IMG_3846.webp", span: "normal" },
+  { name: "Vrindavan", label: "Braj Bhoomi", image: "/vrindavan_new.webp", span: "wide" },
+  { name: "Mathura", label: "Birthplace of Krishna", image: "/mathura_new.webp", span: "normal" },
+  { name: "Nandgaon", label: "Krishna's Childhood Home", image: "/nandgaon_new.webp", span: "normal" },
   { name: "Barsana", label: "Radha's Divine Abode", image: "/IMG_3637.webp", span: "wide" },
 ];
 
@@ -119,77 +119,7 @@ function useCounter(end: number, duration: number = 2000) {
   return { count, ref };
 }
 
-const sliderImages = [
-  { url: "https://upload.wikimedia.org/wikipedia/commons/7/77/Vrindavan_Chandrodaya_Mandir.jpg", title: "Vrindavan, Braj Bhoomi" },
-  { url: "/599049187978314472.webp", title: "Mathura, Birthplace of Krishna" },
-  { url: "/IMG_3846.webp", title: "Nandgaon, Krishna's Childhood Home" },
-  { url: "/IMG_3637.webp", title: "Barsana, Radha's Divine Abode" }
-];
 
-function HeroSlider() {
-  const [activeSlide, setActiveSlide] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveSlide(prev => (prev + 1) % sliderImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const nextSlide = () => {
-    setActiveSlide(prev => (prev + 1) % sliderImages.length);
-  };
-
-  const prevSlide = () => {
-    setActiveSlide(prev => (prev - 1 + sliderImages.length) % sliderImages.length);
-  };
-
-  return (
-    <div className="y-slider-inner">
-      <AnimatePresence initial={false} mode="wait">
-        <motion.img
-          key={activeSlide}
-          src={sliderImages[activeSlide].url}
-          alt={sliderImages[activeSlide].title}
-          className="y-slider-slide"
-          initial={{ opacity: 0, scale: 1.04 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-        />
-      </AnimatePresence>
-
-      {/* Inset white border outline overlay */}
-      <div className="y-slider-border-overlay" />
-
-      {/* Bottom legibility gradient overlay */}
-      <div className="y-slider-gradient" />
-
-      {/* Centered bold title */}
-      <div className="y-slider-title-overlay">
-        {sliderImages[activeSlide].title}
-      </div>
-
-      {/* Circular Navigation Arrows */}
-      <button
-        type="button"
-        className="y-slider-arrow y-left"
-        onClick={prevSlide}
-        aria-label="Previous Slide"
-      >
-        <ChevronLeft size={22} />
-      </button>
-      <button
-        type="button"
-        className="y-slider-arrow y-right"
-        onClick={nextSlide}
-        aria-label="Next Slide"
-      >
-        <ChevronRight size={22} />
-      </button>
-    </div>
-  );
-}
 
 /* ─── COMPONENT ─── */
 export default function BrajYatra() {
@@ -501,9 +431,10 @@ export default function BrajYatra() {
           letter-spacing: 0.08em;
           text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
           text-transform: uppercase;
-          line-height: 1;
+          line-height: 1.1;
           pointer-events: none;
-          width: 85%;
+          width: 95%;
+          white-space: normal;
         }
 
         /* Circular Navigation Arrows */
@@ -650,7 +581,9 @@ export default function BrajYatra() {
           }
           .y-slider-title-overlay {
             bottom: 20px;
-            font-size: 1.8rem;
+            font-size: 1.45rem;
+            width: 95%;
+            word-wrap: break-word;
           }
         }
 
@@ -1391,14 +1324,25 @@ export default function BrajYatra() {
             </motion.p>
           </div>
 
-          {/* CINEMATIC WIDE SLIDER CONTAINER (Bottom Tier) */}
+          {/* DIVINE DESTINATIONS GRID (Replaces Slider) */}
           <motion.div 
-            className="y-slider-container"
+            className="y-dest-grid"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.0, delay: 0.6, ease: "easeOut" as const }}
+            transition={{ duration: 1.0, delay: 0.6, ease: "easeOut" }}
+            style={{ width: '100%', zIndex: 5, position: 'relative' }}
           >
-            <HeroSlider />
+            {destinations.map((dest, i) => (
+              <motion.div key={dest.name} className="y-dest" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: i * 0.12, ease: "easeOut" }}>
+                <img loading="lazy" decoding="async" src={dest.image} alt={dest.name} />
+                <div className="y-dest-overlay" />
+                <div className="y-dest-arrow"><i className="fas fa-arrow-right"></i></div>
+                <div className="y-dest-content">
+                  <span className="y-dest-label">{dest.label}</span>
+                  <div className="y-dest-name">{dest.name}</div>
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
 
           {/* Floating Search Packages widget (Bottom Right) */}
@@ -1654,26 +1598,7 @@ export default function BrajYatra() {
           </div>
         </section>
 
-        {/* ═══ DESTINATIONS ═══ */}
-        <section className="y-destinations">
-          <motion.div className="y-dest-header" {...fadeUp}>
-            <div className="y-sec-eyebrow" style={{ justifyContent: 'center', display: 'flex' }}>Divine Places</div>
-            <h2 className="y-sec-title" style={{ textAlign: 'center', color: '#0a0e14' }}>Divine <span className="y-accent">Destinations</span></h2>
-          </motion.div>
-          <div className="y-dest-grid">
-            {destinations.map((dest, i) => (
-              <motion.div key={dest.name} className="y-dest" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true } as const} transition={{ duration: 0.7, delay: i * 0.12, ease: "easeOut" as const }}>
-                <img loading="lazy" decoding="async" src={dest.image} alt={dest.name} />
-                <div className="y-dest-overlay" />
-                <div className="y-dest-arrow"><i className="fas fa-arrow-right"></i></div>
-                <div className="y-dest-content">
-                  <span className="y-dest-label">{dest.label}</span>
-                  <div className="y-dest-name">{dest.name}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+
 
         {/* ═══ TESTIMONIALS ═══ */}
         <section className="testimonials-section">
@@ -1773,7 +1698,14 @@ export default function BrajYatra() {
           <div className="footer-col"><h3>Stay & Book</h3><a href="/booking">Book Your Stay</a><a href="/weddings">Wedding Packages</a><a href="/corporate">Corporate Stays</a><a href="#">Refund Policy</a></div>
           <div className="footer-col"><h3>Help & Support</h3><a href="#">FAQ</a><a href="/contact">Contact Us</a><a href="#">Direction Map</a><a href="#">Group Inquiries</a></div>
           <div className="footer-col"><h3>Information</h3><Link href="/privacy">Privacy Policy</Link><Link href="/terms">Terms of Service</Link><Link href="/guest-policy">Guest Policy</Link><Link href="/cancellation-policy">Cancellation Policy</Link></div>
+                        <div className="footer-col">
+                <h3>Follow Us</h3>
+                <a href="https://wa.me/917037794300" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+                <a href="https://www.instagram.com/braj.nidhi_/" target="_blank" rel="noopener noreferrer">Instagram</a>
+            </div>
         </div>
+
         <div className="footer-middle-bar"><Link href="/privacy">Privacy Policy</Link><span>Copyright &copy; BRAJNIDHI {new Date().getFullYear()}</span><Link href="/terms">Terms Of Use</Link></div>
         <div className="footer-massive-text">BRAJNIDHI</div>
       </footer>

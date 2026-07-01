@@ -130,7 +130,7 @@ const attractions: Attraction[] = [
     rating: "4.9",
     location: "Mathura",
     distance: "12.5 km",
-    image: "/Vishram Ghat Mathura – Sacred Yamuna Aarti & Spiritual Vibes🌸.webp",
+    image: "/vishram-ghat.jpg",
     mapSrc:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.8665045058414!2d77.6814793!3d27.5045647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sVishram%20Ghat!5e0!3m2!1sen!2sin!4v1714486500000!5m2!1sen!2sin",
     alt: "Vishram Ghat Mathura",

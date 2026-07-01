@@ -16,26 +16,38 @@ const imagePositions: Record<string, string> = {
   "m1.webp": "center 30%",
 };
 
-const HeroSlideshow = ({ images }: { images: string[] }) => {
+const HeroSlideshow = ({ images, mobileImages }: { images: string[]; mobileImages?: string[] }) => {
   const [heroBgIndex, setHeroBgIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const activeImages = isMobile && mobileImages && mobileImages.length > 0 ? mobileImages : images;
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setHeroBgIndex((prev) => (prev + 1) % images.length);
+      setHeroBgIndex((prev) => (prev + 1) % activeImages.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [images.length]);
+  }, [activeImages.length]);
 
-  const currentImage = images[heroBgIndex];
+  const currentImage = activeImages[heroBgIndex] || activeImages[0];
 
   return (
-    <AnimatePresence mode="popLayout">
+    <AnimatePresence>
       <motion.div
         key={heroBgIndex}
         className="hero-slider-bg"
-        initial={{ opacity: 0, scale: 1.05 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 1.05, zIndex: 1 }}
+        animate={{ opacity: 1, scale: 1, zIndex: 2 }}
+        exit={{ opacity: 1, scale: 0.95, zIndex: 0 }}
         transition={{ duration: 1.8, ease: "easeInOut" }}
         style={{
           position: 'absolute',
@@ -66,24 +78,22 @@ const RoomCardSlideshow = ({ images, alt, interval = 4000 }: { images: string[];
 
   return (
     <>
-      {images.map((src, i) => (
+      <AnimatePresence initial={false}>
         <motion.img
-          key={src}
-          src={src}
-          alt={i === imgIndex ? alt : ''}
+          key={imgIndex}
+          src={images[imgIndex]}
+          alt={alt}
           className="room-bg-img"
-          initial={false}
-          animate={{
-            opacity: i === imgIndex ? 1 : 0,
-            scale: i === imgIndex ? 1.07 : 1.0,
-          }}
+          initial={{ opacity: 0, scale: 1.0, zIndex: 1 }}
+          animate={{ opacity: 1, scale: 1.07, zIndex: 2 }}
+          exit={{ opacity: 0.99, scale: 1.07, zIndex: 0 }}
           transition={{
             opacity: { duration: 1.4, ease: 'easeInOut' },
-            scale: { duration: 8, ease: 'linear' },
+            scale: { duration: 8, ease: 'linear' }
           }}
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
         />
-      ))}
+      </AnimatePresence>
     </>
   );
 };
@@ -122,9 +132,6 @@ export default function Home() {
   const deluxe3Images = ["t1.webp", "t2.webp", "t3.webp", "t4.webp"];
   const deluxe4Images = ["f1.webp", "f2.webp", "f3.webp"];
   const heroImages = [
-    "m1.webp",
-    "m2.webp",
-    "m3.webp",
     "h11.webp",
     "DSC09652.webp",
     "DSC09672.webp",
@@ -133,10 +140,11 @@ export default function Home() {
     "DSC05818-HDR.webp",
     "DSC05963-HDR.webp"
   ];
+  const mobileHeroImages = ["m1.webp", "m2.webp", "m3.webp"];
 
   // Preload hero images on mount to ensure smooth, flicker-free transitions
   useEffect(() => {
-    heroImages.forEach((imgSrc) => {
+    [...heroImages, ...mobileHeroImages].forEach((imgSrc) => {
       const img = new Image();
       img.src = `/${imgSrc}`;
     });
@@ -388,7 +396,14 @@ export default function Home() {
   }, []);
 
   const requestReservation = () => {
-    alert(`Reservation Requested!\n\nRoom: ${bookingData.roomType}\nPrice: ₹${roomPrices[bookingData.roomType].toLocaleString()}/night\nCheck-in: ${bookingData.checkIn}\nCheck-out: ${bookingData.checkOut}\nGuests: ${bookingData.guests}\nEvent: ${bookingData.eventType}`);
+    alert(`Reservation Requested!
+
+Room: ${bookingData.roomType}
+Price: ₹${roomPrices[bookingData.roomType].toLocaleString()}/night
+Check-in: ${bookingData.checkIn}
+Check-out: ${bookingData.checkOut}
+Guests: ${bookingData.guests}
+Event: ${bookingData.eventType}`);
   };
 
   const toggleFAQ = (e: any) => {
@@ -514,7 +529,7 @@ export default function Home() {
     <main>
         <section className="hero">
             <div className="hero-slider-container">
-                <HeroSlideshow images={heroImages} />
+                <HeroSlideshow images={heroImages} mobileImages={mobileHeroImages} />
             </div>
 
             {/* Luxury Yacht Style Horizontal Booking widget */}
@@ -944,7 +959,7 @@ export default function Home() {
 
                 {/*  Offer Card 3  */}
                 <div className="offer-card immersive">
-                    <img loading="lazy" decoding="async" src="weekend.webp" alt="Weekend Serenity" className="offer-bg-img" />
+                    <img loading="lazy" decoding="async" src="guestroom-1.webp" alt="Weekend Serenity" className="offer-bg-img" />
                     <div className="offer-gradient-blur"></div>
                     
                     <div className="offer-content">
@@ -1496,7 +1511,7 @@ export default function Home() {
                 <div className="attraction-card" onClick={(e) => e.currentTarget.classList.toggle('flipped')}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <img loading="lazy" decoding="async" src="/Vishram Ghat Mathura – Sacred Yamuna Aarti & Spiritual Vibes🌸.webp" alt="Vishram Ghat Mathura" className="attraction-bg" />
+                            <img loading="lazy" decoding="async" src="/vishram-ghat.jpg" alt="Vishram Ghat Mathura" className="attraction-bg" />
                             <div className="card-overlay-gradient"></div>
                             <div className="distance-pill">12.5 km</div>
                             <div className="attraction-content">
@@ -1595,6 +1610,12 @@ export default function Home() {
                 <Link href="/terms">Terms of Service</Link>
                 <Link href="/guest-policy">Guest Policy</Link>
                 <Link href="/cancellation-policy">Cancellation Policy</Link>
+            </div>
+                        <div className="footer-col">
+                <h3>Follow Us</h3>
+                <a href="https://wa.me/917037794300" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+                <a href="https://www.instagram.com/braj.nidhi_/" target="_blank" rel="noopener noreferrer">Instagram</a>
             </div>
         </div>
         

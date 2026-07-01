@@ -8,7 +8,7 @@ export async function generateBookingPDF(htmlContent: string): Promise<Buffer> {
 
   try {
     const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
     
     const pdfBuffer = await page.pdf({
       format: 'A4',

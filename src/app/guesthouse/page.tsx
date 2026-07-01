@@ -22,24 +22,22 @@ const RoomCardSlideshow = ({ images, alt, interval = 4000 }: { images: string[];
 
   return (
     <>
-      {images.map((src, i) => (
+      <AnimatePresence initial={false}>
         <motion.img
-          key={src}
-          src={src}
-          alt={i === imgIndex ? alt : ''}
+          key={imgIndex}
+          src={images[imgIndex]}
+          alt={alt}
           className="room-bg-img"
-          initial={false}
-          animate={{
-            opacity: i === imgIndex ? 1 : 0,
-            scale: i === imgIndex ? 1.07 : 1.0,
-          }}
+          initial={{ opacity: 0, scale: 1.0, zIndex: 1 }}
+          animate={{ opacity: 1, scale: 1.07, zIndex: 2 }}
+          exit={{ opacity: 0.99, scale: 1.07, zIndex: 0 }}
           transition={{
             opacity: { duration: 1.4, ease: 'easeInOut' },
-            scale: { duration: 8, ease: 'linear' },
+            scale: { duration: 8, ease: 'linear' }
           }}
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
         />
-      ))}
+      </AnimatePresence>
     </>
   );
 };
@@ -1585,9 +1583,9 @@ export default function Guesthouse() {
                             key={heroIndex}
                             src={heroImages[heroIndex]}
                             alt="Luxury Resort View"
-                            initial={{ opacity: 0, scale: 1.02 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0, scale: 1.02, zIndex: 1 }}
+                            animate={{ opacity: 1, scale: 1, zIndex: 2 }}
+                            exit={{ opacity: 1, scale: 1, zIndex: 0 }}
                             transition={{ duration: 1.2, ease: "easeInOut" }}
                             style={{
                                 width: '100%',
@@ -1919,9 +1917,9 @@ export default function Guesthouse() {
                         src={promoImages[promoIndex]}
                         alt="Divine Temple of Vrindavan, Mathura, Nandgaon, Barsana"
                         className="promo-slider-img"
-                        initial={{ opacity: 0, scale: 1.05 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
+                        initial={{ opacity: 0, scale: 1.05, zIndex: 1 }}
+                        animate={{ opacity: 1, scale: 1, zIndex: 2 }}
+                        exit={{ opacity: 1, scale: 1, zIndex: 0 }}
                         transition={{ duration: 1.5, ease: "easeInOut" }}
                     />
                 </AnimatePresence>
@@ -1995,6 +1993,12 @@ export default function Guesthouse() {
                 <Link href="/terms">Terms of Service</Link>
                 <Link href="/guest-policy">Guest Policy</Link>
                 <Link href="/cancellation-policy">Cancellation Policy</Link>
+            </div>
+                        <div className="footer-col">
+                <h3>Follow Us</h3>
+                <a href="https://wa.me/917037794300" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+                <a href="https://www.instagram.com/braj.nidhi_/" target="_blank" rel="noopener noreferrer">Instagram</a>
             </div>
         </div>
         

@@ -897,9 +897,9 @@ export default function Corporate() {
                             key={heroImgIndex}
                             src={heroImages[heroImgIndex]}
                             alt="Corporate Retreats"
-                            initial={{ opacity: 0, scale: 1.1 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
+                            initial={{ opacity: 0, scale: 1.1, zIndex: 1 }}
+                            animate={{ opacity: 1, scale: 1, zIndex: 2 }}
+                            exit={{ opacity: 1, scale: 0.95, zIndex: 0 }}
                             transition={{ duration: 1.5, ease: "easeInOut" }}
                             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                         />
@@ -1362,6 +1362,12 @@ export default function Corporate() {
                 <Link href="/terms">Terms of Service</Link>
                 <Link href="/guest-policy">Guest Policy</Link>
                 <Link href="/cancellation-policy">Cancellation Policy</Link>
+            </div>
+                        <div className="footer-col">
+                <h3>Follow Us</h3>
+                <a href="https://wa.me/917037794300" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+                <a href="https://www.instagram.com/braj.nidhi_/" target="_blank" rel="noopener noreferrer">Instagram</a>
             </div>
         </div>
         

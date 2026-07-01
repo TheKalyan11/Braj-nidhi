@@ -3200,7 +3200,9 @@ export default function BookingPage() {
                 <button className="atc-btn" onClick={() => {
                   const fmt = (d: string) => d.replace(/-/g, '');
                   const title = encodeURIComponent(`Braj Nidhi Stay — ${getRoomTitle(roomType)}`);
-                  const details = encodeURIComponent(`Booking Ref: ${bookingRef}\nGuest: ${guestDetails.firstName} ${guestDetails.lastName}\nTotal Paid: Rs.${payableTotal.toLocaleString()}`);
+                  const details = encodeURIComponent(`Booking Ref: ${bookingRef}
+Guest: ${guestDetails.firstName} ${guestDetails.lastName}
+Total Paid: Rs.${payableTotal.toLocaleString()}`);
                   const location = encodeURIComponent('Braj Nidhi Guesthouse, Vrindavan, UP');
                   window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(checkIn)}/${fmt(checkOut)}&details=${details}&location=${location}`, '_blank');
                 }}>
@@ -3530,7 +3532,14 @@ export default function BookingPage() {
           <div className="footer-col"><h3>Stay & Book</h3><Link href="/booking">Book Your Stay</Link><Link href="/weddings">Wedding Packages</Link><Link href="/corporate">Corporate Stays</Link><a href="#">Refund Policy</a></div>
           <div className="footer-col"><h3>Help & Support</h3><a href="#">FAQ</a><Link href="/contact">Contact Us</Link><a href="#">Direction Map</a><a href="#">Group Inquiries</a></div>
           <div className="footer-col"><h3>Information</h3><Link href="/privacy">Privacy Policy</Link><Link href="/terms">Terms of Service</Link><Link href="/guest-policy">Guest Policy</Link><Link href="/cancellation-policy">Cancellation Policy</Link></div>
+                        <div className="footer-col">
+                <h3>Follow Us</h3>
+                <a href="https://wa.me/917037794300" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+                <a href="https://www.instagram.com/braj.nidhi_/" target="_blank" rel="noopener noreferrer">Instagram</a>
+            </div>
         </div>
+
         <div className="footer-middle-bar">
           <Link href="/privacy">Privacy Policy</Link>
           <span>Copyright &copy; BRAJNIDHI {new Date().getFullYear()}</span>

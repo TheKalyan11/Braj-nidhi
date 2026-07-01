@@ -572,7 +572,14 @@ export default function GuestPolicyPage() {
             <Link href="/guest-policy">Guest Policy</Link>
             <Link href="/cancellation-policy">Cancellation Policy</Link>
           </div>
+                        <div className="footer-col">
+                <h3>Follow Us</h3>
+                <a href="https://wa.me/917037794300" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+                <a href="https://www.instagram.com/braj.nidhi_/" target="_blank" rel="noopener noreferrer">Instagram</a>
+            </div>
         </div>
+
         <div className="footer-middle-bar">
           <Link href="/privacy">Privacy Policy</Link>
           <span>Copyright &copy; BRAJNIDHI {new Date().getFullYear()}</span>
