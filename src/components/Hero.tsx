@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Calendar, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const Hero = () => {
   return (
@@ -50,6 +51,34 @@ const Hero = () => {
             >
               Explore Suites
             </Link>
+          </div>
+
+          {/* Desktop Showcase Images */}
+          <div className="hidden lg:flex items-center justify-center gap-6 mt-16">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="relative w-48 h-32 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl hover:z-10"
+            >
+              <Image src="/m1.webp" alt="Royal Vrindavan 1" fill className="object-cover hover:scale-110 transition-transform duration-700" />
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="relative w-48 h-32 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl -mt-12 hover:z-10"
+            >
+              <Image src="/m2.webp" alt="Royal Vrindavan 2" fill className="object-cover hover:scale-110 transition-transform duration-700" />
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.8 }}
+              className="relative w-48 h-32 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl hover:z-10"
+            >
+              <Image src="/m3.webp" alt="Royal Vrindavan 3" fill className="object-cover hover:scale-110 transition-transform duration-700" />
+            </motion.div>
           </div>
         </motion.div>
       </div>

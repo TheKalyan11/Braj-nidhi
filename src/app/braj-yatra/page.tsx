@@ -1128,6 +1128,7 @@ export default function BrajYatra() {
           .y-stat-divider { display: none; }
         }
         @media (max-width: 768px) {
+          .y-bento-img-arrow { display: none; }
           .y-hero-content { padding: 0 5%; }
           .y-hero-title { font-size: clamp(3.5rem, 12vw, 6rem) !important; }
           .y-intro, .y-packages, .y-destinations, .y-why, .y-cta, .y-journey { padding-left: 5%; padding-right: 5%; }
@@ -1516,18 +1517,25 @@ export default function BrajYatra() {
             onMouseLeave={() => setPkgPaused(false)}
           >
             <div className="y-bento-img">
-              <AnimatePresence mode="popLayout">
-                <motion.img
-                  key={packages[activePackage].image}
-                  src={packages[activePackage].image}
-                  alt={packages[activePackage].title}
-                  initial={{ opacity: 0, scale: 1.05 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              </AnimatePresence>
+              {packages.map((pkg, i) => {
+                const isActive = activePackage === i;
+                const isPrev = (activePackage - 1 + packages.length) % packages.length === i;
+                return (
+                  <motion.img
+                    key={pkg.image}
+                    src={pkg.image}
+                    alt={pkg.title}
+                    initial={false}
+                    animate={{ 
+                      opacity: isActive ? 1 : (isPrev ? 1 : 0),
+                      scale: isActive ? 1 : 1.05,
+                      zIndex: isActive ? 2 : (isPrev ? 1 : 0)
+                    }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', pointerEvents: isActive ? 'auto' : 'none' }}
+                  />
+                );
+              })}
               <div className="y-bento-img-overlay" />
               
               {/* Left/Right Overlaid Arrow Buttons */}

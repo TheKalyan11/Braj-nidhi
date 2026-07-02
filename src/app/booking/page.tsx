@@ -3088,13 +3088,26 @@ export default function BookingPage() {
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>
                       Room Charges
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151', marginBottom: 4 }}>
-                      <span>{getRoomTitle(roomType)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#6b7280', marginBottom: 4 }}>
-                      <span>₹{pricePerNight.toLocaleString()} × {nights} night{nights !== 1 ? 's' : ''} × {rooms} room{rooms > 1 ? 's' : ''}</span>
-                      <span style={{ fontWeight: 700, color: '#111' }}>₹{roomCost.toLocaleString()}</span>
-                    </div>
+                    {Object.entries(roomSelections).filter(([_, count]) => count > 0).map(([rt, count]) => {
+                      const price = livePrices[rt] || getRoomPrice(rt);
+                      return (
+                        <div key={rt} style={{ marginBottom: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151', marginBottom: 4 }}>
+                            <span>{getRoomTitle(rt)}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#6b7280' }}>
+                            <span>₹{price.toLocaleString()} × {nights} night{nights !== 1 ? 's' : ''} × {count} room{count > 1 ? 's' : ''}</span>
+                            <span style={{ fontWeight: 700, color: '#111' }}>₹{(price * nights * count).toLocaleString()}</span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                    {Object.values(roomSelections).filter(c => c > 0).length > 1 && (
+                      <div style={{ borderTop: '1px solid #e5e7eb', marginTop: '4px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#111', fontWeight: 700 }}>
+                        <span>Total Room Cost</span>
+                        <span>₹{roomCost.toLocaleString()}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* ── Add-ons ── */}
@@ -3217,29 +3230,31 @@ Total Paid: Rs.${payableTotal.toLocaleString()}`);
               
               {/* LEFT CARD & GUEST INFO */}
               <div className="conf-left-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div className="conf-left-card">
-                  <img loading="lazy" decoding="async" src={getRoomImage(roomType)} alt="Room Preview" className="conf-left-image" />
-                  <div className="conf-left-body">
-                    <div className="conf-room-title-line">
-                      <h3>{getRoomTitle(roomType)}</h3>
-                      <span>Braj Nidhi Guesthouse, Vrindavan</span>
-                    </div>
-                    <div className="conf-price-row">
-                      <div className="conf-price-tag">
-                        <MapPin size={13} style={{ color: '#C89B3C' }} />
-                        ₹{pricePerNight.toLocaleString()} / night
+                {Object.entries(roomSelections).filter(([_, count]) => count > 0).map(([rt, count]) => (
+                  <div key={rt} className="conf-left-card">
+                    <img loading="lazy" decoding="async" src={getRoomImage(rt)} alt="Room Preview" className="conf-left-image" />
+                    <div className="conf-left-body">
+                      <div className="conf-room-title-line">
+                        <h3>{count}x {getRoomTitle(rt)}</h3>
+                        <span>Braj Nidhi Guesthouse, Vrindavan</span>
                       </div>
-                      <div className="conf-ref-badge"><Check size={10} />{bookingRef}</div>
-                    </div>
-                    <div className="conf-property-box">
-                      <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi" className="conf-property-avatar" />
-                      <div className="conf-property-details">
-                        <h4>Braj Nidhi Guesthouse</h4>
-                        <span>Vrindavan, UP</span>
+                      <div className="conf-price-row">
+                        <div className="conf-price-tag">
+                          <MapPin size={13} style={{ color: '#C89B3C' }} />
+                          ₹{(livePrices[rt] || getRoomPrice(rt)).toLocaleString()} / night
+                        </div>
+                        <div className="conf-ref-badge"><Check size={10} />{bookingRef}</div>
+                      </div>
+                      <div className="conf-property-box">
+                        <img loading="lazy" decoding="async" src="/Braj_nidhi_.png" alt="Braj Nidhi" className="conf-property-avatar" />
+                        <div className="conf-property-details">
+                          <h4>Braj Nidhi Guesthouse</h4>
+                          <span>Vrindavan, UP</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                ))}
 
                 {/* Your Information */}
                 <div className="conf-accordion">

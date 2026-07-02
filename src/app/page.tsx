@@ -41,30 +41,40 @@ const HeroSlideshow = ({ images, mobileImages }: { images: string[]; mobileImage
   const currentImage = activeImages[heroBgIndex] || activeImages[0];
 
   return (
-    <AnimatePresence>
-      <motion.div
-        key={heroBgIndex}
-        className="hero-slider-bg"
-        initial={{ opacity: 0, scale: 1.05, zIndex: 1 }}
-        animate={{ opacity: 1, scale: 1, zIndex: 2 }}
-        exit={{ opacity: 0.99, scale: 0.95, zIndex: 0 }}
-        transition={{ 
-          opacity: { duration: 1.8, ease: "easeInOut" },
-          scale: { duration: 15, ease: "easeOut" }
-        }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundImage: `linear-gradient(to bottom, rgba(10, 14, 20, 0.45), rgba(10, 14, 20, 0.75)), url(/${currentImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: imagePositions[currentImage] ?? 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      />
-    </AnimatePresence>
+    <>
+      {activeImages.map((currentImage, i) => {
+        const isActive = heroBgIndex === i;
+        const isPrev = (heroBgIndex - 1 + activeImages.length) % activeImages.length === i;
+        return (
+          <motion.div
+            key={currentImage}
+            className="hero-slider-bg"
+            initial={false}
+            animate={{ 
+              opacity: isActive ? 1 : (isPrev ? 1 : 0),
+              scale: isActive ? 1 : 1.05,
+              zIndex: isActive ? 2 : (isPrev ? 1 : 0)
+            }}
+            transition={{ 
+              opacity: { duration: 1.8, ease: "easeInOut" },
+              scale: { duration: 15, ease: "easeOut" }
+            }}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundImage: `linear-gradient(to bottom, rgba(10, 14, 20, 0.45), rgba(10, 14, 20, 0.75)), url(/${currentImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: imagePositions[currentImage] ?? 'center',
+              backgroundRepeat: 'no-repeat',
+              pointerEvents: isActive ? 'auto' : 'none'
+            }}
+          />
+        );
+      })}
+    </>
   );
 };
 
@@ -81,22 +91,29 @@ const RoomCardSlideshow = ({ images, alt, interval = 4000 }: { images: string[];
 
   return (
     <>
-      <AnimatePresence initial={false}>
-        <motion.img
-          key={imgIndex}
-          src={images[imgIndex]}
-          alt={alt}
-          className="room-bg-img"
-          initial={{ opacity: 0, scale: 1.0, zIndex: 1 }}
-          animate={{ opacity: 1, scale: 1.07, zIndex: 2 }}
-          exit={{ opacity: 0.99, scale: 1.07, zIndex: 0 }}
-          transition={{
-            opacity: { duration: 1.4, ease: 'easeInOut' },
-            scale: { duration: 8, ease: 'linear' }
-          }}
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-        />
-      </AnimatePresence>
+      {images.map((img, i) => {
+        const isActive = imgIndex === i;
+        const isPrev = (imgIndex - 1 + images.length) % images.length === i;
+        return (
+          <motion.img
+            key={img}
+            src={img}
+            alt={alt}
+            className="room-bg-img"
+            initial={false}
+            animate={{ 
+              opacity: isActive ? 1 : (isPrev ? 1 : 0),
+              scale: isActive ? 1.07 : 1.0,
+              zIndex: isActive ? 2 : (isPrev ? 1 : 0)
+            }}
+            transition={{
+              opacity: { duration: 1.4, ease: 'easeInOut' },
+              scale: { duration: 8, ease: 'linear' }
+            }}
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', pointerEvents: isActive ? 'auto' : 'none' }}
+          />
+        );
+      })}
     </>
   );
 };
@@ -176,36 +193,46 @@ export default function Home() {
     checkIn: '2026-05-18',
     checkOut: '2026-05-20',
     guests: '1 Room, 2 Guests',
-    rooms: 1,
-    adults: 2,
-    children: 0,
+    roomCounts: {
+      deluxe2: 1,
+      deluxe3: 0,
+      deluxe4: 0
+    },
     pets: false,
-    roomType: 'Deluxe 2 – Twin Bedded Room',
     eventType: 'Corporate Offsite'
   });
 
-  const [tempRooms, setTempRooms] = useState(1);
-  const [tempAdults, setTempAdults] = useState(2);
-  const [tempChildren, setTempChildren] = useState(0);
+  const [tempRoomCounts, setTempRoomCounts] = useState({
+    deluxe2: 1,
+    deluxe3: 0,
+    deluxe4: 0
+  });
   const [tempPets, setTempPets] = useState(false);
 
   useEffect(() => {
     if (openDropdown === 'guests') {
-      setTempRooms(bookingData.rooms);
-      setTempAdults(bookingData.adults);
-      setTempChildren(bookingData.children);
+      setTempRoomCounts(bookingData.roomCounts || { deluxe2: 1, deluxe3: 0, deluxe4: 0 });
       setTempPets(bookingData.pets);
     }
   }, [openDropdown]);
 
   const handleApplyGuests = () => {
-    const totalGuests = tempAdults + tempChildren;
-    const guestsLabel = `${tempRooms} Room${tempRooms > 1 ? 's' : ''}, ${totalGuests} Guest${totalGuests > 1 ? 's' : ''}`;
+    const totalRooms = tempRoomCounts.deluxe2 + tempRoomCounts.deluxe3 + tempRoomCounts.deluxe4;
+    const totalGuests = (tempRoomCounts.deluxe2 * 2) + (tempRoomCounts.deluxe3 * 3) + (tempRoomCounts.deluxe4 * 4);
+    
+    // Ensure at least 1 room is selected if they try to apply 0 rooms
+    if (totalRooms === 0) {
+      tempRoomCounts.deluxe2 = 1;
+    }
+    
+    const finalRooms = tempRoomCounts.deluxe2 + tempRoomCounts.deluxe3 + tempRoomCounts.deluxe4;
+    const finalGuests = (tempRoomCounts.deluxe2 * 2) + (tempRoomCounts.deluxe3 * 3) + (tempRoomCounts.deluxe4 * 4);
+    
+    const guestsLabel = `${finalRooms} Room${finalRooms > 1 ? 's' : ''}, ${finalGuests} Guest${finalGuests > 1 ? 's' : ''}`;
+    
     setBookingData(prev => ({
       ...prev,
-      rooms: tempRooms,
-      adults: tempAdults,
-      children: tempChildren,
+      roomCounts: { ...tempRoomCounts },
       pets: tempPets,
       guests: guestsLabel
     }));
@@ -634,23 +661,28 @@ Event: ${bookingData.eventType}`);
                                 animation: 'fadeInUpMini 0.3s ease forwards',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: '20px'
+                                gap: '20px',
+                                maxHeight: '60vh',
+                                overflowY: 'auto'
                             }}>
-                                {/* Row 1: Room */}
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Room</span>
-                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '30px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
+                                {/* Deluxe 2 */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: '1px solid #efe8df' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Deluxe 2</span>
+                                        <span style={{ fontSize: '12px', color: '#8c8272' }}>Twin Bedded Room (2 Guests)</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '30px', padding: '6px 12px', gap: '20px', width: '110px', justifyContent: 'space-between' }}>
                                         <button 
                                             type="button"
-                                            onClick={() => setTempRooms(Math.max(1, tempRooms - 1))}
+                                            onClick={() => setTempRoomCounts(prev => ({ ...prev, deluxe2: Math.max(0, prev.deluxe2 - 1) }))}
                                             style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
                                         >
                                             &minus;
                                         </button>
-                                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempRooms}</span>
+                                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempRoomCounts.deluxe2}</span>
                                         <button 
                                             type="button"
-                                            onClick={() => setTempRooms(Math.min(9, tempRooms + 1))}
+                                            onClick={() => setTempRoomCounts(prev => ({ ...prev, deluxe2: Math.min(10, prev.deluxe2 + 1) }))}
                                             style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
                                         >
                                             &#43;
@@ -658,21 +690,24 @@ Event: ${bookingData.eventType}`);
                                     </div>
                                 </div>
 
-                                {/* Row 2: Adults */}
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Adults</span>
-                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '30px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
+                                {/* Deluxe 3 */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: '1px solid #efe8df' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Deluxe 3</span>
+                                        <span style={{ fontSize: '12px', color: '#8c8272' }}>3 Bedded Room (3 Guests)</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '30px', padding: '6px 12px', gap: '20px', width: '110px', justifyContent: 'space-between' }}>
                                         <button 
                                             type="button"
-                                            onClick={() => setTempAdults(Math.max(1, tempAdults - 1))}
+                                            onClick={() => setTempRoomCounts(prev => ({ ...prev, deluxe3: Math.max(0, prev.deluxe3 - 1) }))}
                                             style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
                                         >
                                             &minus;
                                         </button>
-                                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempAdults}</span>
+                                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempRoomCounts.deluxe3}</span>
                                         <button 
                                             type="button"
-                                            onClick={() => setTempAdults(Math.min(30, tempAdults + 1))}
+                                            onClick={() => setTempRoomCounts(prev => ({ ...prev, deluxe3: Math.min(10, prev.deluxe3 + 1) }))}
                                             style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
                                         >
                                             &#43;
@@ -680,24 +715,24 @@ Event: ${bookingData.eventType}`);
                                     </div>
                                 </div>
 
-                                {/* Row 3: Children */}
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
-                                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Children</span>
-                                        <span style={{ fontSize: '11px', color: '#8c8272', marginTop: '2px' }}>0 - 17 Years Old</span>
+                                {/* Deluxe 4 */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '16px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#2c2520' }}>Deluxe 4</span>
+                                        <span style={{ fontSize: '12px', color: '#8c8272' }}>4 Bedded Room (4 Guests)</span>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '30px', padding: '6px 12px', gap: '20px', width: '120px', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #efe8df', borderRadius: '30px', padding: '6px 12px', gap: '20px', width: '110px', justifyContent: 'space-between' }}>
                                         <button 
                                             type="button"
-                                            onClick={() => setTempChildren(Math.max(0, tempChildren - 1))}
+                                            onClick={() => setTempRoomCounts(prev => ({ ...prev, deluxe4: Math.max(0, prev.deluxe4 - 1) }))}
                                             style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
                                         >
                                             &minus;
                                         </button>
-                                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempChildren}</span>
+                                        <span style={{ fontSize: '16px', fontWeight: 700, color: '#2c2520' }}>{tempRoomCounts.deluxe4}</span>
                                         <button 
                                             type="button"
-                                            onClick={() => setTempChildren(Math.min(30, tempChildren + 1))}
+                                            onClick={() => setTempRoomCounts(prev => ({ ...prev, deluxe4: Math.min(10, prev.deluxe4 + 1) }))}
                                             style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#2c2520', fontWeight: 500, padding: 0 }}
                                         >
                                             &#43;
@@ -705,13 +740,8 @@ Event: ${bookingData.eventType}`);
                                     </div>
                                 </div>
 
-                                {/* Subtext under rows */}
-                                <div style={{ fontSize: '11px', color: '#8c8272', lineHeight: '1.4', marginTop: '-4px', textAlign: 'left' }}>
-                                    Please provide right number of children along with their right age for best options and prices.
-                                </div>
-
-                                {/* Apply Button */}
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                                {/* Apply Row */}
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: '4px', borderTop: '1px solid #efe8df', paddingTop: '16px' }}>
                                     <button 
                                         type="button"
                                         onClick={handleApplyGuests}
@@ -740,9 +770,11 @@ Event: ${bookingData.eventType}`);
                     {/* Search Button block */}
                     <div className="search-action-block" style={{ paddingLeft: '8px', borderLeft: '1px solid rgba(0, 0, 0, 0.08)' }}>
                         <Link
-                          href={`/rooms-combo?checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&rooms=${bookingData.rooms}&adults=${bookingData.adults}&children=${bookingData.children}&guests=${encodeURIComponent(
-                            `${bookingData.adults} Adults${bookingData.children > 0 ? `, ${bookingData.children} Child` : ''}`
-                          )}`}
+                          href={`/rooms-combo?checkin=${bookingData.checkIn}&checkout=${bookingData.checkOut}&rooms=${
+                            bookingData.roomCounts.deluxe2 + bookingData.roomCounts.deluxe3 + bookingData.roomCounts.deluxe4
+                          }&adults=${
+                            (bookingData.roomCounts.deluxe2 * 2) + (bookingData.roomCounts.deluxe3 * 3) + (bookingData.roomCounts.deluxe4 * 4)
+                          }&children=0&guests=${encodeURIComponent(bookingData.guests)}`}
                           className="search-circle-button"
                           aria-label="Search Suites"
                         >

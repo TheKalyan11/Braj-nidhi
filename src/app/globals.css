@@ -4050,6 +4050,9 @@ html, body {
         height: 260px !important;
         border-radius: 20px !important;
     }
+    .offer-gradient-blur {
+        height: 65% !important;
+    }
 }
 
 /* === Stats Section — Mobile === */

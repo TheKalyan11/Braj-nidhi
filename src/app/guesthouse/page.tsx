@@ -22,22 +22,29 @@ const RoomCardSlideshow = ({ images, alt, interval = 4000 }: { images: string[];
 
   return (
     <>
-      <AnimatePresence initial={false}>
-        <motion.img
-          key={imgIndex}
-          src={images[imgIndex]}
-          alt={alt}
-          className="room-bg-img"
-          initial={{ opacity: 0, scale: 1.0, zIndex: 1 }}
-          animate={{ opacity: 1, scale: 1.07, zIndex: 2 }}
-          exit={{ opacity: 0.99, scale: 1.07, zIndex: 0 }}
-          transition={{
-            opacity: { duration: 1.4, ease: 'easeInOut' },
-            scale: { duration: 8, ease: 'linear' }
-          }}
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-        />
-      </AnimatePresence>
+      {images.map((img, i) => {
+        const isActive = imgIndex === i;
+        const isPrev = (imgIndex - 1 + images.length) % images.length === i;
+        return (
+          <motion.img
+            key={img}
+            src={img}
+            alt={alt}
+            className="room-bg-img"
+            initial={false}
+            animate={{ 
+              opacity: isActive ? 1 : (isPrev ? 1 : 0),
+              scale: isActive ? 1.07 : 1.0,
+              zIndex: isActive ? 2 : (isPrev ? 1 : 0)
+            }}
+            transition={{
+              opacity: { duration: 1.4, ease: 'easeInOut' },
+              scale: { duration: 8, ease: 'linear' }
+            }}
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', pointerEvents: isActive ? 'auto' : 'none' }}
+          />
+        );
+      })}
     </>
   );
 };
@@ -674,10 +681,11 @@ export default function Guesthouse() {
                 min-height: 320px;
                 border-radius: 16px;
             }
+            .hero-slider-arrow {
+                display: none;
+            }
             .hero-slider-dots {
-                bottom: 50px;
-                right: 50%;
-                transform: translateX(50%);
+                display: none;
             }
             .hero-orange-banner {
                 width: 100%;
@@ -975,6 +983,12 @@ export default function Guesthouse() {
         @media (max-width: 900px) {
             .promo-section-1, .promo-section-2 {
                 flex-direction: column;
+                gap: 30px;
+            }
+            .promo-col-center {
+                width: 100%;
+                height: 350px;
+                aspect-ratio: auto;
             }
             .promo2-price-badge {
                 bottom: 10px;
@@ -1578,26 +1592,33 @@ export default function Guesthouse() {
                 <div className="hero-title-large">Luxury Guestrooms & Divine Suites</div>
                 
                 <div className="hero-main-img-wrap">
-                    <AnimatePresence initial={false}>
-                        <motion.img
-                            key={heroIndex}
-                            src={heroImages[heroIndex]}
-                            alt="Luxury Resort View"
-                            initial={{ opacity: 0, scale: 1.02, zIndex: 1 }}
-                            animate={{ opacity: 1, scale: 1, zIndex: 2 }}
-                            exit={{ opacity: 1, scale: 1, zIndex: 0 }}
-                            transition={{ duration: 1.2, ease: "easeInOut" }}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                zIndex: 1
-                            }}
-                        />
-                    </AnimatePresence>
+                    {heroImages.map((img, i) => {
+                        const isActive = heroIndex === i;
+                        const isPrev = (heroIndex - 1 + heroImages.length) % heroImages.length === i;
+                        return (
+                            <motion.img
+                                key={img}
+                                src={img}
+                                alt="Luxury Resort View"
+                                initial={false}
+                                animate={{ 
+                                    opacity: isActive ? 1 : (isPrev ? 1 : 0),
+                                    scale: isActive ? 1 : 1.02,
+                                    zIndex: isActive ? 2 : (isPrev ? 1 : 0)
+                                }}
+                                transition={{ duration: 1.2, ease: "easeInOut" }}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    pointerEvents: isActive ? 'auto' : 'none'
+                                }}
+                            />
+                        );
+                    })}
 
                     {/* Circular Navigation Arrows */}
                     <button
@@ -1911,18 +1932,26 @@ export default function Guesthouse() {
             </div>
             
             <div className="promo-col-center">
-                <AnimatePresence initial={false}>
-                    <motion.img
-                        key={promoIndex}
-                        src={promoImages[promoIndex]}
-                        alt="Divine Temple of Vrindavan, Mathura, Nandgaon, Barsana"
-                        className="promo-slider-img"
-                        initial={{ opacity: 0, scale: 1.05, zIndex: 1 }}
-                        animate={{ opacity: 1, scale: 1, zIndex: 2 }}
-                        exit={{ opacity: 1, scale: 1, zIndex: 0 }}
-                        transition={{ duration: 1.5, ease: "easeInOut" }}
-                    />
-                </AnimatePresence>
+                {promoImages.map((img, i) => {
+                    const isActive = promoIndex === i;
+                    const isPrev = (promoIndex - 1 + promoImages.length) % promoImages.length === i;
+                    return (
+                        <motion.img
+                            key={img}
+                            src={img}
+                            alt="Divine Temple of Vrindavan, Mathura, Nandgaon, Barsana"
+                            className="promo-slider-img"
+                            initial={false}
+                            animate={{ 
+                                opacity: isActive ? 1 : (isPrev ? 1 : 0),
+                                scale: isActive ? 1 : 1.05,
+                                zIndex: isActive ? 2 : (isPrev ? 1 : 0)
+                            }}
+                            transition={{ duration: 1.5, ease: "easeInOut" }}
+                            style={{ pointerEvents: isActive ? 'auto' : 'none' }}
+                        />
+                    );
+                })}
             </div>
 
             <div className="promo-col-right">

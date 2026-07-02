@@ -873,18 +873,25 @@ export default function Weddings() {
                 <div className="hero-title-large">DIVINE CELEBRATIONS</div>
                 
                 <div className="hero-single-card">
-                    <AnimatePresence>
-                        <motion.img 
-                            key={heroImgIndex}
-                            src={heroImages[heroImgIndex]}
-                            alt="Divine Weddings"
-                            initial={{ opacity: 0, scale: 1.1, zIndex: 1 }}
-                            animate={{ opacity: 1, scale: 1, zIndex: 2 }}
-                            exit={{ opacity: 1, scale: 0.95, zIndex: 0 }}
-                            transition={{ duration: 1.5, ease: "easeInOut" }}
-                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                    </AnimatePresence>
+                    {heroImages.map((img, i) => {
+                        const isActive = heroImgIndex === i;
+                        const isPrev = (heroImgIndex - 1 + heroImages.length) % heroImages.length === i;
+                        return (
+                            <motion.img 
+                                key={img}
+                                src={img}
+                                alt="Divine Weddings"
+                                initial={false}
+                                animate={{ 
+                                    opacity: isActive ? 1 : (isPrev ? 1 : 0),
+                                    scale: isActive ? 1 : 1.1,
+                                    zIndex: isActive ? 2 : (isPrev ? 1 : 0)
+                                }}
+                                transition={{ duration: 1.5, ease: "easeInOut" }}
+                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', pointerEvents: isActive ? 'auto' : 'none' }}
+                            />
+                        );
+                    })}
                     <motion.div 
                         className="hero-single-content"
                         initial={{ opacity: 0, x: -50 }}

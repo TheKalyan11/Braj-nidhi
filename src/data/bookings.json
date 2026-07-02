@@ -121,6 +121,21 @@
       "erpSyncStatus": "synced",
       "razorpayPaymentId": "pay_T8AYCBDFZYHvbP",
       "razorpayOrderId": "order_T8AY7WVujgNoyh"
+    },
+    {
+      "id": "BK1782982505486-W8D3",
+      "roomType": "deluxe2",
+      "checkIn": "2026-07-04",
+      "checkOut": "2026-07-05",
+      "rooms": 1,
+      "adults": 2,
+      "children": 0,
+      "guestName": "",
+      "guestEmail": "",
+      "guestPhone": "",
+      "bookedAt": "2026-07-02T08:55:05.486Z",
+      "status": "confirmed",
+      "erpSyncStatus": "failed"
     }
   ]
 }
